@@ -1,3 +1,6 @@
+#!/home/robinson/apps/R/R/bin/Rscript
+# #--vanilla
+#args <- commandArgs(TRUE)
 
 ## Load functions
 source("functions.r")
