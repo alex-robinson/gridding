@@ -232,13 +232,13 @@ if (TRUE) {
   create_regional_file(outfile,dx=50,missing=9999.0,nt=408,
                        month0=1,tunits="months since 1978-12-31")
 
-  file1 = "data/ECMWF/NEW/ERA-INTERIM-invariant_historical_mon_197901-201212.nc"
+  file1 = "data/ECMWF/NEW/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
   tmp = var_to_grid(infile=file1,invarname="z",outfile=outfile,outvarname="zs",
                     units="m",longname="Surface elevation",dimnames=c("xc","yc"),transform=geo2zs)
   tmp = var_to_grid(infile=file1,invarname="lsm",outfile=outfile,outvarname="mask",
                     dimnames=c("xc","yc") )
   
-  file2 = "data/ECMWF/NEW/ERA-INTERIM-surface_historical_mon_197901-201212.nc"
+  file2 = "data/ECMWF/NEW/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
   tmp = var_to_grid(infile=file2,invarname="sp",outfile=outfile,outvarname="sp",
                     units="Pa",longname="Surface pressure",dimnames=c("xc","yc","time") )
   tmp = var_to_grid(infile=file2,invarname="tcw",outfile=outfile,outvarname="tcw",
@@ -259,7 +259,7 @@ if (TRUE) {
                     units="K",longname="Sea surface temperature",dimnames=c("xc","yc","time") )
   
 
-  file3 = "data/ECMWF/NEW/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
+  file3 = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
   tmp = var_to_grid(infile=file3,invarname="z",outfile=outfile,outvarname="v750z",
                     units="m**2 s**-2",longname="750Mb geopotential",dimnames=c("xc","yc","time") )
   tmp = var_to_grid(infile=file3,invarname="t",outfile=outfile,outvarname="v750t",
