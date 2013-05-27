@@ -137,15 +137,6 @@ var_to_grid <- function(infile,invarname,outfile,outvarname=invarname,dimnames=c
     out$var[,,k] = tmp$z
   }
 
-  # varvec = numeric()
-  # for (k in 1:nt) {
-  #   varnow = indat$var[,,k]
-  #   varvec = c(varvec,varnow[ij])
-  # }
-  # tmp = interp(x=rep(points0$x[ij],nt),y=rep(points0$y[ij],nt),z=varvec,
-  #              xo=rep(out$x,nt),yo=rep(out$y,nt))
-  # out$var = array(tmp$z,dim=c(length(out$x),length(out$y),nt))
-  
   ## Apply the transformation function if exists
   if (!is.null(transform)) out$var = transform(out$var)
   
