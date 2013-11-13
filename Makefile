@@ -21,7 +21,7 @@ else
     FC = gfortran
 endif 
 
-ifeq ($(FC),"ifort")
+ifeq ($(ifort),1)
 	## IFORT OPTIONS ##
 	FLAGS        = -module $(objdir) -L$(objdir) -I/home/robinson/apps/netcdf/netcdf/include
 	LFLAGS		 = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf

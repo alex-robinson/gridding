@@ -114,9 +114,12 @@ program gentopo
 
     ! Map each field back to the SICO domain using the radius method
     call map_field(mTOPO_ice,"zs",TOPO%zs,ice%zs,ice%mask_interp,"shepard",20.d3)
+    call map_field(mTOPO_ice,"zb",TOPO%zb,ice%zb,ice%mask_interp,"shepard",20.d3)
+    call map_field(mTOPO_ice, "H",TOPO%H, ice%H, ice%mask_interp,"shepard",20.d3)
 
     ! Write new gridded ice data to grid file 
     call nc_write(file_ice,ice%zs,  "zs", dim1="xc",dim2="yc")
-
+    call nc_write(file_ice,ice%zb,  "zb", dim1="xc",dim2="yc")
+    call nc_write(file_ice,ice%H,    "H", dim1="xc",dim2="yc")
 
 end program gentopo
