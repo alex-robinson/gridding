@@ -70,8 +70,7 @@ program gentopo
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
     !call nc_write_dim(file_ice,"time",x=1.d0,dx=1.d0,nx=365,units="years",calendar="365_day")
     
-    !call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
-    !call nc_write(file_ice,(/1,2,3,-9999/),"a",dim1="xc" )
+    call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
 
     ! Allocate new ice variables 
     call grid_allocate(gice,ice%zs)
@@ -95,9 +94,6 @@ program gentopo
     call nc_read(file_topo,TOPO%zb,"BedrockElevation",missing_value=missing_value)
     call nc_read(file_topo,TOPO%H, "IceThickness",    missing_value=missing_value)
     
-    write(*,*) "zs min/max: ",minval(TOPO%zs), maxval(TOPO%zs)
-    write(*,*) "zs min/max: ",minval(TOPO%zs,mask=TOPO%zs .ne. missing_value), maxval(TOPO%zs,mask=TOPO%zs .ne. missing_value)
-    
     ! =======================================================================
     !
     ! Step 2: Map the fields 
@@ -110,16 +106,16 @@ program gentopo
     ! Initialize 'to' and 'fro' mappings
     ! max_neighbors is the maximum neighbors to be stored for each point
     ! lat_lim is the range of latitudes relative to a given point to check neighbor distances (to speed things up)
-    call map_init(mTOPO_ice,gTOPO,gice,max_neighbors=50,lat_lim=0.4d0,fldr="maps",load=.TRUE.)
+!     call map_init(mTOPO_ice,gTOPO,gice,max_neighbors=50,lat_lim=0.4d0,fldr="maps",load=.TRUE.)
 
-    ! Map each field back to the SICO domain using the radius method
-    call map_field(mTOPO_ice,"zs",TOPO%zs,ice%zs,ice%mask_interp,"shepard",20.d3)
-    call map_field(mTOPO_ice,"zb",TOPO%zb,ice%zb,ice%mask_interp,"shepard",20.d3)
-    call map_field(mTOPO_ice, "H",TOPO%H, ice%H, ice%mask_interp,"shepard",20.d3)
+!     ! Map each field back to the SICO domain using the radius method
+!     call map_field(mTOPO_ice,"zs",TOPO%zs,ice%zs,ice%mask_interp,"shepard",20.d3,fill=.TRUE.,missing_value=missing_value)
+!     call map_field(mTOPO_ice,"zb",TOPO%zb,ice%zb,ice%mask_interp,"shepard",20.d3,fill=.TRUE.,missing_value=missing_value)
+!     call map_field(mTOPO_ice, "H",TOPO%H, ice%H, ice%mask_interp,"shepard",20.d3,fill=.TRUE.,missing_value=missing_value)
 
-    ! Write new gridded ice data to grid file 
-    call nc_write(file_ice,ice%zs,  "zs", dim1="xc",dim2="yc")
-    call nc_write(file_ice,ice%zb,  "zb", dim1="xc",dim2="yc")
-    call nc_write(file_ice,ice%H,    "H", dim1="xc",dim2="yc")
+!     ! Write new gridded ice data to grid file 
+!     call nc_write(file_ice,ice%zs,  "zs", dim1="xc",dim2="yc")
+!     call nc_write(file_ice,ice%zb,  "zb", dim1="xc",dim2="yc")
+!     call nc_write(file_ice,ice%H,    "H", dim1="xc",dim2="yc")
 
 end program gentopo
