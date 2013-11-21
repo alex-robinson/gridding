@@ -225,10 +225,10 @@ if (FALSE) {
 
 }
 
-## GET ERAINTERIM data onto REMBO 100km grid
+## GET ERAINTERIM data onto REMBO grid
 if (TRUE) {
   
-  outfile = "output/ERA-INTERIM-GRL100KM_historical_mon_197901-201212.nc"
+  outfile = "output/ERA-INTERIM-GRL50KM_historical_mon_197901-201212.nc"
   create_regional_file(outfile,dx=50,missing=9999.0,nt=408,
                        month0=1,tunits="months since 1978-12-31")
 
@@ -277,22 +277,22 @@ if (TRUE) {
   tmp = var_to_grid(infile=file3,invarname="v",outfile=outfile,outvarname="v750v",
                     units="m s**-1",longname="750Mb velocity, v-component",dimnames=c("xc","yc","time") )
   
-  file3 = "data/ECMWF/NEW/ERA-INTERIM-GRL-1000Mb_historical_mon_197901-201212.nc"
-  tmp = var_to_grid(infile=file3,invarname="z",outfile=outfile,outvarname="v1000z",
-                    units="m**2 s**-2",longname="1000Mb geopotential",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="t",outfile=outfile,outvarname="v1000t",
-                    units="K",longname="1000Mb temperature",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="q",outfile=outfile,outvarname="v1000q",
-                    units="kg kg**-1",longname="1000Mb specific humidity",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="w",outfile=outfile,outvarname="v1000w",
-                    units="Pa s**-1",longname="1000Mb vertical velocity",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="r",outfile=outfile,outvarname="v1000r",
-                    units="%",longname="1000Mb Relative humidity",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="cc",outfile=outfile,outvarname="v1000cc",
-                    units="1",longname="1000Mb cloud cover",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="u",outfile=outfile,outvarname="v1000u",
-                    units="m s**-1",longname="1000Mb velocity, u-component",dimnames=c("xc","yc","time") )
-  tmp = var_to_grid(infile=file3,invarname="v",outfile=outfile,outvarname="v1000v",
-                    units="m s**-1",longname="1000Mb velocity, v-component",dimnames=c("xc","yc","time") )
+  file3 = "data/ECMWF/NEW/ERA-INTERIM-GRL-700Mb_historical_mon_197901-201212.nc"
+  tmp = var_to_grid(infile=file3,invarname="z",outfile=outfile,outvarname="v700z",
+                    units="m**2 s**-2",longname="700Mb geopotential",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="t",outfile=outfile,outvarname="v700t",
+                    units="K",longname="700Mb temperature",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="q",outfile=outfile,outvarname="v700q",
+                    units="kg kg**-1",longname="700Mb specific humidity",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="w",outfile=outfile,outvarname="v700w",
+                    units="Pa s**-1",longname="700Mb vertical velocity",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="r",outfile=outfile,outvarname="v700r",
+                    units="%",longname="700Mb Relative humidity",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="cc",outfile=outfile,outvarname="v700cc",
+                    units="1",longname="700Mb cloud cover",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="u",outfile=outfile,outvarname="v700u",
+                    units="m s**-1",longname="700Mb velocity, u-component",dimnames=c("xc","yc","time") )
+  tmp = var_to_grid(infile=file3,invarname="v",outfile=outfile,outvarname="v700v",
+                    units="m s**-1",longname="700Mb velocity, v-component",dimnames=c("xc","yc","time") )
   
 }
