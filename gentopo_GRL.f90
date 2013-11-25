@@ -255,30 +255,30 @@ program gentopo
 
     file_mar = "data/MAR/MARv3.2/ERA-Interim_1979-2012/MARv3.2-monthly-ERA-Interim-"
 
-    allocate(mar_surf(8))
-    call def_var_info(mar_surf(1),trim(file_mar),"SMB", "smb", units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"RU",  "ru",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"ME",  "me",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"SMB2","smb2",units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"RF",  "rf",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"SU",  "su",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"AL",  "al",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"AL2", "al2", units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"ST",  "Ts",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"ST2", "Ts2", units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"TT",  "T3m", units="degrees Celcius")
-    call def_var_info(mar_surf(1),trim(file_mar),"SWD", "swd", units="W m**-2")
-    call def_var_info(mar_surf(1),trim(file_mar),"LWD", "lwd", units="W m**-2")
-    call def_var_info(mar_surf(1),trim(file_mar),"SHF", "shf", units="W m**-2")
-    call def_var_info(mar_surf(1),trim(file_mar),"LHF", "lhf", units="W m**-2")
-    call def_var_info(mar_surf(1),trim(file_mar),"SP",  "sp",  units="hPa")
-    call def_var_info(mar_surf(1),trim(file_mar),"SMBc","smbc",units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"RUc", "ruc", units="mm month**-1")
-    call def_var_info(mar_surf(1),trim(file_mar),"MEc", "mec", units="mm month**-1")
+    allocate(mar_surf(23))
+    call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm month**-1")
+    call def_var_info(mar_surf( 2),trim(file_mar),"RU",  "ru",  units="mm month**-1")
+    call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm month**-1")
+    call def_var_info(mar_surf( 4),trim(file_mar),"SMB2","smb2",units="mm month**-1")
+    call def_var_info(mar_surf( 5),trim(file_mar),"SF",  "sf",  units="mm month**-1")
+    call def_var_info(mar_surf( 6),trim(file_mar),"RF",  "rf",  units="mm month**-1")
+    call def_var_info(mar_surf( 7),trim(file_mar),"SU",  "su",  units="mm month**-1")
+    call def_var_info(mar_surf( 8),trim(file_mar),"SF",  "sf",  units="mm month**-1")
+    call def_var_info(mar_surf( 9),trim(file_mar),"AL",  "al",  units="mm month**-1")
+    call def_var_info(mar_surf(10),trim(file_mar),"AL2", "al2", units="mm month**-1")
+    call def_var_info(mar_surf(11),trim(file_mar),"SF",  "sf",  units="mm month**-1")
+    call def_var_info(mar_surf(12),trim(file_mar),"ST",  "Ts",  units="mm month**-1")
+    call def_var_info(mar_surf(13),trim(file_mar),"ST2", "Ts2", units="mm month**-1")
+    call def_var_info(mar_surf(14),trim(file_mar),"SF",  "sf",  units="mm month**-1")
+    call def_var_info(mar_surf(15),trim(file_mar),"TT",  "T3m", units="degrees Celcius")
+    call def_var_info(mar_surf(16),trim(file_mar),"SWD", "swd", units="W m**-2")
+    call def_var_info(mar_surf(17),trim(file_mar),"LWD", "lwd", units="W m**-2")
+    call def_var_info(mar_surf(18),trim(file_mar),"SHF", "shf", units="W m**-2")
+    call def_var_info(mar_surf(19),trim(file_mar),"LHF", "lhf", units="W m**-2")
+    call def_var_info(mar_surf(20),trim(file_mar),"SP",  "sp",  units="hPa")
+    call def_var_info(mar_surf(21),trim(file_mar),"SMBc","smbc",units="mm month**-1")
+    call def_var_info(mar_surf(22),trim(file_mar),"RUc", "ruc", units="mm month**-1")
+    call def_var_info(mar_surf(23),trim(file_mar),"MEc", "mec", units="mm month**-1")
     
     ! (Re)Allocate the input grid variable
     call grid_allocate(gMAR,invar)
@@ -289,14 +289,16 @@ program gentopo
         call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value)
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.TRUE.,missing_value=missing_value)
+        where(invar .eq. missing_value) invar = 0.d0 
         call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,50.d3, &
                        fill=.TRUE.,missing_value=missing_value)
+        where(invar .eq. missing_value) invar = 0.d0 
         call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
 ! ########################### 
-    if (.FALSE.) then 
+    if (.TRUE.) then 
        
     nyr = 2012-1979+1
     nm  = 12 
@@ -323,10 +325,12 @@ program gentopo
             do i = 1, size(mar_surf)
                 var_now = mar_surf(i) 
                 call nc_read(var_now%filename,invar,var_now%nm_in,start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
-                call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
+                call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
+                               fill=.TRUE.,missing_value=missing_value)
                 call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=(/1,1,m,k/),count=(/gclim%G%nx,gclim%G%ny,1,1/))
-                call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
+                call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",50.d3, &
+                               fill=.TRUE.,missing_value=missing_value)
                 call nc_write(file_ice,icevar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=(/1,1,m,k/),count=(/gice%G%nx,gice%G%ny,1,1/))
             end do 
