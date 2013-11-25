@@ -242,8 +242,8 @@ program gentopo
     write(*,*) 
 
     ! Initialize 'to' and 'fro' mappings
-    call map_init(mMAR_ice, gMAR,gice, max_neighbors=40,lat_lim=4.d0,fldr="maps",load=.TRUE.)
-    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=40,lat_lim=4.d0,fldr="maps",load=.TRUE.)
+    call map_init(mMAR_ice, gMAR,gice, max_neighbors=30,lat_lim=3.d0,fldr="maps",load=.TRUE.)
+    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=30,lat_lim=3.d0,fldr="maps",load=.TRUE.)
 
 
     ! Define the variables to be mapped 
