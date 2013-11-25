@@ -54,12 +54,12 @@ program gentopo
     ! ## Define ice grid and output variable field ##
     call grid_init(gice,name="GRL-20KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
                    dx=20.d0,nx=90,dy=20.d0,ny=150, &
-                   lambda=-39.d0,phi=71.d0,alpha=7.5d0)
+                   lambda=-40.d0,phi=72.d0,alpha=7.5d0)
 
     ! ## Define clim grid and output variable field ##
     call grid_init(gclim,name="GRL-50KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
                    dx=50.d0,nx=37,dy=50.d0,ny=61, &
-                   lambda=-39.d0,phi=71.d0,alpha=7.5d0)
+                   lambda=-40.d0,phi=72.d0,alpha=7.5d0)
 
     ! =========================================================
     !
@@ -238,8 +238,8 @@ program gentopo
     write(*,*) 
 
     ! Initialize 'to' and 'fro' mappings
-    call map_init(mMAR_ice, gMAR,gice, max_neighbors=20,lat_lim=1.d0,fldr="maps",load=.TRUE.)
-    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=20,lat_lim=1.d0,fldr="maps",load=.TRUE.)
+    call map_init(mMAR_ice, gMAR,gice, max_neighbors=20,lat_lim=3.d0,fldr="maps",load=.TRUE.)
+    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=20,lat_lim=3.d0,fldr="maps",load=.TRUE.)
 
 
     ! Define the variables to be mapped 
@@ -297,13 +297,12 @@ program gentopo
         call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
-! ########################### 
-    if (.TRUE.) then 
-       
     nyr = 2012-1979+1
     nm  = 12 
 
-    q = 0 
+! ########################### 
+    if (.FALSE.) then 
+       
     do k = 1, nyr 
 
         year = 1978 + k 
@@ -311,6 +310,7 @@ program gentopo
         write(*,*) "=== ",year," ==="
         write(*,*)
 
+        q = 0 
         do m = 1, nm 
             q = q+1 
 
@@ -323,7 +323,8 @@ program gentopo
                 var_now = mar_surf(i) 
                 write(var_now%filename,"(a,i4,a3)") trim(file_mar),year,".nc"
 
-                call nc_read(var_now%filename,invar,var_now%nm_in,start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
+                call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
+                             start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.TRUE.,missing_value=missing_value)
                 call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
