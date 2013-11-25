@@ -203,7 +203,7 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
@@ -388,8 +388,8 @@ program gentopo
     write(*,*) 
 
     ! Initialize 'to' and 'fro' mappings
-    call map_init(mTOPO_ice, gTOPO,gice, max_neighbors=50,lat_lim=1d0,fldr="maps",load=.TRUE.)
-    call map_init(mTOPO_clim,gTOPO,gclim,max_neighbors=50,lat_lim=1d0,fldr="maps",load=.TRUE.)
+    call map_init(mTOPO_ice, gTOPO,gice, max_neighbors=30,lat_lim=1d0,fldr="maps",load=.TRUE.)
+    call map_init(mTOPO_clim,gTOPO,gclim,max_neighbors=30,lat_lim=1d0,fldr="maps",load=.TRUE.)
 
     ! Define the variables to be mapped 
     file_topo = "data/Greenland/Greenland_bedrock_topography_V3.nc"
