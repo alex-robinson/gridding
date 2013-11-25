@@ -286,7 +286,7 @@ program gentopo
     ! ## INVARIANT FIELDS ##
     do i = 1, size(mar_invariant)
         var_now = mar_invariant(i) 
-        call nc_read(var_now%filename,invar,var_now%nm_in)
+        call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value)
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.TRUE.,missing_value=missing_value)
         call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
