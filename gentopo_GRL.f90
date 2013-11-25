@@ -31,15 +31,16 @@ program gentopo
     type(var_defs), allocatable :: mar_invariant(:), mar_surf(:)
 
     ! TOPO-related variables
-!     type(grid_class) :: gTOPO
-!     type(map_class)  :: mTOPO_ice, mTOPO_clim 
-    
+    type(grid_class) :: gTOPO
+    type(map_class)  :: mTOPO_ice, mTOPO_clim 
+    character(len=256) :: file_topo
+    type(var_defs), allocatable :: topo_invariant(:)
 
     ! == Additional variables ============================= 
 
     double precision, parameter :: missing_value = -9999.d0 
 
-    double precision, dimension(:,:), allocatable :: invar, icevar, climvar
+    double precision, dimension(:,:), allocatable :: invar, icevar, climvar, tmp 
     integer,          dimension(:,:), allocatable :: icemask, climmask
 
     integer :: i, q, k, m, nyr, nm, c
@@ -68,7 +69,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM-750Mb.nc"
@@ -201,6 +202,9 @@ program gentopo
     !
     ! =========================================================
 
+! ########################### 
+    if (.TRUE.) then 
+
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
     file_clim      = "output/GRL-50KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
@@ -238,8 +242,8 @@ program gentopo
     write(*,*) 
 
     ! Initialize 'to' and 'fro' mappings
-    call map_init(mMAR_ice, gMAR,gice, max_neighbors=20,lat_lim=3.d0,fldr="maps",load=.TRUE.)
-    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=20,lat_lim=3.d0,fldr="maps",load=.TRUE.)
+    call map_init(mMAR_ice, gMAR,gice, max_neighbors=40,lat_lim=4.d0,fldr="maps",load=.TRUE.)
+    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=40,lat_lim=4.d0,fldr="maps",load=.TRUE.)
 
 
     ! Define the variables to be mapped 
@@ -289,19 +293,16 @@ program gentopo
         call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value)
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.TRUE.,missing_value=missing_value)
-        where(invar .eq. missing_value) invar = 0.d0 
+        where(climvar .eq. missing_value) climvar = 0.d0 
         call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,50.d3, &
                        fill=.TRUE.,missing_value=missing_value)
-        where(invar .eq. missing_value) invar = 0.d0 
+        where(icevar .eq. missing_value) icevar = 0.d0  
         call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
     nyr = 2012-1979+1
     nm  = 12 
-
-! ########################### 
-    if (.FALSE.) then 
        
     do k = 1, nyr 
 
@@ -340,46 +341,93 @@ program gentopo
 
     end if 
 ! ########################### 
-
-
+    
     ! =========================================================
     !
     !       TOPO DATA
     !
     ! =========================================================
 
-    !     file_topo      = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+! ########################### 
+    if (.TRUE.) then 
+
+    ! Define file names for input and output of global grids  
+    file_ice       = "output/GRL-20KM_TOPO.nc"
+    file_clim      = "output/GRL-50KM_TOPO.nc"
+
+    ! Write ice grid to file
+    call nc_create(file_ice)
+    call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
+    call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
+    call nc_write_dim(file_ice,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+    
+    call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
+    call grid_allocate(gice,icemask)
+    call grid_allocate(gice,icevar)
+
+    ! Write clim grid to file
+    call nc_create(file_clim)
+    call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
+    call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
+    call nc_write_dim(file_clim,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+    
+    call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
+    call grid_allocate(gclim,climmask)
+    call grid_allocate(gclim,climvar)
+
 
     ! Define TOPO grid and input variable field
-!     call grid_init(gTOPO,name="TOPO-1KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-!                    x0=-1300.d0,dx=1.d0,nx=2501,y0=-3500.d0,dy=1.d0,ny=3001, &
-!                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+    call grid_init(gTOPO,name="TOPO-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
+                   x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
+                   lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
-!     call grid_write(gTOPO,"output/test_TOPO.nc",xnm="xc",ynm="yc",create=.TRUE.)
+    write(*,*) 
+    write(*,*) " === MAPPING === "
+    write(*,*) 
+
+    ! Initialize 'to' and 'fro' mappings
+    call map_init(mTOPO_ice, gTOPO,gice, max_neighbors=50,lat_lim=1d0,fldr="maps",load=.TRUE.)
+    call map_init(mTOPO_clim,gTOPO,gclim,max_neighbors=50,lat_lim=1d0,fldr="maps",load=.TRUE.)
+
+    ! Define the variables to be mapped 
+    file_topo = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+
+    allocate(topo_invariant(4))
+    call def_var_info(topo_invariant(1),trim(file_topo),"BedrockElevation","zb",units="m")
+    call def_var_info(topo_invariant(2),trim(file_topo),"SurfaceElevation","zs",units="m")
+    call def_var_info(topo_invariant(3),trim(file_topo),"IceThickness",    "H", units="m")
+    call def_var_info(topo_invariant(4),trim(file_topo),"LandMask",      "mask",units="(0 - 4",method="nn")
+
+    ! (Re)Allocate the input grid variable
+    call grid_allocate(gTOPO,invar)
+
+    ! Allocate tmp array to hold full data (trim to smaller size)
+    allocate(tmp(2501,3001))
+
+    ! ## INVARIANT FIELDS ##
+    do i = 1, size(topo_invariant)
+        var_now = topo_invariant(i) 
+        call nc_read(var_now%filename,tmp,var_now%nm_in,missing_value=missing_value)
+        call thin(invar,tmp,by=10)
+        if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+            where( invar .eq. missing_value ) invar = 0.d0 
+        end if
+        if (trim(var_now%nm_out) .eq. "zb") then 
+            call fill(invar,missing_value=missing_value,fill_value=-1000.d0)
+        end if 
+        call map_field(mTOPO_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,20.d3, &
+                      fill=.TRUE.,missing_value=missing_value)
+        call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call map_field(mTOPO_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,50.d3, &
+                       fill=.TRUE.,missing_value=missing_value)
+        call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+    end do 
+
+    end if 
+! ########################### 
     
-    ! Load data 
-!     call grid_allocate(gTOPO,TOPO%zs)
-!     call grid_allocate(gTOPO,TOPO%zb)
-!     call grid_allocate(gTOPO,TOPO%H)
-
-!     call nc_read(file_topo,TOPO%zs,"SurfaceElevation",missing_value=missing_value)
-!     call nc_read(file_topo,TOPO%zb,"BedrockElevation",missing_value=missing_value)
-!     call nc_read(file_topo,TOPO%H, "IceThickness",    missing_value=missing_value)
-    
-!     ! Initialize 'to' and 'fro' mappings
-!     ! max_neighbors is the maximum neighbors to be stored for each point
-!     ! lat_lim is the range of latitudes relative to a given point to check neighbor distances (to speed things up)
-!     call map_init(mTOPO_ice,gTOPO,gice,max_neighbors=50,lat_lim=0.4d0,fldr="maps",load=.TRUE.)
-
-!     ! Map each field back to the SICO domain using the radius method
-!     call map_field(mTOPO_ice,"zs",TOPO%zs,ice%zs,ice%mask_interp,"shepard",20.d3,fill=.TRUE.,missing_value=missing_value)
-!     call map_field(mTOPO_ice,"zb",TOPO%zb,ice%zb,ice%mask_interp,"shepard",20.d3,fill=.TRUE.,missing_value=missing_value)
-!     call map_field(mTOPO_ice, "H",TOPO%H, ice%H, ice%mask_interp,"shepard",20.d3,fill=.TRUE.,missing_value=missing_value)
-
-!     ! Write new gridded ice data to grid file 
-!     call nc_write(file_ice,ice%zs,  "zs", dim1="xc",dim2="yc")
-!     call nc_write(file_ice,ice%zb,  "zb", dim1="xc",dim2="yc")
-!     call nc_write(file_ice,ice%H,    "H", dim1="xc",dim2="yc")
 
 contains 
 
@@ -406,5 +454,83 @@ contains
         return 
 
     end subroutine def_var_info
+
+    subroutine thin(var1,var,by)
+        implicit none
+
+        double precision, dimension(:,:) :: var, var1 
+        integer :: by 
+        integer :: i,j, nx, ny 
+        integer :: i1, j1
+
+        nx = size(var,1)
+        ny = size(var,2) 
+
+        var1 = missing_value 
+
+        i1 = 0
+        do i = 1, nx, by 
+            i1 = i1+1 
+            j1 = 0 
+            do j = 1, ny, by  
+                j1 = j1 + 1 
+                var1(i1,j1) = var(i,j)
+            end do 
+        end do 
+
+        return
+    end subroutine thin 
+
+    subroutine fill(var,missing_value,fill_value)
+        implicit none 
+        double precision, dimension(:,:) :: var 
+        double precision :: missing_value 
+        double precision, optional :: fill_value
+
+        integer :: q, nx, ny, i, j 
+        integer, parameter :: qmax = 50 ! Iterations 
+
+        double precision, dimension (3,3) :: neighb, weight
+        double precision :: wtot, mval 
+        double precision, dimension(:,:), allocatable :: filled
+        nx = size(var,1)
+        ny = size(var,2) 
+
+        allocate(filled(nx,ny))
+
+        if (present(fill_value)) then
+            where(var .eq. missing_value) var = fill_value 
+        end if 
+
+        do q = 1, qmax 
+
+            filled = missing_value 
+
+            do i = 2, nx-1 
+                do j = 2, ny-1 
+                    neighb = var(i-1:i+1,j-1:j+1)
+
+                    weight = 0.d0 
+                    where (neighb .ne. missing_value) weight = 1.d0
+                    wtot = sum(weight)
+
+                    if (wtot .gt. 0.d0) then 
+                        mval = sum(neighb*weight)/wtot
+                        where (neighb .eq. missing_value) neighb = mval 
+                    end if 
+
+                    filled(i-1:i+1,j-1:j+1) = neighb 
+
+                end do 
+            end do 
+
+            where(filled .ne. missing_value) var = filled 
+
+            write(*,*) q," : Missing values: ", count(var .eq. missing_value)
+            if ( count(var .eq. missing_value) .eq. 0 ) exit 
+        end do 
+
+        return
+    end subroutine fill 
 
 end program gentopo
