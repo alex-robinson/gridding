@@ -276,9 +276,9 @@ program gentopo
     call def_var_info(mar_surf(18),trim(file_mar),"SHF", "shf", units="W m**-2")
     call def_var_info(mar_surf(19),trim(file_mar),"LHF", "lhf", units="W m**-2")
     call def_var_info(mar_surf(20),trim(file_mar),"SP",  "sp",  units="hPa")
-    call def_var_info(mar_surf(21),trim(file_mar),"SMBc","smbc",units="mm month**-1")
-    call def_var_info(mar_surf(22),trim(file_mar),"RUc", "ruc", units="mm month**-1")
-    call def_var_info(mar_surf(23),trim(file_mar),"MEc", "mec", units="mm month**-1")
+    call def_var_info(mar_surf(21),trim(file_mar),"SMBcorr","smbc",units="mm month**-1")
+    call def_var_info(mar_surf(22),trim(file_mar),"RUcorr", "ruc", units="mm month**-1")
+    call def_var_info(mar_surf(23),trim(file_mar),"MEcorr", "mec", units="mm month**-1")
     
     ! (Re)Allocate the input grid variable
     call grid_allocate(gMAR,invar)
