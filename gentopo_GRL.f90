@@ -311,10 +311,6 @@ program gentopo
         write(*,*) "=== ",year," ==="
         write(*,*)
 
-        var_now%filename = ""
-        write(var_now%filename,"(a,i4,a3)") trim(file_mar),year,".nc"
-        write(*,*) "|"//trim(var_now%filename)//"|"
-
         do m = 1, nm 
             q = q+1 
 
@@ -325,6 +321,8 @@ program gentopo
             ! ## SURFACE FIELDS ##
             do i = 1, size(mar_surf)
                 var_now = mar_surf(i) 
+                write(var_now%filename,"(a,i4,a3)") trim(file_mar),year,".nc"
+
                 call nc_read(var_now%filename,invar,var_now%nm_in,start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.TRUE.,missing_value=missing_value)
