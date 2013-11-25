@@ -231,7 +231,7 @@ program gentopo
     ! Define MAR grid and input variable field
     call grid_init(gMAR,name="MAR-5KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
-                   lambda=-39.d0,phi=71.d0,alpha=7.5d0)
+                   lambda=-39.d0,phi=90.d0,alpha=7.5d0)
     
     write(*,*) 
     write(*,*) " === MAPPING === "
