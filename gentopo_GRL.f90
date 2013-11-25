@@ -312,7 +312,7 @@ program gentopo
         write(*,*)
 
         write(var_now%filename,"(a,i4,a3)") trim(file_mar),year,".nc"
-        !write(*,*) trim(var_now%filename)
+        write(*,*) trim(var_now%filename)
 
         do m = 1, nm 
             q = q+1 
