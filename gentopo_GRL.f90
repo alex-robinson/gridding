@@ -69,7 +69,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM-750Mb.nc"
