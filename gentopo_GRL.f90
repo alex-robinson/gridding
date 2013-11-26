@@ -424,7 +424,7 @@ program gentopo
     call def_var_info(mar_surf(19),trim(file_mar),"AL1", "al1", units="(0 - 1)")
     call def_var_info(mar_surf(20),trim(file_mar),"AL2", "al2", units="(0 - 1)")
     call def_var_info(mar_surf(21),trim(file_mar),"CC",  "cc",  units="(0 - 1)")
-    call def_var_info(mar_surf(22),trim(file_mar),"ST",  "Ts",  units="degrees Celcius")
+    call def_var_info(mar_surf(22),trim(file_mar),"STT", "Ts",  units="degrees Celcius")
     call def_var_info(mar_surf(23),trim(file_mar),"SHSN2","Hs", units="m")
     
 
