@@ -11,7 +11,7 @@ program gentopo
         character(len=256) :: nm_in, nm_out  
         character(len=256) :: units_in, units_out 
         character(len=256) :: method
-        logical :: mask 
+        logical :: mask, dimextra
     end type 
     type(var_defs) :: var_now
 
@@ -403,18 +403,18 @@ program gentopo
     file_mar = "data/MAR/MAR_ERA-INTERIM/MARv3.2_historical_mon_"
 
     allocate(mar_surf(23))
-    call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm d**-1")
+    call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm d**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf( 2),trim(file_mar),"RU",  "ru",  units="mm d**-1")
-    call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm d**-1")
-    call def_var_info(mar_surf( 4),trim(file_mar),"RZ",  "rz",  units="mm d**-1")
+    call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm d**-1",dimextra=.TRUE.)
+    call def_var_info(mar_surf( 4),trim(file_mar),"RZ",  "rz",  units="mm d**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf( 5),trim(file_mar),"SF",  "sf",  units="mm d**-1")
     call def_var_info(mar_surf( 6),trim(file_mar),"RF",  "rf",  units="mm d**-1")
-    call def_var_info(mar_surf( 7),trim(file_mar),"SU",  "su",  units="mm d**-1")
+    call def_var_info(mar_surf( 7),trim(file_mar),"SU",  "su",  units="mm d**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf( 8),trim(file_mar),"SF",  "sf",  units="mm d**-1")
-    call def_var_info(mar_surf( 9),trim(file_mar),"TT",  "T3m", units="degrees Celcius")
-    call def_var_info(mar_surf(10),trim(file_mar),"QQ",  "Q",   units="g kg**-1")
-    call def_var_info(mar_surf(11),trim(file_mar),"UU",  "u",   units="m s**-1")
-    call def_var_info(mar_surf(12),trim(file_mar),"VV",  "v",   units="m s**-1")
+    call def_var_info(mar_surf( 9),trim(file_mar),"TT",  "T3m", units="degrees Celcius",dimextra=.TRUE.)
+    call def_var_info(mar_surf(10),trim(file_mar),"QQ",  "Q",   units="g kg**-1",dimextra=.TRUE.)
+    call def_var_info(mar_surf(11),trim(file_mar),"UU",  "u",   units="m s**-1",dimextra=.TRUE.)
+    call def_var_info(mar_surf(12),trim(file_mar),"VV",  "v",   units="m s**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf(13),trim(file_mar),"SP",  "sp",  units="hPa")
     call def_var_info(mar_surf(14),trim(file_mar),"SWD", "swd", units="W m**-2")
     call def_var_info(mar_surf(15),trim(file_mar),"LWD", "lwd", units="W m**-2")
@@ -424,8 +424,8 @@ program gentopo
     call def_var_info(mar_surf(19),trim(file_mar),"AL1", "al1", units="(0 - 1)")
     call def_var_info(mar_surf(20),trim(file_mar),"AL2", "al2", units="(0 - 1)")
     call def_var_info(mar_surf(21),trim(file_mar),"CC",  "cc",  units="(0 - 1)")
-    call def_var_info(mar_surf(22),trim(file_mar),"STT", "Ts",  units="degrees Celcius")
-    call def_var_info(mar_surf(23),trim(file_mar),"SHSN2","Hs", units="m")
+    call def_var_info(mar_surf(22),trim(file_mar),"STT", "Ts",  units="degrees Celcius",dimextra=.TRUE.)
+    call def_var_info(mar_surf(23),trim(file_mar),"SHSN2","Hs", units="m",dimextra=.TRUE.)
     
 
     ! (Re)Allocate the input grid variable
@@ -466,9 +466,14 @@ program gentopo
             do i = 2, size(mar_surf)
                 var_now = mar_surf(i) 
                 write(var_now%filename,"(a,i4,a3,i4,a5)") trim(file_mar),year,"01-",year,"12.nc"
-                write(*,*) trim(var_now%filename), trim(var_now%nm_in), gMAR%G%nx, gMAR%G%ny, q
-                call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
+                write(*,*) trim(var_now%filename), ":", trim(var_now%nm_in), gMAR%G%nx, gMAR%G%ny, q
+                if (var_now%dimextra) then 
+                    call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
+                                  start=(/1,1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1,1/))
+                else 
+                    call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
                              start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
+                end if 
                 climvar = missing_value 
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
@@ -576,13 +581,13 @@ program gentopo
 
 contains 
 
-    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask)
+    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra)
         implicit none 
 
         type(var_defs) :: var 
         character(len=*) :: filename,nm_in,nm_out,units
         character(len=*), optional :: method 
-        logical, optional :: mask 
+        logical, optional :: mask, dimextra
 
         var%filename  = trim(filename)
         var%nm_in     = trim(nm_in)
@@ -595,6 +600,9 @@ contains
 
         var%mask = .FALSE. 
         if (present(mask)) var%mask = mask 
+
+        var%dimextra = .FALSE.
+        if (present(dimextra)) var%dimextra = dimextra 
 
         return 
 
