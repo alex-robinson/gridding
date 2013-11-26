@@ -372,7 +372,7 @@ program gentopo
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
     call nc_write_dim(file_clim,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
-    call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+    call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=33,units="years",calendar="360_day")
     
     call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
     call grid_allocate(gclim,climmask)
