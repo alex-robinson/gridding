@@ -353,8 +353,8 @@ program gentopo
     if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
-    file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
-    file_clim      = "output/GRL-50KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
+    file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201112.nc"
+    file_clim      = "output/GRL-50KM_MARv3.2-ERA-INTERIM_197901-201112.nc"
 
     ! Write ice grid to file
     call nc_create(file_ice)
@@ -411,7 +411,7 @@ program gentopo
     call def_var_info(mar_surf( 6),trim(file_mar),"RF",  "rf",  units="mm d**-1")
     call def_var_info(mar_surf( 7),trim(file_mar),"SU",  "su",  units="mm d**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf( 8),trim(file_mar),"SF",  "sf",  units="mm d**-1")
-    call def_var_info(mar_surf( 9),trim(file_mar),"TT",  "T3m", units="degrees Celcius",dimextra=.TRUE.)
+    call def_var_info(mar_surf( 9),trim(file_mar),"TT",  "t3m", units="degrees Celcius",dimextra=.TRUE.)
     call def_var_info(mar_surf(10),trim(file_mar),"QQ",  "Q",   units="g kg**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf(11),trim(file_mar),"UU",  "u",   units="m s**-1",dimextra=.TRUE.)
     call def_var_info(mar_surf(12),trim(file_mar),"VV",  "v",   units="m s**-1",dimextra=.TRUE.)
@@ -424,7 +424,7 @@ program gentopo
     call def_var_info(mar_surf(19),trim(file_mar),"AL1", "al1", units="(0 - 1)")
     call def_var_info(mar_surf(20),trim(file_mar),"AL2", "al2", units="(0 - 1)")
     call def_var_info(mar_surf(21),trim(file_mar),"CC",  "cc",  units="(0 - 1)")
-    call def_var_info(mar_surf(22),trim(file_mar),"STT", "Ts",  units="degrees Celcius",dimextra=.TRUE.)
+    call def_var_info(mar_surf(22),trim(file_mar),"STT", "ts",  units="degrees Celcius",dimextra=.TRUE.)
     call def_var_info(mar_surf(23),trim(file_mar),"SHSN2","Hs", units="m",dimextra=.TRUE.)
     
 
@@ -445,7 +445,7 @@ program gentopo
         call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
-    nyr = 2012-1979+1
+    nyr = 2011-1979+1
     nm  = 12 
        
     do k = 1, nyr 
@@ -455,18 +455,17 @@ program gentopo
         write(*,*) "=== ",year," ==="
         write(*,*)
  
-        do m = 2, nm 
+        do m = 1, nm 
             q = m 
 
             write(*,*)
-            write(*,*) "= Month ",m, " =", q
+            write(*,*) "= Month ",m, " ="
             write(*,*) 
 
             ! ## SURFACE FIELDS ##
-            do i = 2, size(mar_surf)
+            do i = 1, size(mar_surf)
                 var_now = mar_surf(i) 
                 write(var_now%filename,"(a,i4,a3,i4,a5)") trim(file_mar),year,"01-",year,"12.nc"
-                write(*,*) trim(var_now%filename), ":", trim(var_now%nm_in), gMAR%G%nx, gMAR%G%ny, q
                 if (var_now%dimextra) then 
                     call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
                                   start=(/1,1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1,1/))
