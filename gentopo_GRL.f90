@@ -435,13 +435,13 @@ program gentopo
     do i = 1, size(mar_invariant)
         var_now = mar_invariant(i) 
         call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value)
+        climvar = missing_value 
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
-                      fill=.TRUE.,missing_value=missing_value)
-        where(climvar .eq. missing_value) climvar = 0.d0 
+                      fill=.FALSE.,missing_value=missing_value)
         call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        icevar = missing_value 
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
-                       fill=.TRUE.,missing_value=missing_value)
-        where(icevar .eq. missing_value) icevar = 0.d0  
+                       fill=.FALSE.,missing_value=missing_value)  
         call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
@@ -460,7 +460,7 @@ program gentopo
             q = q+1 
 
             write(*,*)
-            write(*,*) "= Month ",m, " ="
+            write(*,*) "= Month ",m, " =", q
             write(*,*) 
 
             ! ## SURFACE FIELDS ##
@@ -470,12 +470,14 @@ program gentopo
 
                 call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
                              start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
+                climvar = missing_value 
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
-                               fill=.TRUE.,missing_value=missing_value)
+                               fill=.FALSE.,missing_value=missing_value)
                 call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=(/1,1,m,k/),count=(/gclim%G%nx,gclim%G%ny,1,1/))
+                icevar = missing_value 
                 call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",100.d3, &
-                               fill=.TRUE.,missing_value=missing_value)
+                               fill=.FALSE.,missing_value=missing_value)
                 call nc_write(file_ice,icevar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=(/1,1,m,k/),count=(/gice%G%nx,gice%G%ny,1,1/))
             end do 
