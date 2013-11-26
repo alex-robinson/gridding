@@ -69,11 +69,11 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
-    file_ice       = "output/GRL-20KM_ERA-INTERIM-750Mb.nc"
-    file_clim      = "output/GRL-50KM_ERA-INTERIM-750Mb.nc"
+    file_ice       = "output/GRL-20KM_ERA-INTERIM-850Mb.nc"
+    file_clim      = "output/GRL-50KM_ERA-INTERIM-850Mb.nc"
     
     ! Write ice grid to file
     call nc_create(file_ice)
@@ -113,7 +113,7 @@ program gentopo
     ! Define the variables to be mapped 
     file_invariant = "data/ECMWF/NEW/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
     file_surface   = "data/ECMWF/NEW/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
-    file_pres      = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
+    file_pres      = "data/ECMWF/NEW/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
 
     allocate(ecmwf_invariant(1))
     call def_var_info(ecmwf_invariant(1),trim(file_invariant),"z","zs",units="m")
@@ -350,7 +350,7 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201112.nc"
