@@ -454,17 +454,16 @@ program gentopo
         write(*,*) 
         write(*,*) "=== ",year," ==="
         write(*,*)
-
-        q = 0 
-        do m = 1, nm 
-            q = q+1 
+ 
+        do m = 2, nm 
+            q = m 
 
             write(*,*)
             write(*,*) "= Month ",m, " =", q
             write(*,*) 
 
             ! ## SURFACE FIELDS ##
-            do i = 1, size(mar_surf)
+            do i = 2, size(mar_surf)
                 var_now = mar_surf(i) 
                 write(var_now%filename,"(a,i4,a3,i4,a5)") trim(file_mar),year,"01-",year,"12.nc"
                 write(*,*) trim(var_now%filename), trim(var_now%nm_in), gMAR%G%nx, gMAR%G%ny, q
