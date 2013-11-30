@@ -72,8 +72,8 @@ program gentopo
     if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
-    file_ice       = "output/GRL-20KM_ERA-INTERIM-850Mb.nc"
-    file_clim      = "output/GRL-50KM_ERA-INTERIM-850Mb.nc"
+    file_ice       = "output/GRL-20KM_ERA-INTERIM-750Mb.nc"
+    file_clim      = "output/GRL-50KM_ERA-INTERIM-750Mb.nc"
     
     ! Write ice grid to file
     call nc_create(file_ice)
@@ -113,20 +113,24 @@ program gentopo
     ! Define the variables to be mapped 
     file_invariant = "data/ECMWF/NEW/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
     file_surface   = "data/ECMWF/NEW/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
-    file_pres      = "data/ECMWF/NEW/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
+    file_pres      = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
 
     allocate(ecmwf_invariant(1))
     call def_var_info(ecmwf_invariant(1),trim(file_invariant),"z","zs",units="m")
 
-    allocate(ecmwf_surf(8))
-    call def_var_info(ecmwf_surf(1),trim(file_surface),"sp", "sp", units="Pa")
-    call def_var_info(ecmwf_surf(2),trim(file_surface),"tcw","tcw",units="kg m**-2")
-    call def_var_info(ecmwf_surf(3),trim(file_surface),"tcc","tcc",units="(0 - 1)")
-    call def_var_info(ecmwf_surf(4),trim(file_surface),"u10","u10",units="m s**-1")
-    call def_var_info(ecmwf_surf(5),trim(file_surface),"v10","v10",units="m s**-1")
-    call def_var_info(ecmwf_surf(6),trim(file_surface),"t2m","t2m",units="K")
-    call def_var_info(ecmwf_surf(7),trim(file_surface),"al", "al", units="(0 - 1)")
-    call def_var_info(ecmwf_surf(8),trim(file_surface),"sst","sst",units="K")
+    allocate(ecmwf_surf(12))
+    call def_var_info(ecmwf_surf( 1),trim(file_surface),"sp", "sp", units="Pa")
+    call def_var_info(ecmwf_surf( 2),trim(file_surface),"tcw","tcw",units="kg m**-2")
+    call def_var_info(ecmwf_surf( 3),trim(file_surface),"tclw","tclw",units="kg m**-2")
+    call def_var_info(ecmwf_surf( 4),trim(file_surface),"tciw","tciw",units="kg m**-2")
+    call def_var_info(ecmwf_surf( 5),trim(file_surface),"p56.162","clw",units="kg m**-2")
+    call def_var_info(ecmwf_surf( 6),trim(file_surface),"p57.162","ciw",units="kg m**-2")
+    call def_var_info(ecmwf_surf( 7),trim(file_surface),"tcc","tcc",units="(0 - 1)")
+    call def_var_info(ecmwf_surf( 8),trim(file_surface),"u10","u10",units="m s**-1")
+    call def_var_info(ecmwf_surf( 9),trim(file_surface),"v10","v10",units="m s**-1")
+    call def_var_info(ecmwf_surf(10),trim(file_surface),"t2m","t2m",units="K")
+    call def_var_info(ecmwf_surf(11),trim(file_surface),"al", "al", units="(0 - 1)")
+    call def_var_info(ecmwf_surf(12),trim(file_surface),"sst","sst",units="K")
     
     allocate(ecmwf_pres(7))
     call def_var_info(ecmwf_pres(1),trim(file_pres),"z", "p_z",units="m**2 s**-2")
