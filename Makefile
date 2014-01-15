@@ -51,7 +51,7 @@ endif
 # LFLAGS		 = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf
 
 ## Individual libraries or modules ##
-$(objdir)/ncio3.o: ../ncio/ncio3.f90
+$(objdir)/ncio.o: ../ncio/ncio.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/planet.o: ../coord/planet.f90
@@ -69,13 +69,13 @@ $(objdir)/coordinates.o: ../coord/coordinates.f90
 ## Complete programs
 
 # Program to test interpolations of CCSM3 data
-gentopo_grl: $(objdir)/ncio3.o $(objdir)/geodesic.o $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o
+gentopo_grl: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_grl.x $^ gentopo_GRL.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gentopo_grl.x is ready."
 	@echo " "
 
-test: $(objdir)/ncio3.o
+test: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o test.x $^ test.f90 $(LFLAGS)
 	@echo " "
 	@echo "    test.x is ready."

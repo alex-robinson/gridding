@@ -69,7 +69,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM-750Mb.nc"
@@ -79,7 +79,7 @@ program gentopo
     call nc_create(file_ice)
     call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
-    call nc_write_dim(file_ice,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
@@ -90,7 +90,7 @@ program gentopo
     call nc_create(file_clim)
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
@@ -146,11 +146,11 @@ program gentopo
 
     ! ## INVARIANT FIELDS ##
     var_now = ecmwf_invariant(1) 
-    call nc_read(var_now%filename,invar,var_now%nm_in)
+    call nc_read(var_now%filename,var_now%nm_in,invar)
     call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
-    call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+    call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
     call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
-    call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+    call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
 
     nyr = 2012-1979+1
     nm  = 12 
@@ -173,25 +173,25 @@ program gentopo
             ! ## SURFACE FIELDS ##
             do i = 1, size(ecmwf_surf)
                 var_now = ecmwf_surf(i) 
-                call nc_read(var_now%filename,invar,var_now%nm_in,start=(/1,1,q/),count=(/gECMWF%G%nx,gECMWF%G%ny,1/))
+                call nc_read(var_now%filename,var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                 call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
-                call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gclim%G%nx,gclim%G%ny,1,1/))
+                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
-                call nc_write(file_ice,icevar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gice%G%nx,gice%G%ny,1,1/))
+                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
             ! ## PRESSURE FIELDS ##
             do i = 1, size(ecmwf_pres)
                 var_now = ecmwf_pres(i) 
-                call nc_read(var_now%filename,invar,var_now%nm_in,start=(/1,1,q/),count=(/gECMWF%G%nx,gECMWF%G%ny,1/))
+                call nc_read(var_now%filename,var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                 call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
-                call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gclim%G%nx,gclim%G%ny,1,1/))
+                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
-                call nc_write(file_ice,icevar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gice%G%nx,gice%G%ny,1,1/))
+                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
         end do 
@@ -217,7 +217,7 @@ program gentopo
     call nc_create(file_ice)
     call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
-    call nc_write_dim(file_ice,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
@@ -228,7 +228,7 @@ program gentopo
     call nc_create(file_clim)
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
@@ -295,15 +295,15 @@ program gentopo
     ! ## INVARIANT FIELDS ##
     do i = 1, size(mar_invariant)
         var_now = mar_invariant(i) 
-        call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value)
+        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.TRUE.,missing_value=missing_value)
         where(climvar .eq. missing_value) climvar = 0.d0 
-        call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,50.d3, &
                        fill=.TRUE.,missing_value=missing_value)
         where(icevar .eq. missing_value) icevar = 0.d0  
-        call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
     nyr = 2012-1979+1
@@ -329,16 +329,16 @@ program gentopo
                 var_now = mar_surf(i) 
                 write(var_now%filename,"(a,i4,a3)") trim(file_mar),year,".nc"
 
-                call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
-                             start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
+                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                             start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.TRUE.,missing_value=missing_value)
-                call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gclim%G%nx,gclim%G%ny,1,1/))
+                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",50.d3, &
                                fill=.TRUE.,missing_value=missing_value)
-                call nc_write(file_ice,icevar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gice%G%nx,gice%G%ny,1,1/))
+                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
         end do 
@@ -364,7 +364,7 @@ program gentopo
     call nc_create(file_ice)
     call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
-    call nc_write_dim(file_ice,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
@@ -375,7 +375,7 @@ program gentopo
     call nc_create(file_clim)
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=33,units="years",calendar="360_day")
     
     call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
@@ -438,15 +438,15 @@ program gentopo
     ! ## INVARIANT FIELDS ##
     do i = 1, size(mar_invariant)
         var_now = mar_invariant(i) 
-        call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value)
+        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
         climvar = missing_value 
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.FALSE.,missing_value=missing_value)
-        call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
         icevar = missing_value 
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
                        fill=.FALSE.,missing_value=missing_value)  
-        call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
     nyr = 2011-1979+1
@@ -471,22 +471,22 @@ program gentopo
                 var_now = mar_surf(i) 
                 write(var_now%filename,"(a,i4,a3,i4,a5)") trim(file_mar),year,"01-",year,"12.nc"
                 if (var_now%dimextra) then 
-                    call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
-                                  start=(/1,1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1,1/))
+                    call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                                  start=[1,1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1,1])
                 else 
-                    call nc_read(var_now%filename,invar,var_now%nm_in,missing_value=missing_value, &
-                             start=(/1,1,q/),count=(/gMAR%G%nx,gMAR%G%ny,1/))
+                    call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                             start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                 end if 
                 climvar = missing_value 
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
-                call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gclim%G%nx,gclim%G%ny,1,1/))
+                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 icevar = missing_value 
                 call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
-                call nc_write(file_ice,icevar,var_now%nm_out,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=(/1,1,m,k/),count=(/gice%G%nx,gice%G%ny,1,1/))
+                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                              units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
         end do 
@@ -512,7 +512,7 @@ program gentopo
     call nc_create(file_ice)
     call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
-    call nc_write_dim(file_ice,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
@@ -523,7 +523,7 @@ program gentopo
     call nc_create(file_clim)
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"month",x=(/1,2,3,4,5,6,7,8,9,10,11,12/),units="month")
+    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
     call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
@@ -562,7 +562,7 @@ program gentopo
     ! ## INVARIANT FIELDS ##
     do i = 1, size(topo_invariant)
         var_now = topo_invariant(i) 
-        call nc_read(var_now%filename,tmp,var_now%nm_in,missing_value=missing_value)
+        call nc_read(var_now%filename,var_now%nm_in,tmp,missing_value=missing_value)
         call thin(invar,tmp,by=10)
         if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
             where( invar .eq. missing_value ) invar = 0.d0 
@@ -572,10 +572,10 @@ program gentopo
         end if 
         call map_field(mTOPO_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,20.d3, &
                       fill=.TRUE.,missing_value=missing_value)
-        call nc_write(file_clim,climvar,var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
         call map_field(mTOPO_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,50.d3, &
                        fill=.TRUE.,missing_value=missing_value)
-        call nc_write(file_ice, icevar, var_now%nm_out,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
     end if 
