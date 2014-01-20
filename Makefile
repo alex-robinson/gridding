@@ -43,13 +43,6 @@ else
 	endif
 endif
 
-## Cluster ##
-# FC			 = ifort
-# FLAGS          = -module $(objdir) -L$(objdir) -I/home/robinson/apps/netcdf/netcdf/include
-# DFLAGS         = -w -C -traceback -ftrapuv -fpe0 -check all -vec-report0
-# RELEASEFLAGS   = -vec-report0 -O3
-# LFLAGS		 = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf
-
 ## Individual libraries or modules ##
 $(objdir)/ncio.o: ../ncio/ncio.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
@@ -66,10 +59,14 @@ $(objdir)/projection_oblimap2.o: ../coord/projection_oblimap2.f90
 $(objdir)/coordinates.o: ../coord/coordinates.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/vargrid.o: vargrid.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 ## Complete programs
 
 # Program to test interpolations of CCSM3 data
-gentopo_grl: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o
+gentopo_grl: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
+	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
+	         $(objdir)/vargrid.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_grl.x $^ gentopo_GRL.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gentopo_grl.x is ready."
