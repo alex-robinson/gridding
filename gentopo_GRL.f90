@@ -13,8 +13,10 @@ program gentopo
     ! ECMWF-related variables
     type(grid_class)   :: gECMWF 
     type(map_class)    :: mECMWF_ice, mECMWF_clim
-    character(len=256) :: file_invariant, file_surface, file_pres 
+    character(len=256) :: file_invariant, file_surface, file_pres
+    character(len=256) :: file_pres1000, file_pres975, file_pres950
     type(var_defs), allocatable :: ecmwf_invariant(:), ecmwf_surf(:), ecmwf_pres(:) 
+    type(var_defs), allocatable :: ecmwf_pres1000(:), ecmwf_pres975(:), ecmwf_pres950(:) 
 
     ! MAR-related variables
     type(grid_class)   :: gMAR
@@ -61,11 +63,11 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
-    file_ice       = "output/GRL-20KM_ERA-INTERIM-750Mb.nc"
-    file_clim      = "output/GRL-50KM_ERA-INTERIM-750Mb.nc"
+    file_ice       = "output/GRL-20KM_ERA-INTERIM_mon_197901-201212.nc"
+    file_clim      = "output/GRL-50KM_ERA-INTERIM_mon_197901-201212.nc"
     
     ! Write ice grid to file
     call nc_create(file_ice)
@@ -106,7 +108,10 @@ program gentopo
     file_invariant = "data/ECMWF/NEW/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
     file_surface   = "data/ECMWF/NEW/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
     file_pres      = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
-
+    file_pres1000  = "data/ECMWF/NEW/ERA-INTERIM-GRL-1000Mb_historical_mon_197901-201212.nc"
+    file_pres975   = "data/ECMWF/NEW/ERA-INTERIM-GRL-975Mb_historical_mon_197901-201212.nc"
+    file_pres950   = "data/ECMWF/NEW/ERA-INTERIM-GRL-950Mb_historical_mon_197901-201212.nc"
+    
     allocate(ecmwf_invariant(1))
     call def_var_info(ecmwf_invariant(1),trim(file_invariant),"z","zs",units="m")
 
@@ -124,14 +129,30 @@ program gentopo
     call def_var_info(ecmwf_surf(11),trim(file_surface),"al", "al", units="(0 - 1)")
     call def_var_info(ecmwf_surf(12),trim(file_surface),"sst","sst",units="K")
     
-    allocate(ecmwf_pres(7))
-    call def_var_info(ecmwf_pres(1),trim(file_pres),"z", "p_z",units="m**2 s**-2")
-    call def_var_info(ecmwf_pres(2),trim(file_pres),"t", "p_t",units="K")
-    call def_var_info(ecmwf_pres(3),trim(file_pres),"q", "p_q",units="kg kg**-1")
-    call def_var_info(ecmwf_pres(4),trim(file_pres),"w", "p_w",units="Pa s**-1")
-    call def_var_info(ecmwf_pres(5),trim(file_pres),"r", "p_r",units="%")
-    call def_var_info(ecmwf_pres(6),trim(file_pres),"u", "p_u",units="m s**-1")
-    call def_var_info(ecmwf_pres(7),trim(file_pres),"v", "p_v",units="m s**-1")
+    allocate(ecmwf_pres(20))
+    call def_var_info(ecmwf_pres(1),trim(file_pres),"z", "p750_z",units="m**2 s**-2")
+    call def_var_info(ecmwf_pres(2),trim(file_pres),"t", "p750_t",units="K")
+    call def_var_info(ecmwf_pres(3),trim(file_pres),"q", "p750_q",units="kg kg**-1")
+    call def_var_info(ecmwf_pres(4),trim(file_pres),"w", "p750_w",units="Pa s**-1")
+    call def_var_info(ecmwf_pres(5),trim(file_pres),"r", "p750_r",units="%")
+    call def_var_info(ecmwf_pres(6),trim(file_pres),"u", "p750_u",units="m s**-1")
+    call def_var_info(ecmwf_pres(7),trim(file_pres),"v", "p750_v",units="m s**-1")
+
+    call def_var_info(ecmwf_pres( 8),trim(file_pres1000),"z", "p1000_z",units="m**2 s**-2")
+    call def_var_info(ecmwf_pres( 9),trim(file_pres1000),"t", "p1000_t",units="K")
+    call def_var_info(ecmwf_pres(10),trim(file_pres1000),"q", "p1000_q",units="kg kg**-1")
+    call def_var_info(ecmwf_pres(11),trim(file_pres1000),"w", "p1000_w",units="Pa s**-1")
+    call def_var_info(ecmwf_pres(12),trim(file_pres1000),"r", "p1000_r",units="%")
+    call def_var_info(ecmwf_pres(13),trim(file_pres1000),"u", "p1000_u",units="m s**-1")
+    call def_var_info(ecmwf_pres(14),trim(file_pres1000),"v", "p1000_v",units="m s**-1")
+
+    call def_var_info(ecmwf_pres(15),trim(file_pres975),"t", "p975_t",units="K")
+    call def_var_info(ecmwf_pres(16),trim(file_pres975),"q", "p975_q",units="kg kg**-1")
+    call def_var_info(ecmwf_pres(17),trim(file_pres975),"r", "p975_r",units="%")
+
+    call def_var_info(ecmwf_pres(18),trim(file_pres950),"t", "p950_t",units="K")
+    call def_var_info(ecmwf_pres(19),trim(file_pres950),"q", "p950_q",units="kg kg**-1")
+    call def_var_info(ecmwf_pres(20),trim(file_pres950),"r", "p950_r",units="%")
 
     ! Allocate the input grid variable
     call grid_allocate(gECMWF,invar)
@@ -575,3 +596,4 @@ program gentopo
     
 
 end program gentopo
+
