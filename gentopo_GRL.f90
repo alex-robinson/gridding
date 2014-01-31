@@ -14,9 +14,8 @@ program gentopo
     type(grid_class)   :: gECMWF 
     type(map_class)    :: mECMWF_ice, mECMWF_clim
     character(len=256) :: file_invariant, file_surface, file_pres
-    character(len=256) :: file_pres1000, file_pres975, file_pres950
+    character(len=256) :: file_pres1000, file_pres975, file_pres950, file_pres850
     type(var_defs), allocatable :: ecmwf_invariant(:), ecmwf_surf(:), ecmwf_pres(:) 
-    type(var_defs), allocatable :: ecmwf_pres1000(:), ecmwf_pres975(:), ecmwf_pres950(:) 
 
     ! MAR-related variables
     type(grid_class)   :: gMAR
@@ -85,7 +84,7 @@ program gentopo
     call nc_create(file_clim)
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"plev", x=[1000.d0,975.d0,950.d0],units="Millibar")
+    call nc_write_dim(file_clim,"plev", x=[1000.d0,975.d0,950.d0,850.d0],units="hPa")
     call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
@@ -113,7 +112,8 @@ program gentopo
     file_pres1000  = "data/ECMWF/NEW/ERA-INTERIM-GRL-1000Mb_historical_mon_197901-201212.nc"
     file_pres975   = "data/ECMWF/NEW/ERA-INTERIM-GRL-975Mb_historical_mon_197901-201212.nc"
     file_pres950   = "data/ECMWF/NEW/ERA-INTERIM-GRL-950Mb_historical_mon_197901-201212.nc"
-    
+    file_pres850   = "data/ECMWF/NEW/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
+
     allocate(ecmwf_invariant(1))
     call def_var_info(ecmwf_invariant(1),trim(file_invariant),"z","zs",units="m")
 
@@ -141,19 +141,19 @@ program gentopo
     call def_var_info(ecmwf_pres(7),trim(file_pres),"v", "p750_v",units="m s**-1")
 
     call def_var_info(ecmwf_pres( 8),trim(file_pres1000),"t", "p_t",units="K",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
     call def_var_info(ecmwf_pres( 9),trim(file_pres1000),"q", "p_q",units="kg kg**-1",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
     call def_var_info(ecmwf_pres(10),trim(file_pres1000),"r", "p_r",units="%",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
     call def_var_info(ecmwf_pres(11),trim(file_pres1000),"z", "p_z",units="m**2 s**-2",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
     call def_var_info(ecmwf_pres(12),trim(file_pres1000),"w", "p_w",units="Pa s**-1",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
     call def_var_info(ecmwf_pres(13),trim(file_pres1000),"u", "p_u",units="m s**-1",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
     call def_var_info(ecmwf_pres(14),trim(file_pres1000),"v", "p_v",units="m s**-1",plev="plev",&
-                      filenames=[file_pres975,file_pres950])
+                      filenames=[file_pres975,file_pres950,file_pres850])
 
     ! Allocate the input grid variable
     call grid_allocate(gECMWF,invar)
@@ -238,6 +238,15 @@ program gentopo
                 call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
                 call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
                               units=var_now%units_out,start=[1,1,3,m,k],count=[gice%G%nx,gice%G%ny,1,1,1])
+
+                ! Layer 4
+                call nc_read(var_now%filenames(3),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
+                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
+                              units=var_now%units_out,start=[1,1,4,m,k],count=[gclim%G%nx,gclim%G%ny,1,1,1])
+                call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
+                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
+                              units=var_now%units_out,start=[1,1,4,m,k],count=[gice%G%nx,gice%G%ny,1,1,1])
 
             end do 
         end do 
