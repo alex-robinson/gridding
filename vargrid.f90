@@ -6,11 +6,12 @@ module vargrid
 
 
     type var_defs
-        character(len=256) :: filename
+        character(len=256) :: filename, filenames(2)
         character(len=256) :: nm_in, nm_out  
         character(len=256) :: units_in, units_out 
         character(len=256) :: method
         logical :: mask, dimextra
+        character(len=256) :: plev
     end type 
 
     double precision, parameter :: missing_value = -9999.d0
@@ -18,13 +19,15 @@ module vargrid
 contains
 
     ! Define some variable info for later manipulation
-    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra)
+    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,plev,filenames)
         implicit none 
 
         type(var_defs) :: var 
         character(len=*) :: filename,nm_in,nm_out,units
         character(len=*), optional :: method 
         logical, optional :: mask, dimextra
+        character(len=*), optional :: plev 
+        character(len=*), optional :: filenames(:)
 
         var%filename  = trim(filename)
         var%nm_in     = trim(nm_in)
@@ -40,6 +43,12 @@ contains
 
         var%dimextra = .FALSE.
         if (present(dimextra)) var%dimextra = dimextra 
+
+        var%plev = "None"
+        if (present(plev)) var%plev = trim(plev)
+
+        var%filenames(:) = "None"
+        if (present(filenames)) var%filenames = filenames
 
         return 
 
