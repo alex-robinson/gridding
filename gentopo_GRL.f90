@@ -185,8 +185,13 @@ program gentopo
             do i = 1, size(ecmwf_pres)
                 var_now = ecmwf_pres(i) 
 
+                write(*,*) "Pressure files ===="
                 do l = 1, 5   ! Loop over pressure layers
-                    write(*,*) q, k, m, i, trim(var_now%filenames(l))
+                    write(*,*) q, k, m, i, l, trim(var_now%filenames(l))
+                end do 
+
+                do l = 1, 5   ! Loop over pressure layers
+                    write(*,*) q, k, m, i, l , trim(var_now%nm_in), trim(var_now%filenames(l))
                     call nc_read(var_now%filenames(l),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                     call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
                     call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
