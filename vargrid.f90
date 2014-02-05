@@ -6,7 +6,7 @@ module vargrid
 
 
     type var_defs
-        character(len=256) :: filename, filenames(5)
+        character(len=256) :: filename, filenames(7)
         character(len=256) :: nm_in, nm_out  
         character(len=256) :: units_in, units_out 
         character(len=256) :: method
