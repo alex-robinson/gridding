@@ -72,7 +72,7 @@ program gentopo
     call nc_create(file_ice)
     call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
-    call nc_write_dim(file_ice,"plev", x=[950.d0,850.d0,750.d0,650.d0,600.d0,550.d0,500.d0],units="hPa")
+    call nc_write_dim(file_ice,"plev", x=[850.d0,750.d0,700.d0,650.d0,600.d0,550.d0,500.d0],units="hPa")
     call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
@@ -84,7 +84,7 @@ program gentopo
     call nc_create(file_clim)
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"plev", x=[950.d0,850.d0,750.d0,650.d0,600.d0,550.d0,500.d0],units="hPa")
+    call nc_write_dim(file_clim,"plev", x=[850.d0,750.d0,700.d0,650.d0,600.d0,550.d0,500.d0],units="hPa")
     call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
@@ -108,9 +108,9 @@ program gentopo
     ! Define the variables to be mapped 
     file_invariant = "data/ECMWF/NEW/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
     file_surface   = "data/ECMWF/NEW/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
-    files_pres(1)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-950Mb_historical_mon_197901-201212.nc"
-    files_pres(2)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
-    files_pres(3)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
+    files_pres(1)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
+    files_pres(2)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
+    files_pres(3)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-700Mb_historical_mon_197901-201212.nc"
     files_pres(4)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-650Mb_historical_mon_197901-201212.nc"
     files_pres(5)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-600Mb_historical_mon_197901-201212.nc"
     files_pres(6)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
