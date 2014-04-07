@@ -29,6 +29,18 @@ program gentopo
     character(len=256) :: file_topo
     type(var_defs), allocatable :: topo_invariant(:)
 
+    ! OLR-related variables 
+    type(grid_class) :: gOLR 
+    type(map_class)  :: mOLR_ice, mOLR_clim 
+    character(len=256) :: file_olr 
+    type(var_defs) :: olr_toa 
+
+    ! CERES-related variables 
+    type(grid_class) :: gCERES 
+    type(map_class)  :: mCERES_ice, mCERES_clim 
+    character(len=256) :: file_ceres 
+    type(var_defs), allocatable :: ceres(:)
+
     ! == Additional variables =============================  
 
     type(var_defs) :: var_now
@@ -62,7 +74,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM_mon_197901-201212.nc"
@@ -499,6 +511,7 @@ program gentopo
     end do 
 
     end if 
+
 ! ########################### 
 
     ! =========================================================
@@ -586,7 +599,175 @@ program gentopo
 
     end if 
 ! ########################### 
+
+    ! =========================================================
+    !
+    !       OLR DATA
+    !
+    ! =========================================================
+
+! ########################### 
+    if (.FALSE.) then 
+
+    ! Define file names for input and output of global grids  
+    file_ice       = "output/GRL-20KM_OLR_clim1981-2010.nc"
+    file_clim      = "output/GRL-50KM_OLR_clim1981-2010.nc"
+
+    ! Write ice grid to file
+    call nc_create(file_ice)
+    call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
+    call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
+    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+!     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
     
+    call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
+    call grid_allocate(gice,icemask)
+    call grid_allocate(gice,icevar)
+
+    ! Write clim grid to file
+    call nc_create(file_clim)
+    call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
+    call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
+    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+!     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+    
+    call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
+    call grid_allocate(gclim,climmask)
+    call grid_allocate(gclim,climvar)
+
+    ! Define OLR grid and input variable field
+    call grid_init(gOLR,name="OLR-2.5deg",mtype="latlon",units="degrees",lon180=.FALSE., &
+                   x0=0.0d0,dx=2.5d0,nx=144,y0=-90.d0,dy=2.5d0,ny=73 )
+
+    write(*,*) 
+    write(*,*) " === MAPPING === "
+    write(*,*) 
+
+    ! Initialize 'to' and 'fro' mappings
+    call map_init(mOLR_ice, gOLR,gice, max_neighbors=10,lat_lim=4d0,fldr="maps",load=.TRUE.)
+    call map_init(mOLR_clim,gOLR,gclim,max_neighbors=10,lat_lim=4d0,fldr="maps",load=.TRUE.)
+
+    ! Define the variables to be mapped 
+    file_olr = "data/NOAA/OLR/olr.mon.ltm.nc"
+    call def_var_info(olr_toa,trim(file_olr),"olr","olr",units="W m**-2",method="quadrant")
+
+    ! (Re)Allocate the input grid variable
+    call grid_allocate(gOLR,invar)
+
+    ! Loop over months and map gridded variables
+    nm = 12 
+    do m = 1, nm 
+
+        write(*,*)
+        write(*,*) "= Month ",m, " ="
+        write(*,*) 
+
+        var_now = olr_toa
+        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                     start=[1,1,m],count=[gOLR%G%nx,gOLR%G%ny,1])
+        call map_field(mOLR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method, &
+                      fill=.TRUE.,missing_value=missing_value)
+        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month", &
+                      units=var_now%units_out,start=[1,1,m],count=[gclim%G%nx,gclim%G%ny,1])
+        call map_field(mOLR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method, &
+                       fill=.TRUE.,missing_value=missing_value)
+        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",dim3="month", &
+                      units=var_now%units_out,start=[1,1,m],count=[gice%G%nx,gice%G%ny,1])
+    
+    end do 
+
+    end if 
+! ########################### 
+
+    ! =========================================================
+    !
+    !       CERES DATA
+    !
+    ! =========================================================
+
+! ########################### 
+    if (.TRUE.) then 
+
+    ! Define file names for input and output of global grids  
+    file_ice       = "output/GRL-20KM_CERES_clim2001-2013.nc"
+    file_clim      = "output/GRL-50KM_CERES_clim2001-2013.nc"
+
+    ! Write ice grid to file
+    call nc_create(file_ice)
+    call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
+    call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
+    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+!     call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+    
+    call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
+    call grid_allocate(gice,icemask)
+    call grid_allocate(gice,icevar)
+
+    ! Write clim grid to file
+    call nc_create(file_clim)
+    call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
+    call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
+    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+!     call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+    
+    call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
+    call grid_allocate(gclim,climmask)
+    call grid_allocate(gclim,climvar)
+
+    ! Define CERES grid and input variable field
+    call grid_init(gCERES,name="CERES-1deg",mtype="latlon",units="degrees",lon180=.FALSE., &
+                   x0=0.5d0,dx=1d0,nx=360,y0=-90.d0,dy=1d0,ny=180 )
+
+    write(*,*) 
+    write(*,*) " === MAPPING === "
+    write(*,*) 
+
+    ! Initialize 'to' and 'fro' mappings
+    call map_init(mCERES_ice, gCERES,gice, max_neighbors=10,lat_lim=4d0,fldr="maps",load=.TRUE.)
+    call map_init(mCERES_clim,gCERES,gclim,max_neighbors=10,lat_lim=4d0,fldr="maps",load=.TRUE.)
+
+    ! Define the variables to be mapped 
+    allocate(ceres(10))
+    file_CERES = "data/CERES/CERES_EBAF-TOA_Ed2.8_Subset_CLIM01-CLIM12.nc"
+    call def_var_info(ceres( 1),trim(file_ceres),"toa_sw_all_clim","toa_sw_all",units="W m**-2",method="radius")
+    call def_var_info(ceres( 2),trim(file_ceres),"toa_sw_clr_clim","toa_sw_clr",units="W m**-2",method="radius")
+    call def_var_info(ceres( 3),trim(file_ceres),"toa_lw_all_clim","toa_lw_all",units="W m**-2",method="radius")
+    call def_var_info(ceres( 4),trim(file_ceres),"toa_lw_clr_clim","toa_sw_clr",units="W m**-2",method="radius")
+    call def_var_info(ceres( 5),trim(file_ceres),"toa_net_all_clim","toa_net_all",units="W m**-2",method="radius")
+    call def_var_info(ceres( 6),trim(file_ceres),"toa_net_clr_clim","toa_net_clr",units="W m**-2",method="radius")
+    call def_var_info(ceres( 7),trim(file_ceres),"toa_cre_sw_clim","toa_cre_sw",units="W m**-2",method="radius")
+    call def_var_info(ceres( 8),trim(file_ceres),"toa_cre_lw_clim","toa_cre_lw",units="W m**-2",method="radius")
+    call def_var_info(ceres( 9),trim(file_ceres),"toa_cre_net_clim","toa_cre_net",units="W m**-2",method="radius")
+    call def_var_info(ceres(10),trim(file_ceres),"solar_clim","solar",units="W m**-2",method="radius")
+
+    ! (Re)Allocate the input grid variable
+    call grid_allocate(gCERES,invar)
+
+    ! Loop over months and map gridded variables
+    nm = 12 
+    do m = 1, nm 
+
+        write(*,*)
+        write(*,*) "= Month ",m, " ="
+        write(*,*) 
+
+        do i = 1, size(ceres)
+            var_now = ceres(i)
+            call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                         start=[1,1,m],count=[gCERES%G%nx,gCERES%G%ny,1])
+            call map_field(mCERES_clim,var_now%nm_in,invar,climvar,climmask,var_now%method, &
+                          fill=.TRUE.,missing_value=missing_value)
+            call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month", &
+                          units=var_now%units_out,start=[1,1,m],count=[gclim%G%nx,gclim%G%ny,1])
+            call map_field(mCERES_ice, var_now%nm_in,invar,icevar, icemask, var_now%method, &
+                           fill=.TRUE.,missing_value=missing_value)
+            call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",dim3="month", &
+                          units=var_now%units_out,start=[1,1,m],count=[gice%G%nx,gice%G%ny,1])
+        end do 
+    end do 
+
+    end if 
+! ########################### 
 
 end program gentopo
 

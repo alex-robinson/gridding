@@ -6,7 +6,7 @@ usage:
 	@echo ""
 	@echo "    * USAGE * "
 	@echo ""
-	@echo " make ccsm3      : compiles the main program test_ccsm3.x"
+	@echo " make GRL        : compiles the main program gentopo_GRL.x"
 	@echo " make clean      : cleans object files"
 	@echo ""
 
