@@ -12,6 +12,7 @@ module vargrid
         character(len=256) :: method
         logical :: mask, dimextra
         character(len=256) :: plev
+        double precision   :: conv 
     end type 
 
     double precision, parameter :: missing_value = -9999.d0
@@ -19,7 +20,7 @@ module vargrid
 contains
 
     ! Define some variable info for later manipulation
-    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,plev,filenames)
+    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,conv,plev,filenames)
         implicit none 
 
         type(var_defs) :: var 
@@ -28,6 +29,7 @@ contains
         logical, optional :: mask, dimextra
         character(len=*), optional :: plev 
         character(len=*), optional :: filenames(:)
+        double precision, optional :: conv 
 
         var%filename  = trim(filename)
         var%nm_in     = trim(nm_in)
@@ -49,6 +51,9 @@ contains
 
         var%filenames(:) = "None"
         if (present(filenames)) var%filenames = filenames
+
+        var%conv = 1.d0 
+        if (present(conv)) var%conv = conv 
 
         return 
 
