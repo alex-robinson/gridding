@@ -519,6 +519,7 @@ program gentopo
     !       MAR (RCM) DATA - MARv3.3 downloaded from the ftp site:
     !       ftp://ftp.climato.be/fettweis/MARv3.3/Greenland
     !       Data is available on the Bamber et al. (2001) 5km grid
+    !       ERA-40 + ERA-Interim combined datasets
     !
     ! =========================================================
 
@@ -534,7 +535,7 @@ program gentopo
     call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
     call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
     call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-    call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=35,units="years",calendar="360_day")
+    call nc_write_dim(file_ice,"time", x=1958,dx=1,nx=56,units="years",calendar="360_day")
     
     call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
     call grid_allocate(gice,icemask)
@@ -545,7 +546,7 @@ program gentopo
     call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
     call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
     call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-    call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=35,units="years",calendar="360_day")
+    call nc_write_dim(file_clim,"time", x=1958,dx=1,nx=56,units="years",calendar="360_day")
     
     call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
     call grid_allocate(gclim,climmask)
@@ -554,7 +555,7 @@ program gentopo
     ! Define MAR (Bamber et al. 2001) grid and input variable field
     call grid_init(gMAR,name="Bamber01-5KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
-                   lambda=-39.d0,phi=71.d0,alpha=7.5d0)
+                   lambda=-39.d0,phi=90.d0,alpha=7.5d0)
     write(*,*) 
     write(*,*) " === MAPPING === "
     write(*,*) 
@@ -603,11 +604,11 @@ program gentopo
         climvar = missing_value 
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.FALSE.,missing_value=missing_value)
-        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
         icevar = missing_value 
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
                        fill=.FALSE.,missing_value=missing_value)  
-        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
+        call nc_write(file_ice, var_now%nm_out,real(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
     nyr = 2013-1958+1
@@ -641,12 +642,12 @@ program gentopo
                 climvar = missing_value 
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
-                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 icevar = missing_value 
                 call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
-                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                call nc_write(file_ice,var_now%nm_out,real(icevar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
