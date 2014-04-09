@@ -577,14 +577,14 @@ program gentopo
                "MARv3.3-15km-monthly-"
 
     allocate(mar_surf(16))
-    call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm d**-1",conv=1.d0/30.d0)  ! mm/month => mm/day
-    call def_var_info(mar_surf( 2),trim(file_mar),"RU",  "ru",  units="mm d**-1",conv=1.d0/30.d0)  ! mm/month => mm/day
-    call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm d**-1",conv=1.d0/30.d0)  ! mm/month => mm/day
+    call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+    call def_var_info(mar_surf( 2),trim(file_mar),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+    call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
     call def_var_info(mar_surf( 4),trim(file_mar),"ST",  "ts",  units="degrees Celcius")
     call def_var_info(mar_surf( 5),trim(file_mar),"TT",  "t3m", units="degrees Celcius")
-    call def_var_info(mar_surf( 6),trim(file_mar),"SF",  "sf",  units="mm d**-1",conv=1.d0/30.d0)  ! mm/month => mm/day
-    call def_var_info(mar_surf( 7),trim(file_mar),"RF",  "rf",  units="mm d**-1",conv=1.d0/30.d0)  ! mm/month => mm/day
-    call def_var_info(mar_surf( 8),trim(file_mar),"SU",  "su",  units="mm d**-1",conv=1.d0/30.d0)  ! mm/month => mm/day
+    call def_var_info(mar_surf( 6),trim(file_mar),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+    call def_var_info(mar_surf( 7),trim(file_mar),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+    call def_var_info(mar_surf( 8),trim(file_mar),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
     call def_var_info(mar_surf( 9),trim(file_mar),"AL",  "al",  units="(0 - 1)")
     call def_var_info(mar_surf(10),trim(file_mar),"SWD", "swd", units="W m**-2")
     call def_var_info(mar_surf(11),trim(file_mar),"LWD", "lwd", units="W m**-2")
@@ -604,11 +604,19 @@ program gentopo
         climvar = missing_value 
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.FALSE.,missing_value=missing_value)
-        call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
+        if (var_now%method .eq. "nn") then 
+            call nc_write(file_clim,var_now%nm_out,int(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
+        else
+            call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
+        end if 
         icevar = missing_value 
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
                        fill=.FALSE.,missing_value=missing_value)  
-        call nc_write(file_ice, var_now%nm_out,real(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
+        if (var_now%method .eq. "nn") then 
+            call nc_write(file_ice, var_now%nm_out,int(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
+        else 
+            call nc_write(file_ice, var_now%nm_out,real(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
+        end if 
     end do 
 
     nyr = 2013-1958+1
@@ -638,7 +646,7 @@ program gentopo
                 end if
                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
                          start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
-                invar = invar*var_now%conv 
+                where (invar .ne. missing_value) invar = invar*var_now%conv 
                 climvar = missing_value 
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
