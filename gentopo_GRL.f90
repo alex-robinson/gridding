@@ -313,11 +313,20 @@ program gentopo
         climvar = missing_value 
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.FALSE.,missing_value=missing_value)
-        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
+        if (var_now%method .eq. "nn") then 
+            call nc_write(file_clim,var_now%nm_out,nint(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
+        else 
+            call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
+        end if 
         icevar = missing_value 
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
                        fill=.FALSE.,missing_value=missing_value)  
-        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
+        if (var_now%method .eq. "nn") then 
+            call nc_write(file_ice, var_now%nm_out,nint(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
+        else 
+            call nc_write(file_ice, var_now%nm_out,real(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
+        end if 
+
     end do 
 
     nyr = 2011-1979+1
@@ -351,12 +360,12 @@ program gentopo
                 climvar = missing_value 
                 call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
-                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 icevar = missing_value 
                 call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",100.d3, &
                                fill=.FALSE.,missing_value=missing_value)
-                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                call nc_write(file_ice,var_now%nm_out,real(icevar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
