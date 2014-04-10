@@ -257,7 +257,7 @@ program gentopo
     ! Define MAR grid and input variable field
     call grid_init(gMAR,name="MAR-25KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-750.d0,dx=25.d0,nx=58,y0=-1200.d0,dy=25.d0,ny=108, &
-                   lambda=-40.d0,phi=70.d0,alpha=7.5d0)
+                   lambda=-40.d0,phi=71.d0,alpha=7.5d0)
     write(*,*) 
     write(*,*) " === MAPPING === "
     write(*,*) 
@@ -319,8 +319,6 @@ program gentopo
                        fill=.FALSE.,missing_value=missing_value)  
         call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
-
-    stop 
 
     nyr = 2011-1979+1
     nm  = 12 
