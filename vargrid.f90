@@ -13,6 +13,7 @@ module vargrid
         logical :: mask, dimextra
         character(len=256) :: plev
         double precision   :: conv 
+        logical            :: fill 
     end type 
 
     double precision, parameter :: missing_value = -9999.d0

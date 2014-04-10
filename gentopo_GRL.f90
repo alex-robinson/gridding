@@ -570,7 +570,7 @@ program gentopo
                "MARv3.3-15km-monthly-ERA-Interim-2013.nc"
 
     allocate(mar_invariant(2))
-    call def_var_info(mar_invariant(1),trim(file_mar),"MSK_MAR","mask",units="(0 - 2)",method="nn")
+    call def_var_info(mar_invariant(1),trim(file_mar),"MSK_MAR","mask",units="(0 - 2)",method="nn",mask=.TRUE.)
     call def_var_info(mar_invariant(2),trim(file_mar),"SRF_MAR","zs",units="m")
 
     file_mar = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
@@ -603,7 +603,7 @@ program gentopo
         call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
         climvar = missing_value 
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
-                      fill=.FALSE.,missing_value=missing_value)
+                      fill=var_now%mask,missing_value=missing_value)
         if (var_now%method .eq. "nn") then 
             call nc_write(file_clim,var_now%nm_out,nint(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
         else
@@ -611,7 +611,7 @@ program gentopo
         end if 
         icevar = missing_value 
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
-                       fill=.FALSE.,missing_value=missing_value)  
+                       fill=var_now%mask,missing_value=missing_value)  
         if (var_now%method .eq. "nn") then 
             call nc_write(file_ice, var_now%nm_out,nint(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
         else 
