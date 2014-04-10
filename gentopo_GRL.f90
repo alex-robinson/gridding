@@ -220,159 +220,12 @@ program gentopo
 
     ! =========================================================
     !
-    !       MAR (RCM) DATA - MARv3.2 interpolated data on ftp site
-    !
-    ! =========================================================
-
-! ########################### 
-    if (.FALSE.) then 
-
-    ! Define file names for input and output of global grids  
-    file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
-    file_clim      = "output/GRL-50KM_MARv3.2-ERA-INTERIM_197901-201212.nc"
-
-    ! Write ice grid to file
-    call nc_create(file_ice)
-    call nc_write_dim(file_ice,"xc",  x=gice%G%x,units="kilometers")
-    call nc_write_dim(file_ice,"yc",  x=gice%G%y,units="kilometers")
-    call nc_write_dim(file_ice,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-    call nc_write_dim(file_ice,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
-    
-    call grid_write(gice,file_ice,xnm="xc",ynm="yc",create=.FALSE.)
-    call grid_allocate(gice,icemask)
-    call grid_allocate(gice,icevar)
-
-    ! Write clim grid to file
-    call nc_create(file_clim)
-    call nc_write_dim(file_clim,"xc",   x=gclim%G%x,units="kilometers")
-    call nc_write_dim(file_clim,"yc",   x=gclim%G%y,units="kilometers")
-    call nc_write_dim(file_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-    call nc_write_dim(file_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
-    
-    call grid_write(gclim,file_clim,xnm="xc",ynm="yc",create=.FALSE.)
-    call grid_allocate(gclim,climmask)
-    call grid_allocate(gclim,climvar)
-
-
-    ! Define MAR grid and input variable field
-!     call grid_init(gMAR,name="MAR-5KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-!                    x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
-!                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
-    call grid_init(gMAR,name="MAR-25KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-750.d0,dx=25.d0,nx=58,y0=-1200.d0,dy=25.d0,ny=108, &
-                   lambda=320.d0,phi=72.d0,alpha=7.5d0)
-    write(*,*) 
-    write(*,*) " === MAPPING === "
-    write(*,*) 
-
-    ! Initialize 'to' and 'fro' mappings
-    call map_init(mMAR_ice, gMAR,gice, max_neighbors=30,lat_lim=3.d0,fldr="maps",load=.TRUE.)
-    call map_init(mMAR_clim,gMAR,gclim,max_neighbors=30,lat_lim=3.d0,fldr="maps",load=.TRUE.)
-
-
-    ! Define the variables to be mapped 
-    file_mar = "data/MAR/MARv3.2/ERA-Interim_1979-2012/MARv3.2-monthly-ERA-Interim-2012.nc"
-
-    allocate(mar_invariant(6))
-    call def_var_info(mar_invariant(1),trim(file_mar),"MSK_bam01","mask_b01",units="(0 - 2)",method="nn")
-    call def_var_info(mar_invariant(2),trim(file_mar),"SRF_bam01","zs_b01",  units="m")
-    call def_var_info(mar_invariant(3),trim(file_mar),"MSK_bam13","mask_b13",units="(0 - 2)",method="nn")
-    call def_var_info(mar_invariant(4),trim(file_mar),"SRF_bam13","zs_b13",  units="m")
-    call def_var_info(mar_invariant(5),trim(file_mar),"MSK_MAR","mask_mar",units="(0 - 2)",method="nn")
-    call def_var_info(mar_invariant(6),trim(file_mar),"SRF_MAR","zs_mar",  units="m")
-
-    file_mar = "data/MAR/MARv3.2/ERA-Interim_1979-2012/MARv3.2-monthly-ERA-Interim-"
-
-    allocate(mar_surf(22))
-    call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm month**-1")
-    call def_var_info(mar_surf( 2),trim(file_mar),"RU",  "ru",  units="mm month**-1")
-    call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm month**-1")
-    call def_var_info(mar_surf( 4),trim(file_mar),"SMB2","smb2",units="mm month**-1")
-    call def_var_info(mar_surf( 5),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf( 6),trim(file_mar),"RF",  "rf",  units="mm month**-1")
-    call def_var_info(mar_surf( 7),trim(file_mar),"SU",  "su",  units="mm month**-1")
-    call def_var_info(mar_surf( 8),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf( 9),trim(file_mar),"AL",  "al",  units="(0 - 1)")
-    call def_var_info(mar_surf(10),trim(file_mar),"AL2", "al2", units="(0 - 1)")
-    call def_var_info(mar_surf(11),trim(file_mar),"SF",  "sf",  units="mm month**-1")
-    call def_var_info(mar_surf(12),trim(file_mar),"ST",  "Ts",  units="degrees Celcius")
-    call def_var_info(mar_surf(13),trim(file_mar),"ST2", "Ts2", units="degrees Celcius")
-    call def_var_info(mar_surf(14),trim(file_mar),"TT",  "T3m", units="degrees Celcius")
-    call def_var_info(mar_surf(15),trim(file_mar),"SWD", "swd", units="W m**-2")
-    call def_var_info(mar_surf(16),trim(file_mar),"LWD", "lwd", units="W m**-2")
-    call def_var_info(mar_surf(17),trim(file_mar),"SHF", "shf", units="W m**-2")
-    call def_var_info(mar_surf(18),trim(file_mar),"LHF", "lhf", units="W m**-2")
-    call def_var_info(mar_surf(19),trim(file_mar),"SP",  "sp",  units="hPa")
-    call def_var_info(mar_surf(20),trim(file_mar),"SMBcorr","smbc",units="mm month**-1")
-    call def_var_info(mar_surf(21),trim(file_mar),"RUcorr", "ruc", units="mm month**-1")
-    call def_var_info(mar_surf(22),trim(file_mar),"MEcorr", "mec", units="mm month**-1")
-    
-    ! (Re)Allocate the input grid variable
-    call grid_allocate(gMAR,invar)
-
-    ! ## INVARIANT FIELDS ##
-    do i = 1, size(mar_invariant)
-        var_now = mar_invariant(i) 
-        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
-        call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
-                      fill=.TRUE.,missing_value=missing_value)
-        where(climvar .eq. missing_value) climvar = 0.d0 
-        call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
-        call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,50.d3, &
-                       fill=.TRUE.,missing_value=missing_value)
-        where(icevar .eq. missing_value) icevar = 0.d0  
-        call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
-    end do 
-
-    nyr = 2012-1979+1
-    nm  = 12 
-       
-    do k = 1, nyr 
-
-        year = 1978 + k 
-        write(*,*) 
-        write(*,*) "=== ",year," ==="
-        write(*,*)
-
-        q = 0 
-        do m = 1, nm 
-            q = q+1 
-
-            write(*,*)
-            write(*,*) "= Month ",m, " ="
-            write(*,*) 
-
-            ! ## SURFACE FIELDS ##
-            do i = 1, size(mar_surf)
-                var_now = mar_surf(i) 
-                write(var_now%filename,"(a,i4,a3)") trim(file_mar),year,".nc"
-
-                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
-                             start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
-                call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,"shepard",100.d3, &
-                               fill=.TRUE.,missing_value=missing_value)
-                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
-                call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, "shepard",50.d3, &
-                               fill=.TRUE.,missing_value=missing_value)
-                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
-            end do 
-
-        end do 
-    end do 
-
-    end if 
-! ########################### 
-
-    ! =========================================================
-    !
     !       MAR (RCM) DATA - MARv3.2 original data passed by Xavier
     !
     ! =========================================================
 
 ! ########################### 
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201112.nc"
@@ -404,7 +257,7 @@ program gentopo
     ! Define MAR grid and input variable field
     call grid_init(gMAR,name="MAR-25KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-750.d0,dx=25.d0,nx=58,y0=-1200.d0,dy=25.d0,ny=108, &
-                   lambda=-39.d0,phi=71.d0,alpha=7.5d0)
+                   lambda=-40.d0,phi=71.d0,alpha=7.5d0)
     write(*,*) 
     write(*,*) " === MAPPING === "
     write(*,*) 
@@ -467,6 +320,8 @@ program gentopo
         call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
     end do 
 
+    stop 
+
     nyr = 2011-1979+1
     nm  = 12 
        
@@ -524,7 +379,7 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.3-15km-monthly-ERA-Interim_197901-201312.nc"
