@@ -643,7 +643,7 @@ program gentopo
        
     do k = 1, nyr 
 
-        year = 1976 + k 
+        year = 1975 + k 
         write(*,*) 
         write(*,*) "=== ",year," ==="
         write(*,*)
