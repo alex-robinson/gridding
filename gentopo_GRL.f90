@@ -74,7 +74,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM_mon_197901-201212.nc"
@@ -190,10 +190,10 @@ program gentopo
                 var_now = ecmwf_surf(i) 
                 call nc_read(var_now%filename,var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                 call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
-                call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=[1,1,m,k],count=[gclim%G%nx,gclim%G%ny,1,1])
                 call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
-                call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                call nc_write(file_ice,var_now%nm_out,real(icevar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                               units=var_now%units_out,start=[1,1,m,k],count=[gice%G%nx,gice%G%ny,1,1])
             end do 
 
@@ -204,10 +204,10 @@ program gentopo
                 do l = 1, size(files_pres)   ! Loop over pressure layers
                     call nc_read(var_now%filenames(l),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                     call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
-                    call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
+                    call nc_write(file_clim,var_now%nm_out,real(climvar),dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
                                   units=var_now%units_out,start=[1,1,l,m,k],count=[gclim%G%nx,gclim%G%ny,1,1,1])
                     call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
-                    call nc_write(file_ice,var_now%nm_out,icevar,  dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
+                    call nc_write(file_ice,var_now%nm_out,real(icevar),dim1="xc",dim2="yc",dim3="plev",dim4="month",dim5="time", &
                                   units=var_now%units_out,start=[1,1,l,m,k],count=[gice%G%nx,gice%G%ny,1,1,1])
                 end do 
 
@@ -225,7 +225,7 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.2-ERA-INTERIM_197901-201112.nc"
