@@ -605,7 +605,7 @@ program gentopo
         call map_field(mMAR_clim,var_now%nm_in,invar,climvar,climmask,var_now%method,100.d3, &
                       fill=.FALSE.,missing_value=missing_value)
         if (var_now%method .eq. "nn") then 
-            call nc_write(file_clim,var_now%nm_out,int(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
+            call nc_write(file_clim,var_now%nm_out,ceiling(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
         else
             call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
         end if 
@@ -613,12 +613,14 @@ program gentopo
         call map_field(mMAR_ice, var_now%nm_in,invar,icevar, icemask, var_now%method,100.d3, &
                        fill=.FALSE.,missing_value=missing_value)  
         if (var_now%method .eq. "nn") then 
-            call nc_write(file_ice, var_now%nm_out,int(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
+            call nc_write(file_ice, var_now%nm_out,ceiling(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
         else 
             call nc_write(file_ice, var_now%nm_out,real(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
         end if 
     end do 
 
+    stop 
+    
     nyr = 2013-1958+1
     nm  = 12 
        
