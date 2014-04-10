@@ -74,7 +74,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM_mon_197901-201212.nc"
@@ -169,9 +169,9 @@ program gentopo
     var_now = ecmwf_invariant(1) 
     call nc_read(var_now%filename,var_now%nm_in,invar)
     call map_field(mECMWF_clim,var_now%nm_in,invar,climvar,climmask,"shepard",400.d3,missing_value=missing_value)
-    call nc_write(file_clim,var_now%nm_out,climvar,  dim1="xc",dim2="yc",units=var_now%units_out)
+    call nc_write(file_clim,var_now%nm_out,real(climvar),  dim1="xc",dim2="yc",units=var_now%units_out)
     call map_field(mECMWF_ice, var_now%nm_in,invar,icevar, icemask, "shepard",400.d3,missing_value=missing_value)
-    call nc_write(file_ice, var_now%nm_out,icevar,   dim1="xc",dim2="yc",units=var_now%units_out)
+    call nc_write(file_ice, var_now%nm_out,real(icevar),   dim1="xc",dim2="yc",units=var_now%units_out)
 
     nyr = 2012-1979+1
     nm  = 12 
@@ -544,7 +544,7 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_MARv3.3-30km-monthly-MIROC5-rcp85_197601-210012.nc"
