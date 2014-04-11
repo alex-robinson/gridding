@@ -461,7 +461,7 @@ program gentopo
     call def_var_info(mar_surf(14),trim(file_mar),"SP",  "sp",  units="hPa")
     call def_var_info(mar_surf(15),trim(file_mar),"UU",  "u",   units="m s**-1")
     call def_var_info(mar_surf(16),trim(file_mar),"VV",  "v",   units="m s**-1")
-    call def_var_info(mar_surf(17),trim(file_mar),"SH3", "dsh", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
+    call def_var_info(mar_surf(17),trim(file_mar),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
     ! (Re)Allocate the input grid variable
     call grid_allocate(gMAR,invar)
