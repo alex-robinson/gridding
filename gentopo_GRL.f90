@@ -74,7 +74,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  
     file_ice       = "output/GRL-20KM_ERA-INTERIM_mon_197901-201212.nc"
@@ -392,11 +392,11 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
     ! Define file names for input and output of global grids  
-    file_ice       = "output/GRL-20KM_MARv3.3-15km-monthly-ERA-Interim_197901-201312.nc"
-    file_clim      = "output/GRL-50KM_MARv3.3-15km-monthly-ERA-Interim_197901-201312.nc"
+    file_ice       = "output/GRL-20KM_MARv3.3-15km-monthly-ERA-Interim_195801-201312.nc"
+    file_clim      = "output/GRL-50KM_MARv3.3-15km-monthly-ERA-Interim_195801-201312.nc"
 
     ! Write ice grid to file
     call nc_create(file_ice)
@@ -444,7 +444,7 @@ program gentopo
     file_mar = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
                "MARv3.3-15km-monthly-"
 
-    allocate(mar_surf(16))
+    allocate(mar_surf(17))
     call def_var_info(mar_surf( 1),trim(file_mar),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
     call def_var_info(mar_surf( 2),trim(file_mar),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
     call def_var_info(mar_surf( 3),trim(file_mar),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
@@ -461,6 +461,7 @@ program gentopo
     call def_var_info(mar_surf(14),trim(file_mar),"SP",  "sp",  units="hPa")
     call def_var_info(mar_surf(15),trim(file_mar),"UU",  "u",   units="m s**-1")
     call def_var_info(mar_surf(16),trim(file_mar),"VV",  "v",   units="m s**-1")
+    call def_var_info(mar_surf(17),trim(file_mar),"SH3", "dsh", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
     ! (Re)Allocate the input grid variable
     call grid_allocate(gMAR,invar)
@@ -508,7 +509,7 @@ program gentopo
             do i = 1, size(mar_surf)
                 var_now = mar_surf(i) 
                 if (year .le. 1978) then   
-                    write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_mar),"ERA-40-",year,".nc"
+                    write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_mar),"ERA-Interim-",year,".nc"
                 else
                     write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_mar),"ERA-Interim-",year,".nc"
                 end if
