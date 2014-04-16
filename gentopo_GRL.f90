@@ -4,14 +4,12 @@ program gentopo
     use ncio 
     use coordinates
     use vargrid 
-    use gridding_ecmwf 
+    use gridding_datasets
 
     implicit none
 
     type(grid_class) :: g50KM, g25KM, g20KM, g20KMb, g10KM
     character(len=256) :: file_50KM, file_25KM, file_20KM, file_20KMb, file_10KM
-
-    type(map_class)    :: mECMWF_g50KM
 
     type(grid_class)   :: gice, gclim
     character(len=256) :: file_ice, file_clim
@@ -96,14 +94,8 @@ program gentopo
         file_20KMb     = "output/GRL-20KMb_ERA-INTERIM_mon_197901-201212.nc"
         file_10KM      = "output/GRL-10KM_ERA-INTERIM_mon_197901-201212.nc"
         
-        ! Initialize the variables for the 0.75 degree ECMWF dataset
-        call ecmwf_init_vars("GRL075")
-
-        ! Initialize mapping
-        call map_init(mECMWF_g50KM, gECMWF,g50KM, max_neighbors=20,lat_lim=5.d0,fldr="maps",load=.TRUE.)
-
-        ! Map to the grids of interest 
-        call ecmwf_to_grid(file_50KM,g50KM,mECMWF_g50KM)
+        ! Map to the grids of interest from 0.75 degree ECMWF dataset
+        call ecmwf_to_grid(file_50KM,g50KM,"GRL075",max_neighbors=8,lat_lim=2.d0)
 
     end if 
 ! ########################### 

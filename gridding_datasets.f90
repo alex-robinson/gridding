@@ -1,5 +1,5 @@
 
-module gridding_ecmwf 
+module gridding_datasets
 
     use coordinates 
     use ncio 
@@ -7,25 +7,32 @@ module gridding_ecmwf
 
     implicit none 
 
-
-    type(grid_class)   :: gECMWF 
-
-    character(len=256) :: file_invariant, file_surface, files_pres(9)
-    type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
-
-    double precision, allocatable :: invar(:,:) 
-
     private
-    public :: gECMWF, ecmwf_init_vars, ecmwf_to_grid
+    public :: ecmwf_to_grid
 
 contains
 
-    subroutine ecmwf_init_vars(domain)
-        ! Initialize the global variable information 
+    subroutine ecmwf_to_grid(filename,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
 
         implicit none 
 
-        character(len=*) :: domain 
+        character(len=*) :: domain, filename 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+
+        type(grid_class)   :: gECMWF 
+        character(len=256) :: file_invariant, file_surface, files_pres(9)
+        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        double precision, allocatable :: invar(:,:) 
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        integer :: nyr, nm, q, k, year, m, i, l 
 
         ! Define ECMWF input grid
         if (trim(domain) .eq. "GRL075") then 
@@ -87,24 +94,8 @@ contains
         ! Allocate the input grid variable
         call grid_allocate(gECMWF,invar)
 
-        return 
-
-    end subroutine ecmwf_init_vars
-
-    subroutine ecmwf_to_grid(filename,grid,map)
-        ! Convert the variables to the desired grid format and write to file
-
-        implicit none 
-
-        character(len=*) :: filename 
-        type(grid_class) :: grid 
-        type(map_class)  :: map 
-        
-        type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:)
-        integer, allocatable :: outmask(:,:)
-    
-        integer :: nyr, nm, q, k, year, m, i, l 
+        ! Initialize mapping
+        call map_init(map,gECMWF,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize the output file
         call nc_create(filename)
@@ -173,5 +164,5 @@ contains
 
 
 
-end module gridding_ecmwf 
+end module gridding_datasets
 
