@@ -213,7 +213,7 @@ contains
         character(len=512) :: filename 
 
         type(grid_class)   :: gMAR
-        character(len=256) :: file_invariant, file_surface
+        character(len=256) :: file_invariant, file_surface, file_prefix(2)
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
         double precision, allocatable :: invar(:,:) 
         integer :: plev(9) 
@@ -223,7 +223,7 @@ contains
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
 
-        integer :: nyr, nm, q, k, year, m, i, l 
+        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
 
         ! Define ECMWF input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
@@ -236,12 +236,39 @@ contains
             ! Define the input filenames
             file_invariant = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
                              "MARv3.3-15km-monthly-ERA-Interim-2013.nc"
-            file_surface   = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
-                             "MARv3.3-15km-monthly-"
+            file_surface   = "/data/sicopolis/data/MARv3.3/Greenland/"
+            file_prefix(1) = "ERA_1958-2013_15km/MARv3.3-15km-monthly-"
+            file_prefix(2) = "ERA_1958-2013_15km/MARv3.3-15km-monthly-"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_MARv3.3-15km-monthly-ERA-Interim_195801-201312.nc"
+
+            year0       = 1958 
+            year_switch = 1979   ! Switch scenarios (ERA-40 to ERA-INTERIM)
+            nyr         = 2013-1958+1
+
+        else if (trim(domain) .eq. "Greenland-MIROC5-RCP85") then 
+
+            ! Define MAR (Bamber et al. 2001) grid and input variable field
+            call grid_init(gMAR,name="Bamber01-5KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
+                           x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
+                           lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+
+            ! Define the input filenames
+            file_invariant = "/data/sicopolis/data/MARv3.3/Greenland/MIROC5-histo_1976-2005_30km/"// &
+                             "MARv3.3-monthly-MIROC5-histo-1976.nc"
+            file_surface   = "/data/sicopolis/data/MARv3.3/Greenland/"
+            file_prefix(1) = "MIROC5-histo_1976-2005_30km/MARv3.3-monthly-MIROC5-histo-"
+            file_prefix(2) = "MIROC5-rcp85_2006-2100_30km/MARv3.3-monthly-MIROC5-rcp85-"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_MARv3.3-30km-monthly-MIROC5-rcp85_197601-210012.nc"
+
+            year0       = 1976
+            year_switch = 2006   ! Switch scenarios (historical to RCP85)
+            nyr         = 2100-1976+1
 
         else if (trim(domain) .eq. "Antarctica") then 
 
@@ -292,7 +319,7 @@ contains
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-        call nc_write_dim(filename,"time", x=1958,dx=1,nx=56,units="years",calendar="360_day")
+        call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
     
         ! ## INVARIANT FIELDS ##
@@ -309,12 +336,15 @@ contains
             end if  
         end do 
 
-        nyr = 2013-1958+1
-        nm  = 12 
-           
+        nm       = 12    
+        n_prefix = 1 
+        n_var    = size(surf)
+        if (trim(domain) .ne. "Greenland-ERA") n_var = size(surf)-1   ! Exclude SH3 if it doesn't exist
+
         do k = 1, nyr 
 
-            year = 1957 + k 
+            year = year0 + (k-1) 
+            if (year .ge. year_switch) n_prefix = 2
             write(*,*) "=== ",year," ==="
      
             do m = 1, nm 
@@ -322,13 +352,9 @@ contains
                 write(*,*) "month ",m
 
                 ! ## SURFACE FIELDS ##
-                do i = 1, size(surf)
-                    var_now = surf(i) 
-                    if (year .le. 1978) then   
-                        write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_surface),"ERA-Interim-",year,".nc"
-                    else
-                        write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_surface),"ERA-Interim-",year,".nc"
-                    end if
+                do i = 1, n_var
+                    var_now = surf(i)     
+                    write(var_now%filename,"(a,a,i4,a3)") trim(file_surface),trim(file_prefix(n_prefix)),year,".nc"
                     call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                     where (invar .ne. missing_value) invar = invar*var_now%conv 

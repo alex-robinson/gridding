@@ -256,8 +256,6 @@ program gentopo
 
     end if 
 
-! ########################### 
-
     ! =========================================================
     !
     !       MAR (RCM) DATA - MARv3.3 downloaded from the ftp site:
@@ -266,9 +264,7 @@ program gentopo
     !       ERA-40 + ERA-Interim combined datasets
     !
     ! =========================================================
-
-! ########################### 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
         outfldr = "output/Greenland"
 
@@ -279,6 +275,33 @@ program gentopo
         call MARv33_to_grid(outfldr, g10KM, "Greenland-ERA",max_neighbors=10,lat_lim=2.d0)
 
     end if 
+
+    ! =========================================================
+    !
+    !       MAR (RCM) DATA - MARv3.3 downloaded from the ftp site:
+    !       ftp://ftp.climato.be/fettweis/MARv3.3/Greenland
+    !       Data is available on the Bamber et al. (2001) 5km grid
+    !       MIROC5 histo+rcp85 combined datasets
+    !
+    ! =========================================================
+    if (.TRUE.) then 
+
+        outfldr = "output/Greenland"
+
+        ! Map to the grids of interest from 5 km Greenland grid 
+        call MARv33_to_grid(outfldr, g50KM, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(outfldr, g20KM, "Greenland-MIROC5-RCP85",max_neighbors=15,lat_lim=2.d0)
+        call MARv33_to_grid(outfldr,g20KMb, "Greenland-MIROC5-RCP85",max_neighbors=15,lat_lim=2.d0)
+        call MARv33_to_grid(outfldr, g10KM, "Greenland-MIROC5-RCP85",max_neighbors=10,lat_lim=2.d0)
+
+    end if 
+
+
+
+
+
+
+
 
     if (.FALSE.) then 
 
