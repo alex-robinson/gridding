@@ -637,6 +637,7 @@ contains
                               units=var_now%units_out)
             end do 
 
+            nm       = 12 
             do i = 1, n_var
                 var_now = surf(i)
 
@@ -646,7 +647,6 @@ contains
                     var2D = time_average(var3D)
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                                   units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
-                    write(*,*) "Wrote.. ",trim(var_now%nm_out)
                 end do 
             end do 
 
