@@ -87,7 +87,7 @@ program gentopo
     ! =========================================================
 
 ! ###########################   
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
         outfldr = "output/Greenland"
 
@@ -268,6 +268,18 @@ program gentopo
     ! =========================================================
 
 ! ########################### 
+    if (.TRUE.) then 
+
+        outfldr = "output/Greenland"
+
+        ! Map to the grids of interest from 5 km Greenland grid 
+        call MARv33_to_grid(outfldr, g50KM, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(outfldr, g20KM, "Greenland-ERA",max_neighbors=15,lat_lim=2.d0)
+        call MARv33_to_grid(outfldr,g20KMb, "Greenland-ERA",max_neighbors=15,lat_lim=2.d0)
+        call MARv33_to_grid(outfldr, g10KM, "Greenland-ERA",max_neighbors=10,lat_lim=2.d0)
+
+    end if 
+
     if (.FALSE.) then 
 
     ! Define file names for input and output of global grids  

@@ -8,7 +8,7 @@ module gridding_datasets
     implicit none 
 
     private
-    public :: ecmwf_to_grid
+    public :: ecmwf_to_grid, MARv33_to_grid
 
 contains
 
@@ -199,6 +199,152 @@ contains
 
     end subroutine ecmwf_to_grid
 
+
+
+    subroutine MARv33_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+
+        type(grid_class)   :: gMAR
+        character(len=256) :: file_invariant, file_surface
+        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        double precision, allocatable :: invar(:,:) 
+        integer :: plev(9) 
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        integer :: nyr, nm, q, k, year, m, i, l 
+
+        ! Define ECMWF input grid
+        if (trim(domain) .eq. "Greenland-ERA") then 
+            
+            ! Define MAR (Bamber et al. 2001) grid and input variable field
+            call grid_init(gMAR,name="Bamber01-5KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
+                           x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
+                           lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+
+            ! Define the input filenames
+            file_invariant = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
+                             "MARv3.3-15km-monthly-ERA-Interim-2013.nc"
+            file_surface   = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
+                             "MARv3.3-15km-monthly-"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_MARv3.3-15km-monthly-ERA-Interim_195801-201312.nc"
+
+        else if (trim(domain) .eq. "Antarctica") then 
+
+            ! TODO 
+
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+        end if 
+
+        ! Define the variables to be mapped 
+        allocate(invariant(2))
+        call def_var_info(invariant(1),trim(file_invariant),"MSK_MAR","mask",units="(0 - 2)",method="nn")
+        call def_var_info(invariant(2),trim(file_invariant),"SRF_MAR","zs",units="m")
+
+        allocate(surf(17))
+        call def_var_info(surf( 1),trim(file_surface),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 2),trim(file_surface),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 3),trim(file_surface),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 4),trim(file_surface),"ST",  "ts",  units="degrees Celcius")
+        call def_var_info(surf( 5),trim(file_surface),"TT",  "t3m", units="degrees Celcius")
+        call def_var_info(surf( 6),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 7),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 8),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 9),trim(file_surface),"AL",  "al",  units="(0 - 1)")
+        call def_var_info(surf(10),trim(file_surface),"SWD", "swd", units="W m**-2")
+        call def_var_info(surf(11),trim(file_surface),"LWD", "lwd", units="W m**-2")
+        call def_var_info(surf(12),trim(file_surface),"SHF", "shf", units="W m**-2")
+        call def_var_info(surf(13),trim(file_surface),"LHF", "lhf", units="W m**-2")
+        call def_var_info(surf(14),trim(file_surface),"SP",  "sp",  units="hPa")
+        call def_var_info(surf(15),trim(file_surface),"UU",  "u",   units="m s**-1")
+        call def_var_info(surf(16),trim(file_surface),"VV",  "v",   units="m s**-1")
+        call def_var_info(surf(17),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
+
+        ! Allocate the input grid variable
+        call grid_allocate(gMAR,invar)
+
+        ! Initialize mapping
+        call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+        
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+        call nc_write_dim(filename,"time", x=1958,dx=1,nx=56,units="years",calendar="360_day")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+    
+        ! ## INVARIANT FIELDS ##
+        do i = 1, size(invariant)
+            var_now = invariant(i) 
+            call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+            outvar = missing_value 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
+                           fill=.FALSE.,missing_value=missing_value)
+            if (var_now%method .eq. "nn") then 
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            else
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            end if  
+        end do 
+
+        nyr = 2013-1958+1
+        nm  = 12 
+           
+        do k = 1, nyr 
+
+            year = 1957 + k 
+            write(*,*) "=== ",year," ==="
+     
+            do m = 1, nm 
+                q = m 
+                write(*,*) "month ",m
+
+                ! ## SURFACE FIELDS ##
+                do i = 1, size(surf)
+                    var_now = surf(i) 
+                    if (year .le. 1978) then   
+                        write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_surface),"ERA-Interim-",year,".nc"
+                    else
+                        write(var_now%filename,"(a,a,i4,a3,i4,a)") trim(file_surface),"ERA-Interim-",year,".nc"
+                    end if
+                    call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                             start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
+                    where (invar .ne. missing_value) invar = invar*var_now%conv 
+                    outvar = missing_value 
+                    call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
+                                   fill=.FALSE.,missing_value=missing_value)
+                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                  units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+                end do 
+
+            end do 
+        end do 
+        
+        return 
+
+    end subroutine MARv33_to_grid
 
 
 
