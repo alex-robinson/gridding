@@ -145,7 +145,7 @@ program gentopo
     !       MAR (RCM) DATA - MARv3.2 original data passed by Xavier
     !
     ! =========================================================
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
         outfldr = "output/Greenland"
 
