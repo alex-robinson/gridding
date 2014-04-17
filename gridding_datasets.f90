@@ -570,7 +570,7 @@ contains
                 ! ## SURFACE FIELDS ##
                 do i = 1, n_var
                     var_now = surf(i)     
-                    write(var_now%filename,"(a,a,i4,a3)") trim(adjustl(file_surface)),trim(adjustl(file_prefix(n_prefix))),year,".nc"
+                    write(var_now%filename,"(a,a,i4,a3)") trim(adjustl(file_surface)),trim(file_prefix(n_prefix)),year,".nc"
                     call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                     where (invar .ne. missing_value) invar = invar*var_now%conv 
