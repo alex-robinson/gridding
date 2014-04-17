@@ -94,7 +94,7 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
-            call nc_read(var_now%filename,var_now%nm_in,tmp,missing_value=missing_value)
+            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=missing_value)
             call thin(invar,tmp,by=10)
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
@@ -228,7 +228,7 @@ contains
     
         ! ## INVARIANT FIELDS ##
         var_now = invariant(1) 
-        call nc_read(var_now%filename,var_now%nm_in,invar)
+        call nc_read(trim(var_now%filename),var_now%nm_in,invar)
         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
@@ -249,7 +249,7 @@ contains
                 ! ## SURFACE FIELDS ##
                 do i = 1, size(surf)
                     var_now = surf(i) 
-                    call nc_read(var_now%filename,var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                    call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                     call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
                     call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                   units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
@@ -292,7 +292,7 @@ contains
                     do i = 1, size(pres)
                         var_now = pres(i) 
 
-                        call nc_read(var_now%filenames(l),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                        call nc_read(trim(var_now%filenames(l)),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
@@ -393,7 +393,7 @@ contains
 
             do i = 1, size(surf)
                 var_now = surf(i)
-                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1,m],count=[gCERES%G%nx,gCERES%G%ny,1])
                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
                               fill=.TRUE.,missing_value=missing_value)
@@ -541,7 +541,7 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
-            call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value)
             outvar = missing_value 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
                            fill=.FALSE.,missing_value=missing_value)
@@ -571,7 +571,7 @@ contains
                 do i = 1, n_var
                     var_now = surf(i)     
                     write(var_now%filename,"(a,a,i4,a3)") trim(file_surface),trim(file_prefix(n_prefix)),year,".nc"
-                    call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                    call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                     where (invar .ne. missing_value) invar = invar*var_now%conv 
                     outvar = missing_value 
@@ -696,7 +696,7 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
-            call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value)
             outvar = missing_value 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
                            fill=.FALSE.,missing_value=missing_value)
@@ -727,10 +727,10 @@ contains
                     write(var_now%filename,"(a,a,i4,a3,i4,a5)")  &
                         trim(file_surface),trim(file_prefix(n_prefix)),year,"01-",year,"12.nc"
                     if (var_now%dimextra) then 
-                        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                                       start=[1,1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1,1])
                     else 
-                        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                     end if
                     where (invar .ne. missing_value) invar = invar*var_now%conv 
