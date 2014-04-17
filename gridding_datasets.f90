@@ -451,8 +451,8 @@ contains
             file_invariant = "/data/sicopolis/data/MARv3.3/Greenland/ERA_1958-2013_15km/"// &
                              "MARv3.3-15km-monthly-ERA-Interim-2013.nc"
             file_surface   = "/data/sicopolis/data/MARv3.3/Greenland/"
-            file_prefix(1) = "ERA_1958-2013_15km/MARv3.3-15km-monthly-"
-            file_prefix(2) = "ERA_1958-2013_15km/MARv3.3-15km-monthly-"
+            file_prefix(1) = "ERA_1958-2013_15km/MARv3.3-15km-monthly"
+            file_prefix(2) = "ERA_1958-2013_15km/MARv3.3-15km-monthly"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -473,8 +473,8 @@ contains
             file_invariant = "/data/sicopolis/data/MARv3.3/Greenland/MIROC5-histo_1976-2005_30km/"// &
                              "MARv3.3-monthly-MIROC5-histo-1976.nc"
             file_surface   = "/data/sicopolis/data/MARv3.3/Greenland/"
-            file_prefix(1) = "MIROC5-histo_1976-2005_30km/MARv3.3-monthly-MIROC5-histo-"
-            file_prefix(2) = "MIROC5-rcp85_2006-2100_30km/MARv3.3-monthly-MIROC5-rcp85-"
+            file_prefix(1) = "MIROC5-histo_1976-2005_30km/MARv3.3-monthly-MIROC5-histo"
+            file_prefix(2) = "MIROC5-rcp85_2006-2100_30km/MARv3.3-monthly-MIROC5-rcp85"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -570,7 +570,8 @@ contains
                 ! ## SURFACE FIELDS ##
                 do i = 1, n_var
                     var_now = surf(i)     
-                    write(var_now%filename,"(a,a,i4,a3)") trim(adjustl(file_surface)),trim(file_prefix(n_prefix)),year,".nc"
+                    write(var_now%filename,"(a,a,a1,i4,a3)") &
+                        trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),"-",year,".nc"
                     call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                     where (invar .ne. missing_value) invar = invar*var_now%conv 
