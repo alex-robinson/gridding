@@ -546,6 +546,10 @@ contains
         call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)")
         call def_var_info(surf(19),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
+        nm       = 12
+        n_var    = size(surf)
+        if (trim(domain) .ne. "Greenland-ERA") n_var = 16   ! Exclude QQ, CC and SH3 if not available
+    
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
             ! Allocate the input grid variable
@@ -580,11 +584,7 @@ contains
                 end if  
             end do 
 
-            nm       = 12    
             n_prefix = 1 
-            n_var    = size(surf)
-            if (trim(domain) .ne. "Greenland-ERA") n_var = 16   ! Exclude QQ, CC and SH3 if not available
-
             do k = 1, nyr 
 
                 year = year0 + (k-1) 
@@ -637,12 +637,10 @@ contains
                               units=var_now%units_out)
             end do 
 
-            nm       = 12 
             do i = 1, n_var
                 var_now = surf(i)
 
                 do m = 1, nm  
-                    write(*,*) m, k0, nk, "Read.. ",trim(var_now%nm_out)
                     call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
                     var2D = time_average(var3D)
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
