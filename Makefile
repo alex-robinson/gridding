@@ -60,7 +60,13 @@ $(objdir)/coordinates.o: ../coord/coordinates.f90 $(objdir)/projection_oblimap2.
 	                     $(objdir)/geodesic.o $(objdir)/planet.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/vargrid.o: vargrid.f90
+$(objdir)/interp1D.o: ../coord/interp1D.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/interp2D.o: ../coord/interp2D.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/interp_time.o: ../coord/interp_time.f90 $(objdir)/interp1D.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/gridding_datasets.o: gridding_datasets.f90 $(objdir)/vargrid.o
@@ -71,7 +77,7 @@ $(objdir)/gridding_datasets.o: gridding_datasets.f90 $(objdir)/vargrid.o
 # Program to test interpolations of CCSM3 data
 GRL: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
-	         $(objdir)/vargrid.o $(objdir)/gridding_datasets.o
+	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/gridding_datasets.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gentopo_grl.x is ready."

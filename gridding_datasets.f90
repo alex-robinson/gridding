@@ -2,10 +2,23 @@
 module gridding_datasets
 
     use coordinates 
+    use interp_time
     use ncio 
-    use vargrid 
-
+    
     implicit none 
+
+    double precision, parameter :: missing_value = -9999.d0
+    
+    type var_defs
+        character(len=256) :: filename, filenames(20)
+        character(len=256) :: nm_in, nm_out  
+        character(len=256) :: units_in, units_out 
+        character(len=256) :: method
+        logical :: mask, dimextra
+        character(len=256) :: plev
+        double precision   :: conv 
+        logical            :: fill 
+    end type 
 
     private
     public :: Bamber13_to_grid, ecmwf_to_grid
@@ -406,7 +419,7 @@ contains
 
     end subroutine CERES_to_grid
 
-    subroutine MARv33_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine MARv33_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -422,10 +435,11 @@ contains
 
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim 
-        character(len=512) :: filename 
+        integer, optional :: max_neighbors 
+        double precision, optional :: lat_lim 
+        integer, optional :: clim_range(2)
 
+        character(len=512) :: filename 
         type(grid_class)   :: gMAR
         character(len=256) :: file_invariant, file_surface, file_prefix(2)
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
@@ -438,8 +452,11 @@ contains
         integer, allocatable          :: outmask(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+        integer :: yearf, k0, nk 
+        character(len=512) :: filename_clim 
+        double precision, allocatable :: var3D(:,:,:), var2D(:,:)
 
-        ! Define ECMWF input grid
+        ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
             
             ! Define MAR (Bamber et al. 2001) grid and input variable field
@@ -461,6 +478,15 @@ contains
             year0       = 1958 
             year_switch = 1979   ! Switch scenarios (ERA-40 to ERA-INTERIM)
             nyr         = 2013-1958+1
+
+            ! For climatology
+            if (present(clim_range)) then  
+                k0 = clim_range(1) - 1958+1
+                nk = clim_range(2) - clim_range(1) + 1 
+
+                write(filename_clim,"(a)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                                  "_MARv3.3-15km-monthly-ERA-Interim_",year0,"-",yearf,".nc"
+            end if 
 
         else if (trim(domain) .eq. "Greenland-MIROC5-RCP85") then 
 
@@ -520,71 +546,110 @@ contains
         call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)")
         call def_var_info(surf(19),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
-        ! Allocate the input grid variable
-        call grid_allocate(gMAR,invar)
+        if (present(max_neighbors)) then 
 
-        ! Initialize mapping
-        call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+            ! Allocate the input grid variable
+            call grid_allocate(gMAR,invar)
 
-        ! Initialize output variable arrays
-        call grid_allocate(grid,outvar)
-        call grid_allocate(grid,outmask)    
+            ! Initialize mapping
+            call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+            ! Initialize output variable arrays
+            call grid_allocate(grid,outvar)
+            call grid_allocate(grid,outmask)    
+            
+            ! Initialize the output file
+            call nc_create(filename)
+            call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
+            call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
-        ! Initialize the output file
-        call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-        call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
-        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
-        ! ## INVARIANT FIELDS ##
-        do i = 1, size(invariant)
-            var_now = invariant(i) 
-            call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value)
-            outvar = missing_value 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
-                           fill=.FALSE.,missing_value=missing_value)
-            if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-            else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-            end if  
-        end do 
-
-        nm       = 12    
-        n_prefix = 1 
-        n_var    = size(surf)
-        if (trim(domain) .ne. "Greenland-ERA") n_var = 16   ! Exclude QQ, CC and SH3 if not available
-
-        do k = 1, nyr 
-
-            year = year0 + (k-1) 
-            if (year .ge. year_switch) n_prefix = 2
-            write(*,*) "=== ",year," ==="
-     
-            do m = 1, nm 
-                q = m 
-                write(*,*) "month ",m
-
-                ! ## SURFACE FIELDS ##
-                do i = 1, n_var
-                    var_now = surf(i)     
-                    write(var_now%filename,"(a,a,i4,a3)") &
-                        trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
-                    call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
-                             start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
-                    where (invar .ne. missing_value) invar = invar*var_now%conv 
-                    outvar = missing_value 
-                    call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
-                                   fill=.FALSE.,missing_value=missing_value)
-                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                                  units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
-                end do 
-
+            ! ## INVARIANT FIELDS ##
+            do i = 1, size(invariant)
+                var_now = invariant(i) 
+                call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value)
+                outvar = missing_value 
+                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
+                               fill=.FALSE.,missing_value=missing_value)
+                if (var_now%method .eq. "nn") then 
+                    call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                else
+                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                end if  
             end do 
-        end do 
+
+            nm       = 12    
+            n_prefix = 1 
+            n_var    = size(surf)
+            if (trim(domain) .ne. "Greenland-ERA") n_var = 16   ! Exclude QQ, CC and SH3 if not available
+
+            do k = 1, nyr 
+
+                year = year0 + (k-1) 
+                if (year .ge. year_switch) n_prefix = 2
+                write(*,*) "=== ",year," ==="
+         
+                do m = 1, nm 
+                    q = m 
+                    write(*,*) "month ",m
+
+                    ! ## SURFACE FIELDS ##
+                    do i = 1, n_var
+                        var_now = surf(i)     
+                        write(var_now%filename,"(a,a,i4,a3)") &
+                            trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
+                                 start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
+                        where (invar .ne. missing_value) invar = invar*var_now%conv 
+                        outvar = missing_value 
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
+                                       fill=.FALSE.,missing_value=missing_value)
+                        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                      units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+                    end do 
+
+                end do 
+            end do 
         
+        end if 
+
+        if (present(clim_range)) then 
+
+            ! Create climatology too (month by month)
+
+            call grid_allocate(grid,var2D)
+            allocate(var3D(grid%G%nx,grid%G%ny,nk))    
+            
+            ! Initialize the output file
+            call nc_create(filename_clim)
+            call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
+        
+            ! ## INVARIANT FIELDS ##
+            do i = 1, size(invariant)
+                var_now = invariant(i) 
+                call nc_read(filename,var_now%nm_out,var2D)
+                call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+                              units=var_now%units_out)
+            end do 
+
+            do i = 1, n_var
+                var_now = surf(i)
+
+                do m = 1, nm  
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                    var2D = time_average(var3D)
+                    call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                  units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                end do 
+            end do 
+
+        end if 
+
         return 
 
     end subroutine MARv33_to_grid
@@ -748,6 +813,138 @@ contains
         return 
 
     end subroutine MARv32_to_grid
+
+
+
+    !##############################################
+    !
+    ! General subroutines related to the module
+    !
+    !##############################################
+
+
+
+    ! Define some variable info for later manipulation
+    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,conv,plev,filenames)
+        implicit none 
+
+        type(var_defs) :: var 
+        character(len=*) :: filename,nm_in,nm_out,units
+        character(len=*), optional :: method 
+        logical, optional :: mask, dimextra
+        character(len=*), optional :: plev 
+        character(len=*), optional :: filenames(:)
+        double precision, optional :: conv 
+
+        var%filename  = trim(filename)
+        var%nm_in     = trim(nm_in)
+        var%nm_out    = trim(nm_out)
+        var%units_in  = trim(units)
+        var%units_out = trim(units)
+
+        var%method = "shepard"
+        if (present(method)) var%method = trim(method)
+
+        var%mask = .FALSE. 
+        if (present(mask)) var%mask = mask 
+
+        var%dimextra = .FALSE.
+        if (present(dimextra)) var%dimextra = dimextra 
+
+        var%plev = "None"
+        if (present(plev)) var%plev = trim(plev)
+
+        var%filenames(:) = "None"
+        if (present(filenames)) var%filenames = filenames
+
+        var%conv = 1.d0 
+        if (present(conv)) var%conv = conv 
+
+        return 
+
+    end subroutine def_var_info
+
+    ! Extract a thinner version of an input array
+    ! (new array should be a multiple of input array)
+    subroutine thin(var1,var,by)
+        implicit none
+
+        double precision, dimension(:,:) :: var, var1 
+        integer :: by 
+        integer :: i,j, nx, ny 
+        integer :: i1, j1
+
+        nx = size(var,1)
+        ny = size(var,2) 
+
+        var1 = missing_value 
+
+        i1 = 0
+        do i = 1, nx, by 
+            i1 = i1+1 
+            j1 = 0 
+            do j = 1, ny, by  
+                j1 = j1 + 1 
+                var1(i1,j1) = var(i,j)
+            end do 
+        end do 
+
+        return
+    end subroutine thin 
+
+    ! Fill in missing values of an array with neighbor averages
+    ! or with a specified fill_value
+    subroutine fill(var,missing_value,fill_value)
+        implicit none 
+        double precision, dimension(:,:) :: var 
+        double precision :: missing_value 
+        double precision, optional :: fill_value
+
+        integer :: q, nx, ny, i, j 
+        integer, parameter :: qmax = 50 ! Iterations 
+
+        double precision, dimension (3,3) :: neighb, weight
+        double precision :: wtot, mval 
+        double precision, dimension(:,:), allocatable :: filled
+        nx = size(var,1)
+        ny = size(var,2) 
+
+        allocate(filled(nx,ny))
+
+        if (present(fill_value)) then
+            where(var .eq. missing_value) var = fill_value 
+        end if 
+
+        do q = 1, qmax 
+
+            filled = missing_value 
+
+            do i = 2, nx-1 
+                do j = 2, ny-1 
+                    neighb = var(i-1:i+1,j-1:j+1)
+
+                    weight = 0.d0 
+                    where (neighb .ne. missing_value) weight = 1.d0
+                    wtot = sum(weight)
+
+                    if (wtot .gt. 0.d0) then 
+                        mval = sum(neighb*weight)/wtot
+                        where (neighb .eq. missing_value) neighb = mval 
+                    end if 
+
+                    filled(i-1:i+1,j-1:j+1) = neighb 
+
+                end do 
+            end do 
+
+            where(filled .ne. missing_value) var = filled 
+
+            write(*,*) q," : Missing values: ", count(var .eq. missing_value)
+            if ( count(var .eq. missing_value) .eq. 0 ) exit 
+        end do 
+
+        return
+    end subroutine fill 
 
 end module gridding_datasets
 
