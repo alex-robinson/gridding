@@ -499,7 +499,7 @@ contains
         call def_var_info(invariant(1),trim(file_invariant),"MSK_MAR","mask",units="(0 - 2)",method="nn")
         call def_var_info(invariant(2),trim(file_invariant),"SRF_MAR","zs",units="m")
 
-        allocate(surf(17))
+        allocate(surf(18))
         call def_var_info(surf( 1),trim(file_surface),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
         call def_var_info(surf( 2),trim(file_surface),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
         call def_var_info(surf( 3),trim(file_surface),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
@@ -516,7 +516,9 @@ contains
         call def_var_info(surf(14),trim(file_surface),"SP",  "sp",  units="hPa")
         call def_var_info(surf(15),trim(file_surface),"UU",  "u",   units="m s**-1")
         call def_var_info(surf(16),trim(file_surface),"VV",  "v",   units="m s**-1")
-        call def_var_info(surf(17),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
+        call def_var_info(surf(17),trim(file_surface),"QQ",  "q",   units="g kg**-1")
+        call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)")
+        call def_var_info(surf(19),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
         ! Allocate the input grid variable
         call grid_allocate(gMAR,invar)
@@ -553,7 +555,7 @@ contains
         nm       = 12    
         n_prefix = 1 
         n_var    = size(surf)
-        if (trim(domain) .ne. "Greenland-ERA") n_var = size(surf)-1   ! Exclude SH3 if it doesn't exist
+        if (trim(domain) .ne. "Greenland-ERA") n_var = 16   ! Exclude QQ, CC and SH3 if not available
 
         do k = 1, nyr 
 
