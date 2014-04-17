@@ -18,7 +18,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .TRUE. ) then 
+    if ( .FALSE. ) then 
 
         ! ## Define clim grid and output variable field ##
         call grid_init(grid,name="GRL-50KM",mtype="stereographic",units="kilometers", &
@@ -43,7 +43,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .FALSE. ) then 
+    if ( .TRUE. ) then 
         
         ! ## Define ice grid and output variable field ##
         call grid_init(grid,name="GRL-20KM",mtype="stereographic",units="kilometers", &
@@ -68,7 +68,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .FALSE. ) then 
+    if ( .TRUE. ) then 
         
         ! Define Bamber et al. 2001 20KM grid and input variable field
         call grid_init(grid,name="Bamber01-20KM",mtype="stereographic",units="kilometers", &
@@ -93,7 +93,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .FALSE. ) then 
+    if ( .TRUE. ) then 
 
         ! ## Define ice grid and output variable field ##
         call grid_init(grid,name="GRL-10KM",mtype="stereographic",units="kilometers", &
