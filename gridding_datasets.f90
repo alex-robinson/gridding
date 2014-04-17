@@ -502,9 +502,15 @@ contains
                 ! ## SURFACE FIELDS ##
                 do i = 1, n_var
                     var_now = surf(i)     
-                    write(var_now%filename,"(a,a,i4,a3,i4,a5)") trim(file_surface),trim(file_prefix(n_prefix)),year,"01-",year,"12.nc"
-                    call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
-                             start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
+                    write(var_now%filename,"(a,a,i4,a3,i4,a5)")  &
+                        trim(file_surface),trim(file_prefix(n_prefix)),year,"01-",year,"12.nc"
+                    if (var_now%dimextra) then 
+                        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                                      start=[1,1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1,1])
+                    else 
+                        call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                                 start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
+                    end if
                     where (invar .ne. missing_value) invar = invar*var_now%conv 
                     outvar = missing_value 
                     call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
