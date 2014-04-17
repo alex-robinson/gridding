@@ -633,8 +633,10 @@ contains
             do i = 1, size(invariant)
                 var_now = invariant(i) 
                 call nc_read(filename,var_now%nm_out,var2D)
+                write(*,*) "Read.. ",trim(var_now%nm_out)
                 call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
                               units=var_now%units_out)
+                write(*,*) "Wrote.. ",trim(var_now%nm_out)
             end do 
 
             do i = 1, n_var
