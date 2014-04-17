@@ -484,8 +484,8 @@ contains
                 k0 = clim_range(1) - 1958+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
-                write(filename_clim,"(a)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                                  "_MARv3.3-15km-monthly-ERA-Interim_",year0,"-",yearf,".nc"
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                    "_MARv3.3-15km-monthly-ERA-Interim_",year0,"-",yearf,".nc"
             end if 
 
         else if (trim(domain) .eq. "Greenland-MIROC5-RCP85") then 
