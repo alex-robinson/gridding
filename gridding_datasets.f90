@@ -546,7 +546,7 @@ contains
         call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)")
         call def_var_info(surf(19),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
-        if (present(max_neighbors)) then 
+        if (present(max_neighbors) .and. present(lat_lim)) then 
 
             ! Allocate the input grid variable
             call grid_allocate(gMAR,invar)
