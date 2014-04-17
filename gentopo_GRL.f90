@@ -11,7 +11,7 @@ program gentopo
     type(grid_class) :: g50KM, g25KM, g20KM, g20KMb, g10KM
     character(len=256) :: file_50KM, file_25KM, file_20KM, file_20KMb, file_10KM
     character(len=256) :: outfldr 
-    
+
     type(grid_class)   :: gice, gclim
     character(len=256) :: file_ice, file_clim
     
@@ -89,7 +89,7 @@ program gentopo
 ! ###########################   
     if (.TRUE.) then 
 
-        outfldr = "output"
+        outfldr = "output/Greenland"
 
         ! Map to the grids of interest from 0.75 degree ECMWF dataset
         call ecmwf_to_grid(outfldr, g50KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
