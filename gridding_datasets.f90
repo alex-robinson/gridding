@@ -12,20 +12,22 @@ module gridding_datasets
 
 contains
 
-    subroutine ecmwf_to_grid(filename,grid,domain,max_neighbors,lat_lim)
+    subroutine ecmwf_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
 
         implicit none 
 
-        character(len=*) :: domain, filename 
+        character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
         double precision :: lat_lim 
+        character(len=512) :: filename 
 
         type(grid_class)   :: gECMWF 
         character(len=256) :: file_invariant, file_surface, files_pres(9)
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
         double precision, allocatable :: invar(:,:) 
+        integer :: plev(9) 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -64,6 +66,8 @@ contains
             stop 
         end if 
 
+        ! Define the pressure levels to be mapped
+        plev = [1000,950,850,750,700,650,600,550,500]
 
         ! Define the variables to be mapped 
         
@@ -97,19 +101,23 @@ contains
         ! Initialize mapping
         call map_init(map,gECMWF,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-        ! Initialize the output file
-        call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"plev", x=[1000.d0,950.d0,850.d0,750.d0,700.d0,650.d0,600.d0,550.d0,500.d0],units="hPa")
-        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-        call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
-        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
 
+        ! ## First make file for surface fields including invariants ##
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM"// &
+                             "_197901-201212.nc"
+
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"plev", x=dble(plev),units="hPa")
+        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+        call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+    
         ! ## INVARIANT FIELDS ##
         var_now = invariant(1) 
         call nc_read(var_now%filename,var_now%nm_in,invar)
@@ -123,9 +131,7 @@ contains
         do k = 1, nyr 
 
             year = 1978 + k 
-            write(*,*) 
             write(*,*) "=== ",year," ==="
-            write(*,*)
 
             do m = 1, nm 
                 q = q+1 
@@ -139,23 +145,55 @@ contains
                     call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
                     call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                   units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
-                    end do 
+                end do 
+            end do
+        end do  
 
-                ! ## PRESSURE FIELDS ##
-                do i = 1, size(pres)
-                    var_now = pres(i) 
+        do l = 1, size(files_pres)   ! Loop over pressure layers
 
-                    do l = 1, size(files_pres)   ! Loop over pressure layers
+            ! ## Make one file for each pressure level ##
+            if (plev(l) .ge. 1000) then 
+                write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                           plev(l),"Mb_197901-201212.nc"
+            else
+                write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                           plev(l),"Mb_197901-201212.nc"
+            end if 
+
+            ! Initialize the output file
+            call nc_create(filename)
+            call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename,"plev", x=dble(plev),units="hPa")
+            call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+            call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+            q = 0 
+            do k = 1, nyr 
+
+                year = 1978 + k 
+                write(*,*) "=== ",year," ==="
+
+                do m = 1, nm 
+                    q = q+1 
+
+                    write(*,*) "month ",m
+
+                    ! ## PRESSURE FIELDS ##
+                    do i = 1, size(pres)
+                        var_now = pres(i) 
+
                         call nc_read(var_now%filenames(l),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
-                        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="plev",dim4="month", &
-                                      dim5="time",units=var_now%units_out,start=[1,1,l,m,k],count=[grid%G%nx,grid%G%ny,1,1,1])
-                    end do 
+                        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                      units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
 
+                    end do 
                 end do 
             end do 
-        end do 
 
+        end do 
 
         return 
 

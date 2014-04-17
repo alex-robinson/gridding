@@ -10,7 +10,8 @@ program gentopo
 
     type(grid_class) :: g50KM, g25KM, g20KM, g20KMb, g10KM
     character(len=256) :: file_50KM, file_25KM, file_20KM, file_20KMb, file_10KM
-
+    character(len=256) :: outfldr 
+    
     type(grid_class)   :: gice, gclim
     character(len=256) :: file_ice, file_clim
     
@@ -88,17 +89,13 @@ program gentopo
 ! ###########################   
     if (.TRUE.) then 
 
-        ! Define file names for input and output of global grids  
-        file_50KM      = "output/GRL-50KM_ERA-INTERIM_mon_197901-201212.nc"
-        file_20KM      = "output/GRL-20KM_ERA-INTERIM_mon_197901-201212.nc"
-        file_20KMb     = "output/Bamber01-20KM_ERA-INTERIM_mon_197901-201212.nc"
-        file_10KM      = "output/GRL-10KM_ERA-INTERIM_mon_197901-201212.nc"
-        
+        outfldr = "output"
+
         ! Map to the grids of interest from 0.75 degree ECMWF dataset
-        call ecmwf_to_grid(file_50KM, g50KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
-        call ecmwf_to_grid(file_20KM, g20KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
-        call ecmwf_to_grid(file_20KMb,g20KMb,"GRL075",max_neighbors=8,lat_lim=2.d0)
-        call ecmwf_to_grid(file_10KM, g10KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
+        call ecmwf_to_grid(outfldr, g50KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
+        call ecmwf_to_grid(outfldr, g20KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
+        call ecmwf_to_grid(outfldr,g20KMb, "GRL075",max_neighbors=8,lat_lim=2.d0)
+        call ecmwf_to_grid(outfldr, g10KM, "GRL075",max_neighbors=8,lat_lim=2.d0)
 
     end if 
 ! ########################### 
