@@ -11,11 +11,117 @@ module gridding_datasets
     public :: Bamber13_to_grid, ecmwf_to_grid
     public :: MARv33_to_grid, MARv32_to_grid
     public :: CERES_to_grid 
-    
+
 contains
+
+    subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       TOPO DATA
+        !
+        ! =========================================================
+        
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+
+        type(grid_class)   :: gTOPO
+        character(len=256) :: file_invariant, file_surface, file_prefix(2)
+        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        double precision, allocatable :: invar(:,:) 
+        integer :: plev(9) 
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:), tmp(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+
+        ! Define ECMWF input grid
+        if (trim(domain) .eq. "Greenland") then 
+            
+            ! Define topography (Bamber et al. 2013) grid and input variable field
+            call grid_init(gTOPO,name="TOPO-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
+                   x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
+                   lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+
+            ! Define the input filenames
+            file_invariant = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO.nc"
+
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+        end if 
+
+        ! Define the variables to be mapped 
+        allocate(invariant(4))
+        call def_var_info(invariant(1),trim(file_invariant),"BedrockElevation","zb",units="m")
+        call def_var_info(invariant(2),trim(file_invariant),"SurfaceElevation","zs",units="m")
+        call def_var_info(invariant(3),trim(file_invariant),"IceThickness",    "H", units="m")
+        call def_var_info(invariant(4),trim(file_invariant),"LandMask",      "mask",units="(0 - 4",method="nn")
+
+        ! Allocate the input grid variable
+        call grid_allocate(gTOPO,invar)
+        
+        ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
+        allocate(tmp(2501,3001))
+
+        ! Initialize mapping
+        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+        
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+    
+        ! ## INVARIANT FIELDS ##
+        do i = 1, size(invariant)
+            var_now = invariant(i) 
+            call nc_read(var_now%filename,var_now%nm_in,tmp,missing_value=missing_value)
+            call thin(invar,tmp,by=10)
+            if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+                where( invar .eq. missing_value ) invar = 0.d0 
+            end if
+            if (trim(var_now%nm_out) .eq. "zb") then 
+                call fill(invar,missing_value=missing_value,fill_value=-1000.d0)
+            end if 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+                          fill=.TRUE.,missing_value=missing_value)
+            if (var_now%method .eq. "nn") then 
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            else
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            end if 
+        end do 
+
+        return 
+
+    end subroutine Bamber13_to_grid
 
     subroutine ecmwf_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       ECMWF DATA (ERA-INTERIM 1979-2013)
+        !
+        ! ========================================================= 
 
         implicit none 
 
@@ -201,9 +307,13 @@ contains
 
     end subroutine ecmwf_to_grid
 
-    subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine CERES_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
-
+        ! =========================================================
+        !
+        !       CERES DATA
+        !
+        ! =========================================================
         implicit none 
 
         character(len=*) :: domain, outfldr 
@@ -212,7 +322,7 @@ contains
         double precision :: lat_lim 
         character(len=512) :: filename 
 
-        type(grid_class)   :: gTOPO
+        type(grid_class)   :: gCERES
         character(len=256) :: file_invariant, file_surface, file_prefix(2)
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
         double precision, allocatable :: invar(:,:) 
@@ -220,25 +330,24 @@ contains
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:), tmp(:,:)
+        double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
 
         ! Define ECMWF input grid
-        if (trim(domain) .eq. "Greenland") then 
+        if (trim(domain) .eq. "Global") then 
             
-            ! Define topography (Bamber et al. 2013) grid and input variable field
-            call grid_init(gTOPO,name="TOPO-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
-                   lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+            ! Define MAR grid and input variable field
+            call grid_init(gCERES,name="CERES-1deg",mtype="latlon",units="degrees",lon180=.FALSE., &
+                   x0=0.5d0,dx=1d0,nx=360,y0=-90.d0,dy=1d0,ny=180 )
 
             ! Define the input filenames
-            file_invariant = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+            file_surface = "data/CERES/CERES_EBAF-TOA_Ed2.8_Subset_CLIM01-CLIM12.nc"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO.nc"
+                              "_CERES_clim2001-2013.nc"
 
         else
 
@@ -247,20 +356,23 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(4))
-        call def_var_info(invariant(1),trim(file_invariant),"BedrockElevation","zb",units="m")
-        call def_var_info(invariant(2),trim(file_invariant),"SurfaceElevation","zs",units="m")
-        call def_var_info(invariant(3),trim(file_invariant),"IceThickness",    "H", units="m")
-        call def_var_info(invariant(4),trim(file_invariant),"LandMask",      "mask",units="(0 - 4",method="nn")
+        allocate(surf(10))
+        call def_var_info(surf( 1),trim(file_surface),"toa_sw_all_clim","toa_sw_all",units="W m**-2",method="radius")
+        call def_var_info(surf( 2),trim(file_surface),"toa_sw_clr_clim","toa_sw_clr",units="W m**-2",method="radius")
+        call def_var_info(surf( 3),trim(file_surface),"toa_lw_all_clim","toa_lw_all",units="W m**-2",method="radius")
+        call def_var_info(surf( 4),trim(file_surface),"toa_lw_clr_clim","toa_lw_clr",units="W m**-2",method="radius")
+        call def_var_info(surf( 5),trim(file_surface),"toa_net_all_clim","toa_net_all",units="W m**-2",method="radius")
+        call def_var_info(surf( 6),trim(file_surface),"toa_net_clr_clim","toa_net_clr",units="W m**-2",method="radius")
+        call def_var_info(surf( 7),trim(file_surface),"toa_cre_sw_clim","toa_cre_sw",units="W m**-2",method="radius")
+        call def_var_info(surf( 8),trim(file_surface),"toa_cre_lw_clim","toa_cre_lw",units="W m**-2",method="radius")
+        call def_var_info(surf( 9),trim(file_surface),"toa_cre_net_clim","toa_cre_net",units="W m**-2",method="radius")
+        call def_var_info(surf(10),trim(file_surface),"solar_clim","solar",units="W m**-2",method="radius")
 
         ! Allocate the input grid variable
-        call grid_allocate(gTOPO,invar)
-        
-        ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
-        allocate(tmp(2501,3001))
+        call grid_allocate(gCERES,invar)
 
         ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,gCERES,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -273,32 +385,38 @@ contains
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
     
-        ! ## INVARIANT FIELDS ##
-        do i = 1, size(invariant)
-            var_now = invariant(i) 
-            call nc_read(var_now%filename,var_now%nm_in,tmp,missing_value=missing_value)
-            call thin(invar,tmp,by=10)
-            if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
-                where( invar .eq. missing_value ) invar = 0.d0 
-            end if
-            if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill(invar,missing_value=missing_value,fill_value=-1000.d0)
-            end if 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=missing_value)
-            if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-            else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-            end if 
+        ! Loop over months and map climatological gridded variables
+        nm = 12 
+        do m = 1, nm 
+
+            write(*,*) "month ",m
+
+            do i = 1, size(surf)
+                var_now = surf(i)
+                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
+                             start=[1,1,m],count=[gCERES%G%nx,gCERES%G%ny,1])
+                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
+                              fill=.TRUE.,missing_value=missing_value)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
+                              units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+            end do 
         end do 
 
         return 
 
-    end subroutine Bamber13_to_grid
+    end subroutine CERES_to_grid
 
     subroutine MARv33_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       MAR (RCM) DATA - MARv3.3 downloaded from the ftp site:
+        !       ftp://ftp.climato.be/fettweis/MARv3.3/Greenland
+        !       Data is available on the Bamber et al. (2001) 5km grid
+        !       domain="Greenland-ERA": ERA-40 + ERA-Interim combined datasets
+        !       domain="Greenland-MIROC5-RCP85": MIROC5 histo+rcp85 combined datasets
+        !
+        ! =========================================================
 
         implicit none 
 
@@ -470,6 +588,11 @@ contains
 
     subroutine MARv32_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       MAR (RCM) DATA - MARv3.2 original data passed by Xavier
+        !
+        ! =========================================================
 
         implicit none 
 
@@ -622,102 +745,6 @@ contains
         return 
 
     end subroutine MARv32_to_grid
-
-    subroutine CERES_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
-        ! Convert the variables to the desired grid format and write to file
-
-        implicit none 
-
-        character(len=*) :: domain, outfldr 
-        type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim 
-        character(len=512) :: filename 
-
-        type(grid_class)   :: gCERES
-        character(len=256) :: file_invariant, file_surface, file_prefix(2)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
-        double precision, allocatable :: invar(:,:) 
-        integer :: plev(9) 
-
-        type(map_class)  :: map 
-        type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:)
-        integer, allocatable          :: outmask(:,:)
-
-        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
-
-        ! Define ECMWF input grid
-        if (trim(domain) .eq. "Global") then 
-            
-            ! Define MAR grid and input variable field
-            call grid_init(gCERES,name="CERES-1deg",mtype="latlon",units="degrees",lon180=.FALSE., &
-                   x0=0.5d0,dx=1d0,nx=360,y0=-90.d0,dy=1d0,ny=180 )
-
-            ! Define the input filenames
-            file_surface = "data/CERES/CERES_EBAF-TOA_Ed2.8_Subset_CLIM01-CLIM12.nc"
-
-            ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_CERES_clim2001-2013.nc"
-
-        else
-
-            write(*,*) "Domain not recognized: ",trim(domain)
-            stop 
-        end if 
-
-        ! Define the variables to be mapped 
-        allocate(surf(10))
-        call def_var_info(surf( 1),trim(file_surface),"toa_sw_all_clim","toa_sw_all",units="W m**-2",method="radius")
-        call def_var_info(surf( 2),trim(file_surface),"toa_sw_clr_clim","toa_sw_clr",units="W m**-2",method="radius")
-        call def_var_info(surf( 3),trim(file_surface),"toa_lw_all_clim","toa_lw_all",units="W m**-2",method="radius")
-        call def_var_info(surf( 4),trim(file_surface),"toa_lw_clr_clim","toa_lw_clr",units="W m**-2",method="radius")
-        call def_var_info(surf( 5),trim(file_surface),"toa_net_all_clim","toa_net_all",units="W m**-2",method="radius")
-        call def_var_info(surf( 6),trim(file_surface),"toa_net_clr_clim","toa_net_clr",units="W m**-2",method="radius")
-        call def_var_info(surf( 7),trim(file_surface),"toa_cre_sw_clim","toa_cre_sw",units="W m**-2",method="radius")
-        call def_var_info(surf( 8),trim(file_surface),"toa_cre_lw_clim","toa_cre_lw",units="W m**-2",method="radius")
-        call def_var_info(surf( 9),trim(file_surface),"toa_cre_net_clim","toa_cre_net",units="W m**-2",method="radius")
-        call def_var_info(surf(10),trim(file_surface),"solar_clim","solar",units="W m**-2",method="radius")
-
-        ! Allocate the input grid variable
-        call grid_allocate(gCERES,invar)
-
-        ! Initialize mapping
-        call map_init(map,gCERES,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
-        ! Initialize output variable arrays
-        call grid_allocate(grid,outvar)
-        call grid_allocate(grid,outmask)    
-        
-        ! Initialize the output file
-        call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
-        ! Loop over months and map climatological gridded variables
-        nm = 12 
-        do m = 1, nm 
-
-            write(*,*) "month ",m
-
-            do i = 1, size(surf)
-                var_now = surf(i)
-                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
-                             start=[1,1,m],count=[gCERES%G%nx,gCERES%G%ny,1])
-                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
-                              fill=.TRUE.,missing_value=missing_value)
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
-                              units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
-            end do 
-        end do 
-
-        return 
-
-    end subroutine CERES_to_grid
-
 
 end module gridding_datasets
 

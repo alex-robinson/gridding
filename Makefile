@@ -56,13 +56,14 @@ $(objdir)/geodesic.o: ../coord/geodesic.f90
 $(objdir)/projection_oblimap2.o: ../coord/projection_oblimap2.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/coordinates.o: ../coord/coordinates.f90
+$(objdir)/coordinates.o: ../coord/coordinates.f90 $(objdir)/projection_oblimap2.o \
+	                     $(objdir)/geodesic.o $(objdir)/planet.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/vargrid.o: vargrid.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/gridding_datasets.o: gridding_datasets.f90
+$(objdir)/gridding_datasets.o: gridding_datasets.f90 $(objdir)/vargrid.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 ## Complete programs
