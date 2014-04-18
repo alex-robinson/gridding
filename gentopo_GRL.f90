@@ -49,7 +49,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .TRUE. ) then 
+    if ( .FALSE. ) then 
         
         ! ## Define ice grid and output variable field ##
         call grid_init(grid,name="GRL-20KM",mtype="stereographic",units="kilometers", &
@@ -58,13 +58,13 @@ program gentopo
 
         outfldr = "output/Greenland/"//trim(grid%name)
 
-!         call Bamber13_to_grid(outfldr, grid, "Greenland",max_neighbors=20,lat_lim=2.d0)
-!         call ecmwf_to_grid(   outfldr, grid, "GRL075",max_neighbors=8,lat_lim=2.d0)
-!         call CERES_to_grid(   outfldr, grid, "Global",max_neighbors=8,lat_lim=2.d0)
+        call Bamber13_to_grid(outfldr, grid, "Greenland",max_neighbors=20,lat_lim=2.d0)
+        call ecmwf_to_grid(   outfldr, grid, "GRL075",max_neighbors=8,lat_lim=2.d0)
+        call CERES_to_grid(   outfldr, grid, "Global",max_neighbors=8,lat_lim=2.d0)
 
-!         call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
-!         call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
-!         call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
+        call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
         
         ! Climatologlies
         call ecmwf_to_grid( outfldr,grid,"GRL075",                clim_range=[1981,2010])
@@ -80,7 +80,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .FALSE. ) then 
+    if ( .TRUE. ) then 
         
         ! Define Bamber et al. 2001 20KM grid and input variable field
         call grid_init(grid,name="Bamber01-20KM",mtype="stereographic",units="kilometers", &
@@ -89,14 +89,19 @@ program gentopo
 
         outfldr = "output/Greenland/"//trim(grid%name)
 
-        call Bamber13_to_grid(outfldr, grid, "Greenland",max_neighbors=20,lat_lim=2.d0)
-        call ecmwf_to_grid(   outfldr, grid, "GRL075",max_neighbors=8,lat_lim=2.d0)
-        call CERES_to_grid(   outfldr, grid, "Global",max_neighbors=8,lat_lim=2.d0)
+!         call Bamber13_to_grid(outfldr, grid, "Greenland",max_neighbors=20,lat_lim=2.d0)
+!         call ecmwf_to_grid(   outfldr, grid, "GRL075",max_neighbors=8,lat_lim=2.d0)
+!         call CERES_to_grid(   outfldr, grid, "Global",max_neighbors=8,lat_lim=2.d0)
 
-        call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
-        call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
-        call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
-    
+!         call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+!         call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
+!         call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+        
+        call ecmwf_to_grid( outfldr,grid,"GRL075",                clim_range=[1981,2010])
+        call MARv33_to_grid(outfldr,grid,"Greenland-ERA",         clim_range=[1981,2010])
+        call MARv33_to_grid(outfldr,grid,"Greenland-MIROC5-RCP85",clim_range=[1981,2010])
+        call MARv33_to_grid(outfldr,grid,"Greenland-MIROC5-RCP85",clim_range=[2071,2100])
+        
     end if 
 
     ! =========================================================
