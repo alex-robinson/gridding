@@ -128,7 +128,7 @@ contains
 
     end subroutine Bamber13_to_grid
 
-    subroutine ecmwf_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine ecmwf_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -140,9 +140,10 @@ contains
 
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim 
+        integer, optional :: max_neighbors 
+        double precision, optional :: lat_lim 
         character(len=512) :: filename 
+        integer, optional  :: clim_range(2) 
 
         type(grid_class)   :: gECMWF 
         character(len=256) :: file_invariant, file_surface, files_pres(9)
@@ -156,6 +157,9 @@ contains
         integer, allocatable          :: outmask(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l 
+        integer :: yearf, k0, nk 
+        character(len=512) :: filename_clim 
+        double precision, allocatable :: var3D(:,:,:), var2D(:,:)
 
         ! Define ECMWF input grid
         if (trim(domain) .eq. "GRL075") then 
@@ -176,6 +180,18 @@ contains
             files_pres(7)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-600Mb_historical_mon_197901-201212.nc"
             files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
             files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-500Mb_historical_mon_197901-201212.nc"
+
+            ! ## First make file for surface fields including invariants ##
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM_197901-201212.nc"
+
+            ! For climatology
+            if (present(clim_range)) then  
+                k0 = clim_range(1) - 1958 + 1
+                nk = clim_range(2) - clim_range(1) + 1 
+
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                    "_MARv3.3-15km-monthly-ERA-Interim_",clim_range(1),"-",clim_range(2),".nc"
+            end if 
 
         else if (trim(domain) .eq. "ANT075") then 
 
@@ -216,70 +232,17 @@ contains
         call def_var_info(pres( 4),"None","v", "p_v",units="m s**-1",   plev="plev",filenames=files_pres)
         call def_var_info(pres( 5),"None","w", "p_w",units="Pa s**-1",  plev="plev",filenames=files_pres)
 
-        ! Allocate the input grid variable
-        call grid_allocate(gECMWF,invar)
+        if (present(max_neighbors) .and. present(lat_lim)) then 
 
-        ! Initialize mapping
-        call map_init(map,gECMWF,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+            ! Allocate the input grid variable
+            call grid_allocate(gECMWF,invar)
 
-        ! Initialize output variable arrays
-        call grid_allocate(grid,outvar)
-        call grid_allocate(grid,outmask)    
+            ! Initialize mapping
+            call map_init(map,gECMWF,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-        ! ## First make file for surface fields including invariants ##
-        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM"// &
-                             "_197901-201212.nc"
-
-        ! Initialize the output file
-        call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"plev", x=dble(plev),units="hPa")
-        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-        call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
-        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
-        ! ## INVARIANT FIELDS ##
-        var_now = invariant(1) 
-        call nc_read(trim(var_now%filename),var_now%nm_in,invar)
-        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
-        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-
-        nyr = 2012-1979+1
-        nm  = 12 
-
-        q = 0 
-        do k = 1, nyr 
-
-            year = 1978 + k 
-            write(*,*) "=== ",year," ==="
-
-            do m = 1, nm 
-                q = q+1 
-
-                write(*,*) "month ",m
-
-                ! ## SURFACE FIELDS ##
-                do i = 1, size(surf)
-                    var_now = surf(i) 
-                    call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
-                    call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
-                    call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                                  units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
-                end do 
-            end do
-        end do  
-
-        do l = 1, size(files_pres)   ! Loop over pressure layers
-
-            ! ## Make one file for each pressure level ##
-            if (plev(l) .ge. 1000) then 
-                write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                           plev(l),"Mb_197901-201212.nc"
-            else
-                write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                           plev(l),"Mb_197901-201212.nc"
-            end if 
+            ! Initialize output variable arrays
+            call grid_allocate(grid,outvar)
+            call grid_allocate(grid,outmask)    
 
             ! Initialize the output file
             call nc_create(filename)
@@ -290,6 +253,15 @@ contains
             call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
+            ! ## INVARIANT FIELDS ##
+            var_now = invariant(1) 
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+
+            nyr = 2012-1979+1
+            nm  = 12 
+
             q = 0 
             do k = 1, nyr 
 
@@ -301,20 +273,135 @@ contains
 
                     write(*,*) "month ",m
 
-                    ! ## PRESSURE FIELDS ##
-                    do i = 1, size(pres)
-                        var_now = pres(i) 
-
-                        call nc_read(trim(var_now%filenames(l)),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                    ! ## SURFACE FIELDS ##
+                    do i = 1, size(surf)
+                        var_now = surf(i) 
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
-                        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                        call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
-
                     end do 
+                end do
+            end do  
+
+            do l = 1, size(files_pres)   ! Loop over pressure layers
+
+                ! ## Make one file for each pressure level ##
+                if (plev(l) .ge. 1000) then 
+                    write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb_197901-201212.nc"
+                else
+                    write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb_197901-201212.nc"
+                end if 
+
+                ! Initialize the output file
+                call nc_create(filename)
+                call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+                call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+                call nc_write_dim(filename,"plev", x=dble(plev),units="hPa")
+                call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+                call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+                call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+            
+                q = 0 
+                do k = 1, nyr 
+
+                    year = 1978 + k 
+                    write(*,*) "=== ",year," ==="
+
+                    do m = 1, nm 
+                        q = q+1 
+
+                        write(*,*) "month ",m
+
+                        ! ## PRESSURE FIELDS ##
+                        do i = 1, size(pres)
+                            var_now = pres(i) 
+
+                            call nc_read(trim(var_now%filenames(l)),var_now%nm_in,invar, &
+                                         start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                            call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3, &
+                                           missing_value=missing_value)
+                            call nc_write(filename,var_now%nm_out,real(outvar), &
+                                          dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                          units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+
+                        end do 
+                    end do 
+                end do 
+
+            end do 
+
+        end if 
+
+        if (present(clim_range)) then 
+
+            ! Create climatology too (month by month)
+
+            call grid_allocate(grid,var2D)
+            allocate(var3D(grid%G%nx,grid%G%ny,nk))    
+            
+            ! Initialize the output file
+            call nc_create(filename_clim)
+            call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
+        
+            ! ## INVARIANT FIELDS ##
+            do i = 1, size(invariant)
+                var_now = invariant(i) 
+                call nc_read(filename,var_now%nm_out,var2D)
+                call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+                              units=var_now%units_out)
+            end do 
+
+            do i = 1, size(surf)
+                var_now = surf(i)
+
+                do m = 1, nm  
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                    var2D = time_average(var3D)
+                    call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                  units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
                 end do 
             end do 
 
-        end do 
+            do l = 1, size(files_pres)   ! Loop over pressure layers
+
+                ! ## Make one file for each pressure level ##
+                if (plev(l) .ge. 1000) then 
+                    write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
+                else
+                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb",clim_range(1),"-",clim_range(2),".nc"
+                end if 
+
+                ! Initialize the output file
+                call nc_create(filename_clim)
+                call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
+                call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+                call nc_write_dim(filename_clim,"plev", x=dble(plev),units="hPa")
+                call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+                call nc_write_dim(filename_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
+                call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
+            
+                do i = 1, size(pres)
+                    var_now = pres(i)
+
+                    do m = 1, nm  
+                        call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                        var2D = time_average(var3D)
+                        call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                      units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                    end do 
+                end do 
+
+            end do 
+
+        end if 
 
         return 
 
