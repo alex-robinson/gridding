@@ -228,7 +228,7 @@ contains
         ! Make sure basins cover entire land area
         call nc_read(filename,"zs",zs)
         where(outvar .eq. 0) outvar = nint(missing_value)
-        where(zs .lt. 0.d0)  outvar = 0.d0 
+        where(zs .eq. 0.d0)  outvar = 0.d0 
         call fill_nearest(outvar,nint(missing_value))
 
         ! Add to output file
