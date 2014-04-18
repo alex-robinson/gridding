@@ -357,7 +357,7 @@ contains
 
             do i = 1, size(surf)
                 var_now = surf(i)
-
+                write(*,*) "Processing ",trim(var_now%nm_out)
                 do m = 1, nm  
                     call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
                     var2D = time_average(var3D)
