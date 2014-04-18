@@ -375,10 +375,10 @@ contains
                     write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
                                                plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 else
-                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb",clim_range(1),"-",clim_range(2),".nc"
                     write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
                                                plev(l),"Mb_197901-201212.nc"
+                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 end if 
 
                 ! Initialize the output file
