@@ -69,7 +69,7 @@ $(objdir)/interp2D.o: ../coord/interp2D.f90
 $(objdir)/interp_time.o: ../coord/interp_time.f90 $(objdir)/interp1D.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/gridding_datasets.o: gridding_datasets.f90 $(objdir)/vargrid.o
+$(objdir)/gridding_datasets.o: gridding_datasets.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 ## Complete programs
