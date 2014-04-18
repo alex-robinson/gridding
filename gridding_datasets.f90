@@ -386,7 +386,6 @@ contains
                 call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
                 call nc_write_dim(filename_clim,"plev", x=dble(plev),units="hPa")
                 call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-                call nc_write_dim(filename_clim,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
                 call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
             
                 do i = 1, size(pres)
