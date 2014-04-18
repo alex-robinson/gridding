@@ -117,6 +117,7 @@ contains
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                           fill=.TRUE.,missing_value=missing_value)
+            call fill(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
             else
@@ -603,7 +604,7 @@ contains
                 nk = clim_range(2) - clim_range(1) + 1 
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                    "_MARv3.3-15km-monthly-MIROC5-rcp85_",clim_range(1),"-",clim_range(2),".nc"
+                    "_MARv3.3-30km-monthly-MIROC5-rcp85_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
         else if (trim(domain) .eq. "Antarctica") then 
