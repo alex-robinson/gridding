@@ -36,7 +36,9 @@ program gentopo
 !         call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
         
         ! Climatologlies
-        call MARv33_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+!         call MARv33_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+        call MARv33_to_grid(outfldr,grid,"Greenland-MIROC5-RCP85",clim_range=[1981,2010])
+        call MARv33_to_grid(outfldr,grid,"Greenland-MIROC5-RCP85",clim_range=[2071,2100])
         
     end if 
 

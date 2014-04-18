@@ -481,7 +481,7 @@ contains
 
             ! For climatology
             if (present(clim_range)) then  
-                k0 = clim_range(1) - 1958+1
+                k0 = clim_range(1) - year0+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
@@ -509,6 +509,15 @@ contains
             year0       = 1976
             year_switch = 2006   ! Switch scenarios (historical to RCP85)
             nyr         = 2100-1976+1
+
+            ! For climatology
+            if (present(clim_range)) then  
+                k0 = clim_range(1) - year0+1
+                nk = clim_range(2) - clim_range(1) + 1 
+
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                    "_MARv3.3-15km-monthly-MIROC5-rcp85_",clim_range(1),"-",clim_range(2),".nc"
+            end if 
 
         else if (trim(domain) .eq. "Antarctica") then 
 
