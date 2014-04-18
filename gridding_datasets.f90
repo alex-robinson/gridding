@@ -232,6 +232,9 @@ contains
         call def_var_info(pres( 4),"None","v", "p_v",units="m s**-1",   plev="plev",filenames=files_pres)
         call def_var_info(pres( 5),"None","w", "p_w",units="Pa s**-1",  plev="plev",filenames=files_pres)
 
+        nyr = 2012-1979+1
+        nm  = 12 
+
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
             ! Allocate the input grid variable
@@ -258,9 +261,6 @@ contains
             call nc_read(trim(var_now%filename),var_now%nm_in,invar)
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-
-            nyr = 2012-1979+1
-            nm  = 12 
 
             q = 0 
             do k = 1, nyr 
