@@ -186,7 +186,7 @@ contains
 
             ! For climatology
             if (present(clim_range)) then  
-                k0 = clim_range(1) - 1958 + 1
+                k0 = clim_range(1) - 1979 + 1
                 nk = clim_range(2) - clim_range(1) + 1 
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
@@ -350,12 +350,10 @@ contains
             call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
         
             ! ## INVARIANT FIELDS ##
-            do i = 1, size(invariant)
-                var_now = invariant(i) 
-                call nc_read(filename,var_now%nm_out,var2D)
-                call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
-                              units=var_now%units_out)
-            end do 
+            var_now = invariant(1) 
+            call nc_read(filename,var_now%nm_out,var2D)
+            call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+                          units=var_now%units_out)
 
             do i = 1, size(surf)
                 var_now = surf(i)
