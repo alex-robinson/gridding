@@ -190,7 +190,7 @@ contains
                 nk = clim_range(2) - clim_range(1) + 1 
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                    "_MARv3.3-15km-monthly-ERA-Interim_",clim_range(1),"-",clim_range(2),".nc"
+                    "_ERA-INTERIM_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
         else if (trim(domain) .eq. "ANT075") then 
@@ -372,11 +372,15 @@ contains
 
                 ! ## Make one file for each pressure level ##
                 if (plev(l) .ge. 1000) then 
+                    write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb_197901-201212.nc"
                     write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
                                                plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 else
                     write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
                                                plev(l),"Mb",clim_range(1),"-",clim_range(2),".nc"
+                    write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
+                                               plev(l),"Mb_197901-201212.nc"
                 end if 
 
                 ! Initialize the output file
