@@ -226,7 +226,7 @@ contains
                        fill=.TRUE.,missing_value=missing_value)
         
         ! Make sure basins cover entire land area
-        call nc_read(trim(var_now%filename),"zs",zs)
+        call nc_read(filename,"zs",zs)
         where(outvar .eq. 0) outvar = nint(missing_value)
         where(zs .lt. 0.d0)  outvar = 0.d0 
         call fill_nearest(outvar,nint(missing_value))
