@@ -93,8 +93,8 @@ program gentopo
 !         call ecmwf_to_grid(   outfldr, grid, "GRL075",   max_neighbors=8,lat_lim=2.d0)
 !         call CERES_to_grid(   outfldr, grid, "Global",   max_neighbors=8,lat_lim=2.d0)
 
-        call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",         max_neighbors=20,lat_lim=2.d0)
-        call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",         max_neighbors=30,lat_lim=2.d0)
+        call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=30,lat_lim=2.d0)
 !         call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",         max_neighbors=20,lat_lim=2.d0)
         
         ! Climatologlies
