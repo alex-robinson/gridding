@@ -114,11 +114,11 @@ contains
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
             if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill(invar,missing_value=missing_value,fill_value=-1000.d0)
+                call fill_mean(invar,missing_value=missing_value,fill_value=-1000.d0)
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                           fill=.TRUE.,missing_value=missing_value)
-            call fill(outvar,missing_value=missing_value)
+            call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
             else
@@ -640,13 +640,14 @@ contains
         type(grid_class)   :: gMAR
         character(len=256) :: file_invariant, file_surface, file_prefix(2)
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
-        double precision, allocatable :: invar(:,:) 
+        double precision, allocatable :: invar(:,:)
+        integer, allocatable :: invar_int(:,:) 
         integer :: plev(9) 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
-        integer, allocatable          :: outmask(:,:)
+        integer, allocatable          :: outmask(:,:), outvar_int(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
         integer :: yearf, k0, nk 
@@ -728,28 +729,28 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(2))
-        call def_var_info(invariant(1),trim(file_invariant),"MSK_MAR","mask",units="(0 - 2)",method="nn")
-        call def_var_info(invariant(2),trim(file_invariant),"SRF_MAR","zs",units="m")
+        call def_var_info(invariant(1),trim(file_invariant),"MSK_MAR","mask",units="(0 - 2)",method="nn",fill=.TRUE.)
+        call def_var_info(invariant(2),trim(file_invariant),"SRF_MAR","zs",units="m",fill=.TRUE.)
 
         allocate(surf(19))
         call def_var_info(surf( 1),trim(file_surface),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
         call def_var_info(surf( 2),trim(file_surface),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
         call def_var_info(surf( 3),trim(file_surface),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
         call def_var_info(surf( 4),trim(file_surface),"ST",  "ts",  units="degrees Celcius")
-        call def_var_info(surf( 5),trim(file_surface),"TT",  "t3m", units="degrees Celcius")
-        call def_var_info(surf( 6),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
-        call def_var_info(surf( 7),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
-        call def_var_info(surf( 8),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 5),trim(file_surface),"TT",  "t3m", units="degrees Celcius",fill=.TRUE.)
+        call def_var_info(surf( 6),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
+        call def_var_info(surf( 7),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
+        call def_var_info(surf( 8),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
         call def_var_info(surf( 9),trim(file_surface),"AL",  "al",  units="(0 - 1)")
-        call def_var_info(surf(10),trim(file_surface),"SWD", "swd", units="W m**-2")
-        call def_var_info(surf(11),trim(file_surface),"LWD", "lwd", units="W m**-2")
-        call def_var_info(surf(12),trim(file_surface),"SHF", "shf", units="W m**-2")
-        call def_var_info(surf(13),trim(file_surface),"LHF", "lhf", units="W m**-2")
-        call def_var_info(surf(14),trim(file_surface),"SP",  "sp",  units="hPa")
-        call def_var_info(surf(15),trim(file_surface),"UU",  "u",   units="m s**-1")
-        call def_var_info(surf(16),trim(file_surface),"VV",  "v",   units="m s**-1")
-        call def_var_info(surf(17),trim(file_surface),"QQ",  "q",   units="g kg**-1")
-        call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)")
+        call def_var_info(surf(10),trim(file_surface),"SWD", "swd", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(11),trim(file_surface),"LWD", "lwd", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(12),trim(file_surface),"SHF", "shf", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(13),trim(file_surface),"LHF", "lhf", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(14),trim(file_surface),"SP",  "sp",  units="hPa",fill=.TRUE.)
+        call def_var_info(surf(15),trim(file_surface),"UU",  "u",   units="m s**-1",fill=.TRUE.)
+        call def_var_info(surf(16),trim(file_surface),"VV",  "v",   units="m s**-1",fill=.TRUE.)
+        call def_var_info(surf(17),trim(file_surface),"QQ",  "q",   units="g kg**-1",fill=.TRUE.)
+        call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)",fill=.TRUE.)
         call def_var_info(surf(19),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
 
         nm       = 12
@@ -760,6 +761,7 @@ contains
 
             ! Allocate the input grid variable
             call grid_allocate(gMAR,invar)
+            call grid_allocate(gMAR,invar_int)
 
             ! Initialize mapping
             call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -767,7 +769,8 @@ contains
             ! Initialize output variable arrays
             call grid_allocate(grid,outvar)
             call grid_allocate(grid,outmask)    
-            
+            call grid_allocate(grid,outvar_int)
+
             ! Initialize the output file
             call nc_create(filename)
             call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
@@ -777,19 +780,21 @@ contains
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
             ! ## INVARIANT FIELDS ##
-            do i = 1, size(invariant)
-                var_now = invariant(i) 
-                call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value)
-                outvar = missing_value 
-                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
-                               fill=.TRUE.,missing_value=missing_value)
-                call fill_weighted(outvar,missing_value=missing_value)
-                if (var_now%method .eq. "nn") then 
-                    call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-                else
-                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
-                end if  
-            end do 
+            var_now = invariant(1)
+            call nc_read(var_now%filename,var_now%nm_in,invar_int,missing_value=nint(missing_value))
+            outvar_int = nint(missing_value)
+            call map_field(map,var_now%nm_in,invar_int,outvar_int,outmask,var_now%method,50.d3, &
+                           fill=.TRUE.,missing_value=missing_value)
+            if (var_now%fill) call fill_nearest(outvar_int,missing_value=nint(missing_value))
+            call nc_write(filename,var_now%nm_out,outvar_int,dim1="xc",dim2="yc",units=var_now%units_out)
+
+            var_now = invariant(2)
+            call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+            outvar_int = nint(missing_value)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
+                           fill=.TRUE.,missing_value=missing_value)
+            if (var_now%fill) call fill_mean(outvar,missing_value=missing_value)
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
             n_prefix = 1 
             do k = 1, nyr 
@@ -813,7 +818,7 @@ contains
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
                                        fill=.TRUE.,missing_value=missing_value)
-                        call fill_weighted(outvar,missing_value=missing_value)
+                        if (var_now%fill) call fill_mean(outvar,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     end do 
@@ -1033,7 +1038,7 @@ contains
 
 
     ! Define some variable info for later manipulation
-    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,conv,plev,filenames)
+    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,conv,plev,fill,filenames)
         implicit none 
 
         type(var_defs) :: var 
@@ -1043,6 +1048,7 @@ contains
         character(len=*), optional :: plev 
         character(len=*), optional :: filenames(:)
         double precision, optional :: conv 
+        logical, optional :: fill 
 
         var%filename  = trim(filename)
         var%nm_in     = trim(nm_in)
@@ -1067,6 +1073,9 @@ contains
 
         var%conv = 1.d0 
         if (present(conv)) var%conv = conv 
+
+        var%fill = .FALSE. 
+        if (present(fill)) var%fill = fill 
 
         return 
 
@@ -1099,60 +1108,6 @@ contains
 
         return
     end subroutine thin 
-
-    ! Fill in missing values of an array with neighbor averages
-    ! or with a specified fill_value
-    subroutine fill(var,missing_value,fill_value)
-        implicit none 
-        double precision, dimension(:,:) :: var 
-        double precision :: missing_value 
-        double precision, optional :: fill_value
-
-        integer :: q, nx, ny, i, j 
-        integer, parameter :: qmax = 50 ! Iterations 
-
-        double precision, dimension (3,3) :: neighb, weight
-        double precision :: wtot, mval 
-        double precision, dimension(:,:), allocatable :: filled
-        nx = size(var,1)
-        ny = size(var,2) 
-
-        allocate(filled(nx,ny))
-
-        if (present(fill_value)) then
-            where(var .eq. missing_value) var = fill_value 
-        end if 
-
-        do q = 1, qmax 
-
-            filled = missing_value 
-
-            do i = 2, nx-1 
-                do j = 2, ny-1 
-                    neighb = var(i-1:i+1,j-1:j+1)
-
-                    weight = 0.d0 
-                    where (neighb .ne. missing_value) weight = 1.d0
-                    wtot = sum(weight)
-
-                    if (wtot .gt. 0.d0) then 
-                        mval = sum(neighb*weight)/wtot
-                        where (neighb .eq. missing_value) neighb = mval 
-                    end if 
-
-                    filled(i-1:i+1,j-1:j+1) = neighb 
-
-                end do 
-            end do 
-
-            where(filled .ne. missing_value) var = filled 
-
-            write(*,*) q," : Missing values: ", count(var .eq. missing_value)
-            if ( count(var .eq. missing_value) .eq. 0 ) exit 
-        end do 
-
-        return
-    end subroutine fill 
 
 end module gridding_datasets
 
