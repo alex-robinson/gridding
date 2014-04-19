@@ -783,6 +783,7 @@ contains
                 outvar = missing_value 
                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
                                fill=.TRUE.,missing_value=missing_value)
+                call fill_weighted(outvar,missing_value=missing_value)
                 if (var_now%method .eq. "nn") then 
                     call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
                 else
@@ -812,6 +813,7 @@ contains
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
                                        fill=.TRUE.,missing_value=missing_value)
+                        call fill_weighted(outvar,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     end do 
