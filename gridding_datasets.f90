@@ -740,7 +740,7 @@ contains
         call def_var_info(surf( 5),trim(file_surface),"TT",  "t3m", units="degrees Celcius",fill=.TRUE.)
         call def_var_info(surf( 6),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
         call def_var_info(surf( 7),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
-        call def_var_info(surf( 8),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
+        call def_var_info(surf( 8),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
         call def_var_info(surf( 9),trim(file_surface),"AL",  "al",  units="(0 - 1)")
         call def_var_info(surf(10),trim(file_surface),"SWD", "swd", units="W m**-2",fill=.TRUE.)
         call def_var_info(surf(11),trim(file_surface),"LWD", "lwd", units="W m**-2",fill=.TRUE.)
@@ -780,21 +780,23 @@ contains
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
             ! ## INVARIANT FIELDS ##
-            var_now = invariant(1)
-            call nc_read(var_now%filename,var_now%nm_in,invar_int,missing_value=nint(missing_value))
-            outvar_int = nint(missing_value)
-            call map_field(map,var_now%nm_in,invar_int,outvar_int,outmask,var_now%method,50.d3, &
-                           fill=.TRUE.,missing_value=missing_value)
-            if (var_now%fill) call fill_nearest(outvar_int,missing_value=nint(missing_value))
-            call nc_write(filename,var_now%nm_out,outvar_int,dim1="xc",dim2="yc",units=var_now%units_out)
+            do i = 1, size(invariant)
 
-            var_now = invariant(2)
-            call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
-            outvar_int = nint(missing_value)
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
-                           fill=.TRUE.,missing_value=missing_value)
-            if (var_now%fill) call fill_mean(outvar,missing_value=missing_value)
-            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                var_now = invariant(i)
+                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+                outvar = missing_value
+                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
+                               fill=.TRUE.,missing_value=missing_value)
+                if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
+                if (trim(var_now%method) .eq. "nn") then 
+                    call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
+                                  units=var_now%units_out,missing_value=nint(missing_value))
+                else 
+                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
+                                  units=var_now%units_out,missing_value=real(missing_value))
+                end if 
+
+            end do 
 
             n_prefix = 1 
             do k = 1, nyr 
