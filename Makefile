@@ -10,8 +10,19 @@ usage:
 	@echo " make clean      : cleans object files"
 	@echo ""
 
+# PATH options
 objdir = .obj
+srcdir = src
+libdir = ..
 
+# netcdf_inc = /usr/include
+# netcdf_lib = /usr/lib
+netcdf_inc = /opt/local/include
+netcdf_lib = /opt/local/lib
+netcdf_inc_ifort = /home/robinson/apps/netcdf/netcdf/include
+netcdf_lib_ifort = /home/robinson/apps/netcdf/netcdf/lib
+
+# Command-line options at make call
 ifort ?= 0
 debug ?= 0 
 
@@ -23,50 +34,52 @@ endif
 
 ifeq ($(ifort),1)
 	## IFORT OPTIONS ##
-	FLAGS        = -module $(objdir) -L$(objdir) -I/home/robinson/apps/netcdf/netcdf/include
-	LFLAGS		 = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf
+	FLAGS        = -module $(objdir) -L$(objdir) -I$(netcdf_inc_ifort)
+	LFLAGS		 = -L$(netcdf_lib_ifort) -lnetcdf
 
 	ifeq ($(debug), 1)
-	    DFLAGS   = -w -C -traceback -ftrapuv -fpe0 -check all -vec-report0
+	    DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0
+	    # -w 
 	else
 	    DFLAGS   = -vec-report0 -O3
 	endif
 else
 	## GFORTRAN OPTIONS ##
-	FLAGS        = -I$(objdir) -J$(objdir) -I/opt/local/include
-	LFLAGS		 = -L/opt/local/lib -lnetcdff -lnetcdf
+	FLAGS        = -I$(objdir) -J$(objdir) -I$(netcdf_inc)
+	LFLAGS		 = -L$(netcdf_lib) -lnetcdff -lnetcdf
 
 	ifeq ($(debug), 1)
-	    DFLAGS   = -w -p -ggdb -ffpe-trap=invalid,zero,overflow,underflow -fbacktrace -fcheck=all
+	    DFLAGS   = -w -p -ggdb -ffpe-trap=invalid,zero,overflow,underflow \
+	               -fbacktrace -fcheck=all -fbackslash
 	else
-	    DFLAGS   = -O3
+	    DFLAGS   = -O3 -fbackslash
 	endif
 endif
 
 ## Individual libraries or modules ##
-$(objdir)/ncio.o: ../ncio/ncio.f90
+$(objdir)/ncio.o: $(libdir)/ncio/ncio.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/planet.o: ../coord/planet.f90
+$(objdir)/planet.o: $(libdir)/coord/planet.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/geodesic.o: ../coord/geodesic.f90
+$(objdir)/geodesic.o: $(libdir)/coord/geodesic.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/projection_oblimap2.o: ../coord/projection_oblimap2.f90
+$(objdir)/projection_oblimap2.o: $(libdir)/coord/projection_oblimap2.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/coordinates.o: ../coord/coordinates.f90 $(objdir)/projection_oblimap2.o \
+$(objdir)/coordinates.o: $(libdir)/coord/coordinates.f90 $(objdir)/projection_oblimap2.o \
 	                     $(objdir)/geodesic.o $(objdir)/planet.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/interp1D.o: ../coord/interp1D.f90
+$(objdir)/interp1D.o: $(libdir)/coord/interp1D.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/interp2D.o: ../coord/interp2D.f90
+$(objdir)/interp2D.o: $(libdir)/coord/interp2D.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/interp_time.o: ../coord/interp_time.f90 $(objdir)/interp1D.o
+$(objdir)/interp_time.o: $(libdir)/coord/interp_time.f90 $(objdir)/interp1D.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/gridding_datasets.o: gridding_datasets.f90
@@ -81,7 +94,16 @@ GRL: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	         $(objdir)/gridding_datasets.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
 	@echo " "
-	@echo "    gentopo_grl.x is ready."
+	@echo "    gentopo_GRL.x is ready."
+	@echo " "
+
+ANT: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
+	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
+	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
+	         $(objdir)/gridding_datasets.o
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_ANT.x is ready."
 	@echo " "
 
 test: $(objdir)/ncio.o

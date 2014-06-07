@@ -22,9 +22,10 @@ module gridding_datasets
     end type 
 
     private
-    public :: Bamber13_to_grid, ecmwf_to_grid
+    public :: Bamber13_to_grid, bedmap2_to_grid, ecmwf_to_grid
     public :: MARv33_to_grid, MARv32_to_grid
     public :: CERES_to_grid 
+    public :: bedmap2_read 
 
 contains
 
@@ -237,6 +238,175 @@ contains
         return 
 
     end subroutine basins_to_grid
+
+    subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       TOPO DATA
+        !
+        ! =========================================================
+        
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename, infldr, prefix  
+
+        type(grid_class)   :: gTOPO
+        character(len=256) :: file_invariant, file_surface, file_prefix(2)
+        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        double precision, allocatable :: invar(:,:) 
+        integer :: plev(9) 
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:), tmp1(:,:), tmp2(:,:), tmp3(:,:)
+        integer, allocatable          :: outmask(:,:)
+        double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
+        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+
+!         !! Test reading bedmap2 dataset 
+!         call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_surface.txt","Surface",var2D,missing_value=-9999.d0)
+!         write(*,*) "bedmap2 surface min/max: ",minval(var2D,mask=var2D .ne. -9999.d0), maxval(var2D,mask=var2D .ne. -9999.d0)
+
+        ! Define input grid
+        if (trim(domain) .eq. "Antarctica") then 
+            
+            ! Define topography (BEDMAP2) grid and input variable field
+            call grid_init(gTOPO,name="BEDMAP2-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
+                   x0=-3400.5d0,dx=1.d0,nx=681,y0=-3400.5d0,dy=1.d0,ny=681, &
+                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+
+            ! Define the input filenames
+            infldr         = "data/Antarctica/Bedmap2/bedmap2_ascii/"
+            file_invariant = trim(infldr)//"bedmap2_surface.txt"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO.nc"
+
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+        end if 
+
+        ! Define the variables to be mapped 
+        allocate(invariant(6))
+        call def_var_info(invariant(1),trim(infldr)//"bedmap2_surface.txt","SurfaceElevation","zs",units="m")
+        call def_var_info(invariant(2),trim(infldr)//"bedmap2_bed.txt","BedrockElevation","zb",units="m")
+        call def_var_info(invariant(3),trim(infldr)//"bedmap2_thickness.txt","IceThickness","H",units="m")
+        call def_var_info(invariant(4),trim(infldr)//"bedmap2_icemask_grounded_and_shelves.txt", &
+                          "LandMask","mask",units="(0 - 4",method="nn")
+        call def_var_info(invariant(5),trim(infldr)//"rignot_velocity_bedmap2_grid.txt", &
+                          "Velocity","uv",units="m/s")
+        call def_var_info(invariant(6),trim(infldr)//"arthern_accumulation_rms_bedmap2_grid.txt", &
+                          "Accumulation","acc",units="mm a^-1")
+
+        ! Allocate the input grid variable
+        call grid_allocate(gTOPO,invar)
+        
+        ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
+        allocate(tmp1(6801,6801))  ! bedmap2 array
+        allocate(tmp2(5602,5602))  ! rignot array
+        allocate(tmp3(7899,8300))  ! arthern array 
+
+        ! Initialize mapping
+        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+        
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+    
+        ! ## INVARIANT FIELDS ##
+        do i = 1, 1 !size(invariant)
+            var_now = invariant(i) 
+            call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
+            call thin(invar,tmp1,by=10)
+            if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+                where( invar .eq. missing_value ) invar = 0.d0 
+            end if
+            if (trim(var_now%nm_out) .eq. "zb") then 
+                call fill_mean(invar,missing_value=missing_value,fill_value=-1000.d0)
+            end if 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+                          fill=.TRUE.,missing_value=missing_value)
+            call fill_mean(outvar,missing_value=missing_value)
+            if (var_now%method .eq. "nn") then 
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            else
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            end if 
+        end do 
+
+!         ! Fix the mask to be consistent with interpolated fields 
+!         ! Initialize variable arrays
+!         call grid_allocate(grid,zb)
+!         call grid_allocate(grid,zs)
+!         call grid_allocate(grid,H)
+    
+!         call nc_read(trim(filename),"zb",zb,missing_value=missing_value)
+!         call nc_read(trim(filename),"zs",zs,missing_value=missing_value)
+!         call nc_read(trim(filename),"H",H,missing_value=missing_value)
+        
+!         where(zs .lt. 0.d0) zs = 0.d0 
+!         where(zs .lt. zb)   zs = zb 
+!         H = zs - zb 
+!         where(H  .lt. 1.d0) H  = 0.d0 
+
+!         outvar = 0.d0 
+!         where (zs .gt. 0.d0) outvar = 1.d0 
+        
+        return 
+
+    end subroutine bedmap2_to_grid
+
+    subroutine bedmap2_read(filename,name,var2D,missing_value)
+
+        implicit none 
+
+        character(len=*) :: filename, name 
+        double precision :: var2D(:,:), missing_value 
+        character(len=50) :: tmpc 
+        double precision  :: tmpd, missing_val0 
+        integer :: i, nrow 
+
+        write(*,*) "Reading: "//trim(filename)//": "//trim(name)
+
+        ! Open the data file for reading
+        open(166,file=filename,status="old")
+
+        ! Read the header, extract the missing value from last line
+        do i = 1, 6
+            read(166,*) tmpc, tmpd 
+        end do 
+        missing_val0 = tmpd 
+
+        ! Loop over all rows in file and store data in array
+        nrow = size(var2D,1)
+        var2D = missing_value
+        do i = 1, nrow 
+            read(166,*) var2D(i,:)
+        end do 
+
+        ! Overwrite missing data with the desired missing value
+        where(var2D .eq. missing_val0) var2D = missing_value 
+
+        write(*,*) "Done."
+
+        return
+
+    end subroutine bedmap2_read
 
     subroutine ecmwf_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file

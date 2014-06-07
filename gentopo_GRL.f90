@@ -111,7 +111,7 @@ program gentopo
     !
     ! =========================================================
 
-    if ( .TRUE. ) then 
+    if ( .FALSE. ) then 
         
         ! Define output variable grid
         call grid_init(grid,name="Bamber01-10KM",mtype="stereographic",units="kilometers", &
@@ -120,12 +120,12 @@ program gentopo
 
         outfldr = "output/Greenland/"//trim(grid%name)
 
-!         call Bamber13_to_grid(outfldr, grid, "Greenland",max_neighbors=20,lat_lim=2.d0)
-!         call ecmwf_to_grid(   outfldr, grid, "GRL075",   max_neighbors=8,lat_lim=2.d0)
-!         call CERES_to_grid(   outfldr, grid, "Global",   max_neighbors=8,lat_lim=2.d0)
+        call Bamber13_to_grid(outfldr, grid, "Greenland",max_neighbors=20,lat_lim=2.d0)
+        call ecmwf_to_grid(   outfldr, grid, "GRL075",   max_neighbors=8,lat_lim=2.d0)
+        call CERES_to_grid(   outfldr, grid, "Global",   max_neighbors=8,lat_lim=2.d0)
 
-!         call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",         max_neighbors=20,lat_lim=2.d0)
-!         call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(  outfldr, grid, "Greenland-ERA",         max_neighbors=20,lat_lim=2.d0)
+        call MARv33_to_grid(  outfldr, grid, "Greenland-MIROC5-RCP85",max_neighbors=20,lat_lim=2.d0)
         call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",         max_neighbors=20,lat_lim=2.d0)
         
         ! Climatologlies
@@ -145,7 +145,7 @@ program gentopo
     if ( .FALSE. ) then 
 
         ! Define output variable grid
-        
+
         call grid_init(grid,name="GRL-10KM",mtype="stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=10.d0,nx=180,dy=10.d0,ny=300, &
                        lambda=-40.d0,phi=72.d0,alpha=7.5d0)
