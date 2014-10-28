@@ -835,7 +835,7 @@ contains
             file_invariant = "/data/sicopolis/data/MARv3.5/Greenland/ERA_1958-2013_25km/"// &
                              "MARv3.5-25km-monthly-ERA-Interim-2013.nc"
             file_surface   = "/data/sicopolis/data/MARv3.5/Greenland/"
-            file_prefix(1) = "ERA_1958-2013_25km/MARv3.5-25km-monthly-ERA-Interim-"
+            file_prefix(1) = "ERA_1958-2013_25km/MARv3.5-25km-monthly-ERA-40-"
             file_prefix(2) = "ERA_1958-2013_25km/MARv3.5-25km-monthly-ERA-Interim-"
 
             ! Define the output filename 
