@@ -15,12 +15,11 @@ program rawclean
     implicit none 
 
     integer :: nx, ny, nlev, nt
-    double precision, allocatable, dimension(:) :: x, y, time
+    double precision, allocatable, dimension(:) :: x, y
     character(len=512) :: filename0, filename
     character(len=256) :: xnm0, ynm0, xnm, ynm, tnm, gm
 
     real, allocatable :: var2D(:,:), var3D(:,:,:), var3D365(:,:,:)
-    real, parameter :: mv0 = -1.d34 
     real, parameter :: mv  = -9999.0 
 
     integer :: argcount
@@ -57,7 +56,7 @@ program rawclean
     nt = nc_size(filename0,"TIME")
     write(*,*) "nx,ny,nt = ",nx, ny, nt 
 
-    allocate(x(nx),y(ny),time(366))
+    allocate(x(nx),y(ny))
     allocate(var2D(nx,ny),var3D(nx,ny,nt),var3D365(nx,ny,365))
 
     call nc_read(filename0,xnm0,x)
@@ -290,8 +289,11 @@ contains
 
         nt = size(var,3)
 
+        write(*,*) "var:    ",size(var,1),size(var,2),size(var,3)
+        write(*,*) "var365: ",size(var365,1),size(var365,2),size(var365,3)
+        
         if (nt .eq. 366) then 
-            var365(:,:,1:k28) = var(:,:,1:k28)
+            var365(:,:,1:k28)     = var(:,:,1:k28)
             var365(:,:,k28+1:365) = var(:,:,k28+2:366)
         else
             var365 = var 
