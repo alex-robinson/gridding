@@ -66,7 +66,7 @@ program rawclean
     call nc_write_map(filename,gm,lambda=-39.d0,phi=71.d0,x_e=0.d0,y_n=0.d0)
     call nc_write_dim(filename,xnm,x=x)
     call nc_write_dim(filename,ynm,x=y)
-    call nc_write_dim(filename,"time",x=1,dx=1,nx=365,units="day",calendar="360day")
+    call nc_write_dim(filename,"time",x=1,dx=1,nx=365,units="day",calendar="365day")
 
     ! Longitude 
     call nc_read(filename0,"LON",var2D,missing_value=mv)
