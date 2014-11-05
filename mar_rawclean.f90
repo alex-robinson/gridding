@@ -303,6 +303,8 @@ contains
             var365 = var 
         end if 
 
+        write(*,*) "range(var365): ",minval(var365),maxval(var365)
+
         return
 
     end subroutine del29feb 
