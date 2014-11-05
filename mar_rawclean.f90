@@ -289,21 +289,12 @@ contains
 
         nt = size(var,3)
 
-        write(*,*) "var:    ",size(var,1),size(var,2),size(var,3)
-        write(*,*) "var365: ",size(var365,1),size(var365,2),size(var365,3)
-        write(*,*) size(var365(:,:,k28+1:365),3), size(var(:,:,k28+2:366),3)
-
         if (nt .eq. 366) then 
-            write(*,*) "Here 1"
             var365(:,:,1:k28)     = var(:,:,1:k28)
-            write(*,*) "Here 2"
             var365(:,:,k28+1:365) = var(:,:,k28+2:366)
-            write(*,*) "Here 3"
         else
             var365 = var 
         end if 
-
-        write(*,*) "range(var365): ",minval(var365),maxval(var365)
 
         return
 

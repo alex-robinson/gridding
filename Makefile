@@ -38,10 +38,10 @@ ifeq ($(ifort),1)
 	LFLAGS		 = -L$(netcdf_lib_ifort) -lnetcdf
 
 	ifeq ($(debug), 1)
-	    DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0
+	    DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -heap-arrays
 	    # -w 
 	else
-	    DFLAGS   = -vec-report0 -O3
+	    DFLAGS   = -vec-report0 -O3 -heap-arrays
 	endif
 else
 	## GFORTRAN OPTIONS ##
