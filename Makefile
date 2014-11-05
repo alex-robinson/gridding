@@ -106,6 +106,12 @@ ANT: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	@echo "    gentopo_ANT.x is ready."
 	@echo " "
 
+marclean: $(objdir)/ncio.o
+	$(FC) $(DFLAGS) $(FLAGS) -o mar_rawclean.x $^ mar_rawclean.f90 $(LFLAGS)
+	@echo " "
+	@echo "    mar_rawclean.x is ready."
+	@echo " "
+
 test: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o test.x $^ test.f90 $(LFLAGS)
 	@echo " "
@@ -113,6 +119,6 @@ test: $(objdir)/ncio.o
 	@echo " "
 
 clean:
-	rm -f gentopo_grl.x $(objdir)/*.o $(objdir)/*.mod
+	rm -f gentopo_grl.x gentopo_ant.x mar_rawclean.x $(objdir)/*.o $(objdir)/*.mod
 
 # cleanall: cleansico cleanrembo cleansicoX
