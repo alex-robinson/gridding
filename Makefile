@@ -112,6 +112,12 @@ marclean: $(objdir)/ncio.o
 	@echo "    mar_rawclean.x is ready."
 	@echo " "
 
+marmonthly: $(objdir)/ncio.o
+	$(FC) $(DFLAGS) $(FLAGS) -o mar_calcmonthly.x $^ mar_calcmonthly.f90 $(LFLAGS)
+	@echo " "
+	@echo "    mar_calcmonthly.x is ready."
+	@echo " "
+
 test: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o test.x $^ test.f90 $(LFLAGS)
 	@echo " "

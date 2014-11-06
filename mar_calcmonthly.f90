@@ -8,7 +8,7 @@
 ! gfortran -I/opt/local/include -o mar_rawclean.x ncio.f90 mar_rawclean.f90 -L/opt/local/lib -lnetcdff -lnetcdf
 !
 
-program rawclean
+program calcmonthly
 
     use ncio 
 
@@ -16,10 +16,10 @@ program rawclean
 
     integer :: nx, ny, nlev, nt
     double precision, allocatable, dimension(:) :: x, y
-    character(len=512) :: filename0, filename
+    character(len=512) :: filename0, filename, filename1
     character(len=256) :: xnm0, ynm0, xnm, ynm, tnm, gm
 
-    real, allocatable :: var2D(:,:), var3D(:,:,:), var3D365(:,:,:)
+    real, allocatable :: var2D(:,:), var3D(:,:,:), var3D12(:,:,:)
     real, parameter :: mv  = -9999.0 
 
     integer :: argcount
@@ -36,6 +36,12 @@ program rawclean
 
     filename0 = trim(args(1))//"/"//trim(args(2))
     filename  = trim(args(1))//"clean/"//trim(args(2))
+
+    ! Monthly filename
+    i0 = index(filename,"ERA-30km-",back=.TRUE.)
+    i1 = i0 + 9
+    i2 = len_trim(filename)
+    filename = filename(1:i0-1)//"ERA-30km-monthly-"//filename(i1:i2)
 
     if (trim(filename0) == trim(filename) ) then 
         write(*,*) "Error: new filename is the same as the input filename."
@@ -58,7 +64,7 @@ program rawclean
     write(*,*) "nx,ny,nt = ",nx, ny, nt 
 
     allocate(x(nx),y(ny))
-    allocate(var2D(nx,ny),var3D(nx,ny,nt),var3D365(nx,ny,365))
+    allocate(var2D(nx,ny),var3D(nx,ny,nt),var3D12(nx,ny,12))
 
     call nc_read(filename0,xnm0,x)
     call nc_read(filename0,ynm0,y)
@@ -68,7 +74,7 @@ program rawclean
     call nc_write_map(filename,gm,lambda=-39.d0,phi=71.d0,x_e=0.d0,y_n=0.d0)
     call nc_write_dim(filename,xnm,x=x)
     call nc_write_dim(filename,ynm,x=y)
-    call nc_write_dim(filename,"time",x=1,dx=1,nx=365,units="day",calendar="365day")
+    call nc_write_dim(filename,"time",x=1,dx=1,nx=12,units="month")
 
     ! Longitude 
     call nc_read(filename0,"LON",var2D,missing_value=mv)
@@ -105,211 +111,191 @@ program rawclean
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SHSN0",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SHSN0",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SHSN0",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Ini. old firn/ice thickness",units="m", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SHSN2",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SHSN2",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SHSN2",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Snow Pack Height above Ice",units="m", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SHSN3",var3D,start=[1,1,2,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SHSN3",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SHSN3",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Snow Pack Height Total",units="m", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SMB",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SMB",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SMB",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Surface Mass Balance (SMB~SF+RF-RU-SU-SW)",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SU",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SU",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SU",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Sublimation and evaporation",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"ME",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"ME",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"ME",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Meltwater production",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"RZ",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"RZ",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"RZ",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Meltwater refreezing and deposition",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
 !     call nc_read(filename0,"SW",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-!     call del29feb(var3D,var3D365)
-!     call nc_write(filename,"SW",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+!     call daily_to_monthly(var3D,var3D12)
+!     call nc_write(filename,"SW",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
 !                   long_name="Surface Water",units="mmWE/day", &
 !                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SF",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SF",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SF",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Snowfall",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"RF",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"RF",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"RF",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Rainfall",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"RU",var3D,start=[1,1,1,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"RU",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"RU",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Run-off of meltwater and rain water",units="mmWE/day", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"UU",var3D,start=[1,1,23,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"UU",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"UU",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="x-Wind Speed component",units="m/s", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"VV",var3D,start=[1,1,23,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"VV",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"VV",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="y-Wind Speed component",units="m/s", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"TT",var3D,start=[1,1,23,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"TT",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"TT",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Temperature",units="C", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"QQ",var3D,start=[1,1,23,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"QQ",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"QQ",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Specific Humidity",units="g/kg", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SP",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SP",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SP",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Surface Pressure",units="hPa", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"RH",var3D,start=[1,1,3,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"RH",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"RH",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Relative Humidity",units="%", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"TTMIN",var3D,start=[1,1,3,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"TTMIN",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"TTMIN",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Min Temp",units="C", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"TTMAX",var3D,start=[1,1,3,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"TTMAX",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"TTMAX",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Max Temp",units="C", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"UV",var3D,start=[1,1,3,1],count=[nx,ny,1,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"UV",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"UV",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Wind Speed",units="m/s", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SWD",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SWD",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SWD",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Short Wave Downward",units="W/m2", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"LWD",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"LWD",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"LWD",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Long  Wave Downward",units="W/m2", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"LWU",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"LWU",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"LWU",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Long  Wave Upward",units="W/m2", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"SHF",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"SHF",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"SHF",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Sensible Heat Flux",units="W/m2", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"LHF",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"LHF",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"LHF",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Latent Heat Flux",units="W/m2", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"AL",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"AL",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"AL",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Albedo",units="-", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"CC",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"CC",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"CC",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Cloud Cover",units="-", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"ST",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"ST",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"ST",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Surface Temperature",units="C", &
                   missing_value=mv,grid_mapping=gm)
 
     call nc_read(filename0,"PDD",var3D,start=[1,1,1],count=[nx,ny,nt],missing_value=mv)
-    call del29feb(var3D,var3D365)
-    call nc_write(filename,"PDD",var3D365,dim1=xnm,dim2=ynm,dim3=tnm, &
+    call daily_to_monthly(var3D,var3D12)
+    call nc_write(filename,"PDD",var3D12,dim1=xnm,dim2=ynm,dim3=tnm, &
                   long_name="Postive Degree Day",units="C", &
                   missing_value=mv,grid_mapping=gm)
 
-
 contains 
 
-    subroutine del29feb(var,var365)
+    subroutine daily_to_monthly(var,var12)
 
         implicit none 
 
-        real, dimension(:,:,:) :: var, var365
-        integer, parameter :: k28 = 59
-        integer :: nt 
-
-        nt = size(var,3)
-
-        if (nt .eq. 366) then 
-            var365(:,:,1:k28)     = var(:,:,1:k28)
-            var365(:,:,k28+1:365) = var(:,:,k28+2:366)
-        else
-            var365 = var 
-        end if 
-
-        return
-
-    end subroutine del29feb 
-
-    subroutine daily_to_monthly(var365,var12)
-
-        implicit none 
-
-        real, dimension(:,:,:) :: var365, var12
-        integer, parameter, dimension(12) :: mdays = [31,28,31,30,31,30,31,31,30,31,30,31]
+        real, dimension(:,:,:) :: var, var12
+        integer :: mdays(12)
         integer :: m, k0, k1
 
+        mdays = [31,28,31,30,31,30,31,31,30,31,30,31]
+        if (size(var,3) == 366) mdays(2) = 29 
 
         do m = 1, 12 
             if (m == 1) then
@@ -319,7 +305,7 @@ contains
             end if 
             k1 = sum(mdays(1:m))
 
-            var12(:,:,m) = sum(var365(:,:,k0:k1),dim=3) / dble(mdays(m))
+            var12(:,:,m) = sum(var(:,:,k0:k1),dim=3) / dble(mdays(m))
 
         end do 
 
@@ -327,7 +313,7 @@ contains
 
     end subroutine daily_to_monthly 
 
-end program rawclean 
+end program calcmonthly 
 
 
 
