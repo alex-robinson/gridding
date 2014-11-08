@@ -118,6 +118,14 @@ marmonthly: $(objdir)/ncio.o
 	@echo "    mar_calcmonthly.x is ready."
 	@echo " "
 
+bedmap: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
+	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
+	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o
+	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
+	@echo " "
+	@echo "    bedmap2_netcdf.x is ready."
+	@echo " "
+
 test: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o test.x $^ test.f90 $(LFLAGS)
 	@echo " "
