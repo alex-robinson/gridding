@@ -296,18 +296,16 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(4))
-        call def_var_info(invariant(1),file_invariant,"Surface elevation","zs",units="m")
-        call def_var_info(invariant(2),file_invariant,"Bedrock elevation","zb",units="m")
-        call def_var_info(invariant(3),file_invariant,"Ice thickness","H",units="m")
-        call def_var_info(invariant(4),file_invariant,"Ice mask","mask_ice",units="(0 - 1",method="nn")
+        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m")
+        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m")
+        call def_var_info(invariant(3),file_invariant,"H","H",units="m")
+        call def_var_info(invariant(4),file_invariant,"mask_ice","mask_ice",units="(0 - 1",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
         
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(6667,6667))  ! bedmap2 array
-
-        write(*,*) "nc_size: ", nc_size(invariant(1)%filename,"xc"), nc_size(invariant(1)%filename,"yc")
 
         ! Initialize mapping
         call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -326,8 +324,6 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, 1 !size(invariant)
             var_now = invariant(i) 
-            write(*,*) i, trim(var_now%filename), " : ",trim(var_now%nm_in)
-            write(*,*) size(tmp1,1), size(tmp1,2)
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
 !             call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
             call thin(invar,tmp1,by=10)
