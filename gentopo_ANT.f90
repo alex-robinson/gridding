@@ -29,7 +29,7 @@ program gentopo
 
         outfldr = "output/Antarctica/"//trim(grid%name)
 
-        call bedmap2_to_grid( outfldr, grid, "Antarctica",max_neighbors=20,lat_lim=1.d0)
+        call bedmap2_to_grid( outfldr, grid, "Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call ecmwf_to_grid(   outfldr, grid, "ANT075",    max_neighbors=8, lat_lim=2.d0)
 !         call CERES_to_grid(   outfldr, grid, "Global",    max_neighbors=8, lat_lim=2.d0)
 

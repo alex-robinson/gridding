@@ -277,12 +277,12 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(gTOPO,name="BEDMAP2-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3400.5d0,dx=1.d0,nx=681,y0=-3400.5d0,dy=1.d0,ny=681, &
+                   x0=-3400.d0,dx=1.d0,nx=681,y0=-3400.d0,dy=1.d0,ny=681, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
             ! Define the input filenames
-            infldr         = "data/Antarctica/Bedmap2/bedmap2_ascii/"
-            file_invariant = trim(infldr)//"bedmap2_surface.txt"
+            infldr         = "output/Antarctica/"
+            file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_topo.nc"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -295,24 +295,17 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(6))
-        call def_var_info(invariant(1),trim(infldr)//"bedmap2_surface.txt","SurfaceElevation","zs",units="m")
-        call def_var_info(invariant(2),trim(infldr)//"bedmap2_bed.txt","BedrockElevation","zb",units="m")
-        call def_var_info(invariant(3),trim(infldr)//"bedmap2_thickness.txt","IceThickness","H",units="m")
-        call def_var_info(invariant(4),trim(infldr)//"bedmap2_icemask_grounded_and_shelves.txt", &
-                          "LandMask","mask",units="(0 - 4",method="nn")
-        call def_var_info(invariant(5),trim(infldr)//"rignot_velocity_bedmap2_grid.txt", &
-                          "Velocity","uv",units="m/s")
-        call def_var_info(invariant(6),trim(infldr)//"arthern_accumulation_rms_bedmap2_grid.txt", &
-                          "Accumulation","acc",units="mm a^-1")
+        allocate(invariant(4))
+        call def_var_info(invariant(1),file_invariant,"Surface elevation","zs",units="m")
+        call def_var_info(invariant(2),file_invariant,"Bedrock elevation","zb",units="m")
+        call def_var_info(invariant(3),file_invariant,"Ice thickness","H",units="m")
+        call def_var_info(invariant(4),file_invariant,"Ice mask","mask_ice",units="(0 - 1",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
         
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
-        allocate(tmp1(6801,6801))  ! bedmap2 array
-        allocate(tmp2(5602,5602))  ! rignot array
-        allocate(tmp3(7899,8300))  ! arthern array 
+        allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
         call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -331,13 +324,14 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, 1 !size(invariant)
             var_now = invariant(i) 
-            call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
+            call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
+!             call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
             call thin(invar,tmp1,by=10)
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
             if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=missing_value,fill_value=-1000.d0)
+                call fill_mean(invar,missing_value=missing_value,fill_value=-1001.d0)
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                           fill=.TRUE.,missing_value=missing_value)
