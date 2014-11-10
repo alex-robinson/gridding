@@ -277,7 +277,7 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(gTOPO,name="BEDMAP2-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3400.d0,dx=1.d0,nx=681,y0=-3400.d0,dy=1.d0,ny=681, &
+                   x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
             ! Define the input filenames
