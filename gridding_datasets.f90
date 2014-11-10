@@ -307,7 +307,7 @@ contains
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
-        write(*,*) "nc_size: ", nc_size(invariant(1)%filename,"zs")
+        write(*,*) "nc_size: ", nc_size(invariant(1)%filename,"xc"), nc_size(invariant(1)%filename,"yc")
 
         ! Initialize mapping
         call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
