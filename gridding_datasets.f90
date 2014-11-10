@@ -326,6 +326,8 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, 1 !size(invariant)
             var_now = invariant(i) 
+            write(*,*) i, trim(var_now%filename), " : ",trim(var_now%nm_in)
+            write(*,*) size(tmp1,1), size(tmp1,2)
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
 !             call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
             call thin(invar,tmp1,by=10)
