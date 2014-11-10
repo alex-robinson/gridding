@@ -327,11 +327,14 @@ contains
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
 !             call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
             call thin(invar,tmp1,by=10)
-            if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+            if (trim(var_now%nm_out) .eq. "H" .or. &
+                trim(var_now%nm_out) .eq. "zs" .or. &
+                trim(var_now%nm_out) .eq. "mask_ice") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
             if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=missing_value,fill_value=-1001.d0)
+!                 call fill_mean(invar,missing_value=missing_value,fill_value=-1001.d0)
+                call fill_mean(invar,missing_value=missing_value)
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                           fill=.TRUE.,missing_value=missing_value)
