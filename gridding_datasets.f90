@@ -322,7 +322,7 @@ contains
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! ## INVARIANT FIELDS ##
-        do i = 1, 1 !size(invariant)
+        do i = 1, size(invariant)
             var_now = invariant(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
 !             call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
