@@ -52,10 +52,91 @@ program bedmap2_netcdf
     ! Allocate grid variable
     call grid_allocate(grid,var)
 
-    ! Write grid information to output file
-    if (.TRUE.) then
 
-        fnm = filename_topo
+    ! ====== TOPOGRAPHY ========
+    if (.FALSE.) then 
+        ! Write grid information to output file
+        call write_init(filename_topo,grid)
+
+        ! Allocate bedmap dimensions and data array
+        call bedmap2_dims(x,y,var0,x0=-3333.d0,dx=1.d0,nx=6667,y0=-3333.d0,dy=1.d0,ny=6667)
+        
+        ! Surface elevation
+        call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_surface.txt", &
+                          "zs",var0,missing_value=mv)
+    !     var = var0
+        call bedmap2_align(var0=var0,x0=x(1),y0=y(1),var1=var,x1=grid%G%x(1),y1=grid%G%y(1),missing_value=mv)
+        call nc_write(filename_topo,"zs",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="m",long_name="Surface elevation")
+        
+        ! Bedrock elevation
+        call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_bed.txt", &
+                          "zb",var0,missing_value=mv)
+        var = var0
+        call nc_write(filename_topo,"zb",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="m",long_name="Bedrock elevation")
+        
+        ! Ice thickness
+        call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_thickness.txt", &
+                          "H",var0,missing_value=mv)
+        var = var0
+        call nc_write(filename_topo,"H",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="m",long_name="Ice thickness")
+        
+        ! Ice-shelf mask
+        call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_icemask_grounded_and_shelves.txt", &
+                          "mask_ice",var0,missing_value=mv)
+        var = var0
+        call nc_write(filename_topo,"mask_ice",int(var),dim1="xc",dim2="yc",missing_value=int(mv), &
+                      units="-",long_name="Mask (ice-shelf)")
+        
+    !     ! Rock mask
+    !     call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_rockmask.txt", &
+    !                       "mask_rock",var0,missing_value=mv)
+    !     var = var0
+    !     call nc_write(filename_topo,"mask_rock",int(var),dim1="xc",dim2="yc",missing_value=int(mv), &
+    !                   units="-",long_name="Mask (rock)")
+        
+    !     ! Vostock mask
+    !     call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_lakemask_vostok.txt", &
+    !                       "mask_lake",var0,missing_value=mv)
+    !     var = var0
+    !     call nc_write(filename_topo,"mask_lake",int(var),dim1="xc",dim2="yc",missing_value=int(mv), &
+    !                   units="-",long_name="Mask (lake)")
+    
+    end if 
+
+
+
+    ! ====== Velocity ========
+    if (.TRUE.) then 
+    
+        ! ====== Rignot velocities at 900 m resolution
+        call bedmap2_dims(x,y,var0,x0=-2800.d0,dx=0.9d0,nx=6223,y0=-2800.d0,dy=0.9d0,ny=6223)
+        
+        ! Write grid information to output file
+        call write_init(filename_vel,grid)
+
+        call nc_read("data/Antarctica/antarctica_ice_velocity.nc","vx",var0)
+        var0 = var0(:,size(var0),2):1)
+        write(*,*) "Read vx."
+        var = interp_nearest_dble(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,missing_value=mv)
+        write(*,*) "Interpolated vx."
+        call nc_write(filename_vel,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="m*a-1",long_name="Surface velocity, x-comp.")
+    
+    end if 
+
+
+contains 
+
+    subroutine write_init(fnm,grid)
+
+        implicit none 
+
+        character(len=*) :: fnm 
+        type(grid_class) :: grid 
+
         call nc_create(fnm)
             
         ! Add grid axis variables to netcdf file
@@ -66,83 +147,12 @@ program bedmap2_netcdf
         call nc_write_map(fnm,grid%mtype,grid%proj%lambda,phi=grid%proj%phi, &
                           x_e=grid%proj%x_e,y_n=grid%proj%y_n)
      
-    !     call nc_write(fnm,"x2D",grid%x,dim1=xnm,dim2=ynm,grid_mapping=grid%name)
-    !     call nc_write(fnm,"y2D",grid%y,dim1=xnm,dim2=ynm,grid_mapping=grid%name)
         call nc_write(fnm,"lon2D",real(grid%lon),dim1="xc",dim2="yc",grid_mapping=grid%name)
         call nc_write(fnm,"lat2D",real(grid%lat),dim1="xc",dim2="yc",grid_mapping=grid%name)
 
-    end if 
+        return 
 
-    ! Allocate bedmap dimensions and data array
-    call bedmap2_dims(x,y,var0,x0=-3333.d0,dx=1.d0,nx=6667,y0=-3333.d0,dy=1.d0,ny=6667)
-    
-    ! Surface elevation
-    call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_surface.txt", &
-                      "zs",var0,missing_value=mv)
-!     var = var0
-    call bedmap2_align(var0=var0,x0=x(1),y0=y(1),var1=var,x1=grid%G%x(1),y1=grid%G%y(1),missing_value=mv)
-    call nc_write(filename_topo,"zs",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
-                  units="m",long_name="Surface elevation")
-    
-    ! Bedrock elevation
-    call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_bed.txt", &
-                      "zb",var0,missing_value=mv)
-    var = var0
-    call nc_write(filename_topo,"zb",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
-                  units="m",long_name="Bedrock elevation")
-    
-    ! Ice thickness
-    call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_thickness.txt", &
-                      "H",var0,missing_value=mv)
-    var = var0
-    call nc_write(filename_topo,"H",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
-                  units="m",long_name="Ice thickness")
-    
-    ! Ice-shelf mask
-    call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_icemask_grounded_and_shelves.txt", &
-                      "mask_ice",var0,missing_value=mv)
-    var = var0
-    call nc_write(filename_topo,"mask_ice",int(var),dim1="xc",dim2="yc",missing_value=int(mv), &
-                  units="-",long_name="Mask (ice-shelf)")
-    
-!     ! Rock mask
-!     call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_rockmask.txt", &
-!                       "mask_rock",var0,missing_value=mv)
-!     var = var0
-!     call nc_write(filename_topo,"mask_rock",int(var),dim1="xc",dim2="yc",missing_value=int(mv), &
-!                   units="-",long_name="Mask (rock)")
-    
-!     ! Vostock mask
-!     call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_lakemask_vostok.txt", &
-!                       "mask_lake",var0,missing_value=mv)
-!     var = var0
-!     call nc_write(filename_topo,"mask_lake",int(var),dim1="xc",dim2="yc",missing_value=int(mv), &
-!                   units="-",long_name="Mask (lake)")
-    
-    
-    ! ==== Rignot velocities
-
-    ! Bedmap2: Rignot velocity
-    !ncols         5602
-    !nrows         5602
-    !xllcorner     -2800500
-    !yllcorner     -2801500
-    !cellsize      1000
-    !NODATA_value  -9999
-
-!     ! Allocate bedmap dimensions and data array
-!     call bedmap2_dims(x,y,var0,x0=-2800.d0,dx=1.d0,nx=5602,y0=-2801.d0,dy=1.d0,ny=5602)
-    
-!     ! Surface elevation
-!     call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/rignot_velocity_bedmap2_grid.txt", &
-!                       "uv",var0,missing_value=mv)
-! !     var = var0
-!     call bedmap2_align(var0=var0,x0=x(1),y0=y(1),var1=var,x1=grid%G%x(1),y1=grid%G%y(1),missing_value=mv)
-!     call nc_write(filename_topo,"uv",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
-!                   units="m**s^-1",long_name="Velocity")
-    
-
-contains 
+    end subroutine write_init 
 
     subroutine bedmap2_dims(x,y,var0,x0,dx,nx,y0,dy,ny)
 
@@ -256,7 +266,7 @@ contains
             end do 
 
         end if 
-        
+
         return
 
     end subroutine bedmap2_align 
