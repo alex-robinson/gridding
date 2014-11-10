@@ -307,6 +307,8 @@ contains
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
+        write(*,*) "nc_size: ", nc_size(invariant(1)%filename,"zs")
+
         ! Initialize mapping
         call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
@@ -320,7 +322,7 @@ contains
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
+        
         ! ## INVARIANT FIELDS ##
         do i = 1, 1 !size(invariant)
             var_now = invariant(i) 
