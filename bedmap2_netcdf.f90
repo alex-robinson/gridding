@@ -27,6 +27,7 @@ program bedmap2_netcdf
 
     use ncio
     use coordinates 
+    use interp2D 
 
     implicit none 
 
@@ -35,15 +36,15 @@ program bedmap2_netcdf
     type(grid_class) :: grid 
 
     double precision, allocatable, dimension(:) :: x, y
-    double precision, allocatable, dimension(:,:) :: var0, var 
+    double precision, allocatable, dimension(:,:) :: var0, var, tmp 
     integer :: i, j, h, k
 
-    character(len=256) :: fnm, filename_topo, filename_acc, filename_vel 
+    character(len=256) :: fnm, filename_topo, filename_vel, filename_acc
 
     filename_topo = "output/Antarctica/ANT-1KM_BEDMAP2_topo.nc"
-!     filename_acc  = "output/Antarctica/ANT-1KM_BEDMAP2_acc.nc"
-!     filename_vel  = "output/Antarctica/ANT-1KM_BEDMAP2_vel.nc"
-
+    filename_vel  = "output/Antarctica/ANT-1KM_BEDMAP2_vel.nc"
+    filename_acc  = "output/Antarctica/ANT-1KM_BEDMAP2_acc.nc"
+    
     ! Initialize the output grid
     call grid_init(grid,name="ANT-1KM",mtype="polar stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667, &
@@ -51,7 +52,6 @@ program bedmap2_netcdf
 
     ! Allocate grid variable
     call grid_allocate(grid,var)
-
 
     ! ====== TOPOGRAPHY ========
     if (.FALSE.) then 
@@ -106,21 +106,25 @@ program bedmap2_netcdf
     
     end if 
 
-
-
     ! ====== Velocity ========
     if (.TRUE.) then 
     
         ! ====== Rignot velocities at 900 m resolution
         call bedmap2_dims(x,y,var0,x0=-2800.d0,dx=0.9d0,nx=6223,y0=-2800.d0,dy=0.9d0,ny=6223)
-        
+        if (allocated(tmp)) deallocate(tmp)
+        allocate(tmp(size(x),size(y)))
+
         ! Write grid information to output file
         call write_init(filename_vel,grid)
 
         call nc_read("data/Antarctica/antarctica_ice_velocity.nc","vx",var0)
-        var0 = var0(:,size(var0),2):1)
         write(*,*) "Read vx."
-        var = interp_nearest_dble(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,missing_value=mv)
+        tmp = var0 
+        do j = 1, size(y)
+            var0(:,j) = tmp(:,size(y)-j+1)  
+        end do 
+        write(*,*) "Flipped vx."
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
         write(*,*) "Interpolated vx."
         call nc_write(filename_vel,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="m*a-1",long_name="Surface velocity, x-comp.")
