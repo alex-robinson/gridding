@@ -128,6 +128,18 @@ program bedmap2_netcdf
         write(*,*) "Interpolated vx."
         call nc_write(filename_vel,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="m*a-1",long_name="Surface velocity, x-comp.")
+        
+        call nc_read("data/Antarctica/antarctica_ice_velocity.nc","vy",var0)
+        write(*,*) "Read vy."
+        tmp = var0 
+        do j = 1, size(y)
+            var0(:,j) = tmp(:,size(y)-j+1)  
+        end do 
+        write(*,*) "Flipped vy."
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
+        write(*,*) "Interpolated vy."
+        call nc_write(filename_vel,"v",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="m*a-1",long_name="Surface velocity, y-comp.")
     
     end if 
 

@@ -793,7 +793,8 @@ contains
         !
         !       MAR (RCM) DATA - MARv3.5 downloaded from the ftp site:
         !       ftp://ftp.climato.be/fettweis/MARv3.5/Greenland
-        !       Data is available on the Bamber et al. (2001) 5km grid
+        !       * Routine expects the -RAW- MAR data on eg, 30 km grid
+        !       Note: data is also available on the Bamber et al. (2001) 5km grid
         !       domain="Greenland-ERA": ERA-40 + ERA-Interim combined datasets
         !
         ! =========================================================
@@ -833,19 +834,19 @@ contains
                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
             ! Define the input filenames
-            file_invariant = "/data/sicopolis/data/MARv3.5/Greenland/ERA_1958-2013_25km/"// &
-                             "MARv3.5-25km-monthly-ERA-Interim-2013.nc"
+            file_invariant = "/data/sicopolis/data/MARv3.5/Greenland/ERA_1958-2013_30km-rawclean/"// &
+                             "MARv3.5-ERA-30km-monthly-2013.nc"
             file_surface   = "/data/sicopolis/data/MARv3.5/Greenland/"
-            file_prefix(1) = "ERA_1958-2013_25km/MARv3.5-25km-monthly-ERA-40-"
-            file_prefix(2) = "ERA_1958-2013_25km/MARv3.5-25km-monthly-ERA-Interim-"
+            file_prefix(1) = "ERA_1958-2013_30km-rawclean/MARv3.5-ERA-30km-monthly-"
+            file_prefix(2) = "ERA_1958-2013_30km-rawclean/MARv3.5-ERA-30km-monthly-"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_MARv3.5-25km-monthly-ERA-Interim_195801-201312.nc"
+                              "_MARv3.5-ERA-30km-monthly_195701-201312.nc"
 
-            year0       = 1958 
+            year0       = 1957 
             year_switch = 1979   ! Switch scenarios (ERA-40 to ERA-INTERIM)
-            nyr         = 2013-1958+1
+            nyr         = 2013-1957+1
 
             ! For climatology
             if (present(clim_range)) then  
@@ -853,7 +854,7 @@ contains
                 nk = clim_range(2) - clim_range(1) + 1 
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                    "_MARv3.5-25km-monthly-ERA-Interim_",clim_range(1),"-",clim_range(2),".nc"
+                    "_MARv3.5-ERA-30km-monthly_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
         else if (trim(domain) .eq. "Greenland-MIROC5-RCP85") then 
@@ -899,36 +900,44 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(2))
-        call def_var_info(invariant(1),trim(file_invariant),"MSK_MAR","mask",units="(0 - 2)",method="nn",fill=.TRUE.)
-        call def_var_info(invariant(2),trim(file_invariant),"SRF_MAR","zs",units="m",fill=.TRUE.)
-
-        allocate(surf(21))
-        call def_var_info(surf( 1),trim(file_surface),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
-        call def_var_info(surf( 2),trim(file_surface),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
-        call def_var_info(surf( 3),trim(file_surface),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
-        call def_var_info(surf( 4),trim(file_surface),"ST",  "ts",  units="degrees Celcius")
-        call def_var_info(surf( 5),trim(file_surface),"TT",  "t3m", units="degrees Celcius",fill=.TRUE.)
-        call def_var_info(surf( 6),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
-        call def_var_info(surf( 7),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
-        call def_var_info(surf( 8),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
-        call def_var_info(surf( 9),trim(file_surface),"AL",  "al",  units="(0 - 1)")
-        call def_var_info(surf(10),trim(file_surface),"SWD", "swd", units="W m**-2",fill=.TRUE.)
-        call def_var_info(surf(11),trim(file_surface),"LWD", "lwd", units="W m**-2",fill=.TRUE.)
-        call def_var_info(surf(12),trim(file_surface),"SHF", "shf", units="W m**-2",fill=.TRUE.)
-        call def_var_info(surf(13),trim(file_surface),"LHF", "lhf", units="W m**-2",fill=.TRUE.)
-        call def_var_info(surf(14),trim(file_surface),"SP",  "sp",  units="hPa",fill=.TRUE.)
-        call def_var_info(surf(15),trim(file_surface),"UU",  "u",   units="m s**-1",fill=.TRUE.)
-        call def_var_info(surf(16),trim(file_surface),"VV",  "v",   units="m s**-1",fill=.TRUE.)
-        call def_var_info(surf(17),trim(file_surface),"QQ",  "q",   units="g kg**-1",fill=.TRUE.)
-        call def_var_info(surf(18),trim(file_surface),"CC",  "cc",  units="(0 - 1)",fill=.TRUE.)
-        call def_var_info(surf(19),trim(file_surface),"SH1", "SH1", units="m")  
-        call def_var_info(surf(20),trim(file_surface),"SH2", "SH2", units="m")  
-        call def_var_info(surf(21),trim(file_surface),"SH3", "SH3", units="mm d**-1",conv=1d3*12.d0/365.d0)   ! m/month => mm/day
+        call def_var_info(invariant(2),trim(file_invariant),"SH", "zs",  units="m",fill=.TRUE.)
+        call def_var_info(invariant(1),trim(file_invariant),"SRF","mask",units="(0 - 4)",method="nn",fill=.TRUE.)
+        call def_var_info(invariant(1),trim(file_invariant),"MSK","msk", units="%",fill=.TRUE.)
+        
+        allocate(surf(28))
+        call def_var_info(surf( 1),trim(file_surface),"SHSN0", "SH0", units="m")  
+        call def_var_info(surf( 2),trim(file_surface),"SHSN2", "SH2", units="m")  
+        call def_var_info(surf( 3),trim(file_surface),"SHSN3", "SH3", units="m")
+        call def_var_info(surf( 4),trim(file_surface),"SMB", "smb", units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 5),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 6),trim(file_surface),"ME",  "me",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 7),trim(file_surface),"RZ",  "rz",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf( 8),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
+        call def_var_info(surf( 9),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=12.d0/365.d0,fill=.TRUE.)  ! mm/month => mm/day
+        call def_var_info(surf(10),trim(file_surface),"RU",  "ru",  units="mm d**-1",conv=12.d0/365.d0)  ! mm/month => mm/day
+        call def_var_info(surf(11),trim(file_surface),"UU",  "u",   units="m s**-1",fill=.TRUE.)
+        call def_var_info(surf(12),trim(file_surface),"VV",  "v",   units="m s**-1",fill=.TRUE.)
+        call def_var_info(surf(13),trim(file_surface),"TT",  "t3m", units="degrees Celcius",fill=.TRUE.)
+        call def_var_info(surf(14),trim(file_surface),"QQ",  "q",   units="g kg**-1",fill=.TRUE.)
+        call def_var_info(surf(15),trim(file_surface),"SP",  "sp",  units="hPa",fill=.TRUE.)
+        call def_var_info(surf(16),trim(file_surface),"RH",  "rh",  units="%",fill=.TRUE.)
+        call def_var_info(surf(17),trim(file_surface),"TTMIN","t3m_min", units="degrees Celcius",fill=.TRUE.)
+        call def_var_info(surf(18),trim(file_surface),"TTMAX","t3m_max", units="degrees Celcius",fill=.TRUE.)
+        call def_var_info(surf(19),trim(file_surface),"UV",  "uv",  units="m s**-1",fill=.TRUE.)
+        call def_var_info(surf(20),trim(file_surface),"SWD", "swd", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(21),trim(file_surface),"LWD", "lwd", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(22),trim(file_surface),"LWU", "lwu", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(23),trim(file_surface),"SHF", "shf", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(24),trim(file_surface),"LHF", "lhf", units="W m**-2",fill=.TRUE.)
+        call def_var_info(surf(25),trim(file_surface),"AL",  "al",  units="(0 - 1)")
+        call def_var_info(surf(26),trim(file_surface),"CC",  "cc",  units="(0 - 1)",fill=.TRUE.)
+        call def_var_info(surf(27),trim(file_surface),"ST",  "ts",  units="degrees Celcius")
+        call def_var_info(surf(28),trim(file_surface),"PDD", "pdd", units="degrees Celcius")
+        
 
         nm       = 12
         n_var    = size(surf)
-        if (trim(domain) .ne. "Greenland-ERA") n_var = 16   ! Exclude QQ, CC and SH3 if not available
-    
+
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
             ! Allocate the input grid variable
