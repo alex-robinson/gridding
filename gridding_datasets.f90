@@ -903,10 +903,10 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(2))
-        call def_var_info(invariant(2),trim(file_invariant),"SH", "zs",  units="m",fill=.TRUE.)
-        call def_var_info(invariant(1),trim(file_invariant),"SRF","mask",units="(0 - 4)",method="nn",fill=.TRUE.)
-        call def_var_info(invariant(1),trim(file_invariant),"MSK","msk", units="%",fill=.TRUE.)
+        allocate(invariant(3))
+        call def_var_info(invariant(1),trim(file_invariant),"SH", "zs",  units="m",fill=.TRUE.)
+        call def_var_info(invariant(2),trim(file_invariant),"SRF","mask",units="(0 - 4)",method="nn",fill=.TRUE.)
+        call def_var_info(invariant(3),trim(file_invariant),"MSK","msk", units="%",fill=.TRUE.)
         
         allocate(surf(28))
         call def_var_info(surf( 1),trim(file_surface),"SHSN0", "SH0", units="m")  
