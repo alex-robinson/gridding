@@ -828,10 +828,14 @@ contains
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
             
-            ! Define MAR (Bamber et al. 2001) grid and input variable field
-            call grid_init(gMAR,name="Bamber01-5KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
-                           x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
-                           lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+!             ! Define MAR (Bamber et al. 2001) grid and input variable field
+!             call grid_init(gMAR,name="Bamber01-5KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
+!                            x0=-800.d0,dx=5.d0,nx=301,y0=-3400.d0,dy=5.d0,ny=561, &
+!                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+            ! Define MAR raw grid and input variable field
+            call grid_init(gMAR,name="MAR-30KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
+                           x0=-780.d0,dx=30.d0,nx=51,y0=-1230.d0,dy=30.d0,ny=93, &
+                           lambda=-40.d0,phi=71.d0,alpha=7.5d0)
 
             ! Define the input filenames
             file_invariant = "/data/sicopolis/data/MARv3.5/Greenland/ERA_1958-2013_30km-rawclean/"// &
@@ -842,11 +846,11 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_MARv3.5-ERA-30km-monthly_195701-201312.nc"
+                              "_MARv3.5-ERA-30km-monthly_195801-201312.nc"
 
-            year0       = 1957 
+            year0       = 1958 
             year_switch = 1979   ! Switch scenarios (ERA-40 to ERA-INTERIM)
-            nyr         = 2013-1957+1
+            nyr         = 2013-1958+1
 
             ! For climatology
             if (present(clim_range)) then  
@@ -934,7 +938,6 @@ contains
         call def_var_info(surf(27),trim(file_surface),"ST",  "ts",  units="degrees Celcius")
         call def_var_info(surf(28),trim(file_surface),"PDD", "pdd", units="degrees Celcius")
         
-
         nm       = 12
         n_var    = size(surf)
 

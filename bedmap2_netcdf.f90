@@ -107,7 +107,7 @@ program bedmap2_netcdf
     end if 
 
     ! ====== Velocity ========
-    if (.TRUE.) then 
+    if (.FALSE.) then 
     
         ! ====== Rignot velocities at 900 m resolution
         call bedmap2_dims(x,y,var0,x0=-2800.d0,dx=0.9d0,nx=6223,y0=-2800.d0,dy=0.9d0,ny=6223)
