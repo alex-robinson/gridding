@@ -1487,11 +1487,12 @@ contains
         integer, optional :: clim_range(2)
 
         character(len=512) :: filename 
-        character(len=512) :: fldr_input, file_suffix
+        character(len=512) :: fldr_input, file_suffix1, file_suffix2
         type(points_class) :: pIN1, pIN2, pIN3
         type(var_defs), allocatable :: vars(:)
         double precision, allocatable :: invar(:), lon(:), lat(:)
         integer, allocatable :: invar_int(:) 
+        integer :: nx, ny 
 
         type(map_class)  :: map
         type(var_defs) :: var_now 
@@ -1508,7 +1509,8 @@ contains
             
             ! Define the input filenames
             fldr_input     = "data/RACMO2/Antarctica/HadCM3-A1B_2000-2199_rot/"
-            file_suffix    = "_RACMO2-ANT3K55_HadCM3-A1B.nc"
+            file_suffix1   = "_RACMO2-ANT3K55_HadCM3-A1B.nc"
+            file_suffix2   = "_RACMO2-ANT3K55_HadCM3-A1B_2000-2199.nc"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -1529,11 +1531,14 @@ contains
             
             ! Define RACMO2 input grids/points ===========
             
+            nx = 134 
+            ny = 122
+            
             if (allocated(lon)) deallocate(lon)
             if (allocated(lat)) deallocate(lat)
-            allocate(lon(122*134),lat(122*134))
-            call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix),"g10_lon_1",lon,start=[1,1],count=[134,122])
-            call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix),"g10_lat_0",lat,start=[1,1],count=[134,122])
+            allocate(lon(nx*ny),lat(nx*ny))
+            call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix1),"g10_lon_1",lon,start=[1,1],count=[nx,ny])
+            call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix1),"g10_lat_0",lat,start=[1,1],count=[nx,ny])
             call points_init(pIN1,name="ANT3K55",mtype="latlon",units="degrees",lon180=.TRUE., &
                              x=lon,y=lat)
 
@@ -1542,11 +1547,6 @@ contains
             write(*,*) "Domain not recognized: ",trim(domain)
             stop 
         end if 
-
-        ! Define the variables to be mapped 
-        allocate(vars(1))
-        call def_var_info(vars(1),trim(fldr_input)//"Geopotential"//trim(file_suffix), &
-                          "GP_GDS10_HTGL_ave1h", "Z",  units="m**2 s**-2",fill=.TRUE.)
 
         nm       = 12
         n_var    = size(vars)
@@ -1572,13 +1572,23 @@ contains
             call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
             call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-        
+            
             ! ## INVARIANT FIELDS ##
+
+            ! Define the variables to be mapped 
+            allocate(vars(3))
+            call def_var_info(vars(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
+                              "GP_GDS10_HTGL_ave1h", "Z",  units="m**2 s**-2",fill=.TRUE.)
+            call def_var_info(vars(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
+                              "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-",fill=.TRUE.,method="nn")
+            call def_var_info(vars(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
+                              "LAND_GDS10_HTGL_ave1h", "mask_land",  units="-",fill=.TRUE.,method="nn")
+
             do i = 1, size(vars)
 
                 var_now = vars(i)
                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
-                             start=[1,1],count=[134,122])
+                             start=[1,1],count=[nx,ny])
                 outvar = missing_value
                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
                                fill=.TRUE.,missing_value=missing_value)
@@ -1590,6 +1600,45 @@ contains
                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
                                   units=var_now%units_out,missing_value=real(missing_value))
                 end if 
+
+            end do 
+
+            ! ## SURFACE FIELDS ##
+            ! Define the variables to be mapped 
+            if (allocated(vars)) deallocate(vars)
+            allocate(vars(1))
+            call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
+                              "t2m", "t2m",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+
+            do i = 1, size(vars)
+                var_now = vars(i)     
+                write(*,*) "=== ",trim(var_now%nm_out)," ==="
+     
+                do k = 1, nyr 
+                    do m = 1, nm 
+                        q = (k-1)*12 + m 
+
+                        write(*,*) year0-1+k,m
+
+                        if (var_now%dimextra) then 
+                            call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
+                                     missing_value=missing_value, &
+                                     start=[1,1,1,q],count=[nx,ny,1,1])
+                        else 
+                            call nc_read(trim(var_now%filename),var_now%nm_in,invar,&
+                                     missing_value=missing_value, &
+                                     start=[1,1,q],count=[nx,ny,1])
+                        end if
+                        where (invar .ne. missing_value) invar = invar*var_now%conv 
+                        outvar = missing_value 
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
+                                       fill=.FALSE.,missing_value=missing_value)
+                        call nc_write(filename,var_now%nm_out,real(outvar),units=var_now%units_out, &
+                                      dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                      start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+            
+                    end do 
+                end do
 
             end do 
 
