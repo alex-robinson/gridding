@@ -11,7 +11,7 @@ module gridding_datasets
     double precision, parameter :: missing_value = -9999.d0
     
     type var_defs
-        character(len=256) :: filename, filenames(20)
+        character(len=512) :: filename, filenames(20)
         character(len=256) :: nm_in, nm_out  
         character(len=256) :: units_in, units_out 
         character(len=256) :: method
