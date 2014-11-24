@@ -1509,8 +1509,8 @@ contains
             
             ! Define the input filenames
             fldr_input     = "tmpdata/"
-            file_suffix1   = "_RACMO2-ANT3K55_HadCM3-A1B.nc"
-            file_suffix2   = "_RACMO2-ANT3K55_HadCM3-A1B_2000-2199.nc"
+            file_suffix1   = "_RACMO2_ANT3K55_HadCM3-A1B.nc"
+            file_suffix2   = "_RACMO2_ANT3K55_HadCM3-A1B_2000-2199.nc"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
