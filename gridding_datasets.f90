@@ -1489,7 +1489,7 @@ contains
         character(len=512) :: filename 
         character(len=512) :: fldr_input, file_suffix1, file_suffix2
         type(points_class) :: pIN1, pIN2, pIN3
-        type(var_defs), allocatable :: vars(:)
+        type(var_defs), allocatable :: vars0(:), vars(:)
         double precision, allocatable :: invar(:), lon(:), lat(:)
         integer, allocatable :: invar_int(:) 
         integer :: nx, ny 
@@ -1573,20 +1573,69 @@ contains
             call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
             
-            ! ## INVARIANT FIELDS ##
+            ! Define the variables to be mapped
 
-            ! Define the variables to be mapped 
-            allocate(vars(3))
-            call def_var_info(vars(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
+            ! ## INVARIANT (2D) FIELDS ## 
+            allocate(vars0(3))
+            call def_var_info(vars0(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
                               "GP_GDS10_HTGL_ave1h", "Z",  units="m**2 s**-2",fill=.TRUE.)
-            call def_var_info(vars(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
+            call def_var_info(vars0(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
                               "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-",fill=.TRUE.,method="nn")
-            call def_var_info(vars(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
+            call def_var_info(vars0(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
                               "LAND_GDS10_HTGL_ave1h", "mask_land",  units="-",fill=.TRUE.,method="nn")
 
-            do i = 1, size(vars)
 
-                var_now = vars(i)
+            ! ## SURFACE (3D) FIELDS ##
+            if (allocated(vars)) deallocate(vars)
+            allocate(vars(21))
+            call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
+                              "t2m", "t2m",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(2),trim(fldr_input)//"clcov"//trim(file_suffix2), &
+                              "clcov", "cc",  units="-",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(3),trim(fldr_input)//"evap"//trim(file_suffix2), &
+                              "evap", "evap",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(4),trim(fldr_input)//"precip"//trim(file_suffix2), &
+                              "precip", "pr",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(5),trim(fldr_input)//"q2m"//trim(file_suffix2), &
+                              "q2m", "qs",  units="kg kg-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(6),trim(fldr_input)//"rain"//trim(file_suffix2), &
+                              "rain", "rf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(7),trim(fldr_input)//"refreeze"//trim(file_suffix2), &
+                              "refreeze", "rz",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(8),trim(fldr_input)//"runoff"//trim(file_suffix2), &
+                              "runoff", "ru",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(9),trim(fldr_input)//"smb"//trim(file_suffix2), &
+                              "smb", "smb",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(10),trim(fldr_input)//"snowfall"//trim(file_suffix2), &
+                              "snowfall", "sf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(11),trim(fldr_input)//"snowmelt"//trim(file_suffix2), &
+                              "snowmelt", "me",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(12),trim(fldr_input)//"sublim"//trim(file_suffix2), &
+                              "sublim", "subl",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(13),trim(fldr_input)//"tskin"//trim(file_suffix2), &
+                              "tskin", "ts",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(14),trim(fldr_input)//"u10m"//trim(file_suffix2), &
+                              "u10m", "u",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
+            call def_var_info(vars(15),trim(fldr_input)//"v10m"//trim(file_suffix2), &
+                              "v10m", "v",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
+            
+            call def_var_info(vars(16),trim(fldr_input)//"LHF"//trim(file_suffix2), &
+                              "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.)
+            call def_var_info(vars(17),trim(fldr_input)//"LWD"//trim(file_suffix2), &
+                              "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.)
+            call def_var_info(vars(18),trim(fldr_input)//"LWN"//trim(file_suffix2), &
+                              "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.)
+            call def_var_info(vars(19),trim(fldr_input)//"SWD"//trim(file_suffix2), &
+                              "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.)
+            call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
+                              "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
+            call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
+                              "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
+            
+            ! ## INVARIANT (2D) FIELDS ##
+            do i = 1, size(vars0)
+
+                var_now = vars0(i)
                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1],count=[nx,ny])
                 outvar = missing_value
@@ -1603,22 +1652,15 @@ contains
 
             end do 
 
-            ! ## SURFACE FIELDS ##
-            ! Define the variables to be mapped 
-            if (allocated(vars)) deallocate(vars)
-            allocate(vars(1))
-            call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
-                              "t2m", "t2m",  units="K",fill=.TRUE.,dimextra=.TRUE.)
-
+            ! ## SURFACE (3D) FIELDS ##
             do i = 1, size(vars)
                 var_now = vars(i)     
                 write(*,*) "=== ",trim(var_now%nm_out)," ==="
      
                 do k = 1, nyr 
+                    write(*,*) year0-1+k
                     do m = 1, nm 
                         q = (k-1)*12 + m 
-
-                        write(*,*) year0-1+k,m
 
                         if (var_now%dimextra) then 
                             call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
@@ -1642,72 +1684,42 @@ contains
 
             end do 
 
-!             n_prefix = 1 
-!             do k = 1, nyr 
-
-!                 year = year0 + (k-1) 
-!                 if (year .ge. year_switch) n_prefix = 2
-!                 write(*,*) "=== ",year," ==="
-         
-!                 do m = 1, nm 
-!                     q = m 
-!                     write(*,*) "month ",m
-
-!                     ! ## SURFACE FIELDS ##
-!                     do i = 1, n_var
-!                         var_now = surf(i)     
-!                         write(var_now%filename,"(a,a,i4,a3)") &
-!                             trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
-!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
-!                                  start=[1,1,q],count=[pIN%G%nx,pIN%G%ny,1])
-!                         where (invar .ne. missing_value) invar = invar*var_now%conv 
-!                         outvar = missing_value 
-!                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
-!                                        fill=.TRUE.,missing_value=missing_value)
-!                         if (var_now%fill) call fill_weighted(outvar,missing_value=missing_value)
-!                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
-!                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
-!                     end do 
-
-!                 end do 
-!             end do 
-        
         end if 
 
-!         if (present(clim_range)) then 
+        if (present(clim_range)) then 
 
-!             ! Create climatology too (month by month)
+            ! Create climatology too (month by month)
 
-!             call grid_allocate(grid,var2D)
-!             allocate(var3D(grid%G%nx,grid%G%ny,nk))    
+            call grid_allocate(grid,var2D)
+            allocate(var3D(grid%G%nx,grid%G%ny,nk))    
             
-!             ! Initialize the output file
-!             call nc_create(filename_clim)
-!             call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
-!             call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
-!             call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-!             call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
+            ! Initialize the output file
+            call nc_create(filename_clim)
+            call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
         
-!             ! ## INVARIANT FIELDS ##
-!             do i = 1, size(invariant)
-!                 var_now = invariant(i) 
-!                 call nc_read(filename,var_now%nm_out,var2D)
-!                 call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
-!                               units=var_now%units_out)
-!             end do 
+            ! ## INVARIANT (2D) FIELDS ##
+            do i = 1, size(vars0)
+                var_now = vars0(i) 
+                call nc_read(filename,var_now%nm_out,var2D)
+                call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+                              units=var_now%units_out)
+            end do 
 
-!             do i = 1, n_var
-!                 var_now = surf(i)
+            do i = 1, size(vars)
+                var_now = vars(i)
 
-!                 do m = 1, nm  
-!                     call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
-!                     var2D = time_average(var3D)
-!                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
-!                                   units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
-!                 end do 
-!             end do 
+                do m = 1, nm  
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                    var2D = time_average(var3D)
+                    call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                  units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                end do 
+            end do 
 
-!         end if 
+        end if 
 
         return 
 
