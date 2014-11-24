@@ -1508,7 +1508,7 @@ contains
         if (trim(domain) .eq. "Antarctica") then 
             
             ! Define the input filenames
-            fldr_input     = "sicodata/RACMO2/Antarctica/HadCM3-A1B_2000-2199_rot/"
+            fldr_input     = "sicodata/RACMO2/Antarctica/tmp/"
             file_suffix1   = "_RACMO2-ANT3K55_HadCM3-A1B.nc"
             file_suffix2   = "_RACMO2-ANT3K55_HadCM3-A1B_2000-2199.nc"
 
