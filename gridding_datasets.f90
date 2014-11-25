@@ -1548,6 +1548,65 @@ contains
             stop 
         end if 
 
+        ! Define the variables to be mapped
+
+        ! ## INVARIANT (2D) FIELDS ## 
+        allocate(vars0(3))
+        call def_var_info(vars0(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
+                          "GP_GDS10_HTGL_ave1h", "Z",  units="m**2 s**-2",fill=.TRUE.)
+        call def_var_info(vars0(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
+                          "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-",fill=.TRUE.,method="nn")
+        call def_var_info(vars0(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
+                          "LAND_GDS10_HTGL_ave1h", "mask_land",  units="-",fill=.TRUE.,method="nn")
+
+
+        ! ## SURFACE (3D) FIELDS ##
+        if (allocated(vars)) deallocate(vars)
+        allocate(vars(21))
+        call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
+                          "t2m", "t2m",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(2),trim(fldr_input)//"clcov"//trim(file_suffix2), &
+                          "clcov", "cc",  units="-",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(3),trim(fldr_input)//"evap"//trim(file_suffix2), &
+                          "evap", "evap",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(4),trim(fldr_input)//"precip"//trim(file_suffix2), &
+                          "precip", "pr",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(5),trim(fldr_input)//"q2m"//trim(file_suffix2), &
+                          "q2m", "qs",  units="kg kg-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(6),trim(fldr_input)//"rain"//trim(file_suffix2), &
+                          "rain", "rf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(7),trim(fldr_input)//"refreeze"//trim(file_suffix2), &
+                          "refreeze", "rz",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(8),trim(fldr_input)//"runoff"//trim(file_suffix2), &
+                          "runoff", "ru",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(9),trim(fldr_input)//"smb"//trim(file_suffix2), &
+                          "smb", "smb",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(10),trim(fldr_input)//"snowfall"//trim(file_suffix2), &
+                          "snowfall", "sf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(11),trim(fldr_input)//"snowmelt"//trim(file_suffix2), &
+                          "snowmelt", "me",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(12),trim(fldr_input)//"sublim"//trim(file_suffix2), &
+                          "sublim", "subl",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(13),trim(fldr_input)//"tskin"//trim(file_suffix2), &
+                          "tskin", "ts",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(14),trim(fldr_input)//"u10m"//trim(file_suffix2), &
+                          "u10m", "u",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
+        call def_var_info(vars(15),trim(fldr_input)//"v10m"//trim(file_suffix2), &
+                          "v10m", "v",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
+        
+        call def_var_info(vars(16),trim(fldr_input)//"LHF"//trim(file_suffix2), &
+                          "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.)
+        call def_var_info(vars(17),trim(fldr_input)//"LWD"//trim(file_suffix2), &
+                          "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.)
+        call def_var_info(vars(18),trim(fldr_input)//"LWN"//trim(file_suffix2), &
+                          "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.)
+        call def_var_info(vars(19),trim(fldr_input)//"SWD"//trim(file_suffix2), &
+                          "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.)
+        call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
+                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
+        call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
+                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
+        
         nm       = 12
         n_var    = size(vars)
 
@@ -1572,65 +1631,6 @@ contains
             call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
             call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-            
-            ! Define the variables to be mapped
-
-            ! ## INVARIANT (2D) FIELDS ## 
-            allocate(vars0(3))
-            call def_var_info(vars0(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
-                              "GP_GDS10_HTGL_ave1h", "Z",  units="m**2 s**-2",fill=.TRUE.)
-            call def_var_info(vars0(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
-                              "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-",fill=.TRUE.,method="nn")
-            call def_var_info(vars0(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
-                              "LAND_GDS10_HTGL_ave1h", "mask_land",  units="-",fill=.TRUE.,method="nn")
-
-
-            ! ## SURFACE (3D) FIELDS ##
-            if (allocated(vars)) deallocate(vars)
-            allocate(vars(21))
-            call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
-                              "t2m", "t2m",  units="K",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(2),trim(fldr_input)//"clcov"//trim(file_suffix2), &
-                              "clcov", "cc",  units="-",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(3),trim(fldr_input)//"evap"//trim(file_suffix2), &
-                              "evap", "evap",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(4),trim(fldr_input)//"precip"//trim(file_suffix2), &
-                              "precip", "pr",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(5),trim(fldr_input)//"q2m"//trim(file_suffix2), &
-                              "q2m", "qs",  units="kg kg-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(6),trim(fldr_input)//"rain"//trim(file_suffix2), &
-                              "rain", "rf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(7),trim(fldr_input)//"refreeze"//trim(file_suffix2), &
-                              "refreeze", "rz",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(8),trim(fldr_input)//"runoff"//trim(file_suffix2), &
-                              "runoff", "ru",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(9),trim(fldr_input)//"smb"//trim(file_suffix2), &
-                              "smb", "smb",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(10),trim(fldr_input)//"snowfall"//trim(file_suffix2), &
-                              "snowfall", "sf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(11),trim(fldr_input)//"snowmelt"//trim(file_suffix2), &
-                              "snowmelt", "me",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(12),trim(fldr_input)//"sublim"//trim(file_suffix2), &
-                              "sublim", "subl",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(13),trim(fldr_input)//"tskin"//trim(file_suffix2), &
-                              "tskin", "ts",  units="K",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(14),trim(fldr_input)//"u10m"//trim(file_suffix2), &
-                              "u10m", "u",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
-            call def_var_info(vars(15),trim(fldr_input)//"v10m"//trim(file_suffix2), &
-                              "v10m", "v",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
-            
-            call def_var_info(vars(16),trim(fldr_input)//"LHF"//trim(file_suffix2), &
-                              "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.)
-            call def_var_info(vars(17),trim(fldr_input)//"LWD"//trim(file_suffix2), &
-                              "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.)
-            call def_var_info(vars(18),trim(fldr_input)//"LWN"//trim(file_suffix2), &
-                              "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.)
-            call def_var_info(vars(19),trim(fldr_input)//"SWD"//trim(file_suffix2), &
-                              "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.)
-            call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                              "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
-            call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                              "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
             
             ! ## INVARIANT (2D) FIELDS ##
             do i = 1, size(vars0)
