@@ -1708,6 +1708,7 @@ contains
                               units=var_now%units_out)
             end do 
 
+            ! ## SURFACE (3D) FIELDS ##
             do i = 1, size(vars)
                 var_now = vars(i)
 
