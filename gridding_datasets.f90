@@ -463,26 +463,41 @@ contains
             files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
             files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-500Mb_historical_mon_197901-201212.nc"
 
-            ! ## First make file for surface fields including invariants ##
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM_197901-201212.nc"
-
-            ! For climatology
-            if (present(clim_range)) then  
-                k0 = clim_range(1) - 1979 + 1
-                nk = clim_range(2) - clim_range(1) + 1 
-
-                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                    "_ERA-INTERIM_",clim_range(1),"-",clim_range(2),".nc"
-            end if 
-
         else if (trim(domain) .eq. "ANT075") then 
 
-            ! TODO 
+            ! Initialize the grid
+            call grid_init(gECMWF,name="ECMWF-ANT075",mtype="latlon",units="kilometers",lon180=.TRUE., &
+                           x0=-180.d0,dx=0.75d0,nx=480,y0=-90.d0,dy=0.75d0,ny=67)
+            
+            ! Assign the filenames
+            file_invariant = "data/ECMWF/NEW/ERA-INTERIM-ANT-invariant_historical_mon_197901-201212.nc"
+            file_surface   = "data/ECMWF/NEW/ERA-INTERIM-ANT-surface_historical_mon_197901-201212.nc"
+            files_pres(1)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-1000Mb_historical_mon_197901-201212.nc"
+            files_pres(2)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-950Mb_historical_mon_197901-201212.nc"
+            files_pres(3)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-850Mb_historical_mon_197901-201212.nc"
+            files_pres(4)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-750Mb_historical_mon_197901-201212.nc"
+            files_pres(5)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-700Mb_historical_mon_197901-201212.nc"
+            files_pres(6)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-650Mb_historical_mon_197901-201212.nc"
+            files_pres(7)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-600Mb_historical_mon_197901-201212.nc"
+            files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-550Mb_historical_mon_197901-201212.nc"
+            files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-500Mb_historical_mon_197901-201212.nc"
 
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
             stop 
+        end if 
+
+        ! ## First make file for surface fields including invariants ##
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM_197901-201212.nc"
+
+        ! For climatology
+        if (present(clim_range)) then  
+            k0 = clim_range(1) - 1979 + 1
+            nk = clim_range(2) - clim_range(1) + 1 
+
+            write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                "_ERA-INTERIM_",clim_range(1),"-",clim_range(2),".nc"
         end if 
 
         ! Define the pressure levels to be mapped
