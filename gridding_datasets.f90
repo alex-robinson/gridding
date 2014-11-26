@@ -1526,7 +1526,7 @@ contains
         if (trim(domain) .eq. "Antarctica-A1B") then 
             
             ! Define the input filenames
-            fldr_input     = "sicodata/RACMO2/Antarctica/HadCM3-A1B_rot/"
+            fldr_input     = "tmpdata/"
             file_suffix1   = "_RACMO2_ANT3K55_HadCM3-A1B.nc"
             file_suffix2   = "_RACMO2_ANT3K55_HadCM3-A1B_2000-2199.nc"
 
@@ -1549,7 +1549,7 @@ contains
         else if (trim(domain) .eq. "Antarctica-c20") then 
 
             ! Define the input filenames
-            fldr_input     = "sicodata/RACMO2/Antarctica/HadCM3-c20_rot/"
+            fldr_input     = "tmpdata2/"
             file_suffix1   = "_RACMO2_ANT3K55_HadCM3-c20.nc"
             file_suffix2   = "_RACMO2_ANT3K55_HadCM3-c20_1980-1999.nc"
 
