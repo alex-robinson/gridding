@@ -555,7 +555,7 @@ contains
         
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
-            call nc_read(trim(var_now%filename),var_now%nm_in,invar)
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,1],count=[grid%G%nx,grid%G%ny,1])
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
