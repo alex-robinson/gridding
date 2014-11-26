@@ -555,7 +555,8 @@ contains
         
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
-            call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,1],count=[grid%G%nx,grid%G%ny,1])
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
+                         start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1])
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
@@ -1617,15 +1618,15 @@ contains
         call def_var_info(vars(16),trim(fldr_input)//"LHF"//trim(file_suffix2), &
                 "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(17),trim(fldr_input)//"LWD"//trim(file_suffix2), &
-                          "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(18),trim(fldr_input)//"LWN"//trim(file_suffix2), &
-                          "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(19),trim(fldr_input)//"SWD"//trim(file_suffix2), &
-                          "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         
         nm       = 12
         n_var    = size(vars)
