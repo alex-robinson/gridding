@@ -506,7 +506,7 @@ contains
         ! Define the variables to be mapped 
         
         allocate(invariant(1))
-        call def_var_info(invariant(1),trim(file_invariant),"z","zs",units="m")
+        call def_var_info(invariant(1),trim(file_invariant),"z","zs",units="m",conv=1.d0/9.81d0)
 
         allocate(surf(12))
         call def_var_info(surf( 1),trim(file_surface),"sp", "sp", units="Pa")
@@ -649,6 +649,7 @@ contains
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
             call nc_read(filename,var_now%nm_out,var2D)
+            var2D = var2D*var_now%conv 
             call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
                           units=var_now%units_out)
 
