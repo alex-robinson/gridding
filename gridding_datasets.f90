@@ -1518,6 +1518,7 @@ contains
         integer :: yearf, k0, nk 
         character(len=512) :: filename_clim 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
+        double precision :: conv_tosec 
 
         ! Define input grid
         if (trim(domain) .eq. "Antarctica") then 
@@ -1568,7 +1569,7 @@ contains
         ! ## INVARIANT (2D) FIELDS ## 
         allocate(vars0(3))
         call def_var_info(vars0(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
-                          "GP_GDS10_HTGL_ave1h", "Z",  units="m**2 s**-2",fill=.TRUE.)
+                          "GP_GDS10_HTGL_ave1h", "zs",  units="m",fill=.TRUE.,conv=1.d0/9.81d0)
         call def_var_info(vars0(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
                           "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-",fill=.TRUE.,method="nn")
         call def_var_info(vars0(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
@@ -1576,6 +1577,9 @@ contains
 
 
         ! ## SURFACE (3D) FIELDS ##
+
+        conv_tosec = 1.d0/(30.d0*86400.d0)
+
         if (allocated(vars)) deallocate(vars)
         allocate(vars(21))
         call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
@@ -1605,22 +1609,22 @@ contains
         call def_var_info(vars(13),trim(fldr_input)//"tskin"//trim(file_suffix2), &
                           "tskin", "ts",  units="K",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(14),trim(fldr_input)//"u10m"//trim(file_suffix2), &
-                          "u10m", "u",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "u10m", "uas",  units="m s**-1 [rot]",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(15),trim(fldr_input)//"v10m"//trim(file_suffix2), &
-                          "v10m", "v",  units="m s**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "v10m", "vas",  units="m s**-1 [rot]",fill=.TRUE.,dimextra=.TRUE.)
         
         call def_var_info(vars(16),trim(fldr_input)//"LHF"//trim(file_suffix2), &
-                          "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.)
+                "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(17),trim(fldr_input)//"LWD"//trim(file_suffix2), &
-                          "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.)
+                          "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(18),trim(fldr_input)//"LWN"//trim(file_suffix2), &
-                          "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.)
+                          "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(19),trim(fldr_input)//"SWD"//trim(file_suffix2), &
-                          "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.)
+                          "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
+                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.)
+                          "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         
         nm       = 12
         n_var    = size(vars)
@@ -1673,7 +1677,7 @@ contains
                 write(*,*) "=== ",trim(var_now%nm_out)," ==="
      
                 do k = 1, nyr 
-                    write(*,*) year0-1+k
+!                     write(*,*) year0-1+k
                     do m = 1, nm 
                         q = (k-1)*12 + m 
 
