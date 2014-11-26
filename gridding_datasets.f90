@@ -1523,10 +1523,10 @@ contains
         double precision :: conv_tosec 
 
         ! Define input grid
-        if (trim(domain) .eq. "Antarctica") then 
+        if (trim(domain) .eq. "Antarctica-A1B") then 
             
             ! Define the input filenames
-            fldr_input     = "tmpdata/"
+            fldr_input     = "sicodata/RACMO2/Antarctica/HadCM3-A1B_rot/"
             file_suffix1   = "_RACMO2_ANT3K55_HadCM3-A1B.nc"
             file_suffix2   = "_RACMO2_ANT3K55_HadCM3-A1B_2000-2199.nc"
 
@@ -1546,25 +1546,50 @@ contains
                     "_RACMO2-ANT3K55_HadCM3-A1B-monthly__",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
-            
-            ! Define RACMO2 input grids/points ===========
-            
-            nx = 134 
-            ny = 122
-            
-            if (allocated(lon)) deallocate(lon)
-            if (allocated(lat)) deallocate(lat)
-            allocate(lon(nx*ny),lat(nx*ny))
-            call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix1),"g10_lon_1",lon,start=[1,1],count=[nx,ny])
-            call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix1),"g10_lat_0",lat,start=[1,1],count=[nx,ny])
-            call points_init(pIN1,name="ANT3K55",mtype="latlon",units="degrees",lon180=.TRUE., &
-                             x=lon,y=lat)
+        else if (trim(domain) .eq. "Antarctica-c20") then 
+
+            ! Define the input filenames
+            fldr_input     = "sicodata/RACMO2/Antarctica/HadCM3-c20_rot/"
+            file_suffix1   = "_RACMO2_ANT3K55_HadCM3-c20.nc"
+            file_suffix2   = "_RACMO2_ANT3K55_HadCM3-c20_1980-1999.nc"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_RACMO2-ANT3K55_HadCM3-c20-monthly_1980-1999.nc"
+
+            year0       = 1980 
+            nyr         = 1999-1980+1
+
+            ! For climatology
+            if (present(clim_range)) then  
+                k0 = clim_range(1) - year0+1
+                nk = clim_range(2) - clim_range(1) + 1 
+
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                    "_RACMO2-ANT3K55_HadCM3-c20-monthly_",clim_range(1),"-",clim_range(2),".nc"
+            end if 
+
+
+
 
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
             stop 
         end if 
+
+        ! Define RACMO2 input grids/points ===========
+        
+        nx = 134 
+        ny = 122
+        
+        if (allocated(lon)) deallocate(lon)
+        if (allocated(lat)) deallocate(lat)
+        allocate(lon(nx*ny),lat(nx*ny))
+        call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix1),"g10_lon_1",lon,start=[1,1],count=[nx,ny])
+        call nc_read(trim(fldr_input)//"Geopotential"//trim(file_suffix1),"g10_lat_0",lat,start=[1,1],count=[nx,ny])
+        call points_init(pIN1,name="ANT3K55",mtype="latlon",units="degrees",lon180=.TRUE., &
+                         x=lon,y=lat)
 
         ! Define the variables to be mapped
 
@@ -1625,8 +1650,14 @@ contains
                 "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
                 "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
-        call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+        call def_var_info(vars(21),trim(fldr_input)//"Albedo"//trim(file_suffix2), &
+                "ALBDO_GDS10_HTGL_ave1h", "al",  units="-",fill=.TRUE.)
+        
+        if (trim(domain) .ne. "Antarctica-c20") then
+            ! Rename albedo to load empty data, since field is not available for other scenarios
+            call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
+                "VAR_176_GDS10_HTGL_acc", "al",  units="-",fill=.TRUE.,conv=0.d0)
+        end if 
         
         nm       = 12
         n_var    = size(vars)
