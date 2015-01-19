@@ -64,7 +64,8 @@ program gentopo
 
         outfldr = "output/Antarctica/"//trim(grid%name)
 
-        call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!         call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+        call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
 !         call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8, lat_lim=2.d0)
         
