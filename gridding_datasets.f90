@@ -426,9 +426,9 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(4))
-        call def_var_info(invariant(1),file_invariant,"u","u",units="m*a-1")
-        call def_var_info(invariant(2),file_invariant,"v","v",units="m*a-1")
+        allocate(invariant(3))
+        call def_var_info(invariant(1),file_invariant,  "u","u",units="m*a-1")
+        call def_var_info(invariant(2),file_invariant,  "v","v",units="m*a-1")
         call def_var_info(invariant(3),file_invariant,"uv","uv",units="m*a-1")
 
         ! Allocate the input grid variable
