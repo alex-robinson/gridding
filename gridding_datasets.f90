@@ -22,7 +22,8 @@ module gridding_datasets
     end type 
 
     private
-    public :: Bamber13_to_grid, bedmap2_to_grid, ecmwf_to_grid
+    public :: Bamber13_to_grid, ecmwf_to_grid
+    public :: bedmap2_to_grid, bedmap2vel_to_grid
     public :: MARv35_to_grid, MARv33_to_grid, MARv32_to_grid
     public :: RACMO2rot_to_grid
     public :: CERES_to_grid 
