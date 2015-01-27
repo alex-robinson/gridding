@@ -1128,7 +1128,7 @@ contains
                             trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
-                        where (invar .ne. missing_value) invar = invar*var_now%conv 
+!                         where (invar .ne. missing_value) invar = invar*var_now%conv 
 
                         if (trim(var_now%nm_in) == "ME") then 
                             write(*,*) "me vals: ",minval(invar), maxval(invar), &
