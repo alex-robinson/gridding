@@ -1130,7 +1130,7 @@ contains
                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
 
-                        if (trim(var_now%nm_in) == "me") then 
+                        if (trim(var_now%nm_in) == "ME") then 
                             write(*,*) "me vals: ",minval(invar), maxval(invar), &
                                        minval(invar,mask=invar .ne. missing_value), &
                                        maxval(invar,mask=invar .ne. missing_value)
