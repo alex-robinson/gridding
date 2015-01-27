@@ -1129,6 +1129,14 @@ contains
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
+
+                        if (trim(var_now%nm_in) == "me") then 
+                            write(*,*) "me vals: ",minval(invar), maxval(invar), &
+                                       minval(invar,mask=invar .ne. missing_value), &
+                                       maxval(invar,mask=invar .ne. missing_value)
+                            if ( m == 12) stop 
+                        end if 
+
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
                                        fill=.FALSE.,missing_value=missing_value)
