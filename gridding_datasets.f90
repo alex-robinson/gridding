@@ -1132,18 +1132,10 @@ contains
                         ! Bug fix with input values - make sure missing values are missing
                         where (invar .lt. -9000.d0) invar = missing_value 
 
-
-                        if (trim(var_now%nm_in) == "ME") then 
-                            write(*,*) "me vals: ",minval(invar), maxval(invar), &
-                                       minval(invar,mask=invar .ne. missing_value), &
-                                       maxval(invar,mask=invar .ne. missing_value)
-                            if ( m == 12) stop 
-                        end if 
-
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
-                                       fill=.FALSE.,missing_value=missing_value)
+                                       fill=.TRUE.,missing_value=missing_value)
                         if (var_now%fill) call fill_weighted(outvar,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
