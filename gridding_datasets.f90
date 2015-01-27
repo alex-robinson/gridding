@@ -1122,7 +1122,7 @@ contains
                     write(*,*) "month ",m
 
                     ! ## SURFACE FIELDS ##
-                    do i = 6,6 !1, n_var
+                    do i = 1, n_var
                         var_now = surf(i)     
                         write(var_now%filename,"(a,a,i4,a3)") &
                             trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
