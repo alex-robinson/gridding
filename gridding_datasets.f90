@@ -1042,8 +1042,8 @@ contains
         call def_var_info(surf( 3),trim(file_surface),"SHSN3", "SH3", units="m")
         call def_var_info(surf( 4),trim(file_surface),"SMB", "smb", units="mm d**-1") 
         call def_var_info(surf( 5),trim(file_surface),"SU",  "su",  units="mm d**-1") 
-        call def_var_info(surf( 6),trim(file_surface),"ME",  "me",  units="mm d**-1") 
-        call def_var_info(surf( 7),trim(file_surface),"RZ",  "rz",  units="mm d**-1") 
+        call def_var_info(surf( 6),trim(file_surface),"ME",  "me",  units="mm d**-1",fill=.TRUE.) 
+        call def_var_info(surf( 7),trim(file_surface),"RZ",  "rz",  units="mm d**-1",fill=.TRUE.) 
         call def_var_info(surf( 8),trim(file_surface),"SF",  "sf",  units="mm d**-1",fill=.TRUE.) 
         call def_var_info(surf( 9),trim(file_surface),"RF",  "rf",  units="mm d**-1",fill=.TRUE.) 
         call def_var_info(surf(10),trim(file_surface),"RU",  "ru",  units="mm d**-1") 
@@ -1131,7 +1131,7 @@ contains
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
-                                       fill=.TRUE.,missing_value=missing_value)
+                                       fill=.FALSE.,missing_value=missing_value)
                         if (var_now%fill) call fill_weighted(outvar,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])

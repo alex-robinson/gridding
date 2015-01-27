@@ -1,59 +1,82 @@
 .SUFFIXES: .f .F .F90 .f90 .o .mod
 .SHELL: /bin/sh
 
-.PHONY : usage
-usage:
-	@echo ""
-	@echo "    * USAGE * "
-	@echo ""
-	@echo " make GRL        : compiles the main program gentopo_GRL.x"
-	@echo " make clean      : cleans object files"
-	@echo ""
-
 # PATH options
 objdir = .obj
-srcdir = src
 libdir = ..
 
-# netcdf_inc = /usr/include
-# netcdf_lib = /usr/lib
-netcdf_inc = /opt/local/include
-netcdf_lib = /opt/local/lib
-netcdf_inc_ifort = /home/robinson/apps/netcdf/netcdf/include
-netcdf_lib_ifort = /home/robinson/apps/netcdf/netcdf/lib
-
 # Command-line options at make call
-ifort ?= 0
+env   ?= None      # options: manto,eolo,airaki,iplex
 debug ?= 0 
 
-ifeq ($(ifort),1)
-    FC = ifort 
-else
-    FC = gfortran
-endif 
+ifeq ($(env),manto) ## env=manto
 
-ifeq ($(ifort),1)
-	## IFORT OPTIONS ##
-	FLAGS        = -module $(objdir) -L$(objdir) -I$(netcdf_inc_ifort)
-	LFLAGS		 = -L$(netcdf_lib_ifort) -lnetcdf
+    ## IFORT OPTIONS ##
+    FC  = ifort
+    INC_NC  = -I/home/jalvarez/work/librairies/netcdflib/include
+    LIB_NC  = -L/home/jalvarez/work/librairies/netcdflib/lib -lnetcdf
+    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 
-	ifeq ($(debug), 1)
-	    DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -heap-arrays
-	    # -w 
-	else
-	    DFLAGS   = -vec-report0 -O3 -heap-arrays
-	endif
-else
-	## GFORTRAN OPTIONS ##
-	FLAGS        = -I$(objdir) -J$(objdir) -I$(netcdf_inc)
-	LFLAGS		 = -L$(netcdf_lib) -lnetcdff -lnetcdf
+    FLAGS    = -module $(objdir) -L$(objdir) $(INC_NC)
+    LFLAGS   = $(LIB_NC) $(LIB_MKL)
 
-	ifeq ($(debug), 1)
-	    DFLAGS   = -w -p -ggdb -ffpe-trap=invalid,zero,overflow,underflow \
-	               -fbacktrace -fcheck=all -fbackslash
-	else
-	    DFLAGS   = -O3 -fbackslash
-	endif
+    DFLAGS   = -vec-report0 -O2 -fp-model precise -i_dynamic 
+    ifeq ($(debug), 1)
+        DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -fp-model precise -i_dynamic 
+    endif
+
+else ifeq ($(env),eolo) ## env=eolo
+
+    ## IFORT OPTIONS ##
+    FC  = ifort
+    INC_NC  = -I/home/fispalma22/work/librairies/netcdflib/include
+    LIB_NC  = -L/home/fispalma22/work/librairies/netcdflib/lib -lnetcdf
+    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+
+    FLAGS    = -module $(objdir) -L$(objdir) $(INC_NC)
+    LFLAGS   = $(LIB_NC) $(LIB_MKL)
+
+    DFLAGS   = -vec-report0 -O2 -fp-model precise
+    ifeq ($(debug), 1)
+        DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -fp-model precise
+    endif
+
+else ifeq ($(env),airaki) ## env=airaki
+
+    ## GFORTRAN OPTIONS ##
+    FC  = gfortran
+    INC_NC  = -I/opt/local/include
+    LIB_NC  = -L/opt/local/lib -lnetcdff -lnetcdf
+
+    FLAGS  = -I$(objdir) -J$(objdir) $(INC_NC)
+    LFLAGS = $(LIB_NC)
+
+    DFLAGS = -O3
+    ifeq ($(debug), 1)  # ,underflow
+        DFLAGS   = -w -g -p -ggdb -ffpe-trap=invalid,zero,overflow -fbacktrace -fcheck=all
+    endif
+
+else ifeq ($(env),iplex) ## env=iplex
+
+    ## IFORT OPTIONS ##
+    FC  = ifort
+    INC_NC  = -I/home/robinson/apps/netcdf/netcdf/include
+    LIB_NC  = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf
+    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+
+    FLAGS    = -module $(objdir) -L$(objdir) $(INC_NC)
+    LFLAGS   = $(LIB_NC)
+
+    DFLAGS   = -vec-report0 -O3
+    ifeq ($(debug), 1)
+        DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0
+    endif
+
+else 
+    
+    ## None ##
+    FC = $(error "Define env")
+
 endif
 
 ## Individual libraries or modules ##
