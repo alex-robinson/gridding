@@ -1128,7 +1128,10 @@ contains
                             trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
-!                         where (invar .ne. missing_value) invar = invar*var_now%conv 
+                        
+                        ! Bug fix with input values - make sure missing values are missing
+                        where (invar .lt. -9000.d0) invar = missing_value 
+
 
                         if (trim(var_now%nm_in) == "ME") then 
                             write(*,*) "me vals: ",minval(invar), maxval(invar), &
@@ -1137,6 +1140,7 @@ contains
                             if ( m == 12) stop 
                         end if 
 
+                        where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
                                        fill=.FALSE.,missing_value=missing_value)
