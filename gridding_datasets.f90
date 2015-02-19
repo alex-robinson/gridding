@@ -29,7 +29,7 @@ module gridding_datasets
     public :: CERES_to_grid 
     public :: bedmap2_read 
     public :: rignotBM_to_grid
-    
+
 contains
 
     subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -562,7 +562,7 @@ contains
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
             ! Define the input filenames
-            infldr         = "output/Antarctica/"
+            infldr         = "sicodata/Antarctica_data/"
             file_invariant = trim(infldr)//"Ant_MeltingRate.nc"
 
             ! Define the output filename 
