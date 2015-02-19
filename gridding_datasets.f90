@@ -550,17 +550,13 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp1(:,:), tmp2(:,:), tmp3(:,:)
         integer, allocatable          :: outmask(:,:)
+        double precision, allocatable :: xax(:), yax(:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
 
         ! Define input grid
         if (trim(domain) .eq. "Antarctica") then 
             
-            ! Define topography (BEDMAP2/rignot) grid and input variable field
-            call grid_init(gTOPO,name="rignot-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-2800.d0,dx=10.d0,nx=561,y0=2800.d0,dy=-10.d0,ny=561, &
-                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
-
             ! Define the input filenames
             infldr         = "sicodata/Antarctica_data/"
             file_invariant = trim(infldr)//"Ant_MeltingRate.nc"
@@ -569,6 +565,17 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_BMELT.nc"
 
+            ! Define input grid vectors 
+            allocate(xax(561),yax(561))
+            call nc_read(file_invariant,"xaxis",xax)
+            call nc_read(file_invariant,"yaxis",yax)
+            
+            ! Define topography (BEDMAP2/rignot) grid and input variable field
+            call grid_init(gTOPO,name="rignot-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
+                   x=xax,yax, &
+                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+
+            
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
