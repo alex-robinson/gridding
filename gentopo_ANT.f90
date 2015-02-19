@@ -70,19 +70,22 @@ program gentopo
 
 !         call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8, lat_lim=2.d0)
         
-        call ecmwf_to_grid(outfldr,grid,"ANT075",max_neighbors=8, lat_lim=2.d0)
-        call ecmwf_to_grid(outfldr,grid,"ANT075",clim_range=[1981,2010])
+!         call ecmwf_to_grid(outfldr,grid,"ANT075",max_neighbors=8, lat_lim=2.d0)
+!         call ecmwf_to_grid(outfldr,grid,"ANT075",clim_range=[1981,2010])
         
-        call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
-        call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
-        call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
-        call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
+!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
+!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
+!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
+!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
 
         ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
         !       data while they should all have 240 months (1980-1999)
         !       This dataset is not used for now...
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",max_neighbors=20,lat_lim=0.5d0)
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",clim_range=[1980,1999])
+        
+        ! Rignot basal melting data
+        call rignotBM_to_grid(outfldr,grid,"Antarctica-1km",max_neighbors=10, lat_lim=1.d0)
 
     end if 
 
