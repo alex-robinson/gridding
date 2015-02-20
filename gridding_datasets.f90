@@ -190,13 +190,13 @@ contains
 
             allocate(lon(np),lat(np),invar(np))
 
-            ! File format: lon, lat, basin 
+            ! File format: lat, lon, basin 
             open(2,file=trim(file_invariant),status="old")
             do i = 1, nh
                 read(2,"(a)") tmp 
             end do 
             do i = 1, np 
-                read(2,*) lon(i), lat(i), invar(i) 
+                read(2,*) lat(i), lon(i), invar(i) 
             end do 
             close(2)
 
