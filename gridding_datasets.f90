@@ -29,7 +29,8 @@ module gridding_datasets
     public :: CERES_to_grid 
     public :: bedmap2_read 
     public :: rignotBM_to_grid
-
+    public :: nasaBasins_to_grid
+    
 contains
 
     subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -155,6 +156,121 @@ contains
 
     end subroutine Bamber13_to_grid
 
+    subroutine nasaBasins_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+
+        type(points_class) :: pTOPO
+        character(len=256) :: file_invariant, tmp 
+        type(var_defs), allocatable :: invariant(:)
+        double precision, allocatable :: lon(:), lat(:), invar(:)
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable :: outmask(:,:)
+
+        integer :: nh, nl, np, i 
+
+        ! Get input data (from polygon files)
+        if (trim(domain) .eq. "Antarctica") then 
+
+            ! Define the input filenames
+            file_invariant = "data/Antarctica/nasa_basins/Ant_Full_DrainageSystem_Polygons.txt"
+
+            nh = 7        ! Header length
+            nl = 901329   ! File length 
+            np = nl - nh  ! Number of data points 
+
+            allocate(lon(np),lat(np),invar(np))
+
+            ! File format: lon, lat, basin 
+            open(2,file=trim(file_invariant),status="old")
+            do i = 1, nh
+                read(2,"(a)") tmp 
+            end do 
+            do i = 1, np 
+                read(2,*) lon(i), lat(i), invar(i) 
+            end do 
+            close(2)
+
+            write(*,*) "lon: ",minval(lon),maxval(lon)
+            write(*,*) "lat: ",minval(lat),maxval(lat)
+            write(*,*) "var: ",minval(invar),maxval(invar)
+
+            ! Define input points for mapping
+            call points_init(pTOPO,name="NASA-ANT",mtype="lonlat",units="degrees", &
+                             lon180=.TRUE.,x=lon,y=lat)
+
+        else if (trim(domain) .eq. "Greenland") then 
+
+            nh = 7 
+            nl = 272972
+            np = nl - nh  ! Number of data points 
+
+            ! File format: basin, lat, lon 
+        else 
+
+            write(*,*) "nasaBasins_to_grid:: error: "
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+
+        end if 
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                          "_BASINS.nc"
+
+        stop 
+
+        ! Define the variables to be mapped 
+        allocate(invariant(2))
+        call def_var_info(invariant(1),trim(file_invariant),"basin","basin_sub",units="1",method="nn")
+        call def_var_info(invariant(2),trim(file_invariant),"basin","basin",    units="1",method="nn")
+
+        ! Initialize mapping
+        call map_init(map,pTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)   
+        call grid_allocate(grid,outmask)   
+        
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+    
+        ! ## INVARIANT FIELDS ##
+
+        ! First basins including sub basins if available (Greenland)
+        if (trim(domain) .eq. "Greenland") then 
+            var_now = invariant(1) 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+                           fill=.TRUE.,missing_value=missing_value)
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
+                          units=var_now%units_out,missing_value=real(missing_value))
+        end if 
+
+        ! First basins including sub basins if available (Greenland)
+        var_now = invariant(2) 
+        invar = floor(invar)
+        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+                       fill=.TRUE.,missing_value=missing_value)
+        call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
+                      units=var_now%units_out,missing_value=int(missing_value))
+ 
+        return 
+
+    end subroutine nasaBasins_to_grid 
+
     subroutine basins_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
@@ -193,7 +309,7 @@ contains
                            lambda=-40.d0,phi=71.d0,alpha=7.5d0)
 
             ! Define the input filenames
-            file_invariant = "../REMBOv2_data/ekholm_basins.nc"
+            file_invariant = "../ice_data/ekholm_basins.nc"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
