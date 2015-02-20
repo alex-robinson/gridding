@@ -227,8 +227,6 @@ contains
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                           "_BASINS.nc"
 
-        stop 
-
         ! Define the variables to be mapped 
         allocate(invariant(2))
         call def_var_info(invariant(1),trim(file_invariant),"basin","basin_sub",units="1",method="nn")
@@ -245,7 +243,6 @@ contains
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
     
         ! ## INVARIANT FIELDS ##
