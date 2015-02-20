@@ -30,7 +30,7 @@ module gridding_datasets
     public :: bedmap2_read 
     public :: rignotBM_to_grid
     public :: nasaBasins_to_grid
-    
+
 contains
 
     subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -205,7 +205,7 @@ contains
             write(*,*) "var: ",minval(invar),maxval(invar)
 
             ! Define input points for mapping
-            call points_init(pTOPO,name="NASA-ANT",mtype="lonlat",units="degrees", &
+            call points_init(pTOPO,name="NASA-ANT",mtype="latlon",units="degrees", &
                              lon180=.TRUE.,x=lon,y=lat)
 
         else if (trim(domain) .eq. "Greenland") then 
