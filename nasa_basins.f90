@@ -63,7 +63,7 @@ program nasa_basins
         ! File format: basin, lat, lon 
     else 
 
-        write(*,*) "nasaBasins_to_grid:: error: "
+        write(*,*) "nasa_basins:: error: "
         write(*,*) "Domain not recognized: ",trim(domain)
         stop 
 
@@ -96,6 +96,6 @@ program nasa_basins
 
     end do 
 
-contains
+! contains
 
 end program nasa_basins 
