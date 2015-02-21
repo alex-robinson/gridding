@@ -88,7 +88,7 @@ program gentopo
 !         call rignotBM_to_grid(outfldr,grid,"Antarctica",max_neighbors=10, lat_lim=1.d0)
         
         ! NASA drainage basins 
-        call nasaBasins_to_grid(outfldr,grid,"Antarctica",max_neighbors=1, lat_lim=5.d0)
+        call nasaBasins_to_grid(outfldr,grid,"Antarctica",max_neighbors=1,lat_lim=2.d0)
 
     end if 
 
