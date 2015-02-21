@@ -77,8 +77,8 @@ program nasa_basins
     ! Allocate output vectors 
     allocate(outb%lon(npo),outb%lat(npo),outb%basin(npo))
 
-    write(**) "nlon, nlat, npo: ", nlon, nlat, npo
-    
+    write(*,*) "nlon, nlat, npo: ", nlon, nlat, npo
+
     ! Fill latlon values 
     k = 0 
     do i = 1, nlon 
