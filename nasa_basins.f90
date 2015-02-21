@@ -24,7 +24,7 @@ program nasa_basins
 
     ! ## USER DEFINED OPTIONS ##
     domain = "Antarctica" 
-    dlon   = 1.0d0
+    dlon   = 0.5d0
     dlat   = 0.5d0 
 
     ! Get input data (from polygon files)
@@ -70,8 +70,8 @@ program nasa_basins
     end if 
 
     ! Determine how many lon and lat values will be output
-    nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) )
-    nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) )
+    nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) + 1 )
+    nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) + 1 )
     npo  = nlon*nlat 
 
     ! Allocate output vectors 
