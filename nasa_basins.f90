@@ -24,8 +24,8 @@ program nasa_basins
 
     ! ## USER DEFINED OPTIONS ##
     domain = "Antarctica" 
-    dlon   = 0.2d0
-    dlat   = 0.2d0 
+    dlon   = 1.0d0
+    dlat   = 0.5d0 
 
     ! Get input data (from polygon files)
     if (trim(domain) .eq. "Antarctica") then 
@@ -77,6 +77,8 @@ program nasa_basins
     ! Allocate output vectors 
     allocate(outb%lon(npo),outb%lat(npo),outb%basin(npo))
 
+    write(**) "nlon, nlat, npo: ", nlon, nlat, npo
+    
     ! Fill latlon values 
     k = 0 
     do i = 1, nlon 
