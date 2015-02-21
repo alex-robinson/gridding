@@ -105,6 +105,9 @@ $(objdir)/interp2D.o: $(libdir)/coord/interp2D.f90
 $(objdir)/interp_time.o: $(libdir)/coord/interp_time.f90 $(objdir)/interp1D.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/polygons.o: $(libdir)/coord/polygons.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/gridding_datasets.o: gridding_datasets.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -147,6 +150,12 @@ bedmap: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
 	@echo " "
 	@echo "    bedmap2_netcdf.x is ready."
+	@echo " "
+
+nasa-basins: $(objdir)/polygons.o
+	$(FC) $(DFLAGS) $(FLAGS) -o nasa_basins.x $^ nasa_basins.f90 $(LFLAGS)
+	@echo " "
+	@echo "    nasa_basins.x is ready."
 	@echo " "
 
 test: $(objdir)/ncio.o
