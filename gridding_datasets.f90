@@ -247,20 +247,25 @@ contains
     
         ! ## INVARIANT FIELDS ##
 
-        ! First basins including sub basins if available (Greenland)
+        ! Map field
+        var_now = invariant(1) 
+        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,1d6, &
+                       fill=.TRUE.,missing_value=missing_value)
+
+        ! Fill in basins over ocean too
+        where(outvar .eq. 0) outvar = nint(missing_value)
+        call fill_nearest(outvar,nint(missing_value))
+
+        ! First write basins including sub basins if available
         if (trim(domain) .eq. "Greenland") then 
             var_now = invariant(1) 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,1d6, &
-                           fill=.TRUE.,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
                           units=var_now%units_out,missing_value=real(missing_value))
         end if 
 
         ! First basins including sub basins if available (Greenland)
         var_now = invariant(2) 
-        invar = floor(invar)
-        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,1d6, &
-                       fill=.TRUE.,missing_value=missing_value)
+        outvar = floor(outvar)
         call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
                       units=var_now%units_out,missing_value=int(missing_value))
  
