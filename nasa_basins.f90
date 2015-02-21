@@ -5,7 +5,7 @@ program nasa_basins
     ! from a file (lon,lat,basin) and interpolate it to
     ! a set of high res lon, lat points (lon,lat,basin)
 
-    use polygons 
+!     use polygons 
 
     implicit none 
 
@@ -71,10 +71,8 @@ program nasa_basins
     end if 
 
     ! Determine how many lon and lat values will be output
-!     nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) )
-!     nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) )
-    nlon = 50 
-    nlat = 50
+    nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) )
+    nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) )
     npo  = nlon*nlat 
 
     ! Allocate output vectors 
