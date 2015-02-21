@@ -148,8 +148,12 @@ contains
         if (allocated(ind)) deallocate(ind)
         allocate(ind(n))
 
+        n = 0
         do i = 1, size(x) 
-            if (x(i)) ind(i) = i 
+            if (x(i)) then 
+                n = n+1
+                ind(n) = i 
+            end if
         end do 
 
         return 
