@@ -133,23 +133,27 @@ contains
         integer :: k                   ! The number of unique elements
         integer :: i, j
         real(4), parameter :: tol = 1d-5
+        logical :: found 
 
         write(*,*) minval(x), maxval(x)
-        
+
         k = 1
         res(1) = x(1)
-        outer: do i=2,size(x)
+        do i=2,size(x)
+            found = .FALSE.
             do j=1,k
-!                 if (res(j) == x(i)) then
-                if (abs(res(j)-x(j)) .le. tol) then 
+                if (abs(res(j)-x(i)) .le. tol) then 
                    ! Found a match so start looking again
-                   cycle outer
+                   found = .TRUE. 
+                   cycle 
                 end if
             end do
             ! No match found so add it to the output
-            k = k + 1
-            res(k) = x(i)
-        end do outer
+            if (.not. found) then 
+                k = k + 1
+                res(k) = x(i)
+            end if 
+        end do
 
         write(*,advance='no',fmt='(a,i0,a)') 'Unique list has ',k,' elements: '
         write(*,*) res(1:k)
