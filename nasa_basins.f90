@@ -71,8 +71,10 @@ program nasa_basins
     end if 
 
     ! Determine how many lon and lat values will be output
-    nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) )
-    nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) )
+!     nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) )
+!     nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) )
+    nlon = 50 
+    nlat = 50
     npo  = nlon*nlat 
 
     ! Allocate output vectors 
