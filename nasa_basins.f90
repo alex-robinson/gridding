@@ -19,7 +19,7 @@ program nasa_basins
     type(basin_type) :: inb, outb 
     integer :: nh, nl, np, npo, i, j, k  
 
-    double precision :: dlon, dlat 
+    double precision :: dlon, dlat, lon0, lat0 
     integer :: nlat, nlon 
 
     ! ## USER DEFINED OPTIONS ##
@@ -77,15 +77,18 @@ program nasa_basins
     ! Allocate output vectors 
     allocate(outb%lon(npo),outb%lat(npo),outb%basin(npo))
 
-    write(*,*) "nlon, nlat, npo: ", nlon, nlat, npo
+    write(*,*) "np, nlon, nlat, npo: ", np, nlon, nlat, npo
 
     ! Fill latlon values 
+    lon0 = minval(inb%lon)
+    lat0 = minval(inb%lat)
+
     k = 0 
     do i = 1, nlon 
         do j = 1, nlat 
             k = k+1 
-            outb%lon(k) = minval(inb%lon) + (i-1)*dlon
-            outb%lat(k) = minval(inb%lat) + (j-1)*dlat
+            outb%lon(k) = lon0 + (i-1)*dlon
+            outb%lat(k) = lat0 + (j-1)*dlat
         end do 
     end do 
 
