@@ -253,8 +253,8 @@ contains
                        fill=.TRUE.,missing_value=missing_value)
 
         ! Fill in basins over ocean too
-        where(outvar .eq. 0) outvar = nint(missing_value)
-        call fill_nearest(outvar,nint(missing_value))
+        where(outvar .eq. 0) outvar = missing_value
+        call fill_nearest(outvar,missing_value)
 
         ! First write basins including sub basins if available
         if (trim(domain) .eq. "Greenland") then 
