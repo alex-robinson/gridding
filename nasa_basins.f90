@@ -27,7 +27,6 @@ program nasa_basins
     dlon   = 0.2d0
     dlat   = 0.2d0 
 
-
     ! Get input data (from polygon files)
     if (trim(domain) .eq. "Antarctica") then 
 
