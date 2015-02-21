@@ -23,7 +23,9 @@ program nasa_basins
     integer :: nlat, nlon 
 
     real(4), allocatable :: basins(:) 
-    integer :: nb 
+    integer, allocatable :: inds(:)
+    integer :: nb, q 
+    logical :: in_basin 
 
     ! ## USER DEFINED OPTIONS ##
     domain = "Antarctica" 
@@ -75,7 +77,6 @@ program nasa_basins
     ! Determine the input basins available 
     call unique(basins,inb%basin)
     nb = size(basins)
-    write(*,*) nb, basins 
 
     ! Determine how many lon and lat values will be output
     nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) + 1 )
@@ -103,16 +104,59 @@ program nasa_basins
     write(*,*) "lon: ",minval(outb%lon),maxval(outb%lon)
     write(*,*) "lat: ",minval(outb%lat),maxval(outb%lat)
 
-    ! Go through each output point and determine if it fits inside a polygon 
-    k0 = 1 
+    ! Go through each output point and determine if it fits inside a polygon  
     do k = 1, npo 
 
+        ! Initialize basin info for current point
+        in_basin      = .FALSE.
+        outb%basin(k) = 0.0 
+
+        ! Loop over basins and check point in polygon
+        do q = 1, nb 
+            call which(inb%basin==basins(q),inds)
+            write(*,*) "Basin ", basins(q), minval(inds), maxval(inds)
+            in_basin = point_in_polygon(outb%lon(k), outb%lat(k), inb%lon(inds), inb%lat(inds))
+            if (in_basin) exit 
+        end do 
+
+        ! If basin was found, save it
+        if (in_basin) outb%basin(k) = basins(q)
 
     end do 
 
+    ! Write output points to file 
+    ! File format: lon, lat, basin 
+    open(2,file=trim(file_out),status="unknown")
+    write(*,"(3a12)") "lon", "lat", "basin"
+    do i = 1, npo 
+        read(2,*) outb%lon(i), outb%lat(i), outb%basin(i) 
+    end do 
+    close(2)
+
+
 contains
 
-!     subroutine get_polygon(x,y)
+    subroutine which(x,ind)
+
+        implicit none 
+
+        logical :: x(:)
+        integer, allocatable :: ind(:) 
+        integer :: n 
+
+        n = count(x)
+        if (allocated(ind)) deallocate(ind)
+        allocate(ind(n))
+
+        do i = 1, size(x) 
+            if (x(i)) ind(i) = i 
+        end do 
+
+        return 
+
+    end subroutine which 
+
+!     subroutine get_polygon(xx,yy,bb,b)
 
 !         implicit none 
 
@@ -135,8 +179,6 @@ contains
         real(4), parameter :: tol = 1d-5
         logical :: found 
 
-        write(*,*) minval(x), maxval(x)
-
         k = 1
         res(1) = x(1)
         do i=2,size(x)
@@ -154,9 +196,6 @@ contains
                 res(k) = x(i)
             end if 
         end do
-
-        write(*,advance='no',fmt='(a,i0,a)') 'Unique list has ',k,' elements: '
-        write(*,*) res(1:k)
 
         ! Store output in properly sized output vector
         if(allocated(xu)) deallocate(xu)
