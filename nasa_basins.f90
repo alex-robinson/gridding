@@ -134,6 +134,8 @@ contains
         integer :: i, j
         real(4), parameter :: tol = 1d-5
 
+        write(*,*) minval(x), maxval(x)
+        
         k = 1
         res(1) = x(1)
         outer: do i=2,size(x)
