@@ -132,7 +132,7 @@ contains
         real(4), allocatable :: xu(:)  ! The output 
         integer :: k                   ! The number of unique elements
         integer :: i, j
-        real(4), parameter :: tol = 1d-6
+        real(4), parameter :: tol = 1d-5
 
         k = 1
         res(1) = x(1)
@@ -149,6 +149,10 @@ contains
             res(k) = x(i)
         end do outer
 
+        write(*,advance='no',fmt='(a,i0,a)') 'Unique list has ',k,' elements: '
+        write(*,*) res(1:k)
+
+        ! Store output in properly sized output vector
         if(allocated(xu)) deallocate(xu)
         allocate(xu(k))
         xu = res(1:k)
