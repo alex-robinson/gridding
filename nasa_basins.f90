@@ -13,14 +13,17 @@ program nasa_basins
     character(len=256) :: file_in, file_out, tmp 
     
     type basin_type 
-        double precision, allocatable :: lon(:), lat(:), basin(:)
+        real(4), allocatable :: lon(:), lat(:), basin(:)
     end type 
 
     type(basin_type) :: inb, outb 
-    integer :: nh, nl, np, npo, i, j, k  
+    integer :: nh, nl, np, npo, i, j, k, k0, k1 
 
-    double precision :: dlon, dlat, lon0, lat0 
+    real(4) :: dlon, dlat, lon0, lat0  
     integer :: nlat, nlon 
+
+    real(4), allocatable :: basins(:) 
+    integer :: nb 
 
     ! ## USER DEFINED OPTIONS ##
     domain = "Antarctica" 
@@ -69,6 +72,11 @@ program nasa_basins
 
     end if 
 
+    ! Determine the input basins available 
+    call unique(basins,inb%basin)
+    nb = size(basins)
+    write(*,*) nb, basins 
+
     ! Determine how many lon and lat values will be output
     nlon = int( ceiling( (maxval(inb%lon)-minval(inb%lon)) / dlon ) + 1 )
     nlat = int( ceiling( (maxval(inb%lat)-minval(inb%lat)) / dlat ) + 1 )
@@ -96,11 +104,57 @@ program nasa_basins
     write(*,*) "lat: ",minval(outb%lat),maxval(outb%lat)
 
     ! Go through each output point and determine if it fits inside a polygon 
+    k0 = 1 
     do k = 1, npo 
 
 
     end do 
 
-! contains
+contains
+
+!     subroutine get_polygon(x,y)
+
+!         implicit none 
+
+
+!         return 
+
+!     end subroutine get_polygon 
+
+    subroutine unique(xu,x)
+        ! Return only the unique values of a vector
+        ! http://rosettacode.org/wiki/Remove_duplicate_elements#Fortran
+
+        implicit none 
+
+        real(4) :: x(:)          ! The input
+        real(4) :: res(size(x))  ! The unique values
+        real(4), allocatable :: xu(:)  ! The output 
+        integer :: k                   ! The number of unique elements
+        integer :: i, j
+        real(4), parameter :: tol = 1d-6
+
+        k = 1
+        res(1) = x(1)
+        outer: do i=2,size(x)
+            do j=1,k
+!                 if (res(j) == x(i)) then
+                if (abs(res(j)-x(j)) .le. tol) then 
+                   ! Found a match so start looking again
+                   cycle outer
+                end if
+            end do
+            ! No match found so add it to the output
+            k = k + 1
+            res(k) = x(i)
+        end do outer
+
+        if(allocated(xu)) deallocate(xu)
+        allocate(xu(k))
+        xu = res(1:k)
+
+        return 
+
+    end subroutine unique 
 
 end program nasa_basins 
