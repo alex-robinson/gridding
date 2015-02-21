@@ -114,7 +114,6 @@ program nasa_basins
         ! Loop over basins and check point in polygon
         do q = 1, nb 
             call which(inb%basin==basins(q),inds)
-            write(*,*) "Basin ", basins(q), minval(inds), maxval(inds)
             in_basin = point_in_polygon(outb%lon(k), outb%lat(k), inb%lon(inds), inb%lat(inds))
             if (in_basin) exit 
         end do 
@@ -122,6 +121,8 @@ program nasa_basins
         ! If basin was found, save it
         if (in_basin) outb%basin(k) = basins(q)
 
+        if (mod(k,1000) .eq. 0) & 
+            write(*,*) minval(outb%basin(1:k)), maxval(outb%basin(1:k)), k, "/", npo
     end do 
 
     ! Write output points to file 
@@ -129,7 +130,7 @@ program nasa_basins
     open(2,file=trim(file_out),status="unknown")
     write(*,"(3a12)") "lon", "lat", "basin"
     do i = 1, npo 
-        read(2,*) outb%lon(i), outb%lat(i), outb%basin(i) 
+        write(2,*) outb%lon(i), outb%lat(i), outb%basin(i) 
     end do 
     close(2)
 
