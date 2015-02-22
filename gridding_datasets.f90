@@ -171,12 +171,23 @@ contains
         type(var_defs), allocatable :: invariant(:)
         double precision, allocatable :: lon(:), lat(:), invar(:)
 
+        type basin_type 
+            double precision, allocatable :: lon(:), lat(:), basin(:)
+        end type 
+
+        type(basin_type) :: inb
+
         type(map_class)  :: map 
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable :: outmask(:,:)
 
         integer :: nh, nl, np, i 
+
+        real(4), allocatable :: basins(:) 
+        integer, allocatable :: inds(:)
+        integer :: nb, q 
+        logical :: in_basin 
 
         ! Get input data (from polygon files)
         if (trim(domain) .eq. "Antarctica") then 
@@ -188,7 +199,7 @@ contains
             nl = 901329   ! File length 
             np = nl - nh  ! Number of data points 
 
-            allocate(lon(np),lat(np),invar(np))
+            allocate(inb%lon(np),inb%lat(np),inb%basin(np))
 
             ! File format: lat, lon, basin 
             open(2,file=trim(file_invariant),status="old")
@@ -196,17 +207,16 @@ contains
                 read(2,"(a)") tmp 
             end do 
             do i = 1, np 
-                read(2,*) lat(i), lon(i), invar(i) 
+                read(2,*) inb%lat(i), inb%lon(i), inb%basin(i) 
             end do 
             close(2)
 
-            write(*,*) "lon: ",minval(lon),maxval(lon)
-            write(*,*) "lat: ",minval(lat),maxval(lat)
-            write(*,*) "var: ",minval(invar),maxval(invar)
+            write(*,*) "lon: ",minval(inb%lon),maxval(inb%lon)
+            write(*,*) "lat: ",minval(inb%lat),maxval(inb%lat)
+            write(*,*) "var: ",minval(inb%basin),maxval(inb%basin)
 
             ! Define input points for mapping
-            call points_init(pTOPO,name="NASA-ANT",mtype="latlon",units="degrees", &
-                             lon180=.TRUE.,x=lon,y=lat)
+            call points_init(pTOPO,grid,name="NASA-ANT",x=inb%lon,y=inb%lat,latlon=.TRUE.)
 
         else if (trim(domain) .eq. "Greenland") then 
 
@@ -227,30 +237,25 @@ contains
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                           "_BASINS.nc"
 
-        ! Define the variables to be mapped 
-        allocate(invariant(2))
-        call def_var_info(invariant(1),trim(file_invariant),"basin","basin_sub",units="1",method="nn")
-        call def_var_info(invariant(2),trim(file_invariant),"basin","basin",    units="1",method="nn")
-
-        ! Initialize mapping
-        call map_init(map,pTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
         ! Initialize output variable arrays
-        call grid_allocate(grid,outvar)   
-        call grid_allocate(grid,outmask)   
+        call grid_allocate(grid,outvar)     
         
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
-        ! ## INVARIANT FIELDS ##
+        
+        stop 
+        
+        ! ## MAP FIELDS ##
 
-        ! Map field
-        var_now = invariant(1) 
-        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,1d6, &
-                       fill=.TRUE.,missing_value=missing_value)
+        ! Map polygons onto new grid points 
+
+        outvar = missing_value 
+
+
+        ! ## TO DO ## 
 
         ! Fill in basins over ocean too
         where(outvar .eq. 0) outvar = missing_value
@@ -259,15 +264,14 @@ contains
         ! First write basins including sub basins if available
         if (trim(domain) .eq. "Greenland") then 
             var_now = invariant(1) 
-            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
-                          units=var_now%units_out,missing_value=real(missing_value))
+            call nc_write(filename,"basin_sub",real(outvar),dim1="xc",dim2="yc", &
+                          units="1",missing_value=real(missing_value))
         end if 
 
-        ! First basins including sub basins if available (Greenland)
-        var_now = invariant(2) 
+        ! Now whole number basins (aggregate basins)
         outvar = floor(outvar)
-        call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
-                      units=var_now%units_out,missing_value=int(missing_value))
+        call nc_write(filename,"basin",nint(outvar),dim1="xc",dim2="yc", &
+                      units="1",missing_value=int(missing_value))
  
         return 
 

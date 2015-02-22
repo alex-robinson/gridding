@@ -128,9 +128,9 @@ program nasa_basins
     ! Write output points to file 
     ! File format: lon, lat, basin 
     open(2,file=trim(file_out),status="unknown")
-    write(*,"(3a12)") "lon", "lat", "basin"
+    write(2,"(3a12)") "lon", "lat", "basin"
     do i = 1, npo 
-        write(2,*) outb%lon(i), outb%lat(i), outb%basin(i) 
+        write(2,"(3f12.2)") outb%lon(i), outb%lat(i), outb%basin(i) 
     end do 
     close(2)
 
