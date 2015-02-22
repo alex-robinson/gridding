@@ -83,6 +83,9 @@ endif
 $(objdir)/ncio.o: $(libdir)/ncio/ncio.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/index.o: $(libdir)/coord/index.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/planet.o: $(libdir)/coord/planet.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -114,8 +117,8 @@ $(objdir)/gridding_datasets.o: gridding_datasets.f90
 ## Complete programs
 
 # Program to test interpolations of CCSM3 data
-GRL: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
-	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
+GRL: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
+	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
 	         $(objdir)/gridding_datasets.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
@@ -123,8 +126,8 @@ GRL: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	@echo "    gentopo_GRL.x is ready."
 	@echo " "
 
-ANT: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
-	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
+ANT: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
+	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
 	         $(objdir)/gridding_datasets.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
@@ -144,7 +147,7 @@ marmonthly: $(objdir)/ncio.o
 	@echo "    mar_calcmonthly.x is ready."
 	@echo " "
 
-bedmap: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
+bedmap: $(objdir)/ncio.o $(objdir)/index.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o
 	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
@@ -152,8 +155,8 @@ bedmap: $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
 	@echo "    bedmap2_netcdf.x is ready."
 	@echo " "
 
-nasa-basins: $(objdir)/polygons.o $(objdir)/ncio.o $(objdir)/geodesic.o $(objdir)/planet.o \
-	         $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
+nasa-basins: $(objdir)/polygons.o $(objdir)/index.o $(objdir)/ncio.o $(objdir)/geodesic.o \
+	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o
 	$(FC) $(DFLAGS) $(FLAGS) -o nasa_basins.x $^ nasa_basins.f90 $(LFLAGS)
 	@echo " "

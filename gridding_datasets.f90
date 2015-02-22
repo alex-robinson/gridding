@@ -2,6 +2,7 @@
 module gridding_datasets
 
     use coordinates 
+    use polygons 
     use interp_time
     use interp2D 
     use ncio 
@@ -172,17 +173,13 @@ contains
         double precision, allocatable :: lon(:), lat(:), invar(:)
 
         type basin_type 
-            double precision, allocatable :: lon(:), lat(:), basin(:)
+            real (4), allocatable :: lon(:), lat(:), basin(:)
         end type 
 
         type(basin_type) :: inb
-
-        type(map_class)  :: map 
-        type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
-        integer, allocatable :: outmask(:,:)
 
-        integer :: nh, nl, np, i 
+        integer :: nh, nl, np, i, j, k  
 
         real(4), allocatable :: basins(:) 
         integer, allocatable :: inds(:)
@@ -216,7 +213,7 @@ contains
             write(*,*) "var: ",minval(inb%basin),maxval(inb%basin)
 
             ! Define input points for mapping
-            call points_init(pTOPO,grid,name="NASA-ANT",x=inb%lon,y=inb%lat,latlon=.TRUE.)
+            call points_init(pTOPO,grid,name="NASA-ANT",x=dble(inb%lon),y=dble(inb%lat),latlon=.TRUE.)
 
         else if (trim(domain) .eq. "Greenland") then 
 
@@ -246,16 +243,37 @@ contains
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
-        stop 
-        
         ! ## MAP FIELDS ##
-
         ! Map polygons onto new grid points 
 
+        ! Initially set all output values to missing
         outvar = missing_value 
 
+        ! Go through each output point and determine if it fits inside a polygon 
+        write(*,*) "Mapping polygons..." 
+        k = 0 
+        do i = 1, grid%G%nx 
+            do j = 1, grid%G%ny  
 
-        ! ## TO DO ## 
+                ! Initialize basin info for current point
+                in_basin      = .FALSE.
+
+                ! Loop over basins and check point in polygon
+                do q = 1, nb 
+                    call which(inb%basin==basins(q),inds)
+                    in_basin = point_in_polygon(real(grid%lon(i,j)), real(grid%lat(i,j)), &
+                                                inb%lon(inds), inb%lat(inds))
+                    if (in_basin) exit 
+                end do 
+
+                ! If basin was found, save it
+                if (in_basin) outvar(i,j) = basins(q)
+
+                k = k+1 
+                if (mod(k,1000) .eq. 0) write(*,*) k, "/", grid%npts 
+
+            end do 
+        end do 
 
         ! Fill in basins over ocean too
         where(outvar .eq. 0) outvar = missing_value
@@ -263,7 +281,6 @@ contains
 
         ! First write basins including sub basins if available
         if (trim(domain) .eq. "Greenland") then 
-            var_now = invariant(1) 
             call nc_write(filename,"basin_sub",real(outvar),dim1="xc",dim2="yc", &
                           units="1",missing_value=real(missing_value))
         end if 

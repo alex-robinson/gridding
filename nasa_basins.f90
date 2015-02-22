@@ -161,15 +161,6 @@ contains
 
     end subroutine which 
 
-!     subroutine get_polygon(xx,yy,bb,b)
-
-!         implicit none 
-
-
-!         return 
-
-!     end subroutine get_polygon 
-
     subroutine unique(xu,x)
         ! Return only the unique values of a vector
         ! http://rosettacode.org/wiki/Remove_duplicate_elements#Fortran
