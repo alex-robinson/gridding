@@ -3,6 +3,7 @@ module gridding_datasets
 
     use coordinates 
     use polygons 
+    use index 
     use interp_time
     use interp2D 
     use ncio 
@@ -248,6 +249,10 @@ contains
 
         ! Initially set all output values to missing
         outvar = missing_value 
+
+        ! Determine the input basins available 
+        call unique(basins,inb%basin)
+        nb = size(basins)
 
         ! Go through each output point and determine if it fits inside a polygon 
         write(*,*) "Mapping polygons..." 
