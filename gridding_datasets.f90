@@ -158,23 +158,19 @@ contains
 
     end subroutine Bamber13_to_grid
 
-    subroutine nasaBasins_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine nasaBasins_to_grid(outfldr,grid,domain)
 
         implicit none 
 
         character(len=*) :: domain, outfldr 
-        type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim 
+        type(grid_class) :: grid  
         character(len=512) :: filename 
 
         type(points_class) :: pTOPO
         character(len=256) :: file_invariant, tmp 
-        type(var_defs), allocatable :: invariant(:)
-        double precision, allocatable :: lon(:), lat(:), invar(:)
 
         type basin_type 
-            real (4), allocatable :: lon(:), lat(:), basin(:)
+            double precision, allocatable :: lon(:), lat(:), basin(:)
         end type 
 
         type(basin_type) :: inb
@@ -182,7 +178,7 @@ contains
 
         integer :: nh, nl, np, i, j, k  
 
-        real(4), allocatable :: basins(:) 
+        double precision, allocatable :: basins(:) 
         integer, allocatable :: inds(:)
         integer :: nb, q 
         logical :: in_basin 
@@ -214,7 +210,7 @@ contains
             write(*,*) "var: ",minval(inb%basin),maxval(inb%basin)
 
             ! Define input points for mapping
-            call points_init(pTOPO,grid,name="NASA-ANT",x=dble(inb%lon),y=dble(inb%lat),latlon=.TRUE.)
+            call points_init(pTOPO,grid,name="NASA-ANT",x=inb%lon,y=inb%lat,latlon=.TRUE.)
 
         else if (trim(domain) .eq. "Greenland") then 
 
@@ -267,7 +263,7 @@ contains
                 do q = 1, nb 
                     call which(inb%basin==basins(q),inds)
                     in_basin = point_in_polygon(real(grid%lon(i,j)), real(grid%lat(i,j)), &
-                                                inb%lon(inds), inb%lat(inds))
+                                                real(inb%lon(inds)), real(inb%lat(inds)))
                     if (in_basin) exit 
                 end do 
 
