@@ -3,7 +3,13 @@ program gentopo
 
     use ncio 
     use coordinates
-    use gridding_datasets
+!     use gridding_datasets
+    
+    use Bamber13 
+    use NasaBasins 
+    use ECMWF 
+    use CERES
+    use MAR 
 
     implicit none
 

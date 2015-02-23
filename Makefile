@@ -148,14 +148,6 @@ bedmap: $(objdir)/ncio.o $(objdir)/index.o $(objdir)/geodesic.o $(objdir)/planet
 	@echo "    bedmap2_netcdf.x is ready."
 	@echo " "
 
-nasa-basins: $(objdir)/polygons.o $(objdir)/index.o $(objdir)/ncio.o $(objdir)/geodesic.o \
-	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
-	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o
-	$(FC) $(DFLAGS) $(FLAGS) -o nasa_basins.x $^ nasa_basins.f90 $(LFLAGS)
-	@echo " "
-	@echo "    nasa_basins.x is ready."
-	@echo " "
-
 test: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o test.x $^ test.f90 $(LFLAGS)
 	@echo " "
