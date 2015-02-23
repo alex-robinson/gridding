@@ -165,6 +165,7 @@ contains
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid  
         character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
 
         type(points_class) :: pTOPO
         character(len=256) :: file_invariant, tmp 
@@ -190,6 +191,11 @@ contains
 
             ! Define the input filenames
             file_invariant = "data/Antarctica/nasa_basins/Ant_Full_DrainageSystem_Polygons.txt"
+            desc = "Antarctic drainage basins mapped by NASA."
+            ref  = "Zwally, H. Jay, Mario B. Giovinetto, Matthew A. Beckley, &
+                   &and Jack L. Saba, 2012, Antarctic and Greenland Drainage &
+                   & Systems, GSFC Cryospheric Sciences Laboratory, at &
+                   http://icesat4.gsfc.nasa.gov/cryo_data/ant_grn_drainage_systems.php."
 
             nh = 7        ! Header length
             nl = 901329   ! File length 
@@ -218,6 +224,11 @@ contains
 
             ! Define the input filenames
             file_invariant = "data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
+            desc = "Greenland drainage basins mapped by NASA."
+            ref  = "Zwally, H. Jay, Mario B. Giovinetto, Matthew A. Beckley, &
+                   &and Jack L. Saba, 2012, Antarctic and Greenland Drainage &
+                   & Systems, GSFC Cryospheric Sciences Laboratory, at &
+                   http://icesat4.gsfc.nasa.gov/cryo_data/ant_grn_drainage_systems.php."
 
             nh = 7        ! Header length
             nl = 272972   ! File length 
@@ -252,7 +263,7 @@ contains
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                          "_BASINS.nc"
+                          "_BASINS-nasa.nc"
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)     
@@ -264,6 +275,10 @@ contains
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
         ! ## MAP FIELDS ##
         ! Map polygons onto new grid points 
 
