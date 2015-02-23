@@ -275,8 +275,8 @@ contains
         ! Go through each output point and determine if it fits inside a polygon 
         write(*,*) "Mapping polygons..." 
         k = 0 
-        do i = 40, grid%G%nx 
-            do j = 80, grid%G%ny  
+        do i = 1, grid%G%nx 
+            do j = 1, grid%G%ny  
 
                 ! Initialize basin info for current point
                 in_basin      = .FALSE.
@@ -284,12 +284,12 @@ contains
                 ! Loop over basins and check point in polygon
                 do q = 1, nb 
                     call which(abs(inb%basin-basins(q)).lt.tol,inds)
-                    in_basin = point_in_polygon(real(grid%lon(i,j)), real(grid%lat(i,j)), &
-                                                real(inb%lon(inds)), real(inb%lat(inds)))
+                    in_basin = point_in_polygon(real(grid%x(i,j)), real(grid%y(i,j)), &
+                                                real(pTOPO%x(inds)), real(pTOPO%y(inds)))
                     
-                    write(*,*) q, basins(q), size(inds,1), real(grid%lon(i,j)), real(grid%lat(i,j)), &
-                                minval(real(inb%lon(inds))), maxval(real(inb%lon(inds))), &
-                                minval(real(inb%lat(inds))), maxval(real(inb%lat(inds))), in_basin 
+!                     write(*,*) q, basins(q), size(inds,1), real(grid%lon(i,j)), real(grid%lat(i,j)), &
+!                                 minval(real(inb%lon(inds))), maxval(real(inb%lon(inds))), &
+!                                 minval(real(inb%lat(inds))), maxval(real(inb%lat(inds))), in_basin 
                     if (in_basin) exit 
                 end do 
 
