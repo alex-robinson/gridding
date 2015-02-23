@@ -175,6 +175,7 @@ contains
 
         type(basin_type) :: inb
         double precision, allocatable :: outvar(:,:)
+        integer, allocatable :: outmask(:,:)
 
         integer :: nh, nl, np, i, j, k  
 
@@ -255,6 +256,7 @@ contains
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)     
+        call grid_allocate(grid,outmask)     
         
         ! Initialize the output file
         call nc_create(filename)
@@ -297,13 +299,18 @@ contains
                 if (in_basin) outvar(i,j) = basins(q)
 
                 k = k+1 
-                if (mod(k,1000) .eq. 0) write(*,*) k, "/", grid%npts 
+                if (mod(k,1000) .eq. 0) write(*,"(i10,a3,i10") k, " / ", grid%npts 
 
             end do 
         end do 
 
+        ! Write a mask of the original basin extent (no ocean points)
+        outmask = 0 
+        where (outvar .ne. missing_value) outmask = 1 
+        call nc_write(filename,"basin_mask",outmask,dim1="xc",dim2="yc", &
+                      units="1",missing_value=int(missing_value))
+        
         ! Fill in basins over ocean too
-        where(outvar .eq. 0) outvar = missing_value
         call fill_nearest(outvar,missing_value)
 
         ! First write basins including sub basins if available
