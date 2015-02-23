@@ -29,7 +29,6 @@ module gridding_datasets
     public :: MARv35_to_grid, MARv33_to_grid, MARv32_to_grid
     public :: RACMO2rot_to_grid
     public :: CERES_to_grid 
-    public :: bedmap2_read 
     public :: rignotBM_to_grid
     public :: nasaBasins_to_grid
 
@@ -151,9 +150,6 @@ contains
 !         outvar = 0.d0 
 !         where (zs .gt. 0.d0) outvar = 1.d0 
         
-        ! Also perform interpolations to get drainage basins
-        call basins_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
-
         return 
 
     end subroutine Bamber13_to_grid
@@ -302,11 +298,7 @@ contains
                 do q = 1, nb 
                     call which(abs(inb%basin-basins(q)).lt.tol,inds)
                     in_basin = point_in_polygon(real(grid%x(i,j)), real(grid%y(i,j)), &
-                                                real(pTOPO%x(inds)), real(pTOPO%y(inds)))
-                    
-!                     write(*,*) q, basins(q), size(inds,1), real(grid%lon(i,j)), real(grid%lat(i,j)), &
-!                                 minval(real(inb%lon(inds))), maxval(real(inb%lon(inds))), &
-!                                 minval(real(inb%lat(inds))), maxval(real(inb%lat(inds))), in_basin 
+                                                real(pTOPO%x(inds)), real(pTOPO%y(inds))) 
                     if (in_basin) exit 
                 end do 
 
@@ -343,92 +335,6 @@ contains
 
     end subroutine nasaBasins_to_grid 
 
-    subroutine basins_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
-        ! Convert the variables to the desired grid format and write to file
-        ! =========================================================
-        !
-        !       Ekolm et al. drainage basins 
-        !       http://icesat4.gsfc.nasa.gov/cryo_data/ant_grn_drainage_systems.php
-        !
-        ! =========================================================
-        
-        implicit none 
-
-        character(len=*) :: domain, outfldr 
-        type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim 
-        character(len=512) :: filename 
-
-        type(grid_class)   :: gTOPO
-        character(len=256) :: file_invariant, file_surface, file_prefix(2)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
-        integer, allocatable :: invar(:,:) 
-
-        type(map_class)  :: map 
-        type(var_defs) :: var_now 
-        integer, allocatable :: outvar(:,:)
-        integer, allocatable :: outmask(:,:)
-        double precision, allocatable :: zs(:,:)
-        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
-
-        ! Define ECMWF input grid
-        if (trim(domain) .eq. "Greenland") then 
-            
-            ! Basins have already been interpolated to 25km MAR grid
-            call grid_init(gTOPO,name="MAR-25KM",mtype="stereographic",units="kilometers",lon180=.TRUE., &
-                           x0=-750.d0,dx=25.d0,nx=58,y0=-1200.d0,dy=25.d0,ny=108, &
-                           lambda=-40.d0,phi=71.d0,alpha=7.5d0)
-
-            ! Define the input filenames
-            file_invariant = "../ice_data/ekholm_basins.nc"
-
-            ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO.nc"
-
-        else
-
-            write(*,*) "Domain not recognized: ",trim(domain)
-            stop 
-        end if 
-
-        ! Define the variables to be mapped 
-        allocate(invariant(1))
-        call def_var_info(invariant(1),trim(file_invariant),"basin","basin",units="1",method="nn")
-
-        ! Allocate the input grid variable
-        call grid_allocate(gTOPO,invar)
-        
-        ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
-        ! Initialize output variable arrays
-        call grid_allocate(grid,outvar)
-        call grid_allocate(grid,outmask)    
-        call grid_allocate(grid,zs)
-
-        ! Initialize the output file
-        ! Output file should already exist from topography step 
-
-        ! ## INVARIANT FIELDS ##
-        var_now = invariant(1) 
-        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=nint(missing_value))
-        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,30.d3, &
-                       fill=.TRUE.,missing_value=missing_value)
-        
-        ! Make sure basins cover entire land area
-        call nc_read(filename,"zs",zs)
-        where(outvar .eq. 0) outvar = nint(missing_value)
-        where(zs .eq. 0.d0)  outvar = 0.d0 
-        call fill_nearest(outvar,nint(missing_value))
-
-        ! Add to output file
-        call nc_write(filename,var_now%nm_out,outvar,dim1="xc",dim2="yc",units=var_now%units_out)
-
-        return 
-
-    end subroutine basins_to_grid
 
     subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
@@ -458,10 +364,6 @@ contains
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
-
-!         !! Test reading bedmap2 dataset 
-!         call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_surface.txt","Surface",var2D,missing_value=-9999.d0)
-!         write(*,*) "bedmap2 surface min/max: ",minval(var2D,mask=var2D .ne. -9999.d0), maxval(var2D,mask=var2D .ne. -9999.d0)
 
         ! Define input grid
         if (trim(domain) .eq. "Antarctica") then 
@@ -516,7 +418,6 @@ contains
         do i = 1, size(invariant)
             var_now = invariant(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-!             call bedmap2_read(trim(var_now%filename),var_now%nm_in,tmp1,missing_value)
             call thin(invar,tmp1,by=10)
             if (trim(var_now%nm_out) .eq. "H" .or. &
                 trim(var_now%nm_out) .eq. "zs") then 
@@ -671,43 +572,6 @@ contains
         return 
 
     end subroutine bedmap2vel_to_grid
-
-    subroutine bedmap2_read(filename,name,var2D,missing_value)
-
-        implicit none 
-
-        character(len=*) :: filename, name 
-        double precision :: var2D(:,:), missing_value 
-        character(len=50) :: tmpc 
-        double precision  :: tmpd, missing_val0 
-        integer :: i, nrow 
-
-        write(*,*) "Reading: "//trim(filename)//": "//trim(name)
-
-        ! Open the data file for reading
-        open(166,file=filename,status="old")
-
-        ! Read the header, extract the missing value from last line
-        do i = 1, 6
-            read(166,*) tmpc, tmpd 
-        end do 
-        missing_val0 = tmpd 
-
-        ! Loop over all rows in file and store data in array
-        nrow = size(var2D,1)
-        var2D = missing_value
-        do i = 1, nrow 
-            read(166,*) var2D(i,:)
-        end do 
-
-        ! Overwrite missing data with the desired missing value
-        where(var2D .eq. missing_val0) var2D = missing_value 
-
-        write(*,*) "Done."
-
-        return
-
-    end subroutine bedmap2_read
 
     subroutine rignotBM_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
