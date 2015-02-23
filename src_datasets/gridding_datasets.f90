@@ -17,7 +17,8 @@ module gridding_datasets
         logical            :: fill 
     end type 
 
-
+contains
+    
     !##############################################
     !
     ! General subroutines related to the module

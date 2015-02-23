@@ -1,7 +1,8 @@
 module Bamber13 
 
     use gridding_datasets
-    use coordinates 
+    use coordinates
+    use interp2D 
     use ncio 
     
     implicit none 
@@ -126,9 +127,6 @@ contains
 
 !         outvar = 0.d0 
 !         where (zs .gt. 0.d0) outvar = 1.d0 
-        
-        ! Also perform interpolations to get drainage basins
-        call basins_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
 
         return 
 
