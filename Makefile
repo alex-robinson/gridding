@@ -166,13 +166,7 @@ bedmap: $(objdir)/ncio.o
 	@echo "    bedmap2_netcdf.x is ready."
 	@echo " "
 
-test: $(objdir)/ncio.o
-	$(FC) $(DFLAGS) $(FLAGS) -o test.x $^ test.f90 $(LFLAGS)
-	@echo " "
-	@echo "    test.x is ready."
-	@echo " "
-
 clean:
-	rm -f gentopo_grl.x gentopo_ant.x mar_rawclean.x $(objdir)/*.o $(objdir)/*.mod
+	rm -f *.x $(objdir)/*.o $(objdir)/*.mod
 
 # cleanall: cleansico cleanrembo cleansicoX
