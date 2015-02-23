@@ -272,6 +272,9 @@ contains
         call unique(basins,inb%basin)
         nb = size(basins)
 
+        write(*,*) "Basins: ", basins 
+        stop 
+        
         ! Go through each output point and determine if it fits inside a polygon 
         write(*,*) "Mapping polygons..." 
         k = 0 
