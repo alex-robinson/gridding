@@ -116,8 +116,20 @@ $(objdir)/gridding_datasets.o: gridding_datasets.f90
 
 ## Complete programs
 
+ANT: $(objdir)/gridding_datasets.o 
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 ../coord/libcoordinates.a $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_ANT.x is ready."
+	@echo " "
+
+GRL: $(objdir)/gridding_datasets.o 
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 ../coord/libcoordinates.a $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_GRL.x is ready."
+	@echo " "
+
 # Program to test interpolations of CCSM3 data
-GRL: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
+GRL00: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
 	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
 	         $(objdir)/gridding_datasets.o
@@ -131,18 +143,6 @@ ANT00: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesi
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
 	         $(objdir)/gridding_datasets.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_ANT.x is ready."
-	@echo " "
-
-ANT: $(objdir)/gridding_datasets.o 
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 ../coord/libcoordinates.a $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_ANT.x is ready."
-	@echo " "
-
-ANT-shared: $(objdir)/gridding_datasets.o 
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 -L../coord -lcoordinates $(LFLAGS)
 	@echo " "
 	@echo "    gentopo_ANT.x is ready."
 	@echo " "
