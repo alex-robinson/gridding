@@ -299,7 +299,7 @@ contains
                 if (in_basin) outvar(i,j) = basins(q)
 
                 k = k+1 
-                if (mod(k,1000) .eq. 0) write(*,"(i10,a3,i10") k, " / ", grid%npts 
+                if (mod(k,1000) .eq. 0) write(*,"(i10,a3,i10)") k, " / ", grid%npts 
 
             end do 
         end do 
