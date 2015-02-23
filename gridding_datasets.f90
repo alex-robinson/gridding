@@ -182,6 +182,7 @@ contains
         integer, allocatable :: inds(:)
         integer :: nb, q 
         logical :: in_basin 
+        double precision, parameter :: tol = 1d-5 
 
         ! Get input data (from polygon files)
         if (trim(domain) .eq. "Antarctica") then 
@@ -282,7 +283,7 @@ contains
 
                 ! Loop over basins and check point in polygon
                 do q = 1, nb 
-                    call which(inb%basin==basins(q),inds)
+                    call which(abs(inb%basin-basins(q)).lt.tol,inds)
                     in_basin = point_in_polygon(real(grid%lon(i,j)), real(grid%lat(i,j)), &
                                                 real(inb%lon(inds)), real(inb%lat(inds)))
                     if (in_basin) exit 

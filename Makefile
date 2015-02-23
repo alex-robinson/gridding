@@ -128,25 +128,6 @@ GRL: $(objdir)/gridding_datasets.o
 	@echo "    gentopo_GRL.x is ready."
 	@echo " "
 
-# Program to test interpolations of CCSM3 data
-GRL00: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
-	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
-	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
-	         $(objdir)/gridding_datasets.o
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_GRL.x is ready."
-	@echo " "
-
-ANT00: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
-	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
-	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
-	         $(objdir)/gridding_datasets.o
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_ANT.x is ready."
-	@echo " "
-
 marclean: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o mar_rawclean.x $^ mar_rawclean.f90 $(LFLAGS)
 	@echo " "
