@@ -3,14 +3,13 @@ program gentopo
 
     use ncio 
     use coordinates
-!     use gridding_datasets
-    
-    use Bamber13 
-    use NasaBasins 
-    use ECMWF 
-    use CERES
-    use MAR 
 
+    use Bamber13 
+    use CERES 
+    use ECMWF 
+    use MAR 
+    use NasaBasins
+    
     implicit none
 
     type(grid_class)   :: grid

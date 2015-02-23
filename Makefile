@@ -51,7 +51,7 @@ else ifeq ($(env),airaki) ## env=airaki
     INC_COORD = -I/Users/robinson/models/EURICE/coord/.obj
 	LIB_COORD = /Users/robinson/models/EURICE/coord/libcoordinates.a
 
-    FLAGS  = -I$(objdir) -J$(objdir) $(INC_NC) $(INC_COORD)
+    FLAGS  = -I$(objdir) -J$(objdir) $(INC_COORD) $(INC_NC) 
     LFLAGS = $(LIB_COORD) $(LIB_NC)
 
     DFLAGS = -O3
@@ -66,9 +66,11 @@ else ifeq ($(env),iplex) ## env=iplex
     INC_NC  = -I/home/robinson/apps/netcdf/netcdf/include
     LIB_NC  = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf
     LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+    INC_COORD = -I/iplex/01/tumble/robinson/EURICE/coord/.obj
+	LIB_COORD = /iplex/01/tumble/robinson/EURICE/coord/libcoordinates.a
 
-    FLAGS    = -module $(objdir) -L$(objdir) $(INC_NC)
-    LFLAGS   = $(LIB_NC)
+    FLAGS    = -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC) 
+    LFLAGS   = $(LIB_COORD) $(LIB_NC)
 
     DFLAGS   = -vec-report0 -O3
     ifeq ($(debug), 1)

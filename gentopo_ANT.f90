@@ -3,7 +3,14 @@ program gentopo
 
     use ncio 
     use coordinates
-    use gridding_datasets
+    
+    use bedmap2
+    use CERES
+    use ECMWF 
+    use MAR
+    use NasaBasins 
+    use RACMO2 
+    use Rignot13_BasalMelt  
 
     implicit none
 
@@ -85,7 +92,7 @@ program gentopo
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",clim_range=[1980,1999])
         
         ! Rignot basal melting data
-!         call rignotBM_to_grid(outfldr,grid,"Antarctica",max_neighbors=10, lat_lim=1.d0)
+!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10, lat_lim=1.d0)
         
         ! NASA drainage basins 
         call nasaBasins_to_grid(outfldr,grid,"Antarctica")

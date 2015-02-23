@@ -2,16 +2,17 @@ module Rignot13_BasalMelt
 
     use gridding_datasets
     use coordinates 
+    use interp2D
     use ncio 
     
     implicit none 
 
     private 
-    public :: Rignot13_BasalMelt
+    public :: Rignot13_BasalMelt_to_grid
     
 contains 
 
-    subroutine Rignot13_BasalMelt(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine Rignot13_BasalMelt_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -116,7 +117,7 @@ contains
 
         return 
 
-    end subroutine rignotBM_to_grid
+    end subroutine Rignot13_BasalMelt_to_grid
 
 
 
