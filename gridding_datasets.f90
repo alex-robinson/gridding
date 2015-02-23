@@ -272,14 +272,11 @@ contains
         call unique(basins,inb%basin)
         nb = size(basins)
 
-        write(*,*) "Basins: ", basins 
-        stop 
-        
         ! Go through each output point and determine if it fits inside a polygon 
         write(*,*) "Mapping polygons..." 
         k = 0 
-        do i = 1, grid%G%nx 
-            do j = 1, grid%G%ny  
+        do i = 40, grid%G%nx 
+            do j = 80, grid%G%ny  
 
                 ! Initialize basin info for current point
                 in_basin      = .FALSE.
@@ -289,6 +286,10 @@ contains
                     call which(abs(inb%basin-basins(q)).lt.tol,inds)
                     in_basin = point_in_polygon(real(grid%lon(i,j)), real(grid%lat(i,j)), &
                                                 real(inb%lon(inds)), real(inb%lat(inds)))
+                    
+                    write(*,*) q, basins(q), size(inds,1), real(grid%lon(i,j)), real(grid%lat(i,j)), &
+                                minval(real(inb%lon(inds))), maxval(real(inb%lon(inds))), &
+                                minval(real(inb%lat(inds))), maxval(real(inb%lat(inds))), in_basin 
                     if (in_basin) exit 
                 end do 
 
