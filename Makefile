@@ -126,11 +126,23 @@ GRL: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.
 	@echo "    gentopo_GRL.x is ready."
 	@echo " "
 
-ANT: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
+ANT00: $(objdir)/ncio.o $(objdir)/polygons.o $(objdir)/index.o $(objdir)/geodesic.o \
 	         $(objdir)/planet.o $(objdir)/projection_oblimap2.o $(objdir)/coordinates.o  \
 	         $(objdir)/interp1D.o $(objdir)/interp_time.o $(objdir)/interp2D.o \
 	         $(objdir)/gridding_datasets.o
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_ANT.x is ready."
+	@echo " "
+
+ANT: $(objdir)/gridding_datasets.o 
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 ../coord/libcoordinates.a $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_ANT.x is ready."
+	@echo " "
+
+ANT-shared: $(objdir)/gridding_datasets.o 
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 -L../coord -lcoordinates $(LFLAGS)
 	@echo " "
 	@echo "    gentopo_ANT.x is ready."
 	@echo " "
