@@ -214,11 +214,32 @@ contains
 
         else if (trim(domain) .eq. "Greenland") then 
 
-            nh = 7 
-            nl = 272972
+            ! Define the input filenames
+            file_invariant = "data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
+
+            nh = 7        ! Header length
+            nl = 272972   ! File length 
             np = nl - nh  ! Number of data points 
 
+            allocate(inb%lon(np),inb%lat(np),inb%basin(np))
+
             ! File format: basin, lat, lon 
+            open(2,file=trim(file_invariant),status="old")
+            do i = 1, nh
+                read(2,"(a)") tmp 
+            end do 
+            do i = 1, np 
+                read(2,*) inb%basin(i) , inb%lat(i), inb%lon(i)
+            end do 
+            close(2)
+
+            write(*,*) "lon: ",minval(inb%lon),maxval(inb%lon)
+            write(*,*) "lat: ",minval(inb%lat),maxval(inb%lat)
+            write(*,*) "var: ",minval(inb%basin),maxval(inb%basin)
+
+            ! Define input points for mapping
+            call points_init(pTOPO,grid,name="NASA-GRL",x=inb%lon,y=inb%lat,latlon=.TRUE.)
+
         else 
 
             write(*,*) "nasaBasins_to_grid:: error: "
