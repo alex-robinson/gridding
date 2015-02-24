@@ -105,7 +105,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=missing_value)
-            call thin(invar,tmp,by=10)
+            call thin(invar,tmp,by=5)
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
@@ -116,12 +116,15 @@ contains
                            radius=grid%G%dx*0.75d0,fill=.TRUE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
-                              units=var_now%units_out,long_name=var_now%long_name)
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
-                              units=var_now%units_out,long_name=var_now%long_name)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             end if 
+            
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            
         end do 
 
         return 

@@ -30,8 +30,8 @@ contains
         character(len=512) :: filename, infldr, prefix  
 
         type(grid_class)   :: gTOPO
-        character(len=256) :: file_invariant, file_surface, file_prefix(2)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        character(len=256) :: file_invariant
+        type(var_defs), allocatable :: invariant(:) 
         double precision, allocatable :: invar(:,:) 
         integer :: plev(9) 
 
@@ -66,10 +66,11 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(4))
-        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m")
-        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m")
-        call def_var_info(invariant(3),file_invariant,"H","H",units="m")
-        call def_var_info(invariant(4),file_invariant,"mask_ice","mask_ice",units="(0 - 1",method="nn")
+        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m",long_name="Surface elevation")
+        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m",long_name="Bedrock elevation")
+        call def_var_info(invariant(3),file_invariant,"H","H",units="m",long_name="Ice thickness")
+        call def_var_info(invariant(4),file_invariant,"mask_ice","mask_ice",units="(0 - 1", &
+                          long_name="Ice mask",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
@@ -113,30 +114,17 @@ contains
                           fill=.TRUE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             end if 
+
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            
         end do 
 
-!         ! Fix the mask to be consistent with interpolated fields 
-!         ! Initialize variable arrays
-!         call grid_allocate(grid,zb)
-!         call grid_allocate(grid,zs)
-!         call grid_allocate(grid,H)
-    
-!         call nc_read(trim(filename),"zb",zb,missing_value=missing_value)
-!         call nc_read(trim(filename),"zs",zs,missing_value=missing_value)
-!         call nc_read(trim(filename),"H",H,missing_value=missing_value)
-        
-!         where(zs .lt. 0.d0) zs = 0.d0 
-!         where(zs .lt. zb)   zs = zb 
-!         H = zs - zb 
-!         where(H  .lt. 1.d0) H  = 0.d0 
-
-!         outvar = 0.d0 
-!         where (zs .gt. 0.d0) outvar = 1.d0 
-        
         return 
 
     end subroutine bedmap2_to_grid
@@ -158,8 +146,8 @@ contains
         character(len=512) :: filename, infldr, prefix  
 
         type(grid_class)   :: gTOPO
-        character(len=256) :: file_invariant, file_surface, file_prefix(2)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        character(len=256) :: file_invariant
+        type(var_defs), allocatable :: invariant(:)
         double precision, allocatable :: invar(:,:), invarb(:,:)
         integer :: plev(9) 
 
@@ -194,9 +182,12 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(3))
-        call def_var_info(invariant(1),file_invariant,  "u","u",units="m*a-1")
-        call def_var_info(invariant(2),file_invariant,  "v","v",units="m*a-1")
-        call def_var_info(invariant(3),file_invariant,"uv","uv",units="m*a-1")
+        call def_var_info(invariant(1),file_invariant,  "u","u",units="m*a-1", &
+                          long_name="Surface velocity, u-component")
+        call def_var_info(invariant(2),file_invariant,  "v","v",units="m*a-1", &
+                          long_name="Surface velocity, v-component")
+        call def_var_info(invariant(3),file_invariant,"uv","uv",units="m*a-1", &
+                          long_name="Surface velocity, magnitude")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
@@ -240,10 +231,15 @@ contains
                           fill=.TRUE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             end if 
+        
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            
         end do 
 
         return 
