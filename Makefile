@@ -118,12 +118,12 @@ $(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
 grisli_common = $(objdir)/runparam_mod.o $(objdir)/3D-physique-gen_mod.o
 
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
-			   	   $(objdir)/Bamber13.o \
-			       $(objdir)/CERES.o \
-			       $(objdir)/ECMWF.o \
-			       $(objdir)/MAR.o \
-			       $(objdir)/RACMO2.o \
-			       $(objdir)/nasaBasins.o
+			   	   $(objdir)/Bamber13.o #\
+			       # $(objdir)/CERES.o \
+			       # $(objdir)/ECMWF.o \
+			       # $(objdir)/MAR.o \
+			       # $(objdir)/RACMO2.o \
+			       # $(objdir)/nasaBasins.o
 
 obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \

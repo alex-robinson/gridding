@@ -61,16 +61,26 @@ contains
 
         ! Define the variables to be mapped 
         allocate(surf(10))
-        call def_var_info(surf( 1),trim(file_surface),"toa_sw_all_clim","toa_sw_all",units="W m**-2",method="radius")
-        call def_var_info(surf( 2),trim(file_surface),"toa_sw_clr_clim","toa_sw_clr",units="W m**-2",method="radius")
-        call def_var_info(surf( 3),trim(file_surface),"toa_lw_all_clim","toa_lw_all",units="W m**-2",method="radius")
-        call def_var_info(surf( 4),trim(file_surface),"toa_lw_clr_clim","toa_lw_clr",units="W m**-2",method="radius")
-        call def_var_info(surf( 5),trim(file_surface),"toa_net_all_clim","toa_net_all",units="W m**-2",method="radius")
-        call def_var_info(surf( 6),trim(file_surface),"toa_net_clr_clim","toa_net_clr",units="W m**-2",method="radius")
-        call def_var_info(surf( 7),trim(file_surface),"toa_cre_sw_clim","toa_cre_sw",units="W m**-2",method="radius")
-        call def_var_info(surf( 8),trim(file_surface),"toa_cre_lw_clim","toa_cre_lw",units="W m**-2",method="radius")
-        call def_var_info(surf( 9),trim(file_surface),"toa_cre_net_clim","toa_cre_net",units="W m**-2",method="radius")
-        call def_var_info(surf(10),trim(file_surface),"solar_clim","solar",units="W m**-2",method="radius")
+        call def_var_info(surf( 1),trim(file_surface),"toa_sw_all_clim","toa_sw_all",units="W m**-2", &
+                          long_name="TOA shortwave radiation (all)",method="radius")
+        call def_var_info(surf( 2),trim(file_surface),"toa_sw_clr_clim","toa_sw_clr",units="W m**-2", &
+                          long_name="TOA shortwave radiation (clear)",method="radius")
+        call def_var_info(surf( 3),trim(file_surface),"toa_lw_all_clim","toa_lw_all",units="W m**-2", &
+                          long_name="TOA longwave radiation (all)",method="radius")
+        call def_var_info(surf( 4),trim(file_surface),"toa_lw_clr_clim","toa_lw_clr",units="W m**-2", &
+                          long_name="TOA longwave radiation (clear)",method="radius")
+        call def_var_info(surf( 5),trim(file_surface),"toa_net_all_clim","toa_net_all",units="W m**-2", &
+                          long_name="TOA net radiation (all)",method="radius")
+        call def_var_info(surf( 6),trim(file_surface),"toa_net_clr_clim","toa_net_clr",units="W m**-2", &
+                          long_name="TOA net radiation (clear)",method="radius")
+        call def_var_info(surf( 7),trim(file_surface),"toa_cre_sw_clim","toa_cre_sw",units="W m**-2", &
+                          long_name="TOA cre shortwave clim",method="radius")
+        call def_var_info(surf( 8),trim(file_surface),"toa_cre_lw_clim","toa_cre_lw",units="W m**-2", &
+                          long_name="TOA cre longwave clim",method="radius")
+        call def_var_info(surf( 9),trim(file_surface),"toa_cre_net_clim","toa_cre_net",units="W m**-2", &
+                          long_name="TOA cre net clim",method="radius")
+        call def_var_info(surf(10),trim(file_surface),"solar_clim","solar",units="W m**-2", &
+                          long_name="Solar clim",method="radius")
 
         ! Allocate the input grid variable
         call grid_allocate(gCERES,invar)
@@ -102,7 +112,8 @@ contains
                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
                               fill=.TRUE.,missing_value=missing_value)
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
-                              units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                              units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1], &
+                              long_name=var_now%long_name)
             end do 
         end do 
 
