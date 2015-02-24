@@ -93,7 +93,8 @@ contains
             j1 = 0 
             do j = 1, ny, by  
                 j1 = j1 + 1 
-                var1(i1,j1) = var(i,j)
+                if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
+                    var1(i1,j1) = var(i,j)
             end do 
         end do 
 
