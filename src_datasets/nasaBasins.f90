@@ -127,11 +127,11 @@ contains
         call grid_allocate(grid,outvar)     
         call grid_allocate(grid,outmask)     
         
-        call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
-        call nc_write_attr(filename,"basin_sub","long_name","Basins and sub-basins")
-        call nc_write_attr(filename,"basin","long_name","Basins")
+!         call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
+!         call nc_write_attr(filename,"basin_sub","long_name","Basins and sub-basins")
+!         call nc_write_attr(filename,"basin","long_name","Basins")
         
-        stop 
+!         stop 
         
         ! Initialize the output file
         call nc_create(filename)
