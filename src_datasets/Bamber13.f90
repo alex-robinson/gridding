@@ -46,12 +46,12 @@ contains
         if (trim(domain) .eq. "Greenland") then 
             
             ! Define topography (Bamber et al. 2013) grid and input variable field
-            call grid_init(gTOPO,name="TOPO-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
+            call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
+                   x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
             ! Define the input filenames
-            file_in = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+            file_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
             desc    = "Greenland bedrock and surface topography (V3)"
             ref     = "Bamber, J. L., Griggs, J. A., Hurkmans, R. T. W. L., &
                       &Dowdeswell, J. A., Gogineni, S. P., Howat, I., Mouginot, J., &
