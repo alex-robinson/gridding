@@ -127,12 +127,9 @@ contains
         call grid_allocate(grid,outvar)     
         call grid_allocate(grid,outmask)     
         
-        call nc_write_attr(filename,"basin_mask","long_name", &
-                           "Mask of original basin extent")
-        call nc_write_attr(filename,"basin_sub","long_name", &
-                           "Greenland basins and sub-basins")
-        call nc_write_attr(filename,"basin","long_name", &
-                           "Greenland basins")
+        call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
+        call nc_write_attr(filename,"basin_sub","long_name","Basins and sub-basins")
+        call nc_write_attr(filename,"basin","long_name","Basins")
         
         stop 
         
@@ -187,8 +184,7 @@ contains
         where (outvar .ne. missing_value) outmask = 1 
         call nc_write(filename,"basin_mask",outmask,dim1="xc",dim2="yc", &
                       units="1",missing_value=int(missing_value))
-        call nc_write_attr(filename,"basin_mask","long_name", &
-                           "Mask of original basin extent")
+        call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
         
         ! Fill in basins over ocean too
         call fill_nearest(outvar,missing_value)
@@ -197,16 +193,14 @@ contains
         if (trim(domain) .eq. "Greenland") then 
             call nc_write(filename,"basin_sub",real(outvar),dim1="xc",dim2="yc", &
                           units="1",missing_value=real(missing_value))
-            call nc_write_attr(filename,"basin_sub","long_name", &
-                               "Greenland basins and sub-basins")
+            call nc_write_attr(filename,"basin_sub","long_name","Basins and sub-basins")
         end if 
 
         ! Now whole number basins (aggregate basins)
         outvar = floor(outvar)
         call nc_write(filename,"basin",nint(outvar),dim1="xc",dim2="yc", &
                       units="1",missing_value=int(missing_value))
-        call nc_write_attr(filename,"basin","long_name", &
-                           "Greenland basins")
+        call nc_write_attr(filename,"basin","long_name","Basins")
         
         return 
 
