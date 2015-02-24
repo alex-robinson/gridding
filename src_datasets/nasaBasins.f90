@@ -48,7 +48,7 @@ contains
         if (trim(domain) .eq. "Antarctica") then 
 
             ! Define the input filenames
-            file_invariant = "data/Antarctica/nasa_basins/Ant_Full_DrainageSystem_Polygons.txt"
+            file_invariant = "/data/sicopolis/data/Antarctica/nasa_basins/Ant_Full_DrainageSystem_Polygons.txt"
             desc = "Antarctic drainage basins mapped by NASA."
             ref  = "Zwally, H. Jay, Mario B. Giovinetto, Matthew A. Beckley, &
                    &and Jack L. Saba, 2012, Antarctic and Greenland Drainage &
@@ -81,7 +81,7 @@ contains
         else if (trim(domain) .eq. "Greenland") then 
 
             ! Define the input filenames
-            file_invariant = "data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
+            file_invariant = "/data/sicopolis/data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
             desc = "Greenland drainage basins mapped by NASA."
             ref  = "Zwally, H. Jay, Mario B. Giovinetto, Matthew A. Beckley, &
                    &and Jack L. Saba, 2012, Antarctic and Greenland Drainage &
