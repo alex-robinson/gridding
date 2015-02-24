@@ -39,7 +39,8 @@ contains
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
-        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+        integer :: q, k, m, i, l, n_var 
+        integer :: thin_by = 5 
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
@@ -47,15 +48,24 @@ contains
             write(*,*) "Here 1"
 
             ! Define topography (Bamber et al. 2013) grid and input variable field
-            call grid_init(gTOPO,name="TOPO-B13-10KM",mtype="polar stereographic",units="kilometers", &
-                    lon180=.TRUE.,x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
-                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+            select case(thin_by)
+                case(10)
+                    call grid_init(gTOPO,name="TOPO-B13-10KM",mtype="polar stereographic", &
+                            units="kilometers",lon180=.TRUE., &
+                            x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
+                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
-            write(*,*) "Here 1b"
+                case(5)
+                    call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic", &
+                            units="kilometers",lon180=.TRUE., &
+                            x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
+                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
-            call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic",units="kilometers", &
-                    lon180=.TRUE.,x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
-                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+                case DEFAULT
+                    write(*,*) "Bamber13_to_grid:: error: thin_by can only be 5 or 10."
+                    stop 
+
+            end select 
 
             write(*,*) "Here 2"
              
@@ -117,7 +127,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=missing_value)
-            call thin(invar,tmp,by=5)
+            call thin(invar,tmp,by=thin_by)
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
