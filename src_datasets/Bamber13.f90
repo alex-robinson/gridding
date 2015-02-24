@@ -27,10 +27,11 @@ contains
         integer :: max_neighbors 
         double precision :: lat_lim 
         character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
 
         type(grid_class)   :: gTOPO
-        character(len=256) :: file_invariant, file_surface, file_prefix(2)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        character(len=256) :: file_in
+        type(var_defs), allocatable :: vars(:)
         double precision, allocatable :: invar(:,:) 
         integer :: plev(9) 
 
@@ -50,11 +51,17 @@ contains
                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
             ! Define the input filenames
-            file_invariant = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+            file_in = "data/Greenland/Greenland_bedrock_topography_V3.nc"
+            desc    = "Greenland bedrock and surface topography (V3)"
+            ref     = "Bamber, J. L., Griggs, J. A., Hurkmans, R. T. W. L., &
+                      &Dowdeswell, J. A., Gogineni, S. P., Howat, I., Mouginot, J., &
+                      &Paden, J., Palmer, S., Rignot, E., and Steinhage, D.: &
+                      &A new bed elevation dataset for Greenland, &
+                      &The Cryosphere, 7, 499-510, doi:10.5194/tc-7-499-2013, 2013."
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO.nc"
+                              "_TOPO-B13.nc"
 
         else
 
@@ -63,11 +70,12 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(4))
-        call def_var_info(invariant(1),trim(file_invariant),"BedrockElevation","zb",units="m")
-        call def_var_info(invariant(2),trim(file_invariant),"SurfaceElevation","zs",units="m")
-        call def_var_info(invariant(3),trim(file_invariant),"IceThickness",    "H", units="m")
-        call def_var_info(invariant(4),trim(file_invariant),"LandMask",      "mask",units="(0 - 4",method="nn")
+        allocate(vars(4))
+        call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation")
+        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation")
+        call def_var_info(vars(3),trim(file_in),"IceThickness",    "H", units="m",long_name="Ice thickness")
+        call def_var_info(vars(4),trim(file_in),"LandMask",      "mask",units="(0 - 4)", &
+                          long_name="Land mask",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
@@ -88,10 +96,14 @@ contains
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
-        ! ## INVARIANT FIELDS ##
-        do i = 1, size(invariant)
-            var_now = invariant(i) 
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! ## FIELDS ##
+        do i = 1, size(vars)
+            var_now = vars(i) 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=missing_value)
             call thin(invar,tmp,by=10)
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
@@ -100,33 +112,17 @@ contains
             if (trim(var_now%nm_out) .eq. "zb") then 
                 call fill_mean(invar,missing_value=missing_value,fill_value=-1000.d0)
             end if 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=missing_value)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
+                           radius=grid%G%dx*0.75d0,fill=.TRUE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
+                              units=var_now%units_out,long_name=var_now%long_name)
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
+                              units=var_now%units_out,long_name=var_now%long_name)
             end if 
         end do 
-
-!         ! Fix the mask to be consistent with interpolated fields 
-!         ! Initialize variable arrays
-!         call grid_allocate(grid,zb)
-!         call grid_allocate(grid,zs)
-!         call grid_allocate(grid,H)
-    
-!         call nc_read(trim(filename),"zb",zb,missing_value=missing_value)
-!         call nc_read(trim(filename),"zs",zs,missing_value=missing_value)
-!         call nc_read(trim(filename),"H",H,missing_value=missing_value)
-        
-!         where(zs .lt. 0.d0) zs = 0.d0 
-!         where(zs .lt. zb)   zs = zb 
-!         H = zs - zb 
-!         where(H  .lt. 1.d0) H  = 0.d0 
-
-!         outvar = 0.d0 
-!         where (zs .gt. 0.d0) outvar = 1.d0 
 
         return 
 

@@ -10,6 +10,7 @@ module gridding_datasets
         character(len=512) :: filename, filenames(20)
         character(len=256) :: nm_in, nm_out  
         character(len=256) :: units_in, units_out 
+        character(len=512) :: long_name
         character(len=256) :: method
         logical :: mask, dimextra
         character(len=256) :: plev
@@ -18,7 +19,7 @@ module gridding_datasets
     end type 
 
 contains
-    
+
     !##############################################
     !
     ! General subroutines related to the module
@@ -26,11 +27,12 @@ contains
     !##############################################
 
     ! Define some variable info for later manipulation
-    subroutine def_var_info(var,filename,nm_in,nm_out,units,method,mask,dimextra,conv,plev,fill,filenames)
+    subroutine def_var_info(var,filename,nm_in,nm_out,units,long_name, &
+                            method,mask,dimextra,conv,plev,fill,filenames)
         implicit none 
 
         type(var_defs) :: var 
-        character(len=*) :: filename,nm_in,nm_out,units
+        character(len=*) :: filename, nm_in, nm_out, units, long_name
         character(len=*), optional :: method 
         logical, optional :: mask, dimextra
         character(len=*), optional :: plev 
@@ -41,6 +43,7 @@ contains
         var%filename  = trim(filename)
         var%nm_in     = trim(nm_in)
         var%nm_out    = trim(nm_out)
+        var%long_name = trim(long_name)
         var%units_in  = trim(units)
         var%units_out = trim(units)
 
