@@ -8,7 +8,7 @@ program gentopo
 !     use CERES 
 !     use ECMWF 
 !     use MAR 
-!     use NasaBasins
+    use NasaBasins
     
     implicit none
 
@@ -70,9 +70,7 @@ program gentopo
     !
     ! =========================================================
 
-    call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
-
-!     call nasaBasins_to_grid(outfldr,grid,"Greenland")
+!     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
@@ -91,6 +89,7 @@ program gentopo
 
 !     call MARv32_to_grid(  outfldr, grid, "Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 
+    call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
 
     write(*,*)
