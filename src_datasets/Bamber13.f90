@@ -33,7 +33,6 @@ contains
         character(len=256) :: file_in
         type(var_defs), allocatable :: vars(:)
         double precision, allocatable :: invar(:,:) 
-        integer :: plev(9) 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -42,14 +41,18 @@ contains
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
 
-        ! Define ECMWF input grid
+        ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
             
+            write(*,*) "Here 1"
+
             ! Define topography (Bamber et al. 2013) grid and input variable field
             call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
+            write(*,*) "Here 2"
+             
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
             desc    = "Greenland bedrock and surface topography (V3)"
@@ -63,6 +66,9 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-B13.nc"
 
+            write(*,*) "Here 3"
+            stop
+            
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
