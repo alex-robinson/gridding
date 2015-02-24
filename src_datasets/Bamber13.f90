@@ -47,9 +47,15 @@ contains
             write(*,*) "Here 1"
 
             ! Define topography (Bamber et al. 2013) grid and input variable field
+            call grid_init(gTOPO,name="TOPO-B13-10KM",mtype="polar stereographic",units="kilometers", &
+                    lon180=.TRUE.,x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
+                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+
+            write(*,*) "Here 1b"
+
             call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic",units="kilometers", &
-                   lon180=.TRUE.,x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
-                   lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+                    lon180=.TRUE.,x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
+                    lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
             write(*,*) "Here 2"
              
@@ -68,7 +74,7 @@ contains
 
             write(*,*) "Here 3"
             stop
-            
+
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
