@@ -45,8 +45,6 @@ contains
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
             
-            write(*,*) "Here 1"
-
             ! Define topography (Bamber et al. 2013) grid and input variable field
             select case(thin_by)
                 case(10)
@@ -67,8 +65,6 @@ contains
 
             end select 
 
-            write(*,*) "Here 2"
-             
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
             desc    = "Greenland bedrock and surface topography (V3)"
@@ -81,9 +77,6 @@ contains
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-B13.nc"
-
-            write(*,*) "Here 3"
-            stop
 
         else
 
