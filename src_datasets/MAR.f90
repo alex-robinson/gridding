@@ -70,12 +70,13 @@ contains
             file_prefix(1) = "ERA_1958-2013_30km-rawclean/MARv3.5-ERA-30km-monthly-"
             file_prefix(2) = "ERA_1958-2013_30km-rawclean/MARv3.5-ERA-30km-monthly-"
 
-            ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_MARv3.5-ERA-30km-monthly_195801-201312.nc"
             desc    = "Greenland regional climate simulated by MARv3.5"
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.5/Greenland"
 
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_MARv3.5-ERA-30km-monthly_195801-201312.nc"
+            
             year0       = 1958 
             year_switch = 1979   ! Switch scenarios (ERA-40 to ERA-INTERIM)
             nyr         = 2013-1958+1
@@ -103,12 +104,13 @@ contains
             file_prefix(1) = "MIROC5-histo_1976-2005_30km/MARv3.5-monthly-MIROC5-histo-"
             file_prefix(2) = "MIROC5-rcp85_2006-2100_30km/MARv3.5-monthly-MIROC5-rcp85-"
 
-            ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_MARv3.5-30km-monthly-MIROC5-rcp85_197601-210012.nc"
             desc    = "Greenland regional climate simulated by MARv3.5"
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.5/Greenland"
 
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_MARv3.5-30km-monthly-MIROC5-rcp85_197601-210012.nc"
+            
             year0       = 1976
             year_switch = 2006   ! Switch scenarios (historical to RCP85)
             nyr         = 2100-1976+1
@@ -248,7 +250,8 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-                call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
 
@@ -290,7 +293,8 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-                call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
         
@@ -323,7 +327,8 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-                call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
 
@@ -340,7 +345,8 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-                call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
 
