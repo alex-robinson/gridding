@@ -122,8 +122,8 @@ contains
                                     maxval(outvar,outvar.ne.missing_value)
         
         ! Fill any missing values (Antarctica)
-        call fill_mean(outvar,missing_value=missing_value)
-
+        call fill_weighted(outvar,missing_value=missing_value)
+        
         ! Write field to output file 
         call nc_write(filename,"ghf",real(outvar),dim1="xc",dim2="yc", &
                       missing_value=real(missing_value))
