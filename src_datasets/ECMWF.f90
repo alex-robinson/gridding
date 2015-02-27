@@ -54,17 +54,17 @@ contains
                            x0=-100.d0,dx=0.75d0,nx=161,y0=49.5d0,dy=0.75d0,ny=55)
             
             ! Assign the filenames
-            file_invariant = "data/ECMWF/NEW/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
-            file_surface   = "data/ECMWF/NEW/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
-            files_pres(1)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-1000Mb_historical_mon_197901-201212.nc"
-            files_pres(2)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-950Mb_historical_mon_197901-201212.nc"
-            files_pres(3)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
-            files_pres(4)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
-            files_pres(5)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-700Mb_historical_mon_197901-201212.nc"
-            files_pres(6)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-650Mb_historical_mon_197901-201212.nc"
-            files_pres(7)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-600Mb_historical_mon_197901-201212.nc"
-            files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
-            files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-500Mb_historical_mon_197901-201212.nc"
+            file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
+            file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
+            files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-1000Mb_historical_mon_197901-201212.nc"
+            files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-950Mb_historical_mon_197901-201212.nc"
+            files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
+            files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
+            files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-700Mb_historical_mon_197901-201212.nc"
+            files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-650Mb_historical_mon_197901-201212.nc"
+            files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-600Mb_historical_mon_197901-201212.nc"
+            files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
+            files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-500Mb_historical_mon_197901-201212.nc"
 
             desc    = "Regional Greenland subset of the ERA-Interim dataset"
             ref     = "Dee et al., 2011, BAMS, &
@@ -77,17 +77,17 @@ contains
                            x0=-180.d0,dx=0.75d0,nx=480,y0=-90.d0,dy=0.75d0,ny=67)
             
             ! Assign the filenames
-            file_invariant = "data/ECMWF/NEW/ERA-INTERIM-ANT-invariant_historical_mon_197901-201212.nc"
-            file_surface   = "data/ECMWF/NEW/ERA-INTERIM-ANT-surface_historical_mon_197901-201212.nc"
-            files_pres(1)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-1000Mb_historical_mon_197901-201212.nc"
-            files_pres(2)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-950Mb_historical_mon_197901-201212.nc"
-            files_pres(3)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-850Mb_historical_mon_197901-201212.nc"
-            files_pres(4)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-750Mb_historical_mon_197901-201212.nc"
-            files_pres(5)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-700Mb_historical_mon_197901-201212.nc"
-            files_pres(6)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-650Mb_historical_mon_197901-201212.nc"
-            files_pres(7)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-600Mb_historical_mon_197901-201212.nc"
-            files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-550Mb_historical_mon_197901-201212.nc"
-            files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-500Mb_historical_mon_197901-201212.nc"
+            file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-invariant_historical_mon_197901-201212.nc"
+            file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-surface_historical_mon_197901-201212.nc"
+            files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-1000Mb_historical_mon_197901-201212.nc"
+            files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-950Mb_historical_mon_197901-201212.nc"
+            files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-850Mb_historical_mon_197901-201212.nc"
+            files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-750Mb_historical_mon_197901-201212.nc"
+            files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-700Mb_historical_mon_197901-201212.nc"
+            files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-650Mb_historical_mon_197901-201212.nc"
+            files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-600Mb_historical_mon_197901-201212.nc"
+            files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-550Mb_historical_mon_197901-201212.nc"
+            files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-500Mb_historical_mon_197901-201212.nc"
 
             desc    = "Regional Antarctica subset of the ERA-Interim dataset"
             ref     = "Dee et al., 2011, BAMS, &
