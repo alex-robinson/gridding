@@ -42,13 +42,13 @@ program bedmap2_netcdf
     character(len=256) :: fnm, filename_topo, filename_vel, filename_acc
 
     ! Initialize the output grid
-!     call grid_init(grid,name="ANT-1KM",mtype="polar stereographic",units="kilometers", &
-!                        lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667, &
-!                        lambda=0.d0,phi=-90.d0,alpha=19.0d0)
-
-    call grid_init(grid,name="ANT-2KM",mtype="polar stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=2.d0,nx=3334,dy=2.d0,ny=3334, &
+    call grid_init(grid,name="ANT-1KM",mtype="polar stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667, &
                        lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+
+!     call grid_init(grid,name="ANT-2KM",mtype="polar stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=2.d0,nx=3334,dy=2.d0,ny=3334, &
+!                        lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
     ! Allocate grid variable
     call grid_allocate(grid,var)
