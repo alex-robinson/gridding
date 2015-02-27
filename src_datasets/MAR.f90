@@ -268,7 +268,7 @@ contains
                     do m = 1, nm 
                     
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
-                                 start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
+                                 start=[1,1,m],count=[gMAR%G%nx,gMAR%G%ny,1])
                         
                         ! Bug fix with input values - make sure missing values are missing
                         where (invar .lt. -9000.d0) invar = missing_value 
