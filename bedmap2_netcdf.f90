@@ -144,6 +144,29 @@ program bedmap2_netcdf
     
     end if 
 
+    ! ====== Accumulation ========
+    if (.TRUE.) then 
+        ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
+        
+        ! ====== Arthern accumulation at 1 km resolution
+        call bedmap2_dims(x,y,var0,x0=-3949.5d0,dx=1d0,nx=7899,y0=-3949.5d0,dy=1d0,ny=8300)
+        if (allocated(tmp)) deallocate(tmp)
+        allocate(tmp(size(x),size(y)))
+
+        ! Write grid information to output file
+        call write_init(filename_acc,grid)
+
+        call bedmap2_read("data/Antarctica/Bedmap2/arthern_accumulation_bedmap2_grid.txt", &
+                          "accum",var0,missing_value=mv)
+        write(*,*) "Read accum."
+
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
+        write(*,*) "Interpolated vx."
+        call nc_write(filename_acc,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="mm*a-1",long_name="Annual accumulation")
+        
+    end if 
+
 
 contains 
 
