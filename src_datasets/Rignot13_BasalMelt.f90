@@ -50,7 +50,7 @@ contains
         if (trim(domain) .eq. "Antarctica") then 
             
             ! Define the input filenames
-            infldr         = "sicodata/Antarctica_data/"
+            infldr         = "/data/sicopolis/data/Antarctica/"
             file_invariant = trim(infldr)//"Ant_MeltingRate.nc"
 
             desc    = "Ice shelf basal melting dataset"
