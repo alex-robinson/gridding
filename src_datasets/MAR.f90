@@ -251,17 +251,18 @@ contains
             
             end do 
 
-            n_prefix = 1 
-            do k = 1, nyr 
+            ! ## SURFACE FIELDS ##
+            do i = 1, n_var
 
-                year = year0 + (k-1) 
-                if (year .ge. year_switch) n_prefix = 2
-                write(*,*) "=== ",year," ==="
+                var_now = surf(i)  
 
-                ! ## SURFACE FIELDS ##
-                do i = 1, n_var
+                n_prefix = 1 
+                do k = 1, nyr 
 
-                    var_now = surf(i)     
+                    year = year0 + (k-1) 
+                    if (year .ge. year_switch) n_prefix = 2
+                    write(*,*) trim(var_now%nm_in)," :",year
+
                     write(var_now%filename,"(a,a,i4,a3)") &
                         trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
                     
@@ -281,13 +282,14 @@ contains
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     
-                        ! Write variable metadata
-                        call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-                        call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-            
                     end do 
 
                 end do 
+
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+    
             end do 
         
         end if 
