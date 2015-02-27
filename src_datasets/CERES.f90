@@ -25,6 +25,7 @@ contains
         integer :: max_neighbors 
         double precision :: lat_lim 
         character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
 
         type(grid_class)   :: grid_in
         character(len=256) :: file_in
@@ -48,6 +49,9 @@ contains
 
             ! Define the input filenames
             file_in = "/data/sicopolis/data/CERES/CERES_EBAF-TOA_Ed2.8_Subset_CLIM01-CLIM12.nc"
+            desc    = "Clouds and the Earth's radiant energy system (CERES) EBAF-TOA products"
+            ref     = "NASA's Earth Observing System, &
+                      &http://ceres.larc.nasa.gov/products.php?product=EBAF-TOA"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -98,7 +102,11 @@ contains
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-    
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
         ! ## Map climatological gridded variables ##
         
         ! Loop over variables
@@ -118,7 +126,9 @@ contains
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-        
+            !             call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
         end do 
 
         return 
