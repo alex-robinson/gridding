@@ -30,6 +30,7 @@ contains
         integer :: max_neighbors 
         double precision :: lat_lim 
         character(len=512) :: filename, infldr, prefix  
+        character(len=1024) :: desc, ref 
 
         type(grid_class)   :: gTOPO
         character(len=256) :: file_invariant, file_surface, file_prefix(2)
@@ -52,9 +53,14 @@ contains
             infldr         = "sicodata/Antarctica_data/"
             file_invariant = trim(infldr)//"Ant_MeltingRate.nc"
 
+            desc    = "Ice shelf basal melting dataset"
+            ref     = "Rignot, E., Jacobs, S., Mouginot, J. and Scheuchl, B.: &
+                      &Ice-Shelf Melting Around Antarctica, Science, &
+                      &doi: 10.1126/science.1235798, 2013."
+
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_BMELT.nc"
+                              "_BMELT-R13.nc"
 
 !             ! Define input grid vectors 
 !             allocate(xax(561),yax(561))
@@ -75,8 +81,10 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(2))
-        call def_var_info(invariant(1),file_invariant,  "melt_actual","bm_actual",units="m*a-1")
-        call def_var_info(invariant(2),file_invariant,  "melt_steadystate","bm_equil",units="m*a-1")
+        call def_var_info(invariant(1),file_invariant,  "melt_actual","bm_actual",units="m*a-1", &
+                          long_name="Basal melt rate, actual present day")
+        call def_var_info(invariant(2),file_invariant,  "melt_steadystate","bm_equil",units="m*a-1", &
+                          long_name="Basal melt rate, shelf equilibrium")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
@@ -98,6 +106,10 @@ contains
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
@@ -109,10 +121,17 @@ contains
                           fill=.TRUE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             end if 
+
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!             call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
         end do 
 
         return 
