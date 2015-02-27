@@ -128,9 +128,8 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/ECMWF.o \
 			       $(objdir)/bedmap2.o \
-			       $(objdir)/nasaBasins.o
-
-			       # $(objdir)/RACMO2.o \
+			       $(objdir)/nasaBasins.o \
+				   $(objdir)/RACMO2.o
 			       # $(objdir)/Rignot13_BasalMelt.o \
 ## Complete programs
 

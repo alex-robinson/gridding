@@ -32,6 +32,8 @@ contains
         integer, optional :: clim_range(2)
 
         character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
         character(len=512) :: fldr_input, file_suffix1, file_suffix2
         type(points_class) :: pIN1, pIN2, pIN3
         type(var_defs), allocatable :: vars0(:), vars(:)
@@ -58,6 +60,10 @@ contains
             file_suffix1   = "_RACMO2_ANT3K55_HadCM3-A1B.nc"
             file_suffix2   = "_RACMO2_ANT3K55_HadCM3-A1B_2000-2199.nc"
 
+            desc    = "Antartica regional climate simulated by RACMO2"
+            ref     = "Willem van de Berg, pers. comm., &
+                      &http://www.projects.science.uu.nl/iceclimate/models/antarctica.php"
+
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_RACMO2-ANT3K55_HadCM3-A1B-monthly_2000-2199.nc"
@@ -80,6 +86,10 @@ contains
             fldr_input     = "tmpdata2/"
             file_suffix1   = "_RACMO2_ANT3K55_HadCM3-c20.nc"
             file_suffix2   = "_RACMO2_ANT3K55_HadCM3-c20_1980-1999.nc"
+
+            desc    = "Antartica regional climate simulated by RACMO2"
+            ref     = "Willem van de Berg, pers. comm., &
+                      &http://www.projects.science.uu.nl/iceclimate/models/antarctica.php"
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -124,11 +134,14 @@ contains
         ! ## INVARIANT (2D) FIELDS ## 
         allocate(vars0(3))
         call def_var_info(vars0(1),trim(fldr_input)//"Geopotential"//trim(file_suffix1), &
-                          "GP_GDS10_HTGL_ave1h", "zs",  units="m",fill=.TRUE.,conv=1.d0/9.81d0)
+                          "GP_GDS10_HTGL_ave1h", "zs",  units="m", &
+                          long_name="Surface elevation",fill=.TRUE.,conv=1.d0/9.81d0)
         call def_var_info(vars0(2),trim(fldr_input)//"IceMask"//trim(file_suffix1), &
-                          "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-",fill=.TRUE.,method="nn")
+                          "ICE_C_GDS10_HTGL_ave1h", "mask_ice",  units="-", &
+                          long_name="Ice mask",fill=.TRUE.,method="nn")
         call def_var_info(vars0(3),trim(fldr_input)//"LSM"//trim(file_suffix1), &
-                          "LAND_GDS10_HTGL_ave1h", "mask_land",  units="-",fill=.TRUE.,method="nn")
+                          "LAND_GDS10_HTGL_ave1h", "mask_land",  units="-", &
+                          long_name="Land mask",fill=.TRUE.,method="nn")
 
 
         ! ## SURFACE (3D) FIELDS ##
@@ -138,53 +151,75 @@ contains
         if (allocated(vars)) deallocate(vars)
         allocate(vars(21))
         call def_var_info(vars(1),trim(fldr_input)//"t2m"//trim(file_suffix2), &
-                          "t2m", "t2m",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+                          "t2m", "t2m",  units="K", &
+                          long_name="Near-surface temperature (2-m)",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(2),trim(fldr_input)//"clcov"//trim(file_suffix2), &
-                          "clcov", "cc",  units="-",fill=.TRUE.,dimextra=.TRUE.)
+                          "clcov", "cc",  units="-", &
+                          long_name="Cloud cover fraction",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(3),trim(fldr_input)//"evap"//trim(file_suffix2), &
-                          "evap", "evap",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "evap", "evap",  units="kg m**-2 d**-1", &
+                          long_name="Evaporation",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(4),trim(fldr_input)//"precip"//trim(file_suffix2), &
-                          "precip", "pr",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "precip", "pr",  units="kg m**-2 d**-1", &
+                          long_name="Precipitation",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(5),trim(fldr_input)//"q2m"//trim(file_suffix2), &
-                          "q2m", "qs",  units="kg kg-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "q2m", "qs",  units="kg kg-1", &
+                          long_name="Near-surface specific humidity (2-m)",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(6),trim(fldr_input)//"rain"//trim(file_suffix2), &
-                          "rain", "rf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "rain", "rf",  units="kg m**-2 d**-1", &
+                          long_name="Rainfall",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(7),trim(fldr_input)//"refreeze"//trim(file_suffix2), &
-                          "refreeze", "rz",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "refreeze", "rz",  units="kg m**-2 d**-1", &
+                          long_name="Refreezing",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(8),trim(fldr_input)//"runoff"//trim(file_suffix2), &
-                          "runoff", "ru",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "runoff", "ru",  units="kg m**-2 d**-1", &
+                          long_name="Runoff",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(9),trim(fldr_input)//"smb"//trim(file_suffix2), &
-                          "smb", "smb",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "smb", "smb",  units="kg m**-2 d**-1", &
+                          long_name="Surface mass balance",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(10),trim(fldr_input)//"snowfall"//trim(file_suffix2), &
-                          "snowfall", "sf",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "snowfall", "sf",  units="kg m**-2 d**-1", &
+                          long_name="Snowfall",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(11),trim(fldr_input)//"snowmelt"//trim(file_suffix2), &
-                          "snowmelt", "me",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "snowmelt", "me",  units="kg m**-2 d**-1", &
+                          long_name="Total snow melt",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(12),trim(fldr_input)//"sublim"//trim(file_suffix2), &
-                          "sublim", "subl",  units="kg m**-2 d**-1",fill=.TRUE.,dimextra=.TRUE.)
+                          "sublim", "subl",  units="kg m**-2 d**-1", &
+                          long_name="Sublimation",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(13),trim(fldr_input)//"tskin"//trim(file_suffix2), &
-                          "tskin", "ts",  units="K",fill=.TRUE.,dimextra=.TRUE.)
+                          "tskin", "ts",  units="K", &
+                          long_name="Surface temperature (skin)",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(14),trim(fldr_input)//"u10m"//trim(file_suffix2), &
-                          "u10m", "uas",  units="m s**-1 [rot]",fill=.TRUE.,dimextra=.TRUE.)
+                          "u10m", "uas",  units="m s**-1 [rot]", &
+                          long_name="Near-surface wind speed, u-component (10-m)",fill=.TRUE.,dimextra=.TRUE.)
         call def_var_info(vars(15),trim(fldr_input)//"v10m"//trim(file_suffix2), &
-                          "v10m", "vas",  units="m s**-1 [rot]",fill=.TRUE.,dimextra=.TRUE.)
+                          "v10m", "vas",  units="m s**-1 [rot]", &
+                          long_name="Near-surface wind speed, v-component (10-m)",fill=.TRUE.,dimextra=.TRUE.)
         
         call def_var_info(vars(16),trim(fldr_input)//"LHF"//trim(file_suffix2), &
-                "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "LHTFL_GDS10_HTGL_acc", "lhf",  units="W m**-2", &
+                long_name="Latent heat flux",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(17),trim(fldr_input)//"LWD"//trim(file_suffix2), &
-                "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_177_GDS10_HTGL_acc", "lwd",  units="W m**-2", &
+                long_name="Surface radiation, longwave downward",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(18),trim(fldr_input)//"LWN"//trim(file_suffix2), &
-                "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_177_GDS10_HTGL_acc", "lwn",  units="W m**-2", &
+                long_name="Surface radiation, longwave net",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(19),trim(fldr_input)//"SWD"//trim(file_suffix2), &
-                "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_176_GDS10_HTGL_acc", "swd",  units="W m**-2", &
+                long_name="Surface radiation, shortwave downward",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(20),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2",fill=.TRUE.,conv=conv_tosec)
+                "VAR_176_GDS10_HTGL_acc", "swn",  units="W m**-2", &
+                long_name="Surface radiation, shortwave net",fill=.TRUE.,conv=conv_tosec)
         call def_var_info(vars(21),trim(fldr_input)//"Albedo"//trim(file_suffix2), &
-                "ALBDO_GDS10_HTGL_ave1h", "al",  units="-",fill=.TRUE.)
+                "ALBDO_GDS10_HTGL_ave1h", "al",  units="-", &
+                long_name="Surface albedo",fill=.TRUE.)
         
         if (trim(domain) .ne. "Antarctica-c20") then
             ! Rename albedo to load empty data, since field is not available for other scenarios
             call def_var_info(vars(21),trim(fldr_input)//"SWN"//trim(file_suffix2), &
-                "VAR_176_GDS10_HTGL_acc", "al",  units="-",fill=.TRUE.,conv=0.d0)
+                "VAR_176_GDS10_HTGL_acc", "al",  units="-", &
+                long_name="Surface albedo",fill=.TRUE.,conv=0.d0)
         end if 
         
         nm       = 12
@@ -212,6 +247,10 @@ contains
             call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
             
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
             ! ## INVARIANT (2D) FIELDS ##
             do i = 1, size(vars0)
 
@@ -224,12 +263,18 @@ contains
                 if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
                 if (trim(var_now%method) .eq. "nn") then 
                     call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
-                                  units=var_now%units_out,missing_value=nint(missing_value))
+                                  missing_value=nint(missing_value))
                 else 
                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
-                                  units=var_now%units_out,missing_value=real(missing_value))
+                                  missing_value=real(missing_value))
                 end if 
 
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
             end do 
 
             ! ## SURFACE (3D) FIELDS ##
@@ -262,6 +307,12 @@ contains
                     end do 
                 end do
 
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
             end do 
 
         end if 
@@ -279,13 +330,24 @@ contains
             call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
             call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
             call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
-        
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
             ! ## INVARIANT (2D) FIELDS ##
             do i = 1, size(vars0)
                 var_now = vars0(i) 
                 call nc_read(filename,var_now%nm_out,var2D)
                 call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
                               units=var_now%units_out)
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
             end do 
 
             ! ## SURFACE (3D) FIELDS ##
@@ -298,6 +360,13 @@ contains
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                                   units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
                 end do 
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
             end do 
 
         end if 

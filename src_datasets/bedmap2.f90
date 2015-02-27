@@ -10,7 +10,8 @@ module bedmap2
     private 
     public :: bedmap2_to_grid
     public :: bedmap2vel_to_grid
-    
+    public :: bedmap2acc_to_grid
+
 contains 
 
     subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -327,7 +328,7 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(1))
-        call def_var_info(invariant(1),file_invariant,  "accum","acc",units="mm*a-1", &
+        call def_var_info(invariant(1),file_invariant,  "accum","accum",units="mm*a-1", &
                           long_name="Annual accumulation")
 
         ! Allocate the input grid variable
