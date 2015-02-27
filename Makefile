@@ -115,6 +115,9 @@ $(objdir)/bedmap2.o: $(srcdir)/bedmap2.f90
 $(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/sediments.o: $(srcdir)/sediments.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 grisli_common = $(objdir)/runparam_mod.o $(objdir)/3D-physique-gen_mod.o
 
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
@@ -122,7 +125,8 @@ obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/ECMWF.o \
 			       $(objdir)/MAR.o \
-			       $(objdir)/nasaBasins.o
+			       $(objdir)/nasaBasins.o \
+			       $(objdir)/sediments.o
 
 obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
@@ -130,7 +134,8 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/bedmap2.o \
 			       $(objdir)/nasaBasins.o \
 				   $(objdir)/RACMO2.o \
-				   $(objdir)/Rignot13_BasalMelt.o
+				   $(objdir)/Rignot13_BasalMelt.o \
+			       $(objdir)/sediments.o
 
 ## Complete programs
 

@@ -9,7 +9,8 @@ program gentopo
     use ECMWF 
     use MAR 
     use NasaBasins
-    
+    use sediments 
+
     implicit none
 
     type(grid_class)   :: grid
@@ -70,7 +71,7 @@ program gentopo
     !
     ! =========================================================
 
-    call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
+!     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
@@ -82,6 +83,7 @@ program gentopo
 
 !     call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
+    call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."
