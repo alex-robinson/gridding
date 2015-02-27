@@ -35,7 +35,7 @@ contains
         double precision, optional :: lat_lim 
         integer, optional :: clim_range(2)
 
-        character(len=512) :: filename 
+        character(len=512)  :: filename 
         character(len=1024) :: desc, ref 
 
         type(grid_class)   :: gMAR
@@ -248,6 +248,7 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
             
             end do 
 
@@ -289,7 +290,8 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-    
+                call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+            
             end do 
         
         end if 
@@ -321,6 +323,7 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
             
             end do 
 
@@ -337,7 +340,8 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-             
+                call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+            
             end do 
 
         end if 
