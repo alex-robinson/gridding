@@ -41,18 +41,22 @@ program bedmap2_netcdf
 
     character(len=256) :: fnm, filename_topo, filename_vel, filename_acc
 
-    filename_topo = "output/Antarctica/ANT-1KM_BEDMAP2_topo.nc"
-    filename_vel  = "output/Antarctica/ANT-1KM_BEDMAP2_vel.nc"
-    filename_acc  = "output/Antarctica/ANT-1KM_BEDMAP2_acc.nc"
-    
     ! Initialize the output grid
-    call grid_init(grid,name="ANT-1KM",mtype="polar stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667, &
+!     call grid_init(grid,name="ANT-1KM",mtype="polar stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667, &
+!                        lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+
+    call grid_init(grid,name="ANT-2KM",mtype="polar stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=2.d0,nx=3334,dy=2.d0,ny=3334, &
                        lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
     ! Allocate grid variable
     call grid_allocate(grid,var)
 
+    filename_topo = "output/Antarctica/"//trim(grid%name)//"_BEDMAP2_topo.nc"
+    filename_vel  = "output/Antarctica/"//trim(grid%name)//"_BEDMAP2_vel.nc"
+    filename_acc  = "output/Antarctica/"//trim(grid%name)//"_BEDMAP2_acc.nc"
+    
     ! ====== TOPOGRAPHY ========
     if (.FALSE.) then 
         ! Write grid information to output file
@@ -167,7 +171,7 @@ program bedmap2_netcdf
         var = interp_nearest_fast(x=x,y=y,z=var0,xout=real(grid%G%x), &
                                   yout=real(grid%G%y),max_dist_fac=1.2,missing_value=mv)
         write(*,*) "Interpolated vx."
-        call nc_write(filename_acc,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+        call nc_write(filename_acc,"accum",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="mm*a-1",long_name="Annual accumulation")
         
     end if 
