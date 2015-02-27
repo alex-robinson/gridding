@@ -48,8 +48,8 @@ contains
         ! Define input points from global data
         
         ! Define the input filename
-        file_in = "data/Sediments/CRUST5.1-L97/sedmap.gmt"
-!         file_in = "/data/sicopolis/data/Sediments/CRUST5.1/sedmap.gmt"
+!         file_in = "data/Sediments/CRUST5.1-L97/sedmap.gmt"
+        file_in = "/data/sicopolis/data/Sediments/CRUST5.1-L97/sedmap.gmt"
 
         desc    = "Global sediment map updated from CRUST5.1"
         ref     = "Laske, G. and Masters, G.: &
