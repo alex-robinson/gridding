@@ -120,6 +120,7 @@ grisli_common = $(objdir)/runparam_mod.o $(objdir)/3D-physique-gen_mod.o
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			   	   $(objdir)/Bamber13.o \
 			       $(objdir)/CERES.o \
+			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o
 			       # $(objdir)/ECMWF.o \
 			       # $(objdir)/MAR.o \
