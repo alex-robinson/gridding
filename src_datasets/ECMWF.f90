@@ -26,8 +26,9 @@ contains
         type(grid_class) :: grid 
         integer, optional :: max_neighbors 
         double precision, optional :: lat_lim 
-        character(len=512) :: filename 
         integer, optional  :: clim_range(2) 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
 
         type(grid_class)   :: gECMWF 
         character(len=256) :: file_invariant, file_surface, files_pres(9)
@@ -65,6 +66,10 @@ contains
             files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
             files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-GRL-500Mb_historical_mon_197901-201212.nc"
 
+            desc    = "Regional Greenland subset of the ERA-Interim dataset"
+            ref     = "Dee et al., 2011, BAMS, &
+                      &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
+
         else if (trim(domain) .eq. "ANT075") then 
 
             ! Initialize the grid
@@ -83,6 +88,10 @@ contains
             files_pres(7)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-600Mb_historical_mon_197901-201212.nc"
             files_pres(8)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-550Mb_historical_mon_197901-201212.nc"
             files_pres(9)  = "data/ECMWF/NEW/ERA-INTERIM-ANT-500Mb_historical_mon_197901-201212.nc"
+
+            desc    = "Regional Antarctica subset of the ERA-Interim dataset"
+            ref     = "Dee et al., 2011, BAMS, &
+                      &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
 
         else
 
@@ -108,28 +117,45 @@ contains
         ! Define the variables to be mapped 
         
         allocate(invariant(1))
-        call def_var_info(invariant(1),trim(file_invariant),"z","zs",units="m",conv=1.d0/9.81d0)
+        call def_var_info(invariant(1),trim(file_invariant),"z","zs",units="m", &
+                          long_name="Surface elevation",conv=1.d0/9.81d0)
 
         allocate(surf(12))
-        call def_var_info(surf( 1),trim(file_surface),"sp", "sp", units="Pa")
-        call def_var_info(surf( 2),trim(file_surface),"tcw","tcw",units="kg m**-2")
-        call def_var_info(surf( 3),trim(file_surface),"tclw","tclw",units="kg m**-2")
-        call def_var_info(surf( 4),trim(file_surface),"tciw","tciw",units="kg m**-2")
-        call def_var_info(surf( 5),trim(file_surface),"p56.162","clw",units="kg m**-2")
-        call def_var_info(surf( 6),trim(file_surface),"p57.162","ciw",units="kg m**-2")
-        call def_var_info(surf( 7),trim(file_surface),"tcc","tcc",units="(0 - 1)")
-        call def_var_info(surf( 8),trim(file_surface),"u10","u10",units="m s**-1")
-        call def_var_info(surf( 9),trim(file_surface),"v10","v10",units="m s**-1")
-        call def_var_info(surf(10),trim(file_surface),"t2m","t2m",units="K")
-        call def_var_info(surf(11),trim(file_surface),"al", "al", units="(0 - 1)")
-        call def_var_info(surf(12),trim(file_surface),"sst","sst",units="K")
+        call def_var_info(surf( 1),trim(file_surface),"sp", "sp", units="Pa",long_name="Surface pressure")
+        call def_var_info(surf( 2),trim(file_surface),"tcw","tcw",units="kg m**-2", &
+                          long_name="Total column water content")
+        call def_var_info(surf( 3),trim(file_surface),"tclw","tclw",units="kg m**-2", &
+                          long_name="Total column liquid water content")
+        call def_var_info(surf( 4),trim(file_surface),"tciw","tciw",units="kg m**-2", &
+                          long_name="Total column ice water content")
+        call def_var_info(surf( 5),trim(file_surface),"p56.162","clw",units="kg m**-2", &
+                          long_name="Total column liquid condensation")
+        call def_var_info(surf( 6),trim(file_surface),"p57.162","ciw",units="kg m**-2", &
+                          long_name="Total column ice condensation")
+        call def_var_info(surf( 7),trim(file_surface),"tcc","tcc",units="(0 - 1)", &
+                          long_name="Cloud cover fraction")
+        call def_var_info(surf( 8),trim(file_surface),"u10","u10",units="m s**-1", &
+                          long_name="10-m wind speed, u-component")
+        call def_var_info(surf( 9),trim(file_surface),"v10","v10",units="m s**-1", &
+                          long_name="10-m wind speed, v-component")
+        call def_var_info(surf(10),trim(file_surface),"t2m","t2m",units="K", &
+                          long_name="Near-surface temperature (2-m)")
+        call def_var_info(surf(11),trim(file_surface),"al", "al", units="(0 - 1)", &
+                          long_name="Surface albedo")
+        call def_var_info(surf(12),trim(file_surface),"sst","sst",units="K", &
+                          long_name="Sea surface temperature")
 
         allocate(pres(5))
-        call def_var_info(pres( 1),"None","t", "p_t",units="K",         plev="plev",filenames=files_pres)
-        call def_var_info(pres( 2),"None","z", "p_z",units="m**2 s**-2",plev="plev",filenames=files_pres)
-        call def_var_info(pres( 3),"None","u", "p_u",units="m s**-1",   plev="plev",filenames=files_pres)
-        call def_var_info(pres( 4),"None","v", "p_v",units="m s**-1",   plev="plev",filenames=files_pres)
-        call def_var_info(pres( 5),"None","w", "p_w",units="Pa s**-1",  plev="plev",filenames=files_pres)
+        call def_var_info(pres( 1),"None","t", "p_t",units="K",         plev="plev",filenames=files_pres, &
+                          long_name="Temperature")
+        call def_var_info(pres( 2),"None","z", "p_z",units="m**2 s**-2",plev="plev",filenames=files_pres, &
+                          long_name="Geopotential height")
+        call def_var_info(pres( 3),"None","u", "p_u",units="m s**-1",   plev="plev",filenames=files_pres, &
+                          long_name="Wind speed, u-component")
+        call def_var_info(pres( 4),"None","v", "p_v",units="m s**-1",   plev="plev",filenames=files_pres, &
+                          long_name="Wind speed, v-component")
+        call def_var_info(pres( 5),"None","w", "p_w",units="Pa s**-1",  plev="plev",filenames=files_pres, &
+                          long_name="Vertical wind speed")
 
         nyr = 2012-1979+1
         nm  = 12 
@@ -154,7 +180,11 @@ contains
             call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
             call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
             call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-        
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
             call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
@@ -162,26 +192,31 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
-            q = 0 
-            do k = 1, nyr 
+            ! ## SURFACE FIELDS ##
+            do i = 1, size(surf)
+                var_now = surf(i)
 
-                year = 1978 + k 
-                write(*,*) "=== ",year," ==="
+                q = 0 
+                do k = 1, nyr 
 
-                do m = 1, nm 
-                    q = q+1 
+                    year = 1978 + k 
+                    write(*,*) trim(var_now%nm_in)," :",year
 
-                    write(*,*) "month ",m
-
-                    ! ## SURFACE FIELDS ##
-                    do i = 1, size(surf)
-                        var_now = surf(i) 
+                    do m = 1, nm 
+                        q = q+1 
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     end do 
                 end do
+                
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+                
             end do  
 
             do l = 1, size(files_pres)   ! Loop over pressure layers
@@ -203,22 +238,23 @@ contains
                 call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
                 call nc_write_dim(filename,"time", x=1979,dx=1,nx=34,units="years",calendar="360_day")
                 call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-            
-                q = 0 
-                do k = 1, nyr 
+                
+                ! Write meta data 
+                call nc_write_attr(filename,"Description",desc)
+                call nc_write_attr(filename,"Reference",ref)
 
-                    year = 1978 + k 
-                    write(*,*) "=== ",year," ==="
+                ! ## PRESSURE FIELDS ##
+                do i = 1, size(pres)
+                    var_now = pres(i) 
 
-                    do m = 1, nm 
-                        q = q+1 
+                    q = 0 
+                    do k = 1, nyr 
 
-                        write(*,*) "month ",m
+                        year = 1978 + k 
+                        write(*,*) trim(var_now%nm_in)," :",year
 
-                        ! ## PRESSURE FIELDS ##
-                        do i = 1, size(pres)
-                            var_now = pres(i) 
-
+                        do m = 1, nm 
+                            q = q+1 
                             call nc_read(trim(var_now%filenames(l)),var_now%nm_in,invar, &
                                          start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                             call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",400.d3, &
@@ -229,6 +265,13 @@ contains
 
                         end do 
                     end do 
+
+                    ! Write variable metadata
+                    call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                    call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!                     call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                    call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+                
                 end do 
 
             end do 
@@ -248,7 +291,11 @@ contains
             call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
             call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
             call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
-        
+            
+            ! Write meta data 
+            call nc_write_attr(filename_clim,"Description",desc)
+            call nc_write_attr(filename_clim,"Reference",ref)
+
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
             call nc_read(filename,var_now%nm_out,var2D)
@@ -264,6 +311,13 @@ contains
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                                   units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
                 end do 
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+                
             end do 
 
             do l = 1, size(files_pres)   ! Loop over pressure layers
@@ -288,7 +342,11 @@ contains
                 call nc_write_dim(filename_clim,"plev", x=dble(plev),units="hPa")
                 call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
                 call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
-            
+                
+                ! Write meta data 
+                call nc_write_attr(filename_clim,"Description",desc)
+                call nc_write_attr(filename_clim,"Reference",ref)
+
                 do i = 1, size(pres)
                     var_now = pres(i)
 
@@ -298,6 +356,13 @@ contains
                         call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                                       units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
                     end do 
+
+                    ! Write variable metadata
+                    call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                    call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+!                     call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+                    call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+                
                 end do 
 
             end do 
