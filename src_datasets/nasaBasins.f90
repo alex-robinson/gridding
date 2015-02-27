@@ -127,12 +127,6 @@ contains
         call grid_allocate(grid,outvar)     
         call grid_allocate(grid,outmask)     
         
-!         call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
-!         call nc_write_attr(filename,"basin_sub","long_name","Basins and sub-basins")
-!         call nc_write_attr(filename,"basin","long_name","Basins")
-        
-!         stop 
-        
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
@@ -185,7 +179,9 @@ contains
         call nc_write(filename,"basin_mask",outmask,dim1="xc",dim2="yc", &
                       units="1",missing_value=int(missing_value))
         call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
-        
+!         call nc_write_attr(filename,"basin_mask","grid_mapping",trim(grid%mtype))
+        call nc_write_attr(filename,"basin_mask","coordinates","lat2D lon2D")
+            
         ! Fill in basins over ocean too
         call fill_nearest(outvar,missing_value)
 
@@ -194,6 +190,9 @@ contains
             call nc_write(filename,"basin_sub",real(outvar),dim1="xc",dim2="yc", &
                           units="1",missing_value=real(missing_value))
             call nc_write_attr(filename,"basin_sub","long_name","Basins and sub-basins")
+!               call nc_write_attr(filename,"basin_sub","grid_mapping",trim(grid%mtype))
+            call nc_write_attr(filename,"basin_sub","coordinates","lat2D lon2D")
+            
         end if 
 
         ! Now whole number basins (aggregate basins)
@@ -201,7 +200,9 @@ contains
         call nc_write(filename,"basin",nint(outvar),dim1="xc",dim2="yc", &
                       units="1",missing_value=int(missing_value))
         call nc_write_attr(filename,"basin","long_name","Basins")
-        
+!         call nc_write_attr(filename,"basin","grid_mapping",trim(grid%mtype))
+        call nc_write_attr(filename,"basin","coordinates","lat2D lon2D")
+                    
         return 
 
     end subroutine nasaBasins_to_grid 
