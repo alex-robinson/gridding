@@ -31,12 +31,12 @@ program bedmap2_netcdf
 
     implicit none 
 
-    double precision, parameter :: mv = -9999.0 
+    real(4), parameter :: mv = -9999.0 
 
     type(grid_class) :: grid 
 
-    double precision, allocatable, dimension(:) :: x, y
-    double precision, allocatable, dimension(:,:) :: var0, var, tmp 
+    real(4), allocatable, dimension(:)   :: x, y
+    real(4), allocatable, dimension(:,:) :: var0, var, tmp 
     integer :: i, j, h, k
 
     character(len=256) :: fnm, filename_topo, filename_vel, filename_acc
@@ -59,13 +59,14 @@ program bedmap2_netcdf
         call write_init(filename_topo,grid)
 
         ! Allocate bedmap dimensions and data array
-        call bedmap2_dims(x,y,var0,x0=-3333.d0,dx=1.d0,nx=6667,y0=-3333.d0,dy=1.d0,ny=6667)
+        call bedmap2_dims(x,y,var0,x0=-3333.0,dx=1.0,nx=6667,y0=-3333.0,dy=1.0,ny=6667)
         
         ! Surface elevation
         call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/bedmap2_surface.txt", &
                           "zs",var0,missing_value=mv)
     !     var = var0
-        call bedmap2_align(var0=var0,x0=x(1),y0=y(1),var1=var,x1=grid%G%x(1),y1=grid%G%y(1),missing_value=mv)
+        call bedmap2_align(var0=var0,x0=x(1),y0=y(1),var1=var,x1=real(grid%G%x(1)), &
+                           y1=real(grid%G%y(1)),missing_value=mv)
         call nc_write(filename_topo,"zs",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="m",long_name="Surface elevation")
         
@@ -111,7 +112,7 @@ program bedmap2_netcdf
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Rignot velocities at 900 m resolution
-        call bedmap2_dims(x,y,var0,x0=-2800.d0,dx=0.9d0,nx=6223,y0=-2800.d0,dy=0.9d0,ny=6223)
+        call bedmap2_dims(x,y,var0,x0=-2800.0,dx=0.90,nx=6223,y0=-2800.0,dy=0.90,ny=6223)
         if (allocated(tmp)) deallocate(tmp)
         allocate(tmp(size(x),size(y)))
 
@@ -125,7 +126,8 @@ program bedmap2_netcdf
             var0(:,j) = tmp(:,size(y)-j+1)  
         end do 
         write(*,*) "Flipped vx."
-        var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=real(grid%G%x), &
+                                  yout=real(grid%G%y),max_dist_fac=1.2,missing_value=mv)
         write(*,*) "Interpolated vx."
         call nc_write(filename_vel,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="m*a-1",long_name="Surface velocity, x-comp.")
@@ -137,7 +139,8 @@ program bedmap2_netcdf
             var0(:,j) = tmp(:,size(y)-j+1)  
         end do 
         write(*,*) "Flipped vy."
-        var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=real(grid%G%x), &
+                                  yout=real(grid%G%y),max_dist_fac=1.2,missing_value=mv)
         write(*,*) "Interpolated vy."
         call nc_write(filename_vel,"v",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="m*a-1",long_name="Surface velocity, y-comp.")
@@ -149,7 +152,8 @@ program bedmap2_netcdf
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Arthern accumulation at 1 km resolution
-        call bedmap2_dims(x,y,var0,x0=-3949.5d0,dx=1d0,nx=7899,y0=-3949.5d0,dy=2d0,ny=4150)
+!         call bedmap2_dims(x,y,var0,x0=-3949.50,dx=2.0,nx=3949,y0=-3949.5,dy=2.0,ny=4150)
+        call bedmap2_dims(x,y,var0,x0=-3949.50,dx=1.0,nx=7899,y0=-3949.5,dy=1.0,ny=8300)
         if (allocated(tmp)) deallocate(tmp)
         allocate(tmp(size(x),size(y)))
 
@@ -157,10 +161,11 @@ program bedmap2_netcdf
         call write_init(filename_acc,grid)
 
         call bedmap2_read("data/Antarctica/Bedmap2/arthern_accumulation_bedmap2_grid.txt", &
-                          "accum",var0,missing_value=mv,skip=2)
+                          "accum",var0,missing_value=mv)
         write(*,*) "Read accum."
 
-        var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=real(grid%G%x), &
+                                  yout=real(grid%G%y),max_dist_fac=1.2,missing_value=mv)
         write(*,*) "Interpolated vx."
         call nc_write(filename_acc,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="mm*a-1",long_name="Annual accumulation")
@@ -198,9 +203,9 @@ contains
 
         implicit none 
 
-        double precision, allocatable :: x(:), y(:), var0(:,:)
-        double precision :: x0, dx, y0, dy 
-        integer          :: nx, ny 
+        real(4), allocatable :: x(:), y(:), var0(:,:)
+        real(4)              :: x0, dx, y0, dy 
+        integer              :: nx, ny 
 
         if (allocated(x))    deallocate(x)
         if (allocated(y))    deallocate(y)
@@ -229,10 +234,10 @@ contains
         implicit none 
 
         character(len=*) :: filename, name 
-        double precision :: var2D(:,:), missing_value 
+        real(4) :: var2D(:,:), missing_value 
         integer, optional :: skip 
         character(len=50) :: tmpc 
-        double precision  :: tmpd, missing_val0 
+        real(4)  :: tmpd, missing_val0 
         integer :: i, nrow, di 
 
         di = 1
@@ -269,10 +274,10 @@ contains
         
         implicit none 
 
-        double precision :: var0(:,:), var1(:,:)
-        double precision :: x0, y0, x1, y1
+        real(4) :: var0(:,:), var1(:,:)
+        real(4) :: x0, y0, x1, y1
         integer :: nx0,ny0, nx1, ny1, i0, j0, i, j 
-        double precision :: missing_value 
+        real(4) :: missing_value 
 
         var1 = missing_value 
 
