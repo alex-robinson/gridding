@@ -139,6 +139,7 @@ contains
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
             
         end do 
 
