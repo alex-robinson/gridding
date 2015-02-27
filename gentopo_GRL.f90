@@ -10,7 +10,8 @@ program gentopo
     use MAR 
     use NasaBasins
     use sediments 
-
+    use GeothermalHeatFlux 
+    
     implicit none
 
     type(grid_class)   :: grid
@@ -83,7 +84,8 @@ program gentopo
 
 !     call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
-    call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
+!     call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
+    call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."

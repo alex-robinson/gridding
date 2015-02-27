@@ -11,6 +11,7 @@ program gentopo
     use RACMO2 
     use Rignot13_BasalMelt  
     use sediments 
+    use GeothermalHeatFlux 
     
     implicit none
 
@@ -83,7 +84,8 @@ program gentopo
     ! NASA drainage basins 
 !     call nasaBasins_to_grid(outfldr,grid,"Antarctica")
     
-    call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
+!     call sedLaske_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
+    call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."

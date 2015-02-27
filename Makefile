@@ -118,6 +118,9 @@ $(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
 $(objdir)/sediments.o: $(srcdir)/sediments.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/GeothermalHeatFlux.o: $(srcdir)/GeothermalHeatFlux.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 grisli_common = $(objdir)/runparam_mod.o $(objdir)/3D-physique-gen_mod.o
 
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
@@ -126,7 +129,8 @@ obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			       $(objdir)/ECMWF.o \
 			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o \
-			       $(objdir)/sediments.o
+			       $(objdir)/sediments.o \
+			       $(objdir)/GeothermalHeatFlux.o
 
 obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
@@ -135,7 +139,8 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/nasaBasins.o \
 				   $(objdir)/RACMO2.o \
 				   $(objdir)/Rignot13_BasalMelt.o \
-			       $(objdir)/sediments.o
+			       $(objdir)/sediments.o \
+			       $(objdir)/GeothermalHeatFlux.o
 
 ## Complete programs
 
