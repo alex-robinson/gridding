@@ -308,15 +308,16 @@ contains
 
             ! Define the input filenames
             infldr         = "output/Antarctica/"
-            file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_vel.nc"
-            desc    = "Antarctica surface velocity"
-            ref     = "Rignot, E., Mouginot, J. and Scheuchl, B.: &
-                      &Ice Flow of the Antarctic Ice Sheet, Science, &
-                      &doi 10.1126/science.1208336, 2011."
+            file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_acc.nc"
+            desc    = "Antarctica climatological accumulation"
+            ref     = "Arthern, R. J., Winebrenner, D. P. and Vaughan, D. G.: &
+                      &Antarctic snow accumulation mapped using polarization of &
+                      &4.3-cm wavelength microwave emission, J. Geophys. Res., 111, D06107, &
+                      &doi:10.1029/2004JD005667, 2006."
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_VEL-R11.nc"
+                              "_ACC-A06.nc"
 
         else
 
@@ -325,13 +326,9 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(3))
-        call def_var_info(invariant(1),file_invariant,  "u","u",units="m*a-1", &
-                          long_name="Surface velocity, u-component")
-        call def_var_info(invariant(2),file_invariant,  "v","v",units="m*a-1", &
-                          long_name="Surface velocity, v-component")
-        call def_var_info(invariant(3),file_invariant,"uv","uv",units="m*a-1", &
-                          long_name="Surface velocity, magnitude")
+        allocate(invariant(1))
+        call def_var_info(invariant(1),file_invariant,  "accum","acc",units="mm*a-1", &
+                          long_name="Annual accumulation")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)

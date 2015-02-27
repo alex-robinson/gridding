@@ -149,7 +149,7 @@ program bedmap2_netcdf
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Arthern accumulation at 1 km resolution
-        call bedmap2_dims(x,y,var0,x0=-3949.5d0,dx=1d0,nx=7899,y0=-3949.5d0,dy=1d0,ny=8300)
+        call bedmap2_dims(x,y,var0,x0=-3949.5d0,dx=1d0,nx=7899,y0=-3949.5d0,dy=2d0,ny=4150)
         if (allocated(tmp)) deallocate(tmp)
         allocate(tmp(size(x),size(y)))
 
@@ -157,7 +157,7 @@ program bedmap2_netcdf
         call write_init(filename_acc,grid)
 
         call bedmap2_read("data/Antarctica/Bedmap2/arthern_accumulation_bedmap2_grid.txt", &
-                          "accum",var0,missing_value=mv)
+                          "accum",var0,missing_value=mv,skip=2)
         write(*,*) "Read accum."
 
         var = interp_nearest_fast(x=x,y=y,z=var0,xout=grid%G%x,yout=grid%G%y,max_dist_fac=1.2d0,missing_value=mv)
@@ -224,15 +224,19 @@ contains
 
     end subroutine bedmap2_dims
 
-    subroutine bedmap2_read(filename,name,var2D,missing_value)
+    subroutine bedmap2_read(filename,name,var2D,missing_value,skip)
 
         implicit none 
 
         character(len=*) :: filename, name 
         double precision :: var2D(:,:), missing_value 
+        integer, optional :: skip 
         character(len=50) :: tmpc 
         double precision  :: tmpd, missing_val0 
-        integer :: i, nrow 
+        integer :: i, nrow, di 
+
+        di = 1
+        if (present(skip)) di = skip 
 
         write(*,*) "Reading: "//trim(filename)//": "//trim(name)
 
@@ -248,7 +252,7 @@ contains
         ! Loop over all rows in file and store data in array
         nrow = size(var2D,2)
         var2D = missing_value
-        do i = nrow, 1, -1 
+        do i = nrow, 1, -di 
             read(166,*) var2D(:,i)
         end do 
 
