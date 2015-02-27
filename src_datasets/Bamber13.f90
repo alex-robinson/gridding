@@ -54,7 +54,6 @@ contains
                             lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
                 case(5)
-                    write(*,*) "Intializing..."
                     call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
