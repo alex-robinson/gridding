@@ -28,6 +28,7 @@ contains
         integer :: max_neighbors 
         double precision :: lat_lim 
         character(len=512) :: filename, infldr, prefix  
+        character(len=1024) :: desc, ref 
 
         type(grid_class)   :: gTOPO
         character(len=256) :: file_invariant
@@ -53,10 +54,14 @@ contains
             ! Define the input filenames
             infldr         = "output/Antarctica/"
             file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_topo.nc"
+            desc    = "Antarctica bedrock and surface topography (BEDMAP2)"
+            ref     = "Fretwell et al.: Bedmap2: improved ice bed, surface and &
+                      &thickness datasets for Antarctica, The Cryosphere, 7, 375-393, &
+                      &doi:10.5194/tc-7-375-2013, 2013."
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO.nc"
+                              "_TOPO_BEDMAP2.nc"
 
         else
 
@@ -92,6 +97,10 @@ contains
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
@@ -122,6 +131,8 @@ contains
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!             call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
         end do 
 
