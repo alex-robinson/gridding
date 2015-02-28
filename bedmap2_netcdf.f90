@@ -164,7 +164,8 @@ program bedmap2_netcdf
         ! Write grid information to output file
         call write_init(filename_acc,grid)
 
-        call bedmap2_read("data/Antarctica/Bedmap2/bedmap2_ascii/arthern_accumulation_bedmap2_grid.txt", &
+        call bedmap2_read("/data/sicopolis/data/Antarctica/Bedmap2/&
+                          &bedmap2_ascii/arthern_accumulation_bedmap2_grid.txt", &
                           "accum",var0,missing_value=mv)
         write(*,*) "Read accum."
 
