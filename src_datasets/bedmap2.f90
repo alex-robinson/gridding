@@ -356,39 +356,22 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! ## INVARIANT FIELDS ##
-        do i = 1, size(invariant)
-            var_now = invariant(i) 
-            if (trim(var_now%nm_out) .eq. "uv") then 
-                call nc_read(var_now%filename,"u",tmp1,missing_value=missing_value)
-                call thin(invar,tmp1,by=10)
-                where( invar .eq. missing_value ) invar = 0.d0 
-                call nc_read(var_now%filename,"v",tmp1,missing_value=missing_value)
-                call thin(invarb,tmp1,by=10)
-                where( invarb .eq. missing_value ) invarb = 0.d0 
-                invar = dsqrt(invar**2 + invarb**2)
-            else
-                call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-                call thin(invar,tmp1,by=10)
-                where( invar .eq. missing_value ) invar = 0.d0 
-            end if 
+        ! ## FIELDS ##
+        var_now = invariant(1) 
+        call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
+        call thin(invar,tmp1,by=10)
+        where( invar .eq. missing_value ) invar = 0.d0 
 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=missing_value)
-            call fill_mean(outvar,missing_value=missing_value)
-            if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
-            else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
-            end if 
-        
-            ! Write variable metadata
-            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!             call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
-            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
-            
-        end do 
+        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+                      fill=.TRUE.,missing_value=missing_value)
+        call fill_mean(outvar,missing_value=missing_value)
+        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+    
+        ! Write variable metadata
+        call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+        call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!         call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
+        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
 
         return 
 
