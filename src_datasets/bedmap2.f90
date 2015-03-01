@@ -362,10 +362,9 @@ contains
         call thin(invar,tmp1,by=10)
 !         where( invar .eq. missing_value ) invar = 0.d0 
     
-        write(*,*) "range: ",minval(invar),maxval(invar)
         call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                       fill=.TRUE.,missing_value=missing_value)
-        call fill_mean(outvar,missing_value=missing_value)
+        call fill_weighted(outvar,missing_value=missing_value)
         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
     
         ! Write variable metadata
