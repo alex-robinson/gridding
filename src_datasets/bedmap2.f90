@@ -360,7 +360,7 @@ contains
         var_now = invariant(1) 
         call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
         call thin(invar,tmp1,by=10)
-        where( invar .eq. missing_value ) invar = 0.d0 
+!         where( invar .eq. missing_value ) invar = 0.d0 
 
         call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                       fill=.TRUE.,missing_value=missing_value)
