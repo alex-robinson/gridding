@@ -29,6 +29,9 @@ contains
 
         type inp_type 
             double precision, allocatable :: lon(:), lat(:), var(:,:)
+            double precision, allocatable :: zs(:,:) 
+            double precision :: lapse_winter = -8.0d0 
+            double precision :: lapse_summer = -6.5d0 
         end type 
 
         type(inp_type)     :: inp
@@ -39,7 +42,7 @@ contains
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:)
+        double precision, allocatable :: outvar(:,:), outzs(:,:)
         integer, allocatable          :: outmask(:,:)
 
         integer :: q, k, m, i, l, n_var 
@@ -96,6 +99,12 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
+        ! Load reference topography in order to adjust temps to sea-level temps 
+        call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
+
+        write(*,*) "zs : ", minval(inp%zs), maxval(inp%zs)
+        stop 
+        
         ! ## Map climatological gridded variables ##
         
         ! Loop over variables
