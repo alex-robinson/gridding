@@ -30,8 +30,8 @@ contains
         type inp_type 
             double precision, allocatable :: lon(:), lat(:), var(:,:)
             double precision, allocatable :: zs(:,:) 
-            double precision :: lapse_winter = -8.0d0 
-            double precision :: lapse_summer = -6.5d0 
+            double precision :: lapse_ann    = 8.0d0 
+            double precision :: lapse_summer = 6.5d0 
         end type 
 
         type(inp_type)     :: inp
@@ -90,7 +90,7 @@ contains
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
         call grid_allocate(grid,outzs) 
-        
+
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
@@ -103,10 +103,20 @@ contains
 
         ! Load reference topography in order to adjust temps to sea-level temps 
         call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
+        write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
 
-        write(*,*) "zs : ", minval(inp%zs), maxval(inp%zs)
-        stop 
+        ! Map zs to new grid too
+        call map_field(map,"zs",inp%zs,outzs,outmask,"radius", &
+                          fill=.TRUE.,missing_value=missing_value)
 
+        ! Write output elevation to output file
+        call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"zs","units","m")
+        call nc_write_attr(filename,"zs","long_name","Surface elevation")
+        call nc_write_attr(filename,"zs","coordinates","lat2D lon2D")
+            
         ! ## Map climatological gridded variables ##
         
         ! Loop over variables
@@ -117,13 +127,22 @@ contains
             call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=missing_value)
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
+            if (trim(var_now%nm_out) .eq. "t2m_jja") &
+                inp%var = inp%var + inp%lapse_summer*inp%zs 
+            if (trim(var_now%nm_out) .eq. "t2m_ann") &
+                inp%var = inp%var + inp%lapse_ann*inp%zs 
+
             ! Map variable to new grid
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value)
 
+            if (trim(var_now%nm_out) .eq. "t2m_jja") &
+                outvar = outvar - inp%lapse_summer*outzs 
+            if (trim(var_now%nm_out) .eq. "t2m_ann") &
+                outvar = outvar - inp%lapse_ann*outzs 
+
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
-
 
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
