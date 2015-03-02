@@ -27,12 +27,12 @@ contains
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
-        type inpts_type 
-            double precision, allocatable :: lon(:), lat(:), var(:)
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:), var(:,:)
         end type 
 
-        type(inpts_type)     :: inp
-        type(points_class)   :: pTOPO
+        type(inp_type)     :: inp
+        type(grid_class)   :: gTOPO
         character(len=256) :: fldr_in, file_in_topo, file_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
@@ -60,13 +60,13 @@ contains
         ny = nc_size(file_in_topo,"YT_J")
         np = nx*ny 
 
-        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+        allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny))
 
         call nc_read(file_in_topo,"XT_I",inp%lon)
         call nc_read(file_in_topo,"YT_J",inp%lat)
         
         ! Define CLIMBER3a points and input variable field
-        call points_init(pTOPO,name="climber3a-atmos",mtype="latlon",units="degrees", &
+        call grid_init(gTOPO,name="climber3a-atmos",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
         
@@ -96,7 +96,7 @@ contains
                           long_name="Solar clim",method="radius")
 
         ! Initialize mapping
-        call map_init(map,pTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
