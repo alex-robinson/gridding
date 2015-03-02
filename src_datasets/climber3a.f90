@@ -11,7 +11,7 @@ module climber3a
     
 contains 
 
-    subroutine climber3a_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine climber3a_to_grid(outfldr,subfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -20,7 +20,7 @@ contains
         ! =========================================================
         implicit none 
 
-        character(len=*) :: domain, outfldr 
+        character(len=*) :: domain, outfldr, subfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
         double precision :: lat_lim 
@@ -53,7 +53,8 @@ contains
         ref     = "source folder: "//trim(fldr_in)
 
         ! Define the output filename 
-        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_"//trim(domain)//".nc"
+        write(filename,"(a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                              trim(grid%name)//"_"//trim(domain)//".nc"
 
         ! Load the domain information 
         nx = nc_size(file_in_topo,"XT_I")
