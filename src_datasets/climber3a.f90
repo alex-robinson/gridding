@@ -56,14 +56,14 @@ contains
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_"//trim(domain)//".nc"
 
         ! Load the domain information 
-        nx = nc_size(filename,"XT_I")
-        ny = nc_size(filename,"YT_J")
+        nx = nc_size(file_in_topo,"XT_I")
+        ny = nc_size(file_in_topo,"YT_J")
         np = nx*ny 
 
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
-        call nc_read(filename,"XT_I",inp%lon)
-        call nc_read(filename,"YT_J",inp%lat)
+        call nc_read(file_in_topo,"XT_I",inp%lon)
+        call nc_read(file_in_topo,"YT_J",inp%lat)
         
         ! Define CLIMBER3a points and input variable field
         call points_init(pTOPO,name="climber3a-atmos",mtype="latlon",units="degrees", &
