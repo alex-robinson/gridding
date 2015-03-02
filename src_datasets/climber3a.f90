@@ -65,6 +65,7 @@ contains
         np = nx*ny 
 
         allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny))
+        allocate(inp%zs(nx,ny))
 
         call nc_read(file_in_topo,"XT_I",inp%lon)
         call nc_read(file_in_topo,"YT_J",inp%lat)
@@ -88,6 +89,7 @@ contains
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
+        call grid_allocate(grid,outzs) 
         
         ! Initialize the output file
         call nc_create(filename)
@@ -100,8 +102,7 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         ! Load reference topography in order to adjust temps to sea-level temps 
-        call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value, &
-                     start=[1,1,1],count=[nx,ny,1])
+        call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
 
         write(*,*) "zs : ", minval(inp%zs), maxval(inp%zs)
         stop 
