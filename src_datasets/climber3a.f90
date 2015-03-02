@@ -69,31 +69,14 @@ contains
         call grid_init(gTOPO,name="climber3a-atmos",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
-        
-        stop 
-
         ! Define the variables to be mapped 
-        allocate(vars(10))
-        call def_var_info(vars( 1),trim(file_in),"toa_sw_all_clim","toa_sw_all",units="W m**-2", &
-                          long_name="TOA shortwave radiation (all)",method="radius")
-        call def_var_info(vars( 2),trim(file_in),"toa_sw_clr_clim","toa_sw_clr",units="W m**-2", &
-                          long_name="TOA shortwave radiation (clear)",method="radius")
-        call def_var_info(vars( 3),trim(file_in),"toa_lw_all_clim","toa_lw_all",units="W m**-2", &
-                          long_name="TOA longwave radiation (all)",method="radius")
-        call def_var_info(vars( 4),trim(file_in),"toa_lw_clr_clim","toa_lw_clr",units="W m**-2", &
-                          long_name="TOA longwave radiation (clear)",method="radius")
-        call def_var_info(vars( 5),trim(file_in),"toa_net_all_clim","toa_net_all",units="W m**-2", &
-                          long_name="TOA net radiation (all)",method="radius")
-        call def_var_info(vars( 6),trim(file_in),"toa_net_clr_clim","toa_net_clr",units="W m**-2", &
-                          long_name="TOA net radiation (clear)",method="radius")
-        call def_var_info(vars( 7),trim(file_in),"toa_cre_sw_clim","toa_cre_sw",units="W m**-2", &
-                          long_name="TOA cre shortwave clim",method="radius")
-        call def_var_info(vars( 8),trim(file_in),"toa_cre_lw_clim","toa_cre_lw",units="W m**-2", &
-                          long_name="TOA cre longwave clim",method="radius")
-        call def_var_info(vars( 9),trim(file_in),"toa_cre_net_clim","toa_cre_net",units="W m**-2", &
-                          long_name="TOA cre net clim",method="radius")
-        call def_var_info(vars(10),trim(file_in),"solar_clim","solar",units="W m**-2", &
-                          long_name="Solar clim",method="radius")
+        allocate(vars(3))
+        call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="Kelvin", &
+                          long_name="Near-surface temperature (2-m), annual mean",method="radius")
+        call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_jja",units="Kelvin", &
+                          long_name="Near-surface temperature (2-m), summer mean",method="radius")
+        call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
+                          long_name="Precipitation, annual mean",method="radius")
 
         ! Initialize mapping
         call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -118,15 +101,17 @@ contains
         do i = 1, size(vars)
             var_now = vars(i)
 
-            ! Loop over months
-            do m = 1, 12 
-!                 call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
-!                              start=[1,1,m],count=[grid_in%G%nx,grid_in%G%ny,1])
-!                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
-!                               fill=.TRUE.,missing_value=missing_value)
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
-                              start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
-            end do 
+            ! Read in current variable
+            call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=missing_value)
+            where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
+
+            ! Map variable to new grid
+            call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
+                          fill=.TRUE.,missing_value=missing_value)
+
+            ! Write output variable to output file
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+
 
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
