@@ -77,11 +77,11 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(3))
         call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="Kelvin", &
-                          long_name="Near-surface temperature (2-m), annual mean",method="radius")
+                          long_name="Near-surface temperature (2-m), annual mean",method="quadrant")
         call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_jja",units="Kelvin", &
-                          long_name="Near-surface temperature (2-m), summer mean",method="radius")
+                          long_name="Near-surface temperature (2-m), summer mean",method="quadrant")
         call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
-                          long_name="Precipitation, annual mean",method="radius")
+                          long_name="Precipitation, annual mean",method="quadrant")
 
         ! Initialize mapping
         call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -106,7 +106,7 @@ contains
         write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
 
         ! Map zs to new grid too
-        call map_field(map,"zs",inp%zs,outzs,outmask,"radius", &
+        call map_field(map,"zs",inp%zs,outzs,outmask,"quadrant", &
                           fill=.TRUE.,missing_value=missing_value)
 
         ! Write output elevation to output file
