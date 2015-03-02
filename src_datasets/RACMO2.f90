@@ -78,7 +78,7 @@ contains
                 nk = clim_range(2) - clim_range(1) + 1 
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                    "_RACMO2-ANT3K55_HadCM3-A1B-monthly__",clim_range(1),"-",clim_range(2),".nc"
+                    "_RACMO2-ANT3K55_HadCM3-A1B-monthly_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
         else if (trim(domain) .eq. "Antarctica-c20") then 

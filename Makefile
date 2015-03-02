@@ -121,6 +121,9 @@ $(objdir)/sediments.o: $(srcdir)/sediments.f90
 $(objdir)/GeothermalHeatFlux.o: $(srcdir)/GeothermalHeatFlux.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/climber3a.o: $(srcdir)/climber3a.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 grisli_common = $(objdir)/runparam_mod.o $(objdir)/3D-physique-gen_mod.o
 
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
@@ -140,7 +143,8 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 				   $(objdir)/RACMO2.o \
 				   $(objdir)/Rignot13_BasalMelt.o \
 			       $(objdir)/sediments.o \
-			       $(objdir)/GeothermalHeatFlux.o
+			       $(objdir)/GeothermalHeatFlux.o \
+			       $(objdir)/climber3a.o
 
 ## Complete programs
 

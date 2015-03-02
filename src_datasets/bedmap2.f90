@@ -62,7 +62,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO_BEDMAP2.nc"
+                              "_TOPO-BEDMAP2.nc"
 
         else
 

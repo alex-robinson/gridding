@@ -12,7 +12,8 @@ program gentopo
     use Rignot13_BasalMelt  
     use sediments 
     use GeothermalHeatFlux 
-    
+    use climber3a 
+
     implicit none
 
     type(grid_class)   :: grid
@@ -58,9 +59,9 @@ program gentopo
     !
     ! =========================================================
 
-    call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-    call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-    call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8, lat_lim=2.d0)
     
@@ -86,6 +87,9 @@ program gentopo
     
 !     call sedLaske_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
 !     call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
+    
+    ! CLIMBER-3alpha
+    call climber3a_to_grid(outfldr,grid,domain="lgm_1p7strong",max_neighbors=10,lat_lim=5.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."
