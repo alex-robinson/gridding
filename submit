@@ -1,0 +1,21 @@
+#!/bin/ksh
+## @ class = largemem
+# @ class = short
+# @ group = anthroia
+# @ job_type = serial
+# @ as_limit = unlimited
+# @ data_limit = unlimited
+# @ stack_limit = unlimited
+# @ file_limit = unlimited
+# @ nofile_limit = unlimited
+# @ core_limit = unlimited
+# @ executable = gentopo_ANT.x
+# @ arguments =  "" 
+# @ input = /dev/null
+# @ output = out.out
+# @ error =  out.err
+# @ notify_user = robinson@pik-potsdam.de
+# @ notification = complete
+# @ Wall_clock_limit = 6:00:00
+# @ checkpoint = no
+# @ queue
