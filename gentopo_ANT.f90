@@ -89,9 +89,9 @@ program gentopo
 !     call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
     
     ! CLIMBER-3alpha
-    call climber3a_to_grid(outfldr,"C3_brutos",grid,domain="lgm_1p7strong",max_neighbors=10,lat_lim=5.d0)
-    call climber3a_to_grid(outfldr,"C3_brutos",grid,domain="lgm_1p7weak",max_neighbors=10,lat_lim=5.d0)
-    call climber3a_to_grid(outfldr,"C3_brutos",grid,domain="present",max_neighbors=10,lat_lim=5.d0)
+    call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong",max_neighbors=10,lat_lim=5.d0)
+    call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak",max_neighbors=10,lat_lim=5.d0)
+    call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="present",max_neighbors=10,lat_lim=5.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."

@@ -127,6 +127,7 @@ contains
             call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=missing_value)
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
+            ! Scale to sea-level temperature for interpolation
             if (trim(var_now%nm_out) .eq. "t2m_jja") &
                 inp%var = inp%var + inp%lapse_summer*inp%zs 
             if (trim(var_now%nm_out) .eq. "t2m_ann") &
@@ -136,6 +137,7 @@ contains
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value)
 
+            ! Re-scale to near-surface temp for writing to file
             if (trim(var_now%nm_out) .eq. "t2m_jja") &
                 outvar = outvar - inp%lapse_summer*outzs 
             if (trim(var_now%nm_out) .eq. "t2m_ann") &

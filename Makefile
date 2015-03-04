@@ -124,8 +124,6 @@ $(objdir)/GeothermalHeatFlux.o: $(srcdir)/GeothermalHeatFlux.f90
 $(objdir)/climber3a.o: $(srcdir)/climber3a.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-grisli_common = $(objdir)/runparam_mod.o $(objdir)/3D-physique-gen_mod.o
-
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			   	   $(objdir)/Bamber13.o \
 			       $(objdir)/CERES.o \
@@ -134,6 +132,13 @@ obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			       $(objdir)/nasaBasins.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/GeothermalHeatFlux.o
+
+obj_datasets_NH =  $(objdir)/gridding_datasets.o \
+			       $(objdir)/CERES.o \
+			       $(objdir)/ECMWF.o \
+			       $(objdir)/sediments.o \
+			       $(objdir)/GeothermalHeatFlux.o \
+			       $(objdir)/climber3a.o
 
 obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
@@ -148,16 +153,22 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 
 ## Complete programs
 
-ANT: $(obj_datasets_ANT)
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_ANT.x is ready."
-	@echo " "
-
 GRL: $(obj_datasets_GRL) 
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gentopo_GRL.x is ready."
+	@echo " "
+
+NH: $(obj_datasets_NH)
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_NH.x $^ gentopo_NH.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_NH.x is ready."
+	@echo " "
+
+ANT: $(obj_datasets_ANT)
+	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gentopo_ANT.x is ready."
 	@echo " "
 
 marclean: $(objdir)/ncio.o
