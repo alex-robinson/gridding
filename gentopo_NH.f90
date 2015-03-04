@@ -34,7 +34,7 @@ program gentopo
     select case(trim(gridname))
         case("NH-40KM")
             call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
-                           lon180=.TRUE.,dx=40.d0,nx=281,dy=40.d0,ny=281, &
+                           lon180=.TRUE.,dx=40.d0,nx=241,dy=40.d0,ny=241, &
                            lambda=0.d0,phi=90.d0,alpha=37.0d0)
 
         case("NH-20KM")
