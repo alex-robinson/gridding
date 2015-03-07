@@ -8,7 +8,8 @@ module topo_reconstructions
 
     private 
     public :: ICE6GC_to_grid
-    
+    public :: ICE5G_to_grid
+
 contains 
 
     subroutine ICE6GC_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -145,6 +146,138 @@ contains
 
     end subroutine ICE6GC_to_grid
 
+    subroutine ICE5G_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       ICE-5G DATA
+        !
+        ! =========================================================
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type inp_type 
+            double precision, allocatable :: var(:,:)
+        end type 
+
+        type(inp_type)     :: inp
+        integer :: nx, ny 
+        type(grid_class)   :: grid0
+        character(len=256) :: fldr_in, file_in, file_prefix, file_suffix
+        type(var_defs), allocatable :: vars(:)
+        double precision :: time 
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        integer :: q, k, m, i, l, n_var, kt, nt 
+        real(4) :: t0, t1, dt 
+        character(len=10) :: time_char 
+
+        ! Define the input filenames
+        fldr_in         = "/data/sicopolis/data/ICE-5G/"
+        file_in         = trim(fldr_in)//"ice5g_v1.2_00.0k_1deg.nc"
+        file_prefix     = trim(fldr_in)//"ice5g_v1.2_"
+        file_suffix     = "k_1deg.nc"
+
+        t0 = -21.0
+        t1 =   0.0 
+        dt =   0.5
+        nt = (t1-t0)/dt + 1 
+
+        desc    = "ICE-5G (VM2) model 90Km Lithosphere"
+        ref     = "Peltier, D.: GLOBAL GLACIAL ISOSTASY AND THE SURFACE &
+                  &OF THE ICE-AGE EARTH: The ICE-5G (VM2) Model and GRACE, &
+                  &Ann. Rev. Earth Plan. Sci., 32, 111-149, &
+                  &doi:10.1146/annurev.earth.32.082503.144359, 2004  \n\n &
+                  &http://www.atmosp.physics.utoronto.ca/~peltier/data.php"
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"// &
+                              trim(grid%name)//"_TOPO-ICE-5G.nc"
+
+        ! Define the input grid
+        call grid_init(grid0,name="ICE5G-1DEG",mtype="latlon",units="degrees",lon180=.TRUE., &
+                       x0=0.0d0,dx=1.d0,nx=360,y0=-89.5d0,dy=1.d0,ny=180)
+        
+        ! Allocate the input array
+        call grid_allocate(grid0,inp%var)
+
+        ! Define the variables to be mapped 
+        allocate(vars(3))
+        call def_var_info(vars( 1),trim(file_prefix),"sftgif","sftgif",units="%", &
+                          long_name="Ice area fraction",method="quadrant")
+        call def_var_info(vars( 2),trim(file_prefix),"orog","zs",units="m", &
+                          long_name="Orography (surface altitude)",method="quadrant")
+        call def_var_info(vars( 3),trim(file_prefix),"sftgit","H",units="m", &
+                          long_name="Ice sheet thickness",method="quadrant")
+
+        ! Initialize mapping
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)     
+
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"time",x=0.d0,units="kiloyears",unlimited=.TRUE.)
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! Loop over variables
+        do i = 1, size(vars)
+            var_now = vars(i)
+
+            do k = 1, nt
+                time = t0 + (k-1)*dt 
+
+                if (abs(time).lt.10.0) then 
+                    write(time_char,"(i1,f3.1)") 0, abs(time) 
+                else 
+                    write(time_char,"(f4.1)") (time) 
+                end if 
+
+                file_in = trim(file_prefix)//trim(time_char)//trim(file_suffix)
+
+                ! Read in current variable
+                call nc_read(file_in,var_now%nm_in,inp%var,missing_value=missing_value)
+                where(abs(inp%var) .ge. 1d8) inp%var = missing_value 
+
+                ! Map variable to new grid
+                call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
+                              fill=.TRUE.,missing_value=missing_value)
+
+                ! Write output variable to output file
+                call nc_write(filename,"time",time,dim1="time",start=[k],count=[1])
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time", &
+                              start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+
+            end do 
+
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+        end do 
+
+        return 
+
+    end subroutine ICE5G_to_grid
 
 end module topo_reconstructions 
 
