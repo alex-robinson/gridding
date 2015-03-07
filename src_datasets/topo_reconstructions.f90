@@ -178,9 +178,9 @@ contains
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
 
-        integer :: q, k, m, i, l, n_var, kt, nt 
-        real(4) :: t0, t1, dt 
+        integer :: q, k, m, i, l, n_var
         character(len=10) :: time_char 
+        real(4) :: times(38) 
 
         ! Define the input filenames
         fldr_in         = "/data/sicopolis/data/ICE-5G/ice5g_v1.2_0-21k_1deg/"
@@ -188,10 +188,9 @@ contains
         file_prefix     = trim(fldr_in)//"ice5g_v1.2_"
         file_suffix     = "k_1deg.nc"
 
-        t0 = -21.0
-        t1 =   0.0 
-        dt =   0.5
-        nt = (t1-t0)/dt + 1 
+        times = [-21.0,-20.0,-19.0,-17.0,-16.5,-16.0,-15.5,-15.0,-14.5,-14.0,-13.5,-13.0, &
+                 -12.5,-12.0,-11.5,-11.0,-10.5,-10.0,-9.5,-9.0,-8.5,-8.0,-7.5,-7.0,-6.5,-6.0, &
+                 -5.5,-5.0,-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0]
 
         desc    = "ICE-5G (VM2) model 90Km Lithosphere"
         ref     = "Peltier, D.: GLOBAL GLACIAL ISOSTASY AND THE SURFACE &
@@ -243,7 +242,7 @@ contains
             var_now = vars(i)
 
             do k = 1, nt
-                time = t0 + (k-1)*dt 
+                time = times(k)
 
                 if (abs(time).lt.10.0) then 
                     write(time_char,"(i1,f3.1)") 0, abs(time) 
