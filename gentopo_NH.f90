@@ -57,8 +57,8 @@ program gentopo
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
-!     call ecmwf_to_grid(outfldr, grid,"GRL075",max_neighbors=8,lat_lim=2.d0)
-!     call ecmwf_to_grid( outfldr,grid,"GRL075",clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr, grid,"NH",max_neighbors=8,lat_lim=2.d0)
+    call ecmwf_to_grid( outfldr,grid,"NH",clim_range=[1981,2010])
 
 !     call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
 
@@ -69,7 +69,7 @@ program gentopo
     
     ! Paleo topography 
 !     call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+!     call ICE5G_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."

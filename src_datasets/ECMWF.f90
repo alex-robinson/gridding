@@ -93,10 +93,29 @@ contains
             ref     = "Dee et al., 2011, BAMS, &
                       &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
 
-        else
+    else ! GLOBAL DOMAIN
 
-            write(*,*) "Domain not recognized: ",trim(domain)
-            stop 
+            ! Initialize the grid
+            call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
+                           x0=-180.d0,dx=0.75d0,nx=480,y0=-90.d0,dy=0.75d0,ny=241)
+            
+            ! Assign the filenames
+            file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-invariant_historical_mon_197901-201212.nc"
+            file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-surface_historical_mon_197901-201212.nc"
+            files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-1000Mb_historical_mon_197901-201212.nc"
+            files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-950Mb_historical_mon_197901-201212.nc"
+            files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-850Mb_historical_mon_197901-201212.nc"
+            files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
+            files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-700Mb_historical_mon_197901-201212.nc"
+            files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-650Mb_historical_mon_197901-201212.nc"
+            files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-600Mb_historical_mon_197901-201212.nc"
+            files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-550Mb_historical_mon_197901-201212.nc"
+            files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
+
+            desc    = "ERA-Interim dataset"
+            ref     = "Dee et al., 2011, BAMS, &
+                      &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
+                      
         end if 
 
         ! ## First make file for surface fields including invariants ##
