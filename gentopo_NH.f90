@@ -44,8 +44,7 @@ program gentopo
 
     end select
 
-    call grid_write(grid,"output/"//trim(gridname)//".nc",xnm="xc",ynm="yc",create=.TRUE.)
-    stop 
+    call grid_write(grid,"output/"//trim(gridname)//".nc",xnm="xc",ynm="yc",create=.TRUE.) 
 
     ! =========================================================
     !
@@ -55,7 +54,7 @@ program gentopo
 
     call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
-!     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
+    call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
 !     call ecmwf_to_grid(outfldr, grid,"GRL075",max_neighbors=8,lat_lim=2.d0)
 !     call ecmwf_to_grid( outfldr,grid,"GRL075",clim_range=[1981,2010])
