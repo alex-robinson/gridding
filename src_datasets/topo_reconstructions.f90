@@ -115,9 +115,9 @@ contains
 
             do k = 1, size(times)
                 file_in = trim(var_now%filename)//trim(times(k))//".nc"
-                read(time,*) trim(times(k))
+                read(time,*) times(k)
                 write(*,*) trim(file_in), " : ", time 
-                
+
                 ! Read in current variable
                 call nc_read(file_in,var_now%nm_in,inp%var,missing_value=missing_value)
                 where(abs(inp%var) .ge. 1d8) inp%var = missing_value 
