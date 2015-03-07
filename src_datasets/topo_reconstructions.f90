@@ -102,7 +102,7 @@ contains
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"time",x=0.d0,units="ka BP",unlimited=.TRUE.)
+        call nc_write_dim(filename,"time",x=0.d0,units="kiloyears",unlimited=.TRUE.)
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -115,7 +115,8 @@ contains
 
             do k = 1, size(times)
                 file_in = trim(var_now%filename)//trim(times(k))//".nc"
-                read(times(k),*) time
+                read(times(size(times)-k+1),*) time
+                time = -time   ! negative time 
 
                 ! Read in current variable
                 call nc_read(file_in,var_now%nm_in,inp%var,missing_value=missing_value)
@@ -127,7 +128,8 @@ contains
 
                 ! Write output variable to output file
                 call nc_write(filename,"time",time,dim1="time",start=[k],count=[1])
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time")
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time",
+                              start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
             end do 
 
