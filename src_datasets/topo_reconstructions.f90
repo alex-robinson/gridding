@@ -45,7 +45,7 @@ contains
         integer :: q, k, m, i, l, n_var 
 
         ! Define the input filenames
-        fldr_in         = "/data/sicopolis/data/ICE6G_C/"
+        fldr_in         = "/data/sicopolis/data/ICE-6G_C/"
         file_in         = trim(fldr_in)//"I6_C.VM5a_1deg.0.nc"
         file_prefix     = trim(fldr_in)//"I6_C.VM5a_1deg."
         times = ["0   ","0.5 ","1   ","1.5 ","2   ","2.5 ","3   ","3.5 ","4   ","4.5 ", &
