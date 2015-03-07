@@ -183,7 +183,7 @@ contains
         character(len=10) :: time_char 
 
         ! Define the input filenames
-        fldr_in         = "/data/sicopolis/data/ICE-5G/"
+        fldr_in         = "/data/sicopolis/data/ICE-5G/ice5g_v1.2_0-21k_1deg/"
         file_in         = trim(fldr_in)//"ice5g_v1.2_00.0k_1deg.nc"
         file_prefix     = trim(fldr_in)//"ice5g_v1.2_"
         file_suffix     = "k_1deg.nc"
