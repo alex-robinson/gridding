@@ -127,6 +127,9 @@ $(objdir)/climber3a.o: $(srcdir)/climber3a.f90
 $(objdir)/ETOPO.o: $(srcdir)/ETOPO.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/topo_reconstructions.o: $(srcdir)/topo_reconstructions.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			   	   $(objdir)/Bamber13.o \
 			       $(objdir)/CERES.o \
@@ -135,7 +138,8 @@ obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			       $(objdir)/nasaBasins.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/GeothermalHeatFlux.o \
-			       $(objdir)/ETOPO.o
+			       $(objdir)/ETOPO.o \
+			       $(objdir)/topo_reconstructions.o
 
 obj_datasets_NH =  $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
@@ -143,7 +147,8 @@ obj_datasets_NH =  $(objdir)/gridding_datasets.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/GeothermalHeatFlux.o \
 			       $(objdir)/climber3a.o \
-			       $(objdir)/ETOPO.o
+			       $(objdir)/ETOPO.o \
+			       $(objdir)/topo_reconstructions.o
 
 obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
@@ -155,7 +160,8 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/GeothermalHeatFlux.o \
 			       $(objdir)/climber3a.o \
-			       $(objdir)/ETOPO.o
+			       $(objdir)/ETOPO.o \
+			       $(objdir)/topo_reconstructions.o
 
 ## Complete programs
 
