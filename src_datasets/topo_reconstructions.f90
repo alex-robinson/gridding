@@ -248,7 +248,7 @@ contains
                 if (abs(time).lt.10.0) then 
                     write(time_char,"(i1,f3.1)") 0, abs(time) 
                 else 
-                    write(time_char,"(f4.1)") (time) 
+                    write(time_char,"(f4.1)") abs(time) 
                 end if 
 
                 file_in = trim(file_prefix)//trim(time_char)//trim(file_suffix)
