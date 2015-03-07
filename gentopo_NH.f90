@@ -68,7 +68,7 @@ program gentopo
 !     call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="present",max_neighbors=10,lat_lim=5.d0)
     
     ! Paleo topography 
-    call call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."
