@@ -115,9 +115,7 @@ contains
 
             do k = 1, size(times)
                 file_in = trim(var_now%filename)//trim(times(k))//".nc"
-                write(*,*) trim(file_in) 
-                read(time,*) times(k)
-                write(*,*) trim(file_in), " : ", time 
+                read(times(k),*) time
 
                 ! Read in current variable
                 call nc_read(file_in,var_now%nm_in,inp%var,missing_value=missing_value)
