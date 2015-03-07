@@ -180,7 +180,7 @@ contains
 
         integer :: q, k, m, i, l, n_var
         character(len=10) :: time_char 
-        real(4) :: times(38) 
+        real(4) :: times(39) 
 
         ! Define the input filenames
         fldr_in         = "/data/sicopolis/data/ICE-5G/ice5g_v1.2_0-21k_1deg/"
@@ -241,7 +241,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i)
 
-            do k = 1, nt
+            do k = 1, size(times)
                 time = times(k)
 
                 if (abs(time).lt.10.0) then 
