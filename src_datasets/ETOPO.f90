@@ -33,6 +33,7 @@ contains
         end type 
 
         type(inp_type)     :: inp
+        integer :: nx, ny 
         type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in_1, file_in_2 
         type(var_defs), allocatable :: vars(:)
@@ -56,11 +57,18 @@ contains
         write(filename,"(a)") trim(outfldr)//"/"// &
                               trim(grid%name)//"_TOPO-ETOPO1.nc"
 
-        ! Define the input grid and initialize arrays
+        ! Get the input dimensions
+        nx = nc_size(file_in_1,"lon")
+        ny = nc_size(file_in_1,"lat")
+        allocate(inp%lon(nx),inp%lat(ny))
         call nc_read(file_in_1,"lon",inp%lon)
         call nc_read(file_in_1,"lat",inp%lat)
+
+        ! Define the input grid
         call grid_init(grid0,name="ETOPO1-050deg",mtype="latlon",units="degrees",lon180=.TRUE., &
                          x=inp%lon,y=inp%lat)
+        
+        ! Allocate the input array
         call grid_allocate(grid0,inp%var)
 
         ! Define the variables to be mapped 
