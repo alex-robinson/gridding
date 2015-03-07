@@ -43,7 +43,7 @@ contains
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
 
-        integer :: q, k, m, i, l, n_var 
+        integer :: q, k, m, i, l, n_var, kt 
 
         ! Define the input filenames
         fldr_in         = "/data/sicopolis/data/ICE-6G_C/"
@@ -112,10 +112,11 @@ contains
         ! Loop over variables
         do i = 1, size(vars)
             var_now = vars(i)
-
+            kt = size(times)-k+1
+            
             do k = 1, size(times)
-                file_in = trim(var_now%filename)//trim(times(k))//".nc"
-                read(times(size(times)-k+1),*) time
+                file_in = trim(var_now%filename)//trim(times(kt))//".nc"
+                read(times(kt),*) time
                 time = -time   ! negative time 
 
                 ! Read in current variable
