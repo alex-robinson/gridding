@@ -128,7 +128,7 @@ contains
 
                 ! Write output variable to output file
                 call nc_write(filename,"time",time,dim1="time",start=[k],count=[1])
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time",
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time", &
                               start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
             end do 
