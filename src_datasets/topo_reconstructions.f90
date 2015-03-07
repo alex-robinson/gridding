@@ -115,6 +115,7 @@ contains
 
             do k = 1, size(times)
                 file_in = trim(var_now%filename)//trim(times(k))//".nc"
+                write(*,*) trim(file_in) 
                 read(time,*) times(k)
                 write(*,*) trim(file_in), " : ", time 
 
