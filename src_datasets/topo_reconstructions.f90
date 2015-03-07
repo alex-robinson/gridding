@@ -112,9 +112,9 @@ contains
         ! Loop over variables
         do i = 1, size(vars)
             var_now = vars(i)
-            kt = size(times)-k+1
-            
+
             do k = 1, size(times)
+                kt = size(times)-k+1
                 file_in = trim(var_now%filename)//trim(times(kt))//".nc"
                 read(times(kt),*) time
                 time = -time   ! negative time 
