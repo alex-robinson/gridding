@@ -334,11 +334,9 @@ contains
 
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
+        ! Define the input points
         call nc_read(file_in_grid,"lon",inp%lon,start=[1,1],count=[nx,ny])
         call nc_read(file_in_grid,"lat",inp%lat,start=[1,1],count=[nx,ny])
-        call nc_read(file_in,     "zm", inp%var,start=[1,1],count=[nx,ny])
-        
-        ! Define the input grid
         call points_init(points0,name="GISMp-20KM",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat) !,latlon=.TRUE.)
 
@@ -360,8 +358,8 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         ! Read in current variable
-        call nc_read(file_in,"zm",inp%var,missing_value=missing_value)
-
+        call nc_read(file_in,"zm",inp%var,start=[1,1],count=[nx,ny])
+        
         ! Map variable to new grid
         call map_field(map,"mask",inp%var,outvar,outmask,"nn", &
                       fill=.TRUE.,missing_value=missing_value)
