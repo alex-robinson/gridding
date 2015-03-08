@@ -9,6 +9,7 @@ module GeothermalHeatFlux
 
     private 
     public :: ghfMaule_to_grid
+    public :: ghfDavies_to_grid
     
 contains 
 

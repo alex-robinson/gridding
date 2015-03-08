@@ -87,8 +87,9 @@ program gentopo
 
 !     call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 !     call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
+    call ghfDavies_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
     
-    call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+!     call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."
