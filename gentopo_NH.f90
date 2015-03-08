@@ -5,10 +5,11 @@ program gentopo
     use coordinates
 
     use CERES 
+    use climber3a
     use ECMWF 
     use ETOPO 
-    use sediments 
-    use climber3a 
+    use GeothermalHeatFlux
+    use sediments  
     use topo_reconstructions 
 
     implicit none
@@ -57,11 +58,13 @@ program gentopo
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
-    call ecmwf_to_grid(outfldr, grid,"NH",max_neighbors=8,lat_lim=2.d0)
-    call ecmwf_to_grid( outfldr,grid,"NH",clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr, grid,"NH",max_neighbors=8,lat_lim=2.d0)
+!     call ecmwf_to_grid( outfldr,grid,"NH",clim_range=[1981,2010])
 
 !     call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
-
+    
+    call ghfDavies_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
+    
     ! CLIMBER-3alpha
 !     call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong",max_neighbors=10,lat_lim=5.d0)
 !     call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak",max_neighbors=10,lat_lim=5.d0)

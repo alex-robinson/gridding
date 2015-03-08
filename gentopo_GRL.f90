@@ -7,10 +7,11 @@ program gentopo
     use Bamber13 
     use CERES 
     use ECMWF 
+    use GeothermalHeatFlux
     use MAR 
     use NasaBasins
     use sediments 
-    use GeothermalHeatFlux 
+     
     use topo_reconstructions 
 
     implicit none
