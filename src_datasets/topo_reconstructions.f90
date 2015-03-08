@@ -340,7 +340,7 @@ contains
         
         ! Define the input grid
         call points_init(points0,name="GISMp-20KM",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x=inp%lon,y=inp%lat,latlon=.TRUE.)
+                         lon180=.TRUE.,x=inp%lon,y=inp%lat) !,latlon=.TRUE.)
 
         ! Initialize mapping
         call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
