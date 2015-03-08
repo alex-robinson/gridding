@@ -364,6 +364,9 @@ contains
         call map_field(map,"mask",inp%var,outvar,outmask,"nn", &
                       fill=.TRUE.,missing_value=missing_value)
 
+        ! Cut the mask if overlaps with border points 
+        where (grid%border) outvar = 0.d0 
+        
         ! Write output variable to output file
         call nc_write(filename,"mask_lgm",int(outvar),dim1="xc",dim2="yc")
 
