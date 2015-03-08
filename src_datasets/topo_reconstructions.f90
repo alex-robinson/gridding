@@ -297,12 +297,14 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: var(:,:)
+            double precision, allocatable :: lon(:), lat(:)
+            double precision, allocatable :: var(:)
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: grid0
-        character(len=256) :: fldr_in, file_in
+        integer            :: nx, ny, np 
+        type(points_class) :: points0
+        character(len=256) :: fldr_in, file_in, file_in_grid
 
         type(map_class)  :: map 
         double precision, allocatable :: outvar(:,:)
@@ -310,6 +312,7 @@ contains
 
         ! Define the input filenames
         fldr_in         = "/data/sicopolis/data/Simpson2009_GlacialMask//"
+        file_in_grid    = trim(fldr_in)//"GISM20.cdf"
         file_in         = trim(fldr_in)//"glacmask.20.cdf"
 
         desc    = "Reconstructed Greenland ice sheet extent at the LGM"
@@ -324,16 +327,23 @@ contains
         write(filename,"(a)") trim(outfldr)//"/"// &
                               trim(grid%name)//"_TOPO-LGM-S09.nc"
 
-        ! Define the input grid
-        call grid_init(grid0,name="GISM-20KM",mtype="stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=20.d0,nx=83,dy=20.d0,ny=141, &
-                       lambda=-44.d0,phi=72.d0,alpha=7.5d0)
+        ! Define the input data 
+        nx = 83
+        ny = 141 
+        np = nx*ny 
+
+        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+
+        call nc_read(file_in_grid,"lon",inp%lon)
+        call nc_read(file_in_grid,"lat",inp%lat)
+        call nc_read(file_in,     "zm", inp%var)
         
-        ! Allocate the input array
-        call grid_allocate(grid0,inp%var)
+        ! Define the input grid
+        call points_init(points0,name="GISMp-20KM",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x=inp%lon,y=inp%lat,latlon=.TRUE.)
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
