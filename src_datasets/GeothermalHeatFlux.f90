@@ -10,7 +10,7 @@ module GeothermalHeatFlux
     private 
     public :: ghfMaule_to_grid
     public :: ghfDavies_to_grid
-    
+
 contains 
 
     subroutine ghfMaule_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -247,7 +247,7 @@ contains
         call nc_write_attr(filename,"ghf_mean","coordinates","lat2D lon2D")
         
         ! ## ghf_median ##
-        call map_field(map,"ghf_med",inp%mean,outvar,outmask,"quadrant", &
+        call map_field(map,"ghf_med",inp%med,outvar,outmask,"quadrant", &
                        fill=.TRUE.,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
@@ -263,7 +263,7 @@ contains
         call nc_write_attr(filename,"ghf_med","coordinates","lat2D lon2D")
         
         ! ## ghf_err ##
-        call map_field(map,"ghf_err",inp%mean,outvar,outmask,"quadrant", &
+        call map_field(map,"ghf_err",inp%err,outvar,outmask,"quadrant", &
                        fill=.TRUE.,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
