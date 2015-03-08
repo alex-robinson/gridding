@@ -327,7 +327,7 @@ contains
         ! Define the input grid
         call grid_init(grid0,name="GISM-20KM",mtype="stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=20.d0,nx=83,dy=20.d0,ny=141, &
-                       lambda=-44.d0,phi=71.d0,alpha=7.5d0)
+                       lambda=-44.d0,phi=72.d0,alpha=7.5d0)
         
         ! Allocate the input array
         call grid_allocate(grid0,inp%var)
