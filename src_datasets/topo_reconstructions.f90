@@ -334,9 +334,9 @@ contains
 
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
-        call nc_read(file_in_grid,"lon",inp%lon)
-        call nc_read(file_in_grid,"lat",inp%lat)
-        call nc_read(file_in,     "zm", inp%var)
+        call nc_read(file_in_grid,"lon",inp%lon,start=[1,1],count=[nx,ny])
+        call nc_read(file_in_grid,"lat",inp%lat,start=[1,1],count=[nx,ny])
+        call nc_read(file_in,     "zm", inp%var,start=[1,1],count=[nx,ny])
         
         ! Define the input grid
         call points_init(points0,name="GISMp-20KM",mtype="latlon",units="degrees", &
