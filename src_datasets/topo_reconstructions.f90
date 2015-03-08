@@ -9,6 +9,7 @@ module topo_reconstructions
     private 
     public :: ICE6GC_to_grid
     public :: ICE5G_to_grid
+    public :: LGMsimpson_to_grid 
 
 contains 
 
@@ -277,6 +278,96 @@ contains
         return 
 
     end subroutine ICE5G_to_grid
+
+
+    subroutine LGMsimpson_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       SIMPSON GLACIAL MASK DATA
+        !
+        ! =========================================================
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type inp_type 
+            double precision, allocatable :: var(:,:)
+        end type 
+
+        type(inp_type)     :: inp
+        type(grid_class)   :: grid0
+        character(len=256) :: fldr_in, file_in
+
+        type(map_class)  :: map 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        ! Define the input filenames
+        fldr_in         = "/data/sicopolis/data/Simpson2009_GlacialMask//"
+        file_in         = trim(fldr_in)//"glacmask.20.cdf"
+
+        desc    = "Reconstructed Greenland ice sheet extent at the LGM"
+        ref     = "Simpson, M. J. R., Milne, G. A., Huybrechts, P. and Long, A. J.: &
+                  &Calibrating a glaciological model of the Greenland ice sheet &
+                  &from the Last Glacial Maximum to present-day using field &
+                  &observations of relative sea level and ice extent, &
+                  &Quat. Sci. Rev., 28(17-18), 1631–1657, &
+                  &doi:10.1016/j.quascirev.2009.03.004, 2009."
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"// &
+                              trim(grid%name)//"_TOPO-LGM-S09.nc"
+
+        ! Define the input grid
+        call grid_init(grid0,name="GISM-20KM",mtype="stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=20.d0,nx=83,dy=20.d0,ny=141, &
+                       lambda=-44.d0,phi=71.d0,alpha=7.5d0)
+        
+        ! Allocate the input array
+        call grid_allocate(grid0,inp%var)
+
+        ! Initialize mapping
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)     
+
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! Read in current variable
+        call nc_read(file_in,"zm",inp%var,missing_value=missing_value)
+
+        ! Map variable to new grid
+        call map_field(map,"mask",inp%var,outvar,outmask,"nn", &
+                      fill=.TRUE.,missing_value=missing_value)
+
+        ! Write output variable to output file
+        call nc_write(filename,"mask_lgm",int(outvar),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"mask_lgm","units","1")
+        call nc_write_attr(filename,"mask_lgm","long_name", &
+                    "Mask of ice sheet at extent at LGM (21 ka BP)")
+        call nc_write_attr(filename,"mask_lgm","coordinates","lat2D lon2D")
+
+        return 
+
+    end subroutine LGMsimpson_to_grid
 
 end module topo_reconstructions 
 
