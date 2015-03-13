@@ -19,6 +19,7 @@ program gentopo
 
     type(grid_class)   :: grid
     character(len=256) :: gridname, outfldr 
+    character(len=256) :: path 
     
     write(*,*) 
 
