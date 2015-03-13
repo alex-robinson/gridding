@@ -133,6 +133,7 @@ $(objdir)/topo_reconstructions.o: $(srcdir)/topo_reconstructions.f90
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			   	   $(objdir)/Bamber13.o \
 			       $(objdir)/CERES.o \
+			       $(objdir)/climber3a.o \
 			       $(objdir)/ECMWF.o \
 			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o \
