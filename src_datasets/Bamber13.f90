@@ -119,7 +119,7 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         ! Load the geoid
-        call nc_read(var_now%filename,"Geoid",tmp,missing_value=missing_value)
+        call nc_read(file_in,"Geoid",tmp,missing_value=missing_value)
         call thin(geoid,tmp,by=thin_by)
         write(*,*) "Bamber13 geoid range: ", minval(geoid), maxval(geoid)
 
@@ -133,7 +133,7 @@ contains
             if (trim(var_now%nm_out) .eq. "zs" .or. var_now%nm_out .eq. "zb") then 
                 where( invar .ne. missing_value ) invar = invar - geoid 
             end if 
-            
+
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
