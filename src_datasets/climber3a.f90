@@ -221,7 +221,7 @@ contains
 
         ! Make z negative and reverse it (rel to ocean surface)
         do k = 1, nz 
-            inp%z_ocn(k) = -inp%z_ocn(nz-k+1)
+            inp%z_ocn(k) = -inp%depth(nz-k+1)
         end do  
 
         ! Define CLIMBER3a points and input variable field
@@ -268,7 +268,11 @@ contains
 
             ! Map variable to new grid
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value)
+                          fill=.FALSE.,missing_value=missing_value)
+
+            ! Get high resolution mask 
+            outmask = 1 
+            where(outvar == missing_value) outmask = 0 
 
             ! Fill any missing values over land
             call fill_weighted(outvar,missing_value=missing_value)
@@ -280,16 +284,20 @@ contains
             ! Also map mask 
             var_now = vars(2) 
 
-            ! Define topo mask
-            inp%mask = 1
-            where(inp%var == missing_value) inp%mask = 0 
+!             ! Define topo mask
+!             inp%mask = 1
+!             where(inp%var == missing_value) inp%mask = 0 
 
-            call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value)
+!             call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
+!                           fill=.TRUE.,missing_value=missing_value)
 
             ! Write output mask to output file
-            call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
+!             call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
+!                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+        
+            call nc_write(filename,var_now%nm_out,outmask,dim1="xc",dim2="yc",dim3="z_ocn", &
                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+
 
         end do 
 
