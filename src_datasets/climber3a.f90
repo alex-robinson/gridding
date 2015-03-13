@@ -263,17 +263,13 @@ contains
 
             ! Read in current variable (starting from last to reverse depth vector)
             call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
-                         start=[1,1,k],count=[nx,ny,1])
+                         start=[1,1,nz-k+1],count=[nx,ny,1])
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
             ! Map variable to new grid
             outvar = missing_value 
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.FALSE.,missing_value=missing_value)
-
-            ! Get high resolution mask 
-            outmask = 1 
-            where(outvar == missing_value) outmask = 0 
+                          fill=.TRUE.,missing_value=missing_value)
 
             ! Fill any missing values over land
             call fill_weighted(outvar,missing_value=missing_value)
@@ -285,21 +281,17 @@ contains
             ! Also map mask 
             var_now = vars(2) 
 
-!             ! Define topo mask
-!             inp%mask = 1
-!             where(inp%var == missing_value) inp%mask = 0 
+            ! Define topo mask
+            inp%mask = 1
+            where(inp%var == missing_value) inp%mask = 0 
 
-!             call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
-!                           fill=.TRUE.,missing_value=missing_value)
+            call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
+                          fill=.TRUE.,missing_value=missing_value)
 
-            ! Write output mask to output file
-!             call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
-!                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
-        
-            call nc_write(filename,var_now%nm_out,outmask,dim1="xc",dim2="yc",dim3="z_ocn", &
+            Write output mask to output file
+            call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
-
-
+        
         end do 
 
         ! Write variable metadata
