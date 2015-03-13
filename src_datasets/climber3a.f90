@@ -288,7 +288,7 @@ contains
             call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value)
 
-            Write output mask to output file
+            ! Write output mask to output file
             call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
         
