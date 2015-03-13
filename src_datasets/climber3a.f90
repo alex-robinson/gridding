@@ -229,7 +229,7 @@ contains
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="deg C", &
                           long_name="Potential temperature (annual mean)",method="quadrant")
-        call def_var_info(vars( 1),trim(file_in),"mask","mask_ocn",units="1", &
+        call def_var_info(vars( 2),trim(file_in),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
         ! Initialize mapping
