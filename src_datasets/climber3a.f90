@@ -259,7 +259,8 @@ contains
             var_now = vars(1)
 
             ! Read in current variable
-            call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value)
+            call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
+                         start=[1,1,k],count=[nx,ny,1])
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
             ! Map variable to new grid
