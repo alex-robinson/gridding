@@ -177,7 +177,7 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: lon(:), lat(:), z_ocn(:)
+            double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:)
             double precision, allocatable :: var(:,:)
             integer,          allocatable :: mask(:,:)
         end type 
@@ -211,15 +211,17 @@ contains
         ny = nc_size(file_in,"YT_J")
         nz = nc_size(file_in,"ZT_K")
 
-        allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz))
+        allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz),inp%depth(nz))
         allocate(inp%var(nx,ny),inp%mask(nx,ny))
 
         call nc_read(file_in,"XT_I",inp%lon)
         call nc_read(file_in,"YT_J",inp%lat)
-        call nc_read(file_in,"ZT_K",inp%z_ocn)
+        call nc_read(file_in,"ZT_K",inp%depth)
 
-        ! Make z negative (rel to ocean surface)
-        inp%z_ocn = -inp%z_ocn 
+        ! Make z negative and reverse it (rel to ocean surface)
+        do k = 1, nz 
+            inp%z_ocn(k) = -inp%z_ocn(nz-k+1)
+        end do  
 
         ! Define CLIMBER3a points and input variable field
         call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
@@ -258,7 +260,7 @@ contains
 
             var_now = vars(1)
 
-            ! Read in current variable
+            ! Read in current variable (starting from last to reverse depth vector)
             call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
                          start=[1,1,k],count=[nx,ny,1])
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
@@ -267,6 +269,9 @@ contains
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value)
 
+            ! Fill any missing values over land
+            call fill_weighted(outvar,missing_value=missing_value)
+        
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
