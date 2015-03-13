@@ -39,6 +39,7 @@ contains
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
+        double precision, allocatable :: geoid(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
 
@@ -94,7 +95,8 @@ contains
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
-        
+        call grid_allocate(gTOPO,geoid)
+
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp(2501,3001))
 
@@ -116,11 +118,22 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
+        ! Load the geoid
+        call nc_read(var_now%filename,"Geoid",tmp,missing_value=missing_value)
+        call thin(geoid,tmp,by=thin_by)
+        write(*,*) "Bamber13 geoid range: ", minval(geoid), maxval(geoid)
+
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=missing_value)
             call thin(invar,tmp,by=thin_by)
+
+            ! Correct for the geoid, so that elevation is relative to present-day sea level
+            if (trim(var_now%nm_out) .eq. "zs" .or. var_now%nm_out .eq. "zb") then 
+                where( invar .ne. missing_value ) invar = invar - geoid 
+            end if 
+            
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if
@@ -139,7 +152,6 @@ contains
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!             call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
         end do 
