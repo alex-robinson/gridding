@@ -118,11 +118,14 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! Load the geoid
-        call nc_read(file_in,"Geoid",tmp,missing_value=missing_value)
-        call thin(geoid,tmp,by=thin_by)
-        write(*,*) "Bamber13 geoid range: ", minval(geoid), maxval(geoid)
-
+        ! ajr: this correction is not needed, it has already been accounted
+        !      for in the Bamber 2013 dataset
+!         ! Load the geoid
+!         call nc_read(file_in,"Geoid",tmp,missing_value=missing_value)
+!         call thin(geoid,tmp,by=thin_by)
+!         write(*,*) "Bamber13 geoid range: ", minval(geoid), maxval(geoid)
+        geoid = 0.d0 
+        
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
