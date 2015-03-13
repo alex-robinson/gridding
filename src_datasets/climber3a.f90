@@ -273,7 +273,10 @@ contains
 
             ! Fill any missing values over land
             call fill_weighted(outvar,missing_value=missing_value)
-        
+            
+            ! Clean up in case all values were missing (eg, for deep bathymetry levels for GRL domain)
+            where(abs(outvar) .gt. 1d10) outvar = 1.d0
+
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
