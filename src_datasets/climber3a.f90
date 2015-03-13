@@ -275,14 +275,14 @@ contains
             call fill_weighted(outvar,missing_value=missing_value)
             
             ! Clean up in case all values were missing (eg, for deep bathymetry levels for GRL domain)
-            where(abs(outvar) .gt. 1d10) outvar = 1.d0
+            where(outvar .ne. outvar) outvar = 1.d0
 
             if (k .eq. 1) then 
                 write(*,*) "range outvar: ", minval(outvar,mask=outvar.ne.missing_value), &
                                              maxval(outvar,mask=outvar.ne.missing_value)
                 stop
             end if 
-            
+
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
