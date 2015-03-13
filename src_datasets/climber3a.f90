@@ -38,7 +38,7 @@ contains
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: gTOPO
+        type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in_topo, file_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
@@ -74,7 +74,7 @@ contains
         call nc_read(file_in_topo,"YT_J",inp%lat)
         
         ! Define CLIMBER3a points and input variable field
-        call grid_init(gTOPO,name="climber3a-atmos",mtype="latlon",units="degrees", &
+        call grid_init(grid0,name="climber3a-atmos",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
         ! Define the variables to be mapped 
@@ -87,7 +87,7 @@ contains
                           long_name="Precipitation, annual mean",method="quadrant")
 
         ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -183,7 +183,7 @@ contains
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: gTOPO
+        type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, nz 
@@ -222,7 +222,7 @@ contains
         inp%z_ocn = -inp%z_ocn 
 
         ! Define CLIMBER3a points and input variable field
-        call grid_init(gTOPO,name="climber3a-ocn",mtype="latlon",units="degrees", &
+        call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
         ! Define the variables to be mapped 
@@ -233,7 +233,7 @@ contains
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
         ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -283,7 +283,7 @@ contains
 
             ! Write output mask to output file
             call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
-                          start=[1,1,k],count=[gTOPO%G%nx,gTOPO%G%ny,1])
+                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
         end do 
 
