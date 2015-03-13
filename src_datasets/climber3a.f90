@@ -269,7 +269,7 @@ contains
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
-                          start=[1,1,k],count=[gTOPO%G%nx,gTOPO%G%ny,1])
+                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
             ! Also map mask 
             var_now = vars(2) 
