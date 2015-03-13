@@ -6,6 +6,7 @@ program gentopo
 
     use Bamber13 
     use CERES 
+    use climber3a
     use ECMWF 
     use GeothermalHeatFlux
     use MAR 
