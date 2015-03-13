@@ -267,6 +267,7 @@ contains
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
             ! Map variable to new grid
+            outvar = missing_value 
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
                           fill=.FALSE.,missing_value=missing_value)
 
