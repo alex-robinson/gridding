@@ -102,7 +102,7 @@ contains
 
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-        call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+        call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
         call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
 !         ! Initialize mapping
@@ -162,7 +162,7 @@ contains
 !                           fill=.TRUE.,missing_value=missing_value)
             
             ! Map variable to new grid (two-step interpolation)
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant", &
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"radius", &
                            missing_value=missing_value)
             call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant", &
                            missing_value=missing_value)
