@@ -44,7 +44,7 @@ contains
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
 
-        type(map_class)  :: map 
+        type(map_class)  :: map
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), outzs(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -179,7 +179,7 @@ contains
 
         type inp_type 
             double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:)
-            double precision, allocatable :: var(:,:)
+            double precision, allocatable :: var(:,:), var0(:,:)
             integer,          allocatable :: mask(:,:)
         end type 
 
@@ -189,7 +189,7 @@ contains
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, nz 
 
-        type(map_class)  :: map 
+        type(map_class)  :: map, map00
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -213,7 +213,7 @@ contains
         nz = nc_size(file_in,"ZT_K")
 
         allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz),inp%depth(nz))
-        allocate(inp%var(nx,ny),inp%mask(nx,ny))
+        allocate(inp%var(nx,ny),inp%var0(nx,ny),inp%mask(nx,ny))
 
         call nc_read(file_in,"XT_I",inp%lon)
         call nc_read(file_in,"YT_J",inp%lat)
@@ -237,6 +237,9 @@ contains
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Also make a map to fill in points on original grid 
+        call map_init(map00,grid0,grid0,max_neighbors=10,lat_lim=5.d0,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -262,9 +265,13 @@ contains
             var_now = vars(1)
 
             ! Read in current variable (starting from last to reverse depth vector)
-            call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
+            call nc_read(var_now%filename,var_now%nm_in,inp%var0,missing_value=missing_value, &
                          start=[1,1,nz-k+1],count=[nx,ny,1])
-            where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
+            where(abs(inp%var0) .ge. 1d10) inp%var0 = missing_value 
+
+            ! Perform initial interpolation to clear up missing points 
+            call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"quadrant", &
+                           mask_pack=inp%var0.eq.missing_value)
 
             ! Map variable to new grid
             outvar = missing_value 
