@@ -128,9 +128,9 @@ contains
 !                           fill=.TRUE.,missing_value=missing_value)
         
         ! Map zs to new grid (two-step interpolation)
-        call map_field(map0hi,var_now%nm_in,inp%zs,inp%var_hi,inp%mask_hi,"quadrant", &
+        call map_field(map0hi,var_now%nm_in,inp%zs,inp%var_hi,inp%mask_hi,"nn", &
                        missing_value=missing_value)
-        call map_field(maphi, var_now%nm_in,inp%var_hi,outzs,outmask,"quadrant", &
+        call map_field(maphi, var_now%nm_in,inp%var_hi,outzs,outmask,"nn", &
                        missing_value=missing_value)
 
         ! Write output elevation to output file
@@ -162,7 +162,7 @@ contains
 !                           fill=.TRUE.,missing_value=missing_value)
             
             ! Map variable to new grid (two-step interpolation)
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"radius", &
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant", &
                            missing_value=missing_value)
             call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant", &
                            missing_value=missing_value)
