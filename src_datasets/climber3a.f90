@@ -36,15 +36,17 @@ contains
             double precision, allocatable :: zs(:,:) 
             double precision :: lapse_ann    = 8.0d0 
             double precision :: lapse_summer = 6.5d0 
+            double precision, allocatable :: var_hi(:,:)
+            integer,          allocatable :: mask_hi(:,:)
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: grid0
-        character(len=256) :: fldr_in, file_in_topo, file_in 
+        type(grid_class)   :: grid0, grid0hi
+        character(len=256) :: fldr_in, file_in_topo, file_in
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
 
-        type(map_class)  :: map
+        type(map_class)  :: map, map0hi, maphi
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), outzs(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -78,6 +80,14 @@ contains
         call grid_init(grid0,name="climber3a-atmos",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
+        ! Define CLIMBER3a hi resolution intermediate interpolation grid
+        call grid_init(grid0hi,name="climber3a-2deg",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
+!         call grid_init(grid0hi,name="climber3a-1deg",mtype="latlon",units="degrees", &
+!                          lon180=.TRUE.,x0=-180.d0,dx=1.d0,nx=361,y0=-90.d0,dy=1.d0,ny=181)
+        call grid_allocate(grid0hi,inp%var_hi)
+        call grid_allocate(grid0hi,inp%mask_hi)
+        
         ! Define the variables to be mapped 
         allocate(vars(3))
         call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="Kelvin", &
@@ -87,14 +97,20 @@ contains
         call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
                           long_name="Precipitation, annual mean",method="quadrant")
 
-        ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
         call grid_allocate(grid,outzs) 
 
+        ! Initialize mappings
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+        call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+!         ! Initialize mapping
+!         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
@@ -109,9 +125,15 @@ contains
         call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
         write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
 
-        ! Map zs to new grid too
-        call map_field(map,"zs",inp%zs,outzs,outmask,"quadrant", &
-                          fill=.TRUE.,missing_value=missing_value)
+!         ! Map zs to new grid too
+!         call map_field(map,"zs",inp%zs,outzs,outmask,"quadrant", &
+!                           fill=.TRUE.,missing_value=missing_value)
+        
+        ! Map zs to new grid (two-step interpolation)
+        call map_field(map0hi,var_now%nm_in,inp%zs,inp%var_hi,inp%mask_hi,"quadrant", &
+                       missing_value=missing_value)
+        call map_field(maphi, var_now%nm_in,inp%var_hi,outzs,outmask,"quadrant", &
+                       missing_value=missing_value)
 
         ! Write output elevation to output file
         call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
@@ -137,9 +159,15 @@ contains
             if (trim(var_now%nm_out) .eq. "t2m_ann") &
                 inp%var = inp%var + inp%lapse_ann*inp%zs 
 
-            ! Map variable to new grid
-            call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value)
+!             ! Map variable to new grid
+!             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
+!                           fill=.TRUE.,missing_value=missing_value)
+            
+            ! Map variable to new grid (two-step interpolation)
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant", &
+                           missing_value=missing_value)
+            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant", &
+                           missing_value=missing_value)
 
             ! Re-scale to near-surface temp for writing to file
             if (trim(var_now%nm_out) .eq. "t2m_jja") &
@@ -232,9 +260,9 @@ contains
         call grid_allocate(grid0,inp%mask)
 
         ! Define CLIMBER3a hi resolution intermediate interpolation grid
-        call grid_init(grid0hi,name="climber3a-ocn-2deg",mtype="latlon",units="degrees", &
+        call grid_init(grid0hi,name="climber3a-2deg",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
-!         call grid_init(grid0hi,name="climber3a-ocn-1deg",mtype="latlon",units="degrees", &
+!         call grid_init(grid0hi,name="climber3a-1deg",mtype="latlon",units="degrees", &
 !                          lon180=.TRUE.,x0=-180.d0,dx=1.d0,nx=361,y0=-90.d0,dy=1.d0,ny=181)
         call grid_allocate(grid0hi,inp%var_hi)
         call grid_allocate(grid0hi,inp%mask_hi)
@@ -281,8 +309,10 @@ contains
 
             ! Perform two-step interpolation to higher resolution input grid,
             ! then to desired output grid 
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant")
-            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant")
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant", &
+                           missing_value=missing_value)
+            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant", &
+                           missing_value=missing_value)
 
             ! Fill any additional missing values
             call fill_weighted(outvar,missing_value=missing_value)
