@@ -270,7 +270,7 @@ contains
             where(abs(inp%var0) .ge. 1d10) inp%var0 = missing_value 
 
             ! Perform initial interpolation to clear up missing points 
-            call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"quadrant", &
+            call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
                            mask_pack=inp%var0.eq.missing_value)
 
             ! Map variable to new grid
@@ -295,7 +295,7 @@ contains
 
             ! Define topo mask
             inp%mask = 1
-            where(inp%var == missing_value) inp%mask = 0 
+            where(inp%var0 == missing_value) inp%mask = 0 
 
             call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value)
