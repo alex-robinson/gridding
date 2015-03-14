@@ -305,14 +305,15 @@ contains
 
             ! Perform two-step interpolation to higher resolution input grid,
             ! then to desired output grid 
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant", &
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
                            missing_value=missing_value)
-            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant", &
+            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
                            missing_value=missing_value)
 
             ! Fill any additional missing values
-            call fill_weighted(outvar,missing_value=missing_value)
-            
+!             call fill_weighted(outvar,missing_value=missing_value)
+            call fill_nearest(outvar,missing_value=missing_value)
+
             ! Clean up in case all values were missing and
             ! infinity values result from fill_weighted routine
             ! (eg, for deep bathymetry levels for GRL domain)
