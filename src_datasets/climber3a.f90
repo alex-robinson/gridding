@@ -184,7 +184,7 @@ contains
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: grid0
+        type(grid_class)   :: grid0, grid0b
         character(len=256) :: fldr_in, file_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, nz 
@@ -233,7 +233,7 @@ contains
                          y0=-90,dx=2.d0,nx=91)
 
         stop 
-        
+
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="deg C", &
