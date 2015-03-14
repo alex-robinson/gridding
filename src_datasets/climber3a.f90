@@ -269,7 +269,7 @@ contains
                          start=[1,1,nz-k+1],count=[nx,ny,1])
             where(abs(inp%var0) .ge. 1d10) inp%var0 = missing_value 
 
-            ! Perform initial interpolation to clear up missing points 
+            ! Perform initial interpolation to clear up missing points from original grid
             call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
                            mask_pack=inp%var0.eq.missing_value)
 
@@ -284,7 +284,7 @@ contains
             ! Clean up in case all values were missing and
             ! infinity values result from fill_weighted routine
             ! (eg, for deep bathymetry levels for GRL domain)
-            where(outvar .ne. outvar) outvar = 1.d0
+            where(outvar .ne. outvar) outvar = -1.4d0
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
