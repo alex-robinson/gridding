@@ -230,8 +230,10 @@ contains
         call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
+!         call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
+!                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
         call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
+                         lon180=.TRUE.,x0=-180.d0,dx=1.d0,nx=361,y0=-90.d0,dy=1.d0,ny=181)
         call grid_allocate(grid0b,inp%var_hi)
         call grid_allocate(grid0b,inp%mask_hi)
         
@@ -244,11 +246,11 @@ contains
 
         ! Also make a map to fill in points on original grid 
 !         call map_init(map00,grid0,grid0, max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
-        call map_init(map0b,grid0,grid0b,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+        call map_init(map0b,grid0,grid0b,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-        call map_init(map_hi,grid0b,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map_hi,grid0b,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
