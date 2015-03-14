@@ -229,8 +229,7 @@ contains
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
         call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181, &
-                         y0=-90,dy=2.d0,ny=91)
+                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
 
         stop 
 
