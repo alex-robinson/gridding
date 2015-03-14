@@ -6,13 +6,15 @@ program gentopo
     
     use bedmap2
     use CERES
+    use climber3a 
     use ECMWF 
+    use GeothermalHeatFlux 
     use NasaBasins 
     use RACMO2 
     use Rignot13_BasalMelt  
     use sediments 
-    use GeothermalHeatFlux 
-    use climber3a 
+    use topo_reconstructions 
+    
 
     implicit none
 
@@ -86,14 +88,30 @@ program gentopo
 !     call nasaBasins_to_grid(outfldr,grid,"Antarctica")
     
 !     call sedLaske_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
-!     call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
+    call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
     call ghfDavies_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
     call ghfShapiro_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
     
     ! CLIMBER-3alpha
-!     call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong",max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak",max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_to_grid(outfldr,"Montoya2008",grid,domain="present",max_neighbors=10,lat_lim=5.d0)
+    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
+                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
+                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
+                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+    
+    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
+                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
+                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
+                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+    
+    ! Paleo topography 
+    call ICE6GC_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+    call ICE5G_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 
     write(*,*)
     write(*,*) "Regridding program finished."
