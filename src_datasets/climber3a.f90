@@ -179,19 +179,19 @@ contains
 
         type inp_type 
             double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:)
-            double precision, allocatable :: var(:,:), var0(:,:)
+            double precision, allocatable :: var(:,:)
             integer,          allocatable :: mask(:,:)
             double precision, allocatable :: var_hi(:,:)
             integer,          allocatable :: mask_hi(:,:)
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: grid0, grid0b
+        type(grid_class)   :: grid0, grid0hi
         character(len=256) :: fldr_in, file_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, nz 
 
-        type(map_class)  :: map, map00, map0b, map_hi
+        type(map_class)  :: map, map0hi, maphi
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -215,7 +215,6 @@ contains
         nz = nc_size(file_in,"ZT_K")
 
         allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz),inp%depth(nz))
-        allocate(inp%var(nx,ny),inp%var0(nx,ny),inp%mask(nx,ny))
 
         call nc_read(file_in,"XT_I",inp%lon)
         call nc_read(file_in,"YT_J",inp%lat)
@@ -229,11 +228,14 @@ contains
         ! Define CLIMBER3a points and input variable field
         call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
+        call grid_allocate(grid0,inp%var)
+        call grid_allocate(grid0,inp%mask)
 
-        call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
+        ! Define CLIMBER3a hi resolution intermediate interpolation grid
+        call grid_init(grid0hi,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
-        call grid_allocate(grid0b,inp%var_hi)
-        call grid_allocate(grid0b,inp%mask_hi)
+        call grid_allocate(grid0hi,inp%var_hi)
+        call grid_allocate(grid0hi,inp%mask_hi)
         
         ! Define the variables to be mapped 
         allocate(vars(2))
@@ -242,12 +244,10 @@ contains
         call def_var_info(vars( 2),trim(file_in),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
-        ! Also make a map to fill in points on original grid 
-        call map_init(map0b,grid0,grid0b,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
-
-        ! Initialize mapping
+        ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-        call map_init(map_hi,grid0b,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
+        call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+        call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -273,26 +273,16 @@ contains
             var_now = vars(1)
 
             ! Read in current variable (starting from last to reverse depth vector)
-            call nc_read(var_now%filename,var_now%nm_in,inp%var0,missing_value=missing_value, &
+            call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
                          start=[1,1,nz-k+1],count=[nx,ny,1])
-            where(abs(inp%var0) .ge. 1d10) inp%var0 = missing_value 
+            where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
-            ! Perform initial interpolation to clear up missing points from original grid
-!             call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
-!                            mask_pack=inp%var0.eq.missing_value)
-!             inp%var = inp%var0 
-            
-!             ! Map variable to new grid
-!             outvar = missing_value 
-!             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-!                           fill=.TRUE.,missing_value=missing_value)
-    
             ! Perform two-step interpolation to higher resolution input grid,
             ! then to desired output grid 
-            call map_field(map0b,var_now%nm_in,inp%var0,inp%var_hi,inp%mask_hi,"quadrant")
-            call map_field(map_hi,var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant")
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant")
+            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant")
 
-            ! Fill any missing values over land
+            ! Fill any additional missing values
             call fill_weighted(outvar,missing_value=missing_value)
             
             ! Clean up in case all values were missing and
@@ -309,7 +299,7 @@ contains
 
             ! Define topo mask
             inp%mask = 1
-            where(inp%var0 == missing_value) inp%mask = 0 
+            where(inp%var == missing_value) inp%mask = 0 
 
             call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value)
