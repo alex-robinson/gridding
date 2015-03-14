@@ -181,6 +181,8 @@ contains
             double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:)
             double precision, allocatable :: var(:,:), var0(:,:)
             integer,          allocatable :: mask(:,:)
+            double precision, allocatable :: var_hi(:,:)
+            integer,          allocatable :: mask_hi(:,:)
         end type 
 
         type(inp_type)     :: inp
@@ -189,7 +191,7 @@ contains
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, nz 
 
-        type(map_class)  :: map, map00
+        type(map_class)  :: map, map00, map0b, map_hi
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -230,9 +232,9 @@ contains
 
         call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
-
-        stop 
-
+        call grid_allocate(grid0b,inp%var_hi)
+        call grid_allocate(grid0b,inp%mask_hi)
+        
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="deg C", &
@@ -240,11 +242,13 @@ contains
         call def_var_info(vars( 2),trim(file_in),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
+        ! Also make a map to fill in points on original grid 
+!         call map_init(map00,grid0,grid0, max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+        call map_init(map0b,grid0,grid0b,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
-        ! Also make a map to fill in points on original grid 
-        call map_init(map00,grid0,grid0,max_neighbors=10,lat_lim=5.d0,fldr="maps",load=.TRUE.)
+        call map_init(map_hi,grid0b,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -275,14 +279,19 @@ contains
             where(abs(inp%var0) .ge. 1d10) inp%var0 = missing_value 
 
             ! Perform initial interpolation to clear up missing points from original grid
-            call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
-                           mask_pack=inp%var0.eq.missing_value)
+!             call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
+!                            mask_pack=inp%var0.eq.missing_value)
 !             inp%var = inp%var0 
-
-            ! Map variable to new grid
-            outvar = missing_value 
-            call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value)
+            
+!             ! Map variable to new grid
+!             outvar = missing_value 
+!             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
+!                           fill=.TRUE.,missing_value=missing_value)
+    
+            ! Perform two-step interpolation to higher resolution input grid,
+            ! then to desired output grid 
+            call map_field(map0b,var_now%nm_in,inp%var0,inp%var_hi,inp%mask_hi,"radius")
+            call map_field(map_hi,var_now%nm_in,inp%var_hi,outvar,outmask,"radius")
 
             ! Fill any missing values over land
             call fill_weighted(outvar,missing_value=missing_value)
@@ -290,7 +299,7 @@ contains
             ! Clean up in case all values were missing and
             ! infinity values result from fill_weighted routine
             ! (eg, for deep bathymetry levels for GRL domain)
-            where(outvar .ne. outvar) outvar = -1.4d0
+            where(outvar .ne. outvar) outvar = 1.d0
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
