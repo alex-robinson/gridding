@@ -232,10 +232,10 @@ contains
         call grid_allocate(grid0,inp%mask)
 
         ! Define CLIMBER3a hi resolution intermediate interpolation grid
-!         call grid_init(grid0hi,name="climber3a-ocn-2deg",mtype="latlon",units="degrees", &
-!                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
-        call grid_init(grid0hi,name="climber3a-ocn-1deg",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x0=-180.d0,dx=1.d0,nx=361,y0=-90.d0,dy=1.d0,ny=181)
+        call grid_init(grid0hi,name="climber3a-ocn-2deg",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
+!         call grid_init(grid0hi,name="climber3a-ocn-1deg",mtype="latlon",units="degrees", &
+!                          lon180=.TRUE.,x0=-180.d0,dx=1.d0,nx=361,y0=-90.d0,dy=1.d0,ny=181)
         call grid_allocate(grid0hi,inp%var_hi)
         call grid_allocate(grid0hi,inp%mask_hi)
         
