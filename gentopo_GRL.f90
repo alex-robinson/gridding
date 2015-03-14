@@ -12,7 +12,6 @@ program gentopo
     use MAR 
     use NasaBasins
     use sediments 
-     
     use topo_reconstructions 
 
     implicit none
@@ -76,7 +75,7 @@ program gentopo
     !
     ! =========================================================
 
-    call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
+!     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
@@ -112,6 +111,10 @@ program gentopo
 !     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
 !                                path_in=path,max_neighbors=10,lat_lim=5.d0)
     
+    ! Paleo topography 
+    call ICE6GC_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+    call ICE5G_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+
 
     write(*,*)
     write(*,*) "Regridding program finished."
