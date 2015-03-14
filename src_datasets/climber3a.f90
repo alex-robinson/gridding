@@ -162,9 +162,9 @@ contains
 !                           fill=.TRUE.,missing_value=missing_value)
             
             ! Map variable to new grid (two-step interpolation)
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"quadrant", &
+            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
                            missing_value=missing_value)
-            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant", &
+            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
                            missing_value=missing_value)
 
             ! Re-scale to near-surface temp for writing to file
