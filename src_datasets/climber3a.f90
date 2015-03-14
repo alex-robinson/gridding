@@ -228,6 +228,12 @@ contains
         call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
+        call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181, &
+                         y0=-90,dx=2.d0,nx=91)
+
+        stop 
+        
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="deg C", &
@@ -273,7 +279,7 @@ contains
             call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
                            mask_pack=inp%var0.eq.missing_value)
 !             inp%var = inp%var0 
-            
+
             ! Map variable to new grid
             outvar = missing_value 
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
