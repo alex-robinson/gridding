@@ -270,9 +270,9 @@ contains
             where(abs(inp%var0) .ge. 1d10) inp%var0 = missing_value 
 
             ! Perform initial interpolation to clear up missing points from original grid
-!             call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
-!                            mask_pack=inp%var0.eq.missing_value)
-            inp%var = inp%var0 
+            call map_field(map00,var_now%nm_in,inp%var0,inp%var,inp%mask,"radius", &
+                           mask_pack=inp%var0.eq.missing_value)
+!             inp%var = inp%var0 
             
             ! Map variable to new grid
             outvar = missing_value 
