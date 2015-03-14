@@ -230,10 +230,8 @@ contains
         call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
-!         call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
-!                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
         call grid_init(grid0b,name="climber3a-ocn-hi",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x0=-180.d0,dx=1.d0,nx=361,y0=-90.d0,dy=1.d0,ny=181)
+                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
         call grid_allocate(grid0b,inp%var_hi)
         call grid_allocate(grid0b,inp%mask_hi)
         
@@ -245,7 +243,6 @@ contains
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
         ! Also make a map to fill in points on original grid 
-!         call map_init(map00,grid0,grid0, max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
         call map_init(map0b,grid0,grid0b,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
 
         ! Initialize mapping
@@ -292,8 +289,8 @@ contains
     
             ! Perform two-step interpolation to higher resolution input grid,
             ! then to desired output grid 
-            call map_field(map0b,var_now%nm_in,inp%var0,inp%var_hi,inp%mask_hi,"radius")
-            call map_field(map_hi,var_now%nm_in,inp%var_hi,outvar,outmask,"radius")
+            call map_field(map0b,var_now%nm_in,inp%var0,inp%var_hi,inp%mask_hi,"quadrant")
+            call map_field(map_hi,var_now%nm_in,inp%var_hi,outvar,outmask,"quadrant")
 
             ! Fill any missing values over land
             call fill_weighted(outvar,missing_value=missing_value)
