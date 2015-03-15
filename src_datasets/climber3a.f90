@@ -3,6 +3,7 @@ module climber3a
     use gridding_datasets
     use coordinates 
     use interp2D 
+    use gaussian_filter
     use ncio 
     
     implicit none 
@@ -49,6 +50,7 @@ contains
         type(map_class)  :: map, map0hi, maphi
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), outzs(:,:)
+        real(4), allocatable :: outvar1(:,:)
         integer, allocatable          :: outmask(:,:)
 
         integer :: q, k, m, i, l, n_var 
@@ -88,9 +90,9 @@ contains
         
         ! Define the variables to be mapped 
         allocate(vars(3))
-        call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="Kelvin", &
+        call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="degrees Celcius", &
                           long_name="Near-surface temperature (2-m), annual mean",method="quadrant")
-        call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_jja",units="Kelvin", &
+        call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_jja",units="degrees Celcius", &
                           long_name="Near-surface temperature (2-m), summer mean",method="quadrant")
         call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
                           long_name="Precipitation, annual mean",method="quadrant")
@@ -99,7 +101,8 @@ contains
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
         call grid_allocate(grid,outzs) 
-
+        call grid_allocate(grid,outvar1)
+        
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
         call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
@@ -127,20 +130,26 @@ contains
 !         call map_field(map,"zs",inp%zs,outzs,outmask,"quadrant", &
 !                           fill=.TRUE.,missing_value=missing_value)
         
-        ! Map zs to new grid (two-step interpolation)
-        call map_field(map0hi,var_now%nm_in,inp%zs,inp%var_hi,inp%mask_hi,"nn", &
-                       missing_value=missing_value)
-        call map_field(maphi, var_now%nm_in,inp%var_hi,outzs,outmask,"nn", &
-                       missing_value=missing_value)
-
+!         ! Map zs to new grid (two-step interpolation)
+!         call map_field(map0hi,var_now%nm_in,inp%zs,inp%var_hi,inp%mask_hi,"nn", &
+!                        missing_value=missing_value)
+!         call map_field(maphi, var_now%nm_in,inp%var_hi,outzs,outmask,"nn", &
+!                        missing_value=missing_value)
+        
+        ! Map zs to new grid (two-step, nn-gauss)
+        call map_field(map,"zs",inp%zs,outzs,outmask,"nn", &
+                          fill=.TRUE.,missing_value=missing_value)
+        call filter_gaussian(real(outzs),outvar1,sigma=240.0,dx=real(grid%G%dx))
         ! Write output elevation to output file
-        call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
+        call nc_write(filename,"zs",outvar1,dim1="xc",dim2="yc")
 
         ! Write variable metadata
         call nc_write_attr(filename,"zs","units","m")
         call nc_write_attr(filename,"zs","long_name","Surface elevation")
         call nc_write_attr(filename,"zs","coordinates","lat2D lon2D")
-            
+        
+        stop 
+
         ! ## Map climatological gridded variables ##
         
         ! Loop over variables
@@ -265,7 +274,7 @@ contains
         
         ! Define the variables to be mapped 
         allocate(vars(2))
-        call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="deg C", &
+        call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="degrees Celcius", &
                           long_name="Potential temperature (annual mean)",method="quadrant")
         call def_var_info(vars( 2),trim(file_in),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
