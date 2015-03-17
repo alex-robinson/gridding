@@ -119,7 +119,7 @@ contains
         call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
         write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
         where(inp%zs .le. 1.d0) inp%zs = 0.d0  ! Clean-up climber ocean points 
-            
+
         ! Map zs to new grid
         call map_field(map,"zs",inp%zs,outzs,outmask,"nng", &
                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
@@ -130,15 +130,14 @@ contains
         call nc_write_attr(filename,"zs","long_name","Surface elevation")
         call nc_write_attr(filename,"zs","coordinates","lat2D lon2D")
         
-        ! Also generate a land mask 
-        inp%var = inp%zs 
-        inp%zs  = 0.d0 
-        where(inp%var .gt. 1.d0) inp%zs = 1.d0 
+        ! Also generate a land mask
+        inp%var = 0.d0
+        where(inp%zs .gt. 1.d0) inp%var = 1.d0 
 
         ! Map mask to new grid
-        call map_field(map,"mask_land",inp%zs,outzs,outmask,"nn", &
+        call map_field(map,"mask_land",inp%var,outvar,outmask,"nn", &
                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
-        call nc_write(filename,"mask_land",nint(outzs),dim1="xc",dim2="yc")
+        call nc_write(filename,"mask_land",nint(outvar),dim1="xc",dim2="yc")
 
         ! Write variable metadata
         call nc_write_attr(filename,"mask_land","units","1")
