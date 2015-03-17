@@ -188,7 +188,7 @@ contains
 
     end subroutine climber3a_atm_to_grid
 
-    subroutine climber3a_ocn_to_grid(outfldr,subfldr,grid,domain,path_in,max_neighbors,lat_lim)
+    subroutine climber3a_ocn_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -200,7 +200,7 @@ contains
         character(len=*) :: domain, outfldr, subfldr, path_in 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim 
+        double precision :: sigma, lat_lim 
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -258,23 +258,23 @@ contains
         call grid_allocate(grid0,inp%var)
         call grid_allocate(grid0,inp%mask)
 
-        ! Define CLIMBER3a hi resolution intermediate interpolation grid
-        call grid_init(grid0hi,name="climber3a-2deg",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
-        call grid_allocate(grid0hi,inp%var_hi)
-        call grid_allocate(grid0hi,inp%mask_hi)
+!         ! Define CLIMBER3a hi resolution intermediate interpolation grid
+!         call grid_init(grid0hi,name="climber3a-2deg",mtype="latlon",units="degrees", &
+!                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
+!         call grid_allocate(grid0hi,inp%var_hi)
+!         call grid_allocate(grid0hi,inp%mask_hi)
         
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="degrees Celcius", &
-                          long_name="Potential temperature (annual mean)",method="quadrant")
+                          long_name="Potential temperature (annual mean)",method="nng")
         call def_var_info(vars( 2),trim(file_in),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-        call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
-        call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+!         call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
+!         call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -304,16 +304,19 @@ contains
                          start=[1,1,nz-k+1],count=[nx,ny,1])
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
-            ! Perform two-step interpolation to higher resolution input grid,
-            ! then to desired output grid 
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
+            call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
                            missing_value=missing_value)
-            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
-                           missing_value=missing_value)
+
+!             ! Perform two-step interpolation to higher resolution input grid,
+!             ! then to desired output grid 
+!             call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
+!                            missing_value=missing_value)
+!             call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
+!                            missing_value=missing_value)
 
             ! Fill any additional missing values
 !             call fill_weighted(outvar,missing_value=missing_value)
-            call fill_nearest(outvar,missing_value=missing_value)
+!             call fill_nearest(outvar,missing_value=missing_value)
 
             ! Clean up in case all values were missing and
             ! infinity values result from fill_weighted routine
