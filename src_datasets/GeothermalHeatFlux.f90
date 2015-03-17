@@ -376,8 +376,8 @@ contains
         ! ## MAP FIELDS ##
 
         ! ## ghf_mean ##
-        call map_field(map,"ghf",inp%mean,outvar,outmask,"quadrant", &
-                       fill=.TRUE.,missing_value=missing_value)
+        call map_field(map,"ghf",inp%mean,outvar,outmask,"nng", &
+                       fill=.TRUE.,sigma=50.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
