@@ -293,9 +293,10 @@ contains
             call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
                            fill=.TRUE.,missing_value=missing_value,sigma=sigma)
 
-            ! Clean up infinite values 
+            ! Clean up infinite values or all missing layers
             ! (eg, for deep bathymetry levels for GRL domain)
-            where(outvar .ne. outvar) outvar = 1.d0
+            where(outvar .ne. outvar .or. &
+                  count(outvar.eq.missing_value) .eq. grid%npts) outvar = 1.d0
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &

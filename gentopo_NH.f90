@@ -70,17 +70,17 @@ program gentopo
 !     ! CLIMBER-3alpha
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
 !     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
-!                                path_in=path,max_neighbors=10,lat_lim=5.d0)
+!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
 !     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
-!                                path_in=path,max_neighbors=10,lat_lim=5.d0)
+!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
 !     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
-!                                path_in=path,max_neighbors=10,lat_lim=5.d0)
+!                                path_in=path,sigma=80.d0,max_neighbors=10,lat_lim=5.d0)
 !     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
-!                                path_in=path,max_neighbors=10,lat_lim=5.d0)
+!                                path_in=path,sigma=80.d0,max_neighbors=10,lat_lim=5.d0)
 !     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
 !                                path_in=path,sigma=80.d0,max_neighbors=10,lat_lim=5.d0)
     
