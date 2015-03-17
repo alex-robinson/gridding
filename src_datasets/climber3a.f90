@@ -305,7 +305,7 @@ contains
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
             call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
-                           missing_value=missing_value,sigma=sigma)
+                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
 
 !             ! Perform two-step interpolation to higher resolution input grid,
 !             ! then to desired output grid 
