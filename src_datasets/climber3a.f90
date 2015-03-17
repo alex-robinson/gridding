@@ -119,22 +119,9 @@ contains
         call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
         write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
 
-!         ! Map zs to new grid too
-!         call map_field(map,"zs",inp%zs,outzs,outmask,"quadrant", &
-!                           fill=.TRUE.,missing_value=missing_value)
-        
-!         ! Map zs to new grid (two-step interpolation)
-!         call map_field(map0hi,var_now%nm_in,inp%zs,inp%var_hi,inp%mask_hi,"nn", &
-!                        missing_value=missing_value)
-!         call map_field(maphi, var_now%nm_in,inp%var_hi,outzs,outmask,"nn", &
-!                        missing_value=missing_value)
-        
-        ! Map zs to new grid (two-step, nn-gauss)
+        ! Map zs to new grid
         call map_field(map,"zs",inp%zs,outzs,outmask,"nng", &
                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
-!         call filter_gaussian(real(outzs),outvar1,sigma=240.0,dx=real(grid%G%dx))
-        ! Write output elevation to output file
-!         call nc_write(filename,"zs",outvar1,dim1="xc",dim2="yc")
         call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
 
         ! Write variable metadata
@@ -142,6 +129,21 @@ contains
         call nc_write_attr(filename,"zs","long_name","Surface elevation")
         call nc_write_attr(filename,"zs","coordinates","lat2D lon2D")
         
+        ! Also generate a land mask 
+        inp%var = inp%zs 
+        inp%zs  = 0.d0 
+        where(inp%var .gt. 1.d0) inp%zs = 1.d0 
+
+        ! Map mask to new grid
+        call map_field(map,"mask_land",inp%zs,outzs,outmask,"nn", &
+                          fill=.TRUE.,missing_value=missing_value,sigma=sigma)
+        call nc_write(filename,"mask_land",nint(outzs),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"mask_land","units","1")
+        call nc_write_attr(filename,"mask_land","long_name","Land mask (land=1)")
+        call nc_write_attr(filename,"mask_land","coordinates","lat2D lon2D")
+
         ! ## Map climatological gridded variables ##
         
         ! Loop over variables
@@ -162,12 +164,6 @@ contains
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
             
-!             ! Map variable to new grid (two-step interpolation)
-!             call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
-!                            missing_value=missing_value)
-!             call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
-!                            missing_value=missing_value)
-
             ! Re-scale to near-surface temp for writing to file
             if (trim(var_now%nm_out) .eq. "t2m_sum") &
                 outvar = outvar - inp%lapse_summer*outzs 
@@ -208,17 +204,15 @@ contains
             double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:)
             double precision, allocatable :: var(:,:)
             integer,          allocatable :: mask(:,:)
-            double precision, allocatable :: var_hi(:,:)
-            integer,          allocatable :: mask_hi(:,:)
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: grid0, grid0hi
+        type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, nz 
 
-        type(map_class)  :: map, map0hi, maphi
+        type(map_class)  :: map
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -258,12 +252,6 @@ contains
         call grid_allocate(grid0,inp%var)
         call grid_allocate(grid0,inp%mask)
 
-!         ! Define CLIMBER3a hi resolution intermediate interpolation grid
-!         call grid_init(grid0hi,name="climber3a-2deg",mtype="latlon",units="degrees", &
-!                          lon180=.TRUE.,x0=-180.d0,dx=2.d0,nx=181,y0=-90.d0,dy=2.d0,ny=91)
-!         call grid_allocate(grid0hi,inp%var_hi)
-!         call grid_allocate(grid0hi,inp%mask_hi)
-        
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="degrees Celcius", &
@@ -273,8 +261,6 @@ contains
 
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-!         call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.TRUE.)
-!         call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -307,19 +293,7 @@ contains
             call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
                            fill=.TRUE.,missing_value=missing_value,sigma=sigma)
 
-!             ! Perform two-step interpolation to higher resolution input grid,
-!             ! then to desired output grid 
-!             call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
-!                            missing_value=missing_value)
-!             call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
-!                            missing_value=missing_value)
-
-            ! Fill any additional missing values
-!             call fill_weighted(outvar,missing_value=missing_value)
-!             call fill_nearest(outvar,missing_value=missing_value)
-
-            ! Clean up in case all values were missing and
-            ! infinity values result from fill_weighted routine
+            ! Clean up infinite values 
             ! (eg, for deep bathymetry levels for GRL domain)
             where(outvar .ne. outvar) outvar = 1.d0
 
