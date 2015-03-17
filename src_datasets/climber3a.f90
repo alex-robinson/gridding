@@ -135,14 +135,13 @@ contains
 !         call filter_gaussian(real(outzs),outvar1,sigma=240.0,dx=real(grid%G%dx))
         ! Write output elevation to output file
 !         call nc_write(filename,"zs",outvar1,dim1="xc",dim2="yc")
+        call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
 
         ! Write variable metadata
         call nc_write_attr(filename,"zs","units","m")
         call nc_write_attr(filename,"zs","long_name","Surface elevation")
         call nc_write_attr(filename,"zs","coordinates","lat2D lon2D")
         
-        stop 
-
         ! ## Map climatological gridded variables ##
         
         ! Loop over variables
