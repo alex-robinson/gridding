@@ -16,7 +16,7 @@ module climber3a
 
 contains 
 
-    subroutine climber3a_atm_to_grid(outfldr,subfldr,grid,domain,path_in,max_neighbors,lat_lim)
+    subroutine climber3a_atm_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -28,7 +28,7 @@ contains
         character(len=*) :: domain, outfldr, subfldr, path_in 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim 
+        double precision :: sigma, lat_lim 
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -37,20 +37,17 @@ contains
             double precision, allocatable :: zs(:,:) 
             double precision :: lapse_ann    = 8.0d0 
             double precision :: lapse_summer = 6.5d0 
-            double precision, allocatable :: var_hi(:,:)
-            integer,          allocatable :: mask_hi(:,:)
         end type 
 
         type(inp_type)     :: inp
-        type(grid_class)   :: grid0, grid0hi
+        type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in_topo, file_in
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
 
-        type(map_class)  :: map, map0hi, maphi
+        type(map_class)  :: map
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), outzs(:,:)
-        real(4), allocatable :: outvar1(:,:)
         integer, allocatable          :: outmask(:,:)
 
         integer :: q, k, m, i, l, n_var 
@@ -82,36 +79,32 @@ contains
         call grid_init(grid0,name="climber3a-atmos",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
-        ! Define CLIMBER3a hi resolution intermediate interpolation grid
-        call grid_init(grid0hi,name="climber3a-5deg",mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x0=-180.d0,dx=5.d0,nx=73,y0=-90.d0,dy=5.d0,ny=37)
-        call grid_allocate(grid0hi,inp%var_hi)
-        call grid_allocate(grid0hi,inp%mask_hi)
-        
+!         ! Define CLIMBER3a hi resolution intermediate interpolation grid
+!         call grid_init(grid0hi,name="climber3a-5deg",mtype="latlon",units="degrees", &
+!                          lon180=.TRUE.,x0=-180.d0,dx=5.d0,nx=73,y0=-90.d0,dy=5.d0,ny=37)
+
         ! Define the variables to be mapped 
         allocate(vars(3))
         call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="degrees Celcius", &
-                          long_name="Near-surface temperature (2-m), annual mean",method="quadrant")
-        call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_jja",units="degrees Celcius", &
-                          long_name="Near-surface temperature (2-m), summer mean",method="quadrant")
+                          long_name="Near-surface temperature (2-m), annual mean",method="nng")
+        call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_sum",units="degrees Celcius", &
+                          long_name="Near-surface temperature (2-m), summer mean",method="nng")
         call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
-                          long_name="Precipitation, annual mean",method="quadrant")
+                          long_name="Precipitation, annual mean",method="nng")
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
         call grid_allocate(grid,outzs) 
-        call grid_allocate(grid,outvar1)
         
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-        call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
-        call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+!         call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
+!         call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
 !         ! Initialize mapping
 !         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-        
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
@@ -137,11 +130,11 @@ contains
 !                        missing_value=missing_value)
         
         ! Map zs to new grid (two-step, nn-gauss)
-        call map_field(map,"zs",inp%zs,outzs,outmask,"nn", &
-                          fill=.TRUE.,missing_value=missing_value)
-        call filter_gaussian(real(outzs),outvar1,sigma=240.0,dx=real(grid%G%dx))
+        call map_field(map,"zs",inp%zs,outzs,outmask,"nng", &
+                          fill=.TRUE.,missing_value=missing_value,sigma=sigma)
+!         call filter_gaussian(real(outzs),outvar1,sigma=240.0,dx=real(grid%G%dx))
         ! Write output elevation to output file
-        call nc_write(filename,"zs",outvar1,dim1="xc",dim2="yc")
+!         call nc_write(filename,"zs",outvar1,dim1="xc",dim2="yc")
 
         ! Write variable metadata
         call nc_write_attr(filename,"zs","units","m")
@@ -161,23 +154,23 @@ contains
             where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
 
             ! Scale to sea-level temperature for interpolation
-            if (trim(var_now%nm_out) .eq. "t2m_jja") &
+            if (trim(var_now%nm_out) .eq. "t2m_sum") &
                 inp%var = inp%var + inp%lapse_summer*inp%zs 
             if (trim(var_now%nm_out) .eq. "t2m_ann") &
                 inp%var = inp%var + inp%lapse_ann*inp%zs 
 
-!             ! Map variable to new grid
-!             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-!                           fill=.TRUE.,missing_value=missing_value)
+            ! Map variable to new grid
+            call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
+                          fill=.TRUE.,missing_value=missing_value,sigma=sigma)
             
-            ! Map variable to new grid (two-step interpolation)
-            call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
-                           missing_value=missing_value)
-            call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
-                           missing_value=missing_value)
+!             ! Map variable to new grid (two-step interpolation)
+!             call map_field(map0hi,var_now%nm_in,inp%var,inp%var_hi,inp%mask_hi,"nn", &
+!                            missing_value=missing_value)
+!             call map_field(maphi, var_now%nm_in,inp%var_hi,outvar,outmask,"nn", &
+!                            missing_value=missing_value)
 
             ! Re-scale to near-surface temp for writing to file
-            if (trim(var_now%nm_out) .eq. "t2m_jja") &
+            if (trim(var_now%nm_out) .eq. "t2m_sum") &
                 outvar = outvar - inp%lapse_summer*outzs 
             if (trim(var_now%nm_out) .eq. "t2m_ann") &
                 outvar = outvar - inp%lapse_ann*outzs 
