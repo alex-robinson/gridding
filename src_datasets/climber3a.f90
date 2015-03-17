@@ -118,7 +118,8 @@ contains
         ! Load reference topography in order to adjust temps to sea-level temps 
         call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
         write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
-
+        where(inp%zs .le. 1.d0) inp%zs = 0.d0  ! Clean-up climber ocean points 
+            
         ! Map zs to new grid
         call map_field(map,"zs",inp%zs,outzs,outmask,"nng", &
                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
