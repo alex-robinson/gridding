@@ -98,7 +98,7 @@ contains
 
         ! ## MAP FIELD ##
         call map_field(map,"z_sed",inp%var,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=mv)
+                       fill=.TRUE.,sigma=30.d0,missing_value=mv)
 
         write(*,*) "Range outvar: ",minval(outvar), maxval(outvar)
         write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv), &
