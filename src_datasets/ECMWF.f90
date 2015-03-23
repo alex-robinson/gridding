@@ -433,13 +433,15 @@ contains
 
         implicit none 
         double precision :: var(:,:)
-        integer :: ny 
+        integer :: i, ny 
         double precision :: tmp(size(var,1),size(var,2))
 
         ny = size(var,2)
         
         tmp = var 
-        var = tmp(:,ny:1)
+
+        do i = 1, ny 
+        var(:,i) = tmp(:,ny-i+1)
 
         return 
 
