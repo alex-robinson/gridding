@@ -229,24 +229,12 @@ contains
             var_now = invariant(1) 
             call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
                          start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1])
-            write(*,*) "var: ",minval(invar), maxval(invar)
             call flip_lat(invar)
             invar = invar*var_now%conv 
-            write(*,*) "var: ",minval(invar), maxval(invar)
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn",sigma=20.d0,missing_value=missing_value)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=20.d0,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
-
-
-
-
-
             stop 
-
-
-
-
-
 
             ! ## SURFACE FIELDS ##
             do i = 1, size(surf)
@@ -445,7 +433,7 @@ contains
         do i = 1, ny 
             var(:,i) = tmp(:,ny-i+1)
         end do 
-        
+
         return 
 
     end subroutine flip_lat 
