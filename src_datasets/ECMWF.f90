@@ -231,7 +231,7 @@ contains
                          start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1])
             call flip_lat(invar)
             invar = invar*var_now%conv 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=80.d0,missing_value=missing_value)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=50.d0,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
             stop 
