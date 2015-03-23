@@ -137,17 +137,6 @@ contains
             call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
                            x=inp%lon,y=inp%lat)
             
-            write(*,*) "GRID CHECK: "
-            write(*,*) nx, ny 
-            write(*,*) inp%lon(1), inp%lon(nx)
-            write(*,*) inp%lat(1), inp%lat(ny)
-            write(*,*) gECMWF%G%x(1), gECMWF%G%x(nx)
-            write(*,*) gECMWF%G%y(1), gECMWF%G%y(ny)
-            write(*,*) 
-            write(*,"(480f8.2)") gECMWF%G%x 
-
-            stop 
-
 !         end if 
 
         ! ## First make file for surface fields including invariants ##
