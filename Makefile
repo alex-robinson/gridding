@@ -74,7 +74,7 @@ else ifeq ($(env),iplex) ## env=iplex
 
     DFLAGS   = -vec-report0 -O3
     ifeq ($(debug), 1)
-        DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0
+        DFLAGS   = -C -debug full -traceback -ftrapuv -fpe0 -check all -vec-report0
     endif
 
 else 
