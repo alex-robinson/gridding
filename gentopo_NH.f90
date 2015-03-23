@@ -55,9 +55,9 @@ program gentopo
     !
     ! =========================================================
 
-!     call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
-    call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
+!     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 
 !     call ecmwf_to_grid(outfldr, grid,"NH",max_neighbors=8,lat_lim=2.d0)
 !     call ecmwf_to_grid( outfldr,grid,"NH",clim_range=[1981,2010])
