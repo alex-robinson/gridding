@@ -144,8 +144,8 @@ contains
             write(*,*) gECMWF%G%x(1), gECMWF%G%x(nx)
             write(*,*) gECMWF%G%y(1), gECMWF%G%y(ny)
             write(*,*) 
-            write(*,"(241f8.2)") gECMWF%G%y 
-            
+            write(*,"(480f8.2)") gECMWF%G%x 
+
             stop 
 
 !         end if 
