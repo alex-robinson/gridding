@@ -74,9 +74,9 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in_1),"z","zs",units="m", &
-                          long_name="Surface elevation",method="quadrant")
+                          long_name="Surface elevation",method="nng")
         call def_var_info(vars( 2),trim(file_in_2),"z","zb",units="m", &
-                          long_name="Bedrock elevation",method="quadrant")
+                          long_name="Bedrock elevation",method="nng")
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -105,7 +105,7 @@ contains
 
             ! Map variable to new grid
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value)
+                          fill=.TRUE.,sigma=10.d0,missing_value=missing_value)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
