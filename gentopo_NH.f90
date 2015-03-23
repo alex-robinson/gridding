@@ -65,10 +65,10 @@ program gentopo
 !     call ghfDavies_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
-!     call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
     
     ! Paleo topography 
-    call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+!     call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
     call ICE5G_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
     ! ### MODEL DATA ### 

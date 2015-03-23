@@ -259,7 +259,7 @@ contains
 
                 ! Map variable to new grid
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                              fill=.TRUE.,sigma=40.d0,missing_value=mv)
+                              fill=.TRUE.,sigma=60.d0,missing_value=mv)
 
                 ! Write output variable to output file
                 call nc_write(filename,"time",time,dim1="time",start=[k],count=[1])
