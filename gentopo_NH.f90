@@ -55,7 +55,7 @@ program gentopo
     !
     ! =========================================================
 
-    call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=1,lat_lim=1.d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8,lat_lim=2.d0)
 

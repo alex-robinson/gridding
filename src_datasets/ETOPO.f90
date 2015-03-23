@@ -47,8 +47,8 @@ contains
 
         ! Define the input filenames
         fldr_in    = "/data/sicopolis/data/ETOPO/"
-        file_in_1  = trim(fldr_in)//"ETOPO1-ICE-050deg.nc"
-        file_in_2  = trim(fldr_in)//"ETOPO1-BED-050deg.nc"
+        file_in_1  = trim(fldr_in)//"ETOPO1-ICE-020deg.nc"
+        file_in_2  = trim(fldr_in)//"ETOPO1-BED-020deg.nc"
 
         desc    = "ETOPO1 present-day Earth topography data"
         ref     = "http://ngdc.noaa.gov/mgg/global/global.html"
@@ -65,7 +65,7 @@ contains
         call nc_read(file_in_1,"lat",inp%lat)
 
         ! Define the input grid
-        call grid_init(grid0,name="ETOPO1-050deg",mtype="latlon",units="degrees",lon180=.TRUE., &
+        call grid_init(grid0,name="ETOPO1-020deg",mtype="latlon",units="degrees",lon180=.TRUE., &
                          x=inp%lon,y=inp%lat)
         
         ! Allocate the input array
@@ -74,9 +74,9 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in_1),"z","zs",units="m", &
-                          long_name="Surface elevation",method="nng")
+                          long_name="Surface elevation",method="nn")
         call def_var_info(vars( 2),trim(file_in_2),"z","zb",units="m", &
-                          long_name="Bedrock elevation",method="nng")
+                          long_name="Bedrock elevation",method="nn")
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
