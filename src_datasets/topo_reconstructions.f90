@@ -83,15 +83,15 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(5))
         call def_var_info(vars( 1),trim(file_prefix),"sftlf","sftlf",units="%", &
-                          long_name="Land area fraction",method="quadrant")
+                          long_name="Land area fraction",method="nng")
         call def_var_info(vars( 2),trim(file_prefix),"sftgif","sftgif",units="%", &
-                          long_name="Ice area fraction",method="quadrant")
+                          long_name="Ice area fraction",method="nng")
         call def_var_info(vars( 3),trim(file_prefix),"Topo_Diff","dz",units="m", &
-                          long_name="Topography difference from present",method="quadrant")
+                          long_name="Topography difference from present",method="nng")
         call def_var_info(vars( 4),trim(file_prefix),"Topo","z",units="m", &
-                          long_name="Topography (Point-value altitude)",method="quadrant")
+                          long_name="Topography (Point-value altitude)",method="nng")
         call def_var_info(vars( 5),trim(file_prefix),"orog","zs",units="m", &
-                          long_name="Orography (Point-value surface altitude)",method="quadrant")
+                          long_name="Orography (Point-value surface altitude)",method="nng")
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -122,17 +122,17 @@ contains
                 time = -time   ! negative time 
 
                 ! Read in current variable
-                call nc_read(file_in,var_now%nm_in,inp%var,missing_value=missing_value)
-                where(abs(inp%var) .ge. 1d8) inp%var = missing_value 
+                call nc_read(file_in,var_now%nm_in,inp%var,missing_value=mv)
+                where(abs(inp%var) .ge. 1d8) inp%var = mv 
 
                 ! Map variable to new grid
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                              fill=.TRUE.,missing_value=missing_value)
+                              fill=.TRUE.,sigma=40.d0,missing_value=mv)
 
                 ! Write output variable to output file
                 call nc_write(filename,"time",time,dim1="time",start=[k],count=[1])
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time", &
-                              start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+                              start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
 
             end do 
 
@@ -214,11 +214,11 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(3))
         call def_var_info(vars( 1),trim(file_prefix),"sftgif","sftgif",units="%", &
-                          long_name="Ice area fraction",method="quadrant")
+                          long_name="Ice area fraction",method="nng")
         call def_var_info(vars( 2),trim(file_prefix),"orog","zs",units="m", &
-                          long_name="Orography (surface altitude)",method="quadrant")
+                          long_name="Orography (surface altitude)",method="nng")
         call def_var_info(vars( 3),trim(file_prefix),"sftgit","H",units="m", &
-                          long_name="Ice sheet thickness",method="quadrant")
+                          long_name="Ice sheet thickness",method="nng")
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -254,17 +254,17 @@ contains
                 file_in = trim(file_prefix)//trim(time_char)//trim(file_suffix)
 
                 ! Read in current variable
-                call nc_read(file_in,var_now%nm_in,inp%var,missing_value=missing_value)
-                where(abs(inp%var) .ge. 1d8) inp%var = missing_value 
+                call nc_read(file_in,var_now%nm_in,inp%var,missing_value=mv)
+                where(abs(inp%var) .ge. 1d8) inp%var = mv 
 
                 ! Map variable to new grid
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                              fill=.TRUE.,missing_value=missing_value)
+                              fill=.TRUE.,sigma=40.d0,missing_value=mv)
 
                 ! Write output variable to output file
                 call nc_write(filename,"time",time,dim1="time",start=[k],count=[1])
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="time", &
-                              start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+                              start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
 
             end do 
 
@@ -358,17 +358,16 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         ! Read in current variable
-        call nc_read(file_in,"zm",inp%var,start=[1,1],count=[nx,ny])
+        call nc_read(file_in,"zm",inp%var,start=[1,1],count=[nx,ny],missing_value=mv)
         
         ! Map variable to new grid
-        call map_field(map,"mask",inp%var,outvar,outmask,"nn", &
-                      fill=.TRUE.,missing_value=missing_value)
+        call map_field(map,"mask",inp%var,outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
 
         ! Cut the mask if overlaps with border points 
 !         where (grid%border) outvar = 0.d0 
         
         ! Write output variable to output file
-        call nc_write(filename,"mask_lgm",int(outvar),dim1="xc",dim2="yc")
+        call nc_write(filename,"mask_lgm",int(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,"mask_lgm","units","1")
