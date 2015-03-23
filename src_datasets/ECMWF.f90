@@ -12,7 +12,7 @@ module ECMWF
     
 contains 
 
-    subroutine ecmwf_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
+    subroutine ecmwf_to_grid(outfldr,grid,domain,sigma,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -24,6 +24,7 @@ contains
 
         character(len=*)    :: domain, outfldr 
         type(grid_class)    :: grid 
+        double precision, optional :: sigma
         integer, optional   :: max_neighbors 
         double precision, optional :: lat_lim 
         integer, optional   :: clim_range(2) 
@@ -202,6 +203,12 @@ contains
 
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
+            ! Make sure Gaussian filter sigma available 
+            if (.not. present(sigma)) then 
+                write(*,*) "ecmwf_to_grid:: error:", "sigma must be provided for Gaussian filtering step."
+                stop 
+            end if 
+
             ! Allocate the input grid variable
             call grid_allocate(gECMWF,invar)
 
@@ -228,11 +235,11 @@ contains
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
             call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
-                         start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                         start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1],missing_value=mv)
             call flip_lat(invar)
             invar = invar*var_now%conv 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0,missing_value=missing_value)
-            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
@@ -252,11 +259,12 @@ contains
 
                     do m = 1, nm 
                         q = q+1 
-                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
+                                     missing_value=mv)
                         call flip_lat(invar)
-                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0,missing_value=missing_value)
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                                      units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+                                      start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
                     end do 
                 end do
                 
@@ -304,13 +312,12 @@ contains
                         do m = 1, nm 
                             q = q+1 
                             call nc_read(trim(var_now%filenames(l)),var_now%nm_in,invar, &
-                                         start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
+                                         start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1],missing_value=mv)
                             call flip_lat(invar)
-                            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0, &
-                                           missing_value=missing_value)
+                            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
                             call nc_write(filename,var_now%nm_out,real(outvar), &
                                           dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                                          units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+                                          start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
 
                         end do 
                     end do 
@@ -346,17 +353,22 @@ contains
 
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
-            call nc_read(filename,var_now%nm_out,var2D)
-            call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
-                          units=var_now%units_out)
+            call nc_read(filename,var_now%nm_out,var2D,missing_value=mv)
+            call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",missing_value=real(mv))
 
+            ! Write variable metadata
+            call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
             do i = 1, size(surf)
                 var_now = surf(i)
                 do m = 1, nm  
-                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
+                                 missing_value=mv)
                     var2D = time_average(var3D)
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
-                                  units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                                  start=[1,1,m],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
                 end do 
 
                 ! Write variable metadata
@@ -397,10 +409,11 @@ contains
                     var_now = pres(i)
 
                     do m = 1, nm  
-                        call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                        call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
+                                     missing_value=mv)
                         var2D = time_average(var3D)
                         call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
-                                      units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                                      start=[1,1,m],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
                     end do 
 
                     ! Write variable metadata

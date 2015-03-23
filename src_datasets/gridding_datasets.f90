@@ -5,6 +5,7 @@ module gridding_datasets
     implicit none 
 
     double precision, parameter :: missing_value = -9999.d0
+    double precision, parameter :: mv            = missing_value
     
     type var_defs
         character(len=512) :: filename, filenames(20)
