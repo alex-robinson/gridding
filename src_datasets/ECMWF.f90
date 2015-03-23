@@ -443,8 +443,9 @@ contains
         tmp = var 
 
         do i = 1, ny 
-        var(:,i) = tmp(:,ny-i+1)
-
+            var(:,i) = tmp(:,ny-i+1)
+        end do 
+        
         return 
 
     end subroutine flip_lat 
