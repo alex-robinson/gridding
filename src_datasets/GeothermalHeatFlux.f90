@@ -117,23 +117,20 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         ! ## MAP FIELD ##
-        call map_field(map,"ghf",inp%var,outvar,outmask,"quadrant", &
-                       fill=.TRUE.,missing_value=missing_value)
+        call map_field(map,"ghf",inp%var,outvar,outmask,"nng",fill=.TRUE.,sigma=40.d0,missing_value=mv)
 
-        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.missing_value), &
-                                    maxval(outvar,outvar.ne.missing_value)
+        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv), &
+                                    maxval(outvar,outvar.ne.mv)
         
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
         
         ! Write field to output file 
-        call nc_write(filename,"ghf",real(outvar),dim1="xc",dim2="yc", &
-                      missing_value=real(missing_value))
+        call nc_write(filename,"ghf",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,"ghf","units","mW m**-2")
         call nc_write_attr(filename,"ghf","long_name","Geothermal heat flux")
-!         call nc_write_attr(filename,"ghf","grid_mapping",trim(grid%mtype))
         call nc_write_attr(filename,"ghf","coordinates","lat2D lon2D")
             
         return 
