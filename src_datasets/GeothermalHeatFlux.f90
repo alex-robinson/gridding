@@ -248,8 +248,8 @@ contains
         call nc_write_attr(filename,"ghf_mean","coordinates","lat2D lon2D")
         
         ! ## ghf_median ##
-        call map_field(map,"ghf_med",inp%med,outvar,outmask,"quadrant", &
-                       fill=.TRUE.,missing_value=missing_value)
+        call map_field(map,"ghf_med",inp%med,outvar,outmask,"nng", &
+                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
@@ -264,8 +264,8 @@ contains
         call nc_write_attr(filename,"ghf_med","coordinates","lat2D lon2D")
         
         ! ## ghf_err ##
-        call map_field(map,"ghf_err",inp%err,outvar,outmask,"quadrant", &
-                       fill=.TRUE.,missing_value=missing_value)
+        call map_field(map,"ghf_err",inp%err,outvar,outmask,"nng", &
+                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
