@@ -31,7 +31,7 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: lon(:), lat(:)
+            double precision, allocatable :: lon(:), lat(:), tmp(:)
             double precision, allocatable :: var(:,:)
         end type 
 
@@ -127,12 +127,12 @@ contains
             call nc_read(file_invariant,"latitude", inp%lat)
 
             ! Flip latitudes because it is reversed in the file
-            allocate(inp%var(ny))
-            inp%var = inp%lat
+            allocate(inp%tmp(ny))
+            inp%tmp = inp%lat
             do i = 1, ny 
-                inp%lat(i) = inp%var(ny-i+1)
+                inp%lat(i) = inp%tmp(ny-i+1)
             end do 
-            deallocate(inp%var)
+            deallocate(inp%tmp)
 
             call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
                            x=inp%lon,y=inp%lat)
