@@ -98,23 +98,22 @@ contains
 
         ! ## MAP FIELD ##
         call map_field(map,"z_sed",inp%var,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                       fill=.TRUE.,sigma=20.d0,missing_value=mv)
 
         write(*,*) "Range outvar: ",minval(outvar), maxval(outvar)
-        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.missing_value), &
-                                    maxval(outvar,outvar.ne.missing_value)
+        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv), &
+                                    maxval(outvar,outvar.ne.mv)
         
         ! Convert units [km => m]
-        where(outvar .ne. missing_value) outvar = outvar *1d3 
+        where(outvar .ne. mv) outvar = outvar *1d3 
 
         ! Write field to output file 
         call nc_write(filename,"z_sed",real(outvar),dim1="xc",dim2="yc", &
-                      missing_value=real(missing_value))
+                      missing_value=real(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,"z_sed","units","m")
         call nc_write_attr(filename,"z_sed","long_name","Sediment thickness")
-!         call nc_write_attr(filename,"z_sed","grid_mapping",trim(grid%mtype))
         call nc_write_attr(filename,"z_sed","coordinates","lat2D lon2D")
             
         return 
