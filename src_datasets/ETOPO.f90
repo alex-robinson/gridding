@@ -74,9 +74,9 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars( 1),trim(file_in_1),"z","zs",units="m", &
-                          long_name="Surface elevation",method="nng")
+                          long_name="Surface elevation",method="radius")
         call def_var_info(vars( 2),trim(file_in_2),"z","zb",units="m", &
-                          long_name="Bedrock elevation",method="nng")
+                          long_name="Bedrock elevation",method="radius")
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
