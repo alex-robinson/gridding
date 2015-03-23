@@ -123,8 +123,8 @@ contains
             nx = nc_size(file_invariant,"longitude")
             ny = nc_size(file_invariant,"latitude")
             allocate(inp%lon(nx),inp%lat(ny))
-            call nc_read(file_invariant,"latitude",inp%lon)
-            call nc_read(file_invariant,"latitude",inp%lat)
+            call nc_read(file_invariant,"longitude",inp%lon)
+            call nc_read(file_invariant,"latitude", inp%lat)
             inp%lat = inp%lat(ny:1)
 
             call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
@@ -133,7 +133,9 @@ contains
             write(*,*) "GRID CHECK: "
             write(*,*) gECMWF%G%x(1), gECMWF%G%x(nx)
             write(*,*) gECMWF%G%y(1), gECMWF%G%y(ny)
-              
+            
+            stop 
+
 !         end if 
 
         ! ## First make file for surface fields including invariants ##
