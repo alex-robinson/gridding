@@ -58,12 +58,11 @@ contains
                               trim(grid%name)//"_TOPO-ETOPO1.nc"
 
         ! Get the input dimensions
-        nx = nc_size(file_in_1,"longitude")
-        ny = nc_size(file_in_1,"latitude")
+        nx = nc_size(file_in_1,"lon")
+        ny = nc_size(file_in_1,"lat")
         allocate(inp%lon(nx),inp%lat(ny))
-        call nc_read(file_in_1,"latitude",inp%lon)
-        call nc_read(file_in_1,"latitude",inp%lat)
-        inp%lat = inp%lat(ny:1)
+        call nc_read(file_in_1,"lon",inp%lon)
+        call nc_read(file_in_1,"lat",inp%lat)
 
         ! Define the input grid
         call grid_init(grid0,name="ETOPO1-020deg",mtype="latlon",units="degrees",lon180=.TRUE., &

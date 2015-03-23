@@ -22,13 +22,20 @@ contains
 
         implicit none 
 
-        character(len=*) :: domain, outfldr 
-        type(grid_class) :: grid 
-        integer, optional :: max_neighbors 
+        character(len=*)    :: domain, outfldr 
+        type(grid_class)    :: grid 
+        integer, optional   :: max_neighbors 
         double precision, optional :: lat_lim 
-        integer, optional  :: clim_range(2) 
-        character(len=512) :: filename 
+        integer, optional   :: clim_range(2) 
+        character(len=512)  :: filename 
         character(len=1024) :: desc, ref 
+
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:)
+            double precision, allocatable :: var(:,:)
+        end type 
+
+        type(inp_type)     :: inp
 
         type(grid_class)   :: gECMWF 
         character(len=256) :: file_invariant, file_surface, files_pres(9)
@@ -41,7 +48,7 @@ contains
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
 
-        integer :: nyr, nm, q, k, year, m, i, l 
+        integer :: nx, ny, nyr, nm, q, k, year, m, i, l 
         integer :: yearf, k0, nk 
         character(len=512) :: filename_clim 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
@@ -95,10 +102,6 @@ contains
 
 !     else ! GLOBAL DOMAIN
 
-            ! Initialize the grid
-            call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
-                           x0=0.d0,dx=0.75d0,nx=480,y0=-90.d0,dy=0.75d0,ny=241)
-            
             ! Assign the filenames
             file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-invariant_historical_mon_197901-201212.nc"
             file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-surface_historical_mon_197901-201212.nc"
@@ -115,7 +118,22 @@ contains
             desc    = "ERA-Interim dataset"
             ref     = "Dee et al., 2011, BAMS, &
                       &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
-                      
+            
+            ! Initialize the grid
+            nx = nc_size(file_invariant,"longitude")
+            ny = nc_size(file_invariant,"latitude")
+            allocate(inp%lon(nx),inp%lat(ny))
+            call nc_read(file_invariant,"latitude",inp%lon)
+            call nc_read(file_invariant,"latitude",inp%lat)
+            inp%lat = inp%lat(ny:1)
+
+            call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
+                           x=inp%lon,y=inp%lat)
+            
+            write(*,*) "GRID CHECK: "
+            write(*,*) gECMWF%G%x(1), gECMWF%G%x(nx)
+            write(*,*) gECMWF%G%y(1), gECMWF%G%y(ny)
+              
 !         end if 
 
         ! ## First make file for surface fields including invariants ##
@@ -209,8 +227,21 @@ contains
             call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
                          start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1])
             call flip_lat(invar)
+            invar = invar*var_now%conv 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn",sigma=20.d0,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
+
+
+
+
+
+
+            stop 
+
+
+
+
+
 
             ! ## SURFACE FIELDS ##
             do i = 1, size(surf)
@@ -321,7 +352,6 @@ contains
             ! ## INVARIANT FIELDS ##
             var_now = invariant(1) 
             call nc_read(filename,var_now%nm_out,var2D)
-            var2D = var2D*var_now%conv 
             call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
                           units=var_now%units_out)
 
