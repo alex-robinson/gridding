@@ -234,8 +234,6 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
-            stop 
-
             ! ## SURFACE FIELDS ##
             do i = 1, size(surf)
                 var_now = surf(i)
@@ -250,7 +248,7 @@ contains
                         q = q+1 
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                         call flip_lat(invar)
-                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn",sigma=20.d0,missing_value=missing_value)
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     end do 
@@ -259,7 +257,6 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
                 
             end do  
@@ -303,7 +300,7 @@ contains
                             call nc_read(trim(var_now%filenames(l)),var_now%nm_in,invar, &
                                          start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1])
                             call flip_lat(invar)
-                            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn",sigma=20.d0, &
+                            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0, &
                                            missing_value=missing_value)
                             call nc_write(filename,var_now%nm_out,real(outvar), &
                                           dim1="xc",dim2="yc",dim3="month",dim4="time", &
@@ -315,7 +312,6 @@ contains
                     ! Write variable metadata
                     call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                     call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!                     call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                     call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
                 
                 end do 
@@ -360,7 +356,6 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                 call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
                 
             end do 
@@ -405,7 +400,6 @@ contains
                     ! Write variable metadata
                     call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                     call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-!                     call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                     call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
                 
                 end do 
