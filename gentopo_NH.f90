@@ -62,10 +62,10 @@ program gentopo
 !     call ecmwf_to_grid(outfldr, grid,"NH",max_neighbors=8,lat_lim=2.d0)
 !     call ecmwf_to_grid( outfldr,grid,"NH",clim_range=[1981,2010])
 
-!     call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
     
-    call ghfDavies_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
-    call ghfShapiro_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
+!     call ghfDavies_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
+!     call ghfShapiro_to_grid(outfldr,grid,"NH",max_neighbors=10,lat_lim=2.d0)
     
 !     ! CLIMBER-3alpha
 !     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"

@@ -97,8 +97,8 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         ! ## MAP FIELD ##
-        call map_field(map,"z_sed",inp%var,outvar,outmask,"quadrant", &
-                       fill=.TRUE.,missing_value=missing_value)
+        call map_field(map,"z_sed",inp%var,outvar,outmask,"nng", &
+                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
 
         write(*,*) "Range outvar: ",minval(outvar), maxval(outvar)
         write(*,*) "Range outvar: ",minval(outvar,outvar.ne.missing_value), &
