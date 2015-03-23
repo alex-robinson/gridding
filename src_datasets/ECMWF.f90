@@ -141,8 +141,10 @@ contains
             write(*,*) nx, ny 
             write(*,*) inp%lon(1), inp%lon(nx)
             write(*,*) inp%lat(1), inp%lat(ny)
-            write(*,*) gECMWF%G%x(1), gECMWF%G%x(size(gECMWF%G%x))
-            write(*,*) gECMWF%G%y(1), gECMWF%G%y(size(gECMWF%G%y))
+            write(*,*) gECMWF%G%x(1), gECMWF%G%x(nx)
+            write(*,*) gECMWF%G%y(1), gECMWF%G%y(ny)
+            write(*,*) 
+            write(*,"(241f8.2)") gECMWF%G%y 
             
             stop 
 
@@ -443,9 +445,12 @@ contains
         implicit none 
         double precision :: var(:,:)
         integer :: ny 
+        double precision :: tmp(size(var,1),size(var,2))
 
         ny = size(var,2)
-        var = var(:,ny:1)
+        
+        tmp = var 
+        var = tmp(:,ny:1)
 
         return 
 
