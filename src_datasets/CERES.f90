@@ -118,7 +118,7 @@ contains
                 call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1,m],count=[grid_in%G%nx,grid_in%G%ny,1])
                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
-                              fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                              fill=.TRUE.,sigma=30.d0,missing_value=missing_value)
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
                               start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
             end do 
