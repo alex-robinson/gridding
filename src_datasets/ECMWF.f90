@@ -234,6 +234,12 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=30.d0,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+
+
             ! ## SURFACE FIELDS ##
             do i = 1, size(surf)
                 var_now = surf(i)
