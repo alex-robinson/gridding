@@ -233,7 +233,7 @@ contains
 
         ! ## ghf_mean ##
         call map_field(map,"ghf_mean",inp%mean,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                       fill=.TRUE.,sigma=30.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
@@ -249,7 +249,7 @@ contains
         
         ! ## ghf_median ##
         call map_field(map,"ghf_med",inp%med,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                       fill=.TRUE.,sigma=30.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
@@ -265,7 +265,7 @@ contains
         
         ! ## ghf_err ##
         call map_field(map,"ghf_err",inp%err,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                       fill=.TRUE.,sigma=30.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
@@ -377,7 +377,7 @@ contains
 
         ! ## ghf_mean ##
         call map_field(map,"ghf",inp%mean,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                       fill=.TRUE.,sigma=30.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
@@ -393,7 +393,7 @@ contains
         
         ! ## ghf_median ##
         call map_field(map,"ghf_sigma",inp%err,outvar,outmask,"nng", &
-                       fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                       fill=.TRUE.,sigma=30.d0,missing_value=missing_value)
 
         ! Fill any missing values (Antarctica)
         call fill_weighted(outvar,missing_value=missing_value)
