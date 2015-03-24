@@ -54,7 +54,7 @@ program gentopo
                            lambda=-40.d0,phi=72.d0,alpha=7.5d0)
 
         case("Bamber01-20KM")
-            call grid_init(grid,name="Bamber01-20KM",mtype="stereographic",units="kilometers", &
+            call grid_init(grid,name="Bamber01-20KM",mtype="polar stereographic",units="kilometers", &
                            lon180=.TRUE.,x0=-800.d0,dx=20.d0,nx=76,y0=-3400.d0,dy=20.d0,ny=141, &
                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
@@ -69,6 +69,8 @@ program gentopo
 
     end select
 
+    call grid_write(grid,"output/"//trim(gridname)//".nc",xnm="xc",ynm="yc",create=.TRUE.) 
+
     ! =========================================================
     !
     ! DATASET TO GRID CALCULATIONS
@@ -79,7 +81,7 @@ program gentopo
 
     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
-    call ecmwf_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr, grid,"Global",sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
     call ecmwf_to_grid( outfldr,grid,"Global",clim_range=[1981,2010])
 
     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
