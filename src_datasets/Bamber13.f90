@@ -122,8 +122,8 @@ contains
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
             call thin(invar,tmp,by=thin_by)
 
-            write(*,*) trim(var_now%nm_in), minval(invar), maxval(invar)
-            
+            write(*,*) "1:   ", trim(var_now%nm_in), minval(invar), maxval(invar)
+
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
@@ -132,6 +132,10 @@ contains
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
                            radius=grid%G%dx*0.75d0,fill=.TRUE.,missing_value=mv)
+            
+            write(*,*) "2:   ", trim(var_now%nm_in), minval(invar),  maxval(invar)
+            write(*,*) "2:   ", trim(var_now%nm_in), minval(outvar), maxval(outvar)
+
             if (var_now%method .eq. "nn") then 
                 call fill_nearest(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
