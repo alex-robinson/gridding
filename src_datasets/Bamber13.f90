@@ -131,7 +131,7 @@ contains
                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
-                           radius=grid%G%dx*0.75d0,fill=.TRUE.,missing_value=mv)
+                           radius=grid%G%dx*1.75d0,fill=.TRUE.,missing_value=mv)
             
             write(*,*) "2:   ", trim(var_now%nm_in), minval(invar),  maxval(invar)
             write(*,*) "2:   ", trim(var_now%nm_in), minval(outvar), maxval(outvar)
