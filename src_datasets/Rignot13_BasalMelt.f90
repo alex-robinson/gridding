@@ -68,7 +68,7 @@ contains
 !             call nc_read(file_invariant,"yaxis",yax)
             
             ! Define topography (BEDMAP2/rignot) grid and input variable field
-            call grid_init(gTOPO,name="rignot-10KM",mtype="polar stereographic",units="kilometers",lon180=.TRUE., &
+            call grid_init(gTOPO,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-2800.d0,dx=10.d0,nx=561,y0=2800.d0,dy=-10.d0,ny=561, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 

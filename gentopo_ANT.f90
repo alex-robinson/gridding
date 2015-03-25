@@ -63,25 +63,25 @@ program gentopo
     !
     ! =========================================================
 
-    call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-    call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-    call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
-    call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4, lat_lim=2.d0)
+!     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4, lat_lim=2.d0)
     
-    call ecmwf_to_grid(outfldr,grid,"NH",sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf_to_grid(outfldr,grid,"NH",clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr,grid,"NH",sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf_to_grid(outfldr,grid,"NH",clim_range=[1981,2010])
 
-    call etopo1_to_grid(outfldr,grid,"Antarctica",max_neighbors=1,lat_lim=1.d0)
+!     call etopo1_to_grid(outfldr,grid,"Antarctica",max_neighbors=1,lat_lim=1.d0)
   
-    ! Paleo topography 
-    call ICE6GC_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+!     ! Paleo topography 
+!     call ICE6GC_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+!     call ICE5G_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 
-    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
-    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
-    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
-    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
+!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
+!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
+!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
+!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
 
     ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
     !      data while they should all have 240 months (1980-1999)
