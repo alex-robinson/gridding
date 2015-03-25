@@ -39,7 +39,6 @@ contains
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
-        double precision, allocatable :: geoid(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
 
@@ -89,13 +88,12 @@ contains
         allocate(vars(4))
         call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation")
         call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation")
-        call def_var_info(vars(3),trim(file_in),"IceThickness",    "H", units="m",long_name="Ice thickness")
+        call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness")
         call def_var_info(vars(4),trim(file_in),"LandMask",      "mask",units="(0 - 4)", &
                           long_name="Land mask",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(gTOPO,invar)
-        call grid_allocate(gTOPO,geoid)
 
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp(2501,3001))
@@ -118,38 +116,26 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! ajr: this correction is not needed, it has already been accounted
-        !      for in the Bamber 2013 dataset
-!         ! Load the geoid
-!         call nc_read(file_in,"Geoid",tmp,missing_value=missing_value)
-!         call thin(geoid,tmp,by=thin_by)
-!         write(*,*) "Bamber13 geoid range: ", minval(geoid), maxval(geoid)
-        geoid = 0.d0 
-        
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
-            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=missing_value)
+            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
             call thin(invar,tmp,by=thin_by)
 
-            ! Correct for the geoid, so that elevation is relative to present-day sea level
-            if (trim(var_now%nm_out) .eq. "zs" .or. var_now%nm_out .eq. "zb") then 
-                where( invar .ne. missing_value ) invar = invar - geoid 
-            end if 
-
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
-                where( invar .eq. missing_value ) invar = 0.d0 
+                where( invar .eq. mv ) invar = 0.d0 
             end if
             if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=missing_value,fill_value=-1000.d0)
+                call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
-                           radius=grid%G%dx*0.75d0,fill=.TRUE.,missing_value=missing_value)
-            call fill_mean(outvar,missing_value=missing_value)
+                           radius=grid%G%dx*0.75d0,fill=.TRUE.,missing_value=mv)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
+                call fill_nearest(outvar,missing_value=mv)
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+                call fill_weighted(outvar,missing_value=mv)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             end if 
             
             ! Write variable metadata
