@@ -6,6 +6,8 @@ module MAR
     use interp_time 
     use ncio 
     
+    use gaussian_filter 
+
     implicit none 
 
     private 
@@ -47,14 +49,15 @@ contains
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:)
+        double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:), outvar_int(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
         integer :: yearf, k0, nk 
         character(len=512) :: filename_clim 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
-
+        double precision :: sigma 
+        
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
             
@@ -204,6 +207,9 @@ contains
         nm       = 12
         n_var    = size(surf)
 
+        ! Determine smoothing for missing points that are filled in 
+        sigma = grid%G%dx*2.d0 
+
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
             ! Allocate the input grid variable
@@ -217,6 +223,7 @@ contains
             call grid_allocate(grid,outvar)
             call grid_allocate(grid,outmask)    
             call grid_allocate(grid,outvar_int)
+            call grid_allocate(grid,tmp)
 
             ! Initialize the output file
             call nc_create(filename)
@@ -234,23 +241,25 @@ contains
             do i = 1, size(invariant)
 
                 var_now = invariant(i)
-                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv)
                 outvar = missing_value
                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
-                               fill=.TRUE.,missing_value=missing_value)
-                if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
+                               fill=.TRUE.,missing_value=mv)
                 if (trim(var_now%method) .eq. "nn") then 
+                    call fill_nearest(outvar,missing_value=mv)
                     call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
-                                  missing_value=nint(missing_value))
+                                  missing_value=nint(mv))
                 else 
+                    tmp = outvar 
+                    call fill_weighted(tmp,missing_value=mv)
+                    call filter_gaussian(tmp,outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
-                                  missing_value=real(missing_value))
+                                  missing_value=real(mv))
                 end if 
 
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
@@ -272,7 +281,7 @@ contains
                     
                     do m = 1, nm 
                     
-                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv, &
                                  start=[1,1,m],count=[gMAR%G%nx,gMAR%G%ny,1])
                         
                         ! Bug fix with input values - make sure missing values are missing
@@ -281,8 +290,10 @@ contains
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
-                                       fill=.TRUE.,missing_value=missing_value)
-                        if (var_now%fill) call fill_weighted(outvar,missing_value=missing_value)
+                                       fill=.TRUE.,missing_value=mv)
+                        tmp = outvar 
+                        call fill_weighted(tmp,missing_value=mv)
+                        call filter_gaussian(tmp,outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     
@@ -293,7 +304,6 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
@@ -327,7 +337,6 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                 call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
@@ -345,7 +354,6 @@ contains
                 ! Write variable metadata
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename_clim,var_now%nm_out,"grid_mapping",trim(grid%mtype))
                 call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
@@ -531,17 +539,17 @@ contains
 !             do i = 1, size(invariant)
 
 !                 var_now = invariant(i)
-!                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value)
+!                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv)
 !                 outvar = missing_value
 !                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
-!                                fill=.TRUE.,missing_value=missing_value)
-!                 if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
+!                                fill=.TRUE.,missing_value=mv)
+!                 if (var_now%fill) call fill_mean(outvar,missing_value=mv,fill_value=0.d0)
 !                 if (trim(var_now%method) .eq. "nn") then 
 !                     call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
-!                                   units=var_now%units_out,missing_value=nint(missing_value))
+!                                   units=var_now%units_out,missing_value=nint(mv))
 !                 else 
 !                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
-!                                   units=var_now%units_out,missing_value=real(missing_value))
+!                                   units=var_now%units_out,missing_value=real(mv))
 !                 end if 
 
 !             end do 
@@ -562,13 +570,13 @@ contains
 !                         var_now = surf(i)     
 !                         write(var_now%filename,"(a,a,i4,a3)") &
 !                             trim(adjustl(file_surface)), trim(file_prefix(n_prefix)),year,".nc"
-!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
+!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv, &
 !                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
 !                         where (invar .ne. missing_value) invar = invar*var_now%conv 
 !                         outvar = missing_value 
 !                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
-!                                        fill=.TRUE.,missing_value=missing_value)
-!                         if (var_now%fill) call fill_weighted(outvar,missing_value=missing_value)
+!                                        fill=.TRUE.,missing_value=mv)
+!                         if (var_now%fill) call fill_weighted(outvar,missing_value=mv)
 !                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
 !                                       units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
 !                     end do 
@@ -725,10 +733,10 @@ contains
 !         ! ## INVARIANT FIELDS ##
 !         do i = 1, size(invariant)
 !             var_now = invariant(i) 
-!             call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value)
+!             call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv)
 !             outvar = missing_value 
 !             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
-!                            fill=.FALSE.,missing_value=missing_value)
+!                            fill=.FALSE.,missing_value=mv)
 !             if (var_now%method .eq. "nn") then 
 !                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
 !             else
@@ -756,16 +764,16 @@ contains
 !                     write(var_now%filename,"(a,a,i4,a3,i4,a5)")  &
 !                         trim(file_surface),trim(file_prefix(n_prefix)),year,"01-",year,"12.nc"
 !                     if (var_now%dimextra) then 
-!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
+!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv, &
 !                                       start=[1,1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1,1])
 !                     else 
-!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=missing_value, &
+!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv, &
 !                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
 !                     end if
 !                     where (invar .ne. missing_value) invar = invar*var_now%conv 
 !                     outvar = missing_value 
 !                     call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
-!                                    fill=.FALSE.,missing_value=missing_value)
+!                                    fill=.FALSE.,missing_value=mv)
 !                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
 !                                   units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
 !                 end do 

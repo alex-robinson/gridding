@@ -7,7 +7,8 @@ program gentopo
     use Bamber13 
     use CERES 
     use climber3a
-    use ECMWF 
+    use ECMWF
+    use ETOPO 
     use GeothermalHeatFlux
     use MAR 
     use NasaBasins
@@ -84,9 +85,9 @@ program gentopo
 !     call ecmwf_to_grid(outfldr, grid,"Global",sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_to_grid( outfldr,grid,"Global",clim_range=[1981,2010])
 
-    call etopo1_to_grid(outfldr,grid,"Greenland",max_neighbors=1,lat_lim=1.d0)
+!     call etopo1_to_grid(outfldr,grid,"Greenland",max_neighbors=1,lat_lim=1.d0)
   
-!     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+    call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 !     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
 !     call nasaBasins_to_grid(outfldr,grid,"Greenland")
