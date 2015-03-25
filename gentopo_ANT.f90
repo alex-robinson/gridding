@@ -8,6 +8,7 @@ program gentopo
     use CERES
     use climber3a 
     use ECMWF 
+    use ETOPO 
     use GeothermalHeatFlux 
     use NasaBasins 
     use RACMO2 
@@ -62,19 +63,25 @@ program gentopo
     !
     ! =========================================================
 
-!     call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-!     call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-!     call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+    call bedmap2_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+    call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+    call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
-!     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8, lat_lim=2.d0)
+    call CERES_to_grid(outfldr,grid,"Global",max_neighbors=8, lat_lim=2.d0)
     
-!     call ecmwf_to_grid(outfldr,grid,"ANT075",max_neighbors=8, lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,"ANT075",clim_range=[1981,2010])
-    
-!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
-!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
-!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
-!     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
+    call ecmwf_to_grid(outfldr,grid,"Global",max_neighbors=8, lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,"Global",clim_range=[1981,2010])
+
+    call etopo1_to_grid(outfldr,grid,"Antarctica",max_neighbors=1,lat_lim=1.d0)
+  
+    ! Paleo topography 
+    call ICE6GC_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+    call ICE5G_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+
+    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
+    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
+    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
+    call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
 
     ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
     !      data while they should all have 240 months (1980-1999)
@@ -83,37 +90,33 @@ program gentopo
 !     call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",clim_range=[1980,1999])
     
     ! Rignot basal melting data
-!     call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10, lat_lim=1.d0)
+    call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10, lat_lim=1.d0)
         
     ! NASA drainage basins 
-!     call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+    call nasaBasins_to_grid(outfldr,grid,"Antarctica")
     
-!     call sedLaske_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
-!     call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=2.d0)
-!     call ghfDavies_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
-!     call ghfShapiro_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+    call ghfMaule_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+    call ghfDavies_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+    call ghfShapiro_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
     
     ! CLIMBER-3alpha
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
-                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
-                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
-                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
-                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
-                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
-                               path_in=path,max_neighbors=10,lat_lim=5.d0)
+                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
     
-    ! Paleo topography 
-!     call ICE6GC_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
-!     call ICE5G_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
-
     write(*,*)
     write(*,*) "Regridding program finished."
     write(*,*)
