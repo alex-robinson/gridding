@@ -41,6 +41,7 @@ contains
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
+        character(len=128) :: method 
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
@@ -130,8 +131,12 @@ contains
             if (trim(var_now%nm_out) .eq. "zb") then 
                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
             end if 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method, &
-                           radius=grid%G%dx*5d0,fill=.TRUE.,missing_value=mv)
+
+            method = "radius"
+            if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
+
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+                           radius=grid%G%dx*grid%xy_conv*0.75d0,fill=.TRUE.,missing_value=mv)
             
             write(*,*) "2:   ", trim(var_now%nm_in), minval(invar),  maxval(invar)
             write(*,*) "2:   ", trim(var_now%nm_in), minval(outvar), maxval(outvar)
