@@ -77,15 +77,15 @@ program gentopo
     !
     ! =========================================================
 
-    call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
+!     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 
-    call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
-    call ecmwf_to_grid(outfldr, grid,"Global",sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
-    call ecmwf_to_grid( outfldr,grid,"Global",clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr, grid,"Global",sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
+!     call ecmwf_to_grid( outfldr,grid,"Global",clim_range=[1981,2010])
 
-    call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
-    call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+!     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+!     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
     call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
