@@ -41,20 +41,20 @@ program gentopo
         case("GRL-50KM")
             call grid_init(grid,name="GRL-50KM",mtype="stereographic",units="kilometers", &
                            lon180=.TRUE.,dx=50.d0,nx=37,dy=50.d0,ny=61, &
-                           lambda=-40.d0,phi=72.d0,alpha=7.5d0)
+                           lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
         case("GRL-20KM")
             call grid_init(grid,name="GRL-20KM",mtype="stereographic",units="kilometers", &
                            lon180=.TRUE.,dx=20.d0,nx=90,dy=20.d0,ny=150, &
-                           lambda=-40.d0,phi=72.d0,alpha=7.5d0)
+                           lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
         case("GRL-10KM")
             call grid_init(grid,name="GRL-10KM",mtype="stereographic",units="kilometers", &
                            lon180=.TRUE.,dx=10.d0,nx=180,dy=10.d0,ny=300, &
-                           lambda=-40.d0,phi=72.d0,alpha=7.5d0)
+                           lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
         case("Bamber01-20KM")
-            call grid_init(grid,name="Bamber01-20KM",mtype="polar stereographic",units="kilometers", &
+            call grid_init(grid,name="Bamber01-20KM",mtype="polar_stereographic",units="kilometers", &
                            lon180=.TRUE.,x0=-800.d0,dx=20.d0,nx=76,y0=-3400.d0,dy=20.d0,ny=141, &
                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
@@ -87,18 +87,18 @@ program gentopo
 !     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 !     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
-    call nasaBasins_to_grid(outfldr,grid,"Greenland")
+!     call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
-    call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-    call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-    call ghfDavies_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-    call ghfShapiro_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!     call sedLaske_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!     call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!     call ghfDavies_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!     call ghfShapiro_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
     
-    ! Paleo topography 
-    call ICE6GC_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!     ! Paleo topography 
+!     call ICE6GC_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!     call ICE5G_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 
-    call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+!     call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
     
     ! CLIMBER-3alpha
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
