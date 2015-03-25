@@ -28,7 +28,7 @@ program gentopo
     !
     ! =========================================================
  
-    gridname = "GRL-20KM"
+    gridname = "Bamber01-20KM"
     outfldr  = "output/Greenland/"//trim(gridname)
 
     ! =========================================================

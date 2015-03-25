@@ -49,13 +49,13 @@ contains
             ! Define topography (Bamber et al. 2013) grid and input variable field
             select case(thin_by)
                 case(10)
-                    call grid_init(gTOPO,name="TOPO-B13-10KM",mtype="polar stereographic", &
+                    call grid_init(gTOPO,name="TOPO-B13-10KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
                             lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
                 case(5)
-                    call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar stereographic", &
+                    call grid_init(gTOPO,name="TOPO-B13-5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
                             lambda=-39.d0,phi=90.d0,alpha=7.5d0)
