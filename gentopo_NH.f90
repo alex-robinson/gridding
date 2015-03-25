@@ -55,43 +55,42 @@ program gentopo
     !
     ! =========================================================
 
-!     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
-!     call ecmwf_to_grid(outfldr,grid,"NH",sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,"NH",clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,"NH",sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,"NH",clim_range=[1981,2010])
 
-!     call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=1,lat_lim=1.d0)
+    call etopo1_to_grid(outfldr,grid,"NH",max_neighbors=1,lat_lim=1.d0)
   
-!     call ghfDavies_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
-!     call ghfShapiro_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call ghfDavies_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call ghfShapiro_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
-    ! Paleo topography 
-!     call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
-!     call ICE5G_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+!     Paleo topography 
+    call ICE6GC_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call ICE5G_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
-!     call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,grid,"NH",max_neighbors=4,lat_lim=2.d0)
 
-    ! ### MODEL DATA ### 
+!     ### MODEL DATA ### 
 
-    ! CLIMBER-3alpha
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
-!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
-!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
-!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+!     CLIMBER-3alpha
+    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
+                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
+                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
+                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
-!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
-!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
-!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
+                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
+                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
+                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
     
 
-    
     write(*,*)
     write(*,*) "Regridding program finished."
     write(*,*)
