@@ -35,10 +35,9 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: lon(:), lat(:), var(:,:)
-            double precision, allocatable :: var0(:,:,:)
+            double precision, allocatable :: lon(:), lat(:), var(:,:,:,:)
             double precision, allocatable :: time(:)
-            double precision, allocatable :: zs(:,:) 
+            double precision, allocatable :: zs(:,:,:) 
             double precision :: lapse = 6.5d-3 
         end type 
 
@@ -46,7 +45,7 @@ contains
         type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in
         type(var_defs), allocatable :: vars(:)
-        integer :: nx, ny, np, nt
+        integer :: nx, ny, np, nm, nt
 
         type(map_class)  :: map
         type(var_defs) :: var_now 
@@ -55,7 +54,7 @@ contains
 
         integer :: q, k, m, i, l, n_var 
 
-        double precision, parameter :: sigma_climber2 = 1000.d0 
+        double precision, parameter :: sigma_climber2 = 900.d0 
 
         ! Define the input filenames
         fldr_in      = trim(path_in)
@@ -72,13 +71,12 @@ contains
         nx =  7
         ny = 18
         np = nx*ny 
-
+        nm = 12
         nt = nc_size(file_in,"time")
 
         allocate(inp%time(nt))
-        allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny))
-        allocate(inp%var0(nx,ny,12))
-        allocate(inp%zs(nx,ny))
+        allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny,nm,nt))
+        allocate(inp%zs(nx,ny,nt))
 
         call nc_read(file_in,"time",inp%time)
         call nc_read(file_in,"lon",inp%lon,start=[1],count=[7])   ! 8-11 are zonal averages
@@ -105,10 +103,12 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(2))
-        call def_var_info(vars( 1),trim(file_in),"ts","t2m_sl",units="degrees Celcius", &
+        call def_var_info(vars( 1),trim(file_in),"horo","zs",units="m", &
+                          long_name="Surface elevation",method="nn")
+        call def_var_info(vars( 2),trim(file_in),"ts","t2m_sl",units="degrees Celcius", &
                           long_name="Near-surface temperature at sea level",method="nn")
-        call def_var_info(vars( 2),trim(file_in),"prc","pr",units="mm*d**-1", &
-                          long_name="Precipitation",method="nn")
+!         call def_var_info(vars( 3),trim(file_in),"prc","pr",units="mm*d**-1", &
+!                           long_name="Precipitation",method="nn")
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -130,92 +130,61 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! Load reference topography in order to adjust temps to sea-level temps 
-        call nc_read(file_in,"horo",inp%zs,missing_value=mv,start=[1,1,1,1],count=[nx,ny,1,1])
+        ! ## Map climatological gridded variables ##
+
+        ! Read in topography
+        var_now = vars(1)
+        call nc_read(file_in,var_now%nm_in,inp%zs,missing_value=mv,start=[1,1,1,1],count=[nx,ny,1,nt])
         inp%zs = cshift(inp%zs,-2,dim=1)
 
-        ! Map zs to new grid
-        call map_field(map,"zs",inp%zs,outzs,outmask,"nn", &
-                          fill=.TRUE.,missing_value=mv,sigma=sigma)
-        call climber2_smooth(outzs,sigma=sigma_climber2,dx=grid%G%dx,mask=outzs .ne. mv)
-        call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
+        do k = 1, nt 
 
-        ! Write variable metadata
-        call nc_write_attr(filename,"zs","units","m")
-        call nc_write_attr(filename,"zs","long_name","Surface elevation")
-        call nc_write_attr(filename,"zs","coordinates","lat2D lon2D")
-        
-        ! Also generate a land mask
-        inp%var = 0.d0
-        where(inp%zs .gt. 1.d0) inp%var = 1.d0 
+            ! Map variable to new grid
+            call map_field(map,var_now%nm_in,inp%zs(:,:,k),outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
+            call climber2_smooth(outvar,sigma=sigma_climber2,dx=grid%G%dx,mask=outvar .ne. mv)
 
-        ! Map mask to new grid
-        call map_field(map,"mask_land",inp%var,outvar,outmask,"nn", &
-                          fill=.TRUE.,missing_value=mv,sigma=sigma)
-        call nc_write(filename,"mask_land",nint(outvar),dim1="xc",dim2="yc")
+            ! Write output variable to output file
+            call nc_write(filename,"zs",real(outvar),dim1="xc",dim2="yc",dim3="time", &
+                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
-        ! Write variable metadata
-        call nc_write_attr(filename,"mask_land","units","1")
-        call nc_write_attr(filename,"mask_land","long_name","Land mask (land=1)")
-        call nc_write_attr(filename,"mask_land","coordinates","lat2D lon2D")
-
-        ! ## Map climatological gridded variables ##
-        
-        ! Load present day temperature field 
-        var_now = vars(1)
-        call nc_read(trim(var_now%filename),var_now%nm_in,inp%var0,missing_value=mv, &
-                             start=[1,1,1,nt],count=[nx,ny,12,1])
-
-        do m = 1, 12 
-            inp%var0 = cshift(inp%var0,-2,dim=1)
-            inp%var0(:,:,m) = inp%var0(:,:,m) + inp%lapse*inp%zs 
+            write(*,"(a,f10.2,1x,a2)") trim(var_now%nm_out), inp%time(k), "ka"
         end do 
 
-        ! Loop over variables
-        do i = 1, size(vars)
+        ! Write variable metadata
+        call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+        call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+
+
+        ! Loop over monthly variables
+        do i = 2, size(vars)
             var_now = vars(i)
 
+            ! Read in current variable
+            call nc_read(file_in,var_now%nm_in,inp%var,missing_value=mv,start=[1,1,1,1],count=[nx,ny,nm,nt])
+            inp%var = cshift(inp%var,-2,dim=1)
+
             do k = 1, nt 
-            do m = 1, 12 
+                do m = 1, 12 
 
-                ! Read in current variable
-                call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=mv, &
-                             start=[1,1,m,k],count=[nx,ny,1,1])
-                inp%var = cshift(inp%var,-2,dim=1)
+                    ! Scale to sea-level temperature for interpolation
+                    if (trim(var_now%nm_out) .eq. "t2m_sl") &
+                        inp%var(:,:,m,k) = inp%var(:,:,m,k) + inp%lapse*inp%zs(:,:,k) 
 
-                ! Scale to sea-level temperature for interpolation
-                if (trim(var_now%nm_out) .eq. "t2m_sl") &
-                    inp%var = inp%var + inp%lapse*inp%zs 
+                    ! Map variable to new grid
+                    call map_field(map,var_now%nm_in,inp%var(:,:,m,k),outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
+                    call climber2_smooth(outvar,sigma=sigma_climber2,dx=grid%G%dx,mask=outvar .ne. mv)
 
-                ! Map variable to new grid
-                call map_field(map,var_now%nm_in,inp%var,outvar,outmask,"nn", &
-                              fill=.TRUE.,missing_value=mv,sigma=sigma)
-                call climber2_smooth(outvar,sigma=sigma_climber2,dx=grid%G%dx,mask=outvar .ne. mv)
+                    ! Write output variable to output file
+                    call nc_write(filename,var_now%nm_out,real(outvar), &
+                                  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                  start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+                end do 
 
-                ! Write output variable to output file
-                call nc_write(filename,var_now%nm_out,real(outvar), &
-                              dim1="xc",dim2="yc",dim3="month",dim4="time", &
-                              start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+                write(*,"(a,f10.2,1x,a2)") trim(var_now%nm_out), inp%time(k), "ka"
+            end do 
 
-!                 ! Also map anomalies
-!                 if (trim(var_now%nm_out) .eq. "t2m_sl") then 
-!                     inp%var = inp%var - inp%var0(:,:,m)
-
-!                     ! Map variable to new grid
-!                     call map_field(map,var_now%nm_in,inp%var,outvar,outmask,"nn", &
-!                                   fill=.TRUE.,missing_value=mv,sigma=sigma)
-!                     call climber2_smooth(outvar,sigma=sigma_climber2,dx=grid%G%dx,mask=outvar .ne. mv)
-
-!                     ! Write output variable to output file
-!                     call nc_write(filename,"dt2m_sl",real(outvar), &
-!                                   dim1="xc",dim2="yc",dim3="month",dim4="time", &
-!                                   start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
-
-!                 end if 
-
-            end do     
-            end do
-
+                
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
@@ -239,7 +208,7 @@ contains
 
         ! Local variables
         double precision :: tmp2D(size(var2D,1),size(var2D,2))
-        double precision, parameter :: sigma_max = 250.d0 
+        double precision, parameter :: sigma_max = 300.d0 
         integer :: nloop, i 
 
         if (sigma .lt. sigma_max) then 
@@ -250,7 +219,7 @@ contains
 
         nloop = (sigma / sigma_max)**2 
 
-        write(*,*) "climber2_smooth nloop = ", nloop
+!         write(*,*) "climber2_smooth nloop = ", nloop
 
         do i = 1, nloop 
             tmp2D = var2D
