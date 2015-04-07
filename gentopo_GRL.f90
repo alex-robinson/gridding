@@ -6,6 +6,7 @@ program gentopo
 
     use Bamber13 
     use CERES 
+    use climber2
     use climber3a
     use ECMWF
     use ETOPO 
@@ -29,7 +30,7 @@ program gentopo
     !
     ! =========================================================
  
-    gridname = "GRL-40KM"
+    gridname = "Bamber01-20KM"
     outfldr  = "output/Greenland/"//trim(gridname)
 
     ! =========================================================
@@ -78,6 +79,7 @@ program gentopo
     !
     ! =========================================================
 
+    if (.FALSE.) then 
     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 
     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
@@ -119,6 +121,14 @@ program gentopo
                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+
+    end if 
+
+    ! CLIMBER2
+    path = "data/climber_data/NCO2_nc/"
+    call climber2_atm_to_grid(outfldr,"Ganopolski2011",grid,sim="860ka", &
+                              path_in=path,max_neighbors=4,lat_lim=20.d0)
+    
 
     write(*,*)
     write(*,*) "Regridding program finished."
