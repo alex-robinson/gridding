@@ -118,17 +118,17 @@ contains
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-        ! Initialize the output file
-        call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-        call nc_write_dim(filename,"month",x=1,nx=12,units="1")
-        call nc_write_dim(filename,"time", x=inp%time,units="kiloyears")
-        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+!         ! Initialize the output file
+!         call nc_create(filename)
+!         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+!         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+!         call nc_write_dim(filename,"month",x=1,nx=12,units="1")
+!         call nc_write_dim(filename,"time", x=inp%time,units="kiloyears")
+!         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
-        ! Write meta data 
-        call nc_write_attr(filename,"Description",desc)
-        call nc_write_attr(filename,"Reference",ref)
+!         ! Write meta data 
+!         call nc_write_attr(filename,"Description",desc)
+!         call nc_write_attr(filename,"Reference",ref)
 
         ! ## Map climatological gridded variables ##
 
@@ -137,23 +137,23 @@ contains
         call nc_read(file_in,var_now%nm_in,inp%zs,missing_value=mv,start=[1,1,1,1],count=[nx,ny,1,nt])
         inp%zs = cshift(inp%zs,-2,dim=1)
 
-        do k = 1, nt 
+!         do k = 1, nt 
 
-            ! Map variable to new grid
-            call map_field(map,var_now%nm_in,inp%zs(:,:,k),outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
-            call climber2_smooth(outvar,sigma=sigma_climber2,dx=grid%G%dx,mask=outvar .ne. mv)
+!             ! Map variable to new grid
+!             call map_field(map,var_now%nm_in,inp%zs(:,:,k),outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
+!             call climber2_smooth(outvar,sigma=sigma_climber2,dx=grid%G%dx,mask=outvar .ne. mv)
 
-            ! Write output variable to output file
-            call nc_write(filename,"zs",real(outvar),dim1="xc",dim2="yc",dim3="time", &
-                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+!             ! Write output variable to output file
+!             call nc_write(filename,"zs",real(outvar),dim1="xc",dim2="yc",dim3="time", &
+!                           start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
-            write(*,"(a,f10.2,1x,a2)") trim(var_now%nm_out), inp%time(k), "ka"
-        end do 
+!             write(*,"(a,f10.2,1x,a2)") trim(var_now%nm_out), inp%time(k), "ka"
+!         end do 
 
-        ! Write variable metadata
-        call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-        call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+!         ! Write variable metadata
+!         call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+!         call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!         call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
 
 
         ! Loop over monthly variables
@@ -164,7 +164,7 @@ contains
             call nc_read(file_in,var_now%nm_in,inp%var,missing_value=mv,start=[1,1,1,1],count=[nx,ny,nm,nt])
             inp%var = cshift(inp%var,-2,dim=1)
 
-            do k = 1, nt 
+            do k = 260, nt 
                 do m = 1, 12 
 
                     ! Scale to sea-level temperature for interpolation
