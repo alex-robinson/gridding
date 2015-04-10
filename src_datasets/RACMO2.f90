@@ -96,8 +96,8 @@ contains
 
         ! Define RACMO2 input grids/points ===========
         
-        nx = 240 
-        ny = 262
+        nx = 262 
+        ny = 240
         np = nx*ny 
 
         write(*,*) "lon = ",nc_size(file_topo,"lon")
