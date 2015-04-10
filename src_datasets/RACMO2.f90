@@ -100,6 +100,9 @@ contains
         ny = 262
         np = nx*ny 
 
+        write(*,*) "lon = ",nc_size(file_topo,"lon")
+        write(*,*) "lat = ",nc_size(file_topo,"lat")
+        
         if (allocated(inp%lon)) deallocate(inp%lon)
         if (allocated(inp%lat)) deallocate(inp%lat)
         allocate(inp%lon(np),inp%lat(np))
