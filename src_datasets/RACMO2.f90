@@ -103,8 +103,8 @@ contains
         if (allocated(inp%lon)) deallocate(inp%lon)
         if (allocated(inp%lat)) deallocate(inp%lat)
         allocate(inp%lon(np),inp%lat(np))
-        call nc_read(file_topo,"lon2d",inp%lon,start=[1,1],count=[nx,ny])
-        call nc_read(file_topo,"lat2d",inp%lat,start=[1,1],count=[nx,ny])
+        call nc_read(file_topo,"lon2d",inp%lon)
+        call nc_read(file_topo,"lat2d",inp%lat)
         call points_init(pts0,name="ANT27",mtype="latlon",units="degrees",lon180=.TRUE., &
                          x=inp%lon,y=inp%lat)
 
