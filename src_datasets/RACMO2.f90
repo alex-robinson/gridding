@@ -189,8 +189,6 @@ contains
             
             end do 
 
-            stop 
-
             ! ## SURFACE (3D) FIELDS ##
             do i = 1, size(vars)
                 var_now = vars(i)     
@@ -201,19 +199,13 @@ contains
                     do m = 1, nm 
                         q = (k-1)*12 + m 
 
-                        if (var_now%dimextra) then 
-                            call nc_read(trim(var_now%filename),var_now%nm_in,inp%var, &
-                                     missing_value=missing_value, &
-                                     start=[1,1,1,q],count=[nx,ny,1,1])
-                        else 
-                            call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,&
-                                     missing_value=missing_value, &
-                                     start=[1,1,q],count=[nx,ny,1])
-                        end if
+                        call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,&
+                                 missing_value=missing_value, &
+                                 start=[1,1,q],count=[nx,ny,1])
                         where (inp%var .ne. missing_value) inp%var = inp%var*var_now%conv 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,inp%var,outvar,outmask,"shepard",100.d3, &
-                                       fill=.FALSE.,missing_value=missing_value)
+                                       fill=.FALSE.,missing_value=mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),units=var_now%units_out, &
                                       dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
