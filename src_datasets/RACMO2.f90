@@ -96,13 +96,10 @@ contains
 
         ! Define RACMO2 input grids/points ===========
         
-        nx = 262 
-        ny = 240
+        nx = nc_size(file_topo,"lon")
+        ny = nc_size(file_topo,"lat")
         np = nx*ny 
 
-        write(*,*) "lon = ",nc_size(file_topo,"lon")
-        write(*,*) "lat = ",nc_size(file_topo,"lat")
-        
         if (allocated(inp%lon)) deallocate(inp%lon)
         if (allocated(inp%lat)) deallocate(inp%lat)
         allocate(inp%lon(np),inp%lat(np))
@@ -110,8 +107,6 @@ contains
         call nc_read(file_topo,"lat2d",inp%lat,start=[1,1],count=[nx,ny])
         call points_init(pts0,name="ANT27",mtype="latlon",units="degrees",lon180=.TRUE., &
                          x=inp%lon,y=inp%lat)
-
-        stop 
 
         ! Define the variables to be mapped
 
@@ -193,6 +188,8 @@ contains
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
+
+            stop 
 
             ! ## SURFACE (3D) FIELDS ##
             do i = 1, size(vars)
