@@ -90,8 +90,13 @@ contains
         call nc_read(file_in,"z",invar,missing_value=mv)
         where (abs(invar) .gt. 1d6) invar = mv 
 
+        write(*,*) "invar: ", minval(invar), maxval(invar)
+
         call map_field(map,"z",invar,outvar,outmask,method="nng",sigma=sigma,fill=.TRUE.,missing_value=mv)
         where (abs(outvar) .gt. 1d6) outvar = mv 
+
+        write(*,*) "outvar: ", minval(outvar), maxval(outvar)
+        
         call fill_weighted(outvar,missing_value=mv)
 
         call nc_write(filename,"H_litho",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
