@@ -40,7 +40,7 @@ contains
         integer, allocatable          :: outmask(:,:)
         
         integer :: nx, ny
-        double precision, parameter :: sigma = 50   ! kilometers
+        double precision, parameter :: sigma = 20   ! kilometers
 
         ! Define the input filenames
         file_in = "/data/sicopolis/data/Antarctica/AN1-CRUST/AN1-CRUST.grd"
