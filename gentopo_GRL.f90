@@ -4,7 +4,6 @@ program gentopo
     use ncio 
     use coordinates
 
-    use Bamber13 
     use CERES 
     use climber2
     use climber3a
@@ -15,6 +14,7 @@ program gentopo
     use NasaBasins
     use sediments 
     use topo_reconstructions 
+    use topographies_grl 
 
     implicit none
 
@@ -79,6 +79,9 @@ program gentopo
     !
     ! =========================================================
 
+    call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
+
+
     if (.FALSE.) then 
     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 
@@ -122,12 +125,12 @@ program gentopo
     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
 
-    end if 
-
     ! CLIMBER2
     path = "data/climber_data/NCO2_nc/"
     call climber2_atm_to_grid(outfldr,"Ganopolski2011",grid,sim="860ka", &
                               path_in=path,max_neighbors=4,lat_lim=20.d0)
+    
+    end if 
     
 
     write(*,*)

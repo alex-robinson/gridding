@@ -112,7 +112,7 @@ program bedmap2_netcdf
     end if 
 
     ! ====== Velocity ========
-    if (.TRUE.) then 
+    if (.FALSE.) then 
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Rignot velocities at 900 m resolution
@@ -165,7 +165,7 @@ program bedmap2_netcdf
     end if 
 
     ! ====== Accumulation ========
-    if (.FALSE.) then 
+    if (.TRUE.) then 
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Arthern accumulation at 1 km resolution

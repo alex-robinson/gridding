@@ -91,7 +91,7 @@ $(objdir)/ncio.o: $(libdir)/ncio/ncio.f90
 $(objdir)/gridding_datasets.o: $(srcdir)/gridding_datasets.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/Bamber13.o: $(srcdir)/Bamber13.f90
+$(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/CERES.o: $(srcdir)/CERES.f90
@@ -134,7 +134,7 @@ $(objdir)/topo_reconstructions.o: $(srcdir)/topo_reconstructions.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
-			   	   $(objdir)/Bamber13.o \
+			   	   $(objdir)/topographies_grl.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \

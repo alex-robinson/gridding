@@ -31,7 +31,7 @@ contains
         character(len=512) :: filename, infldr, prefix  
         character(len=1024) :: desc, ref 
 
-        type(grid_class)   :: gTOPO
+        type(grid_class)   :: grid0
         character(len=256) :: file_invariant
         type(var_defs), allocatable :: invariant(:) 
         double precision, allocatable :: invar(:,:) 
@@ -48,12 +48,12 @@ contains
         if (trim(domain) .eq. "Antarctica") then 
             
             ! Define topography (BEDMAP2) grid and input variable field
-            call grid_init(gTOPO,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
+            call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
             ! Define the input filenames
-            infldr         = "output/Antarctica/"
+            infldr         = "output/Antarctica/BEDMAP2-netcdf/"
             file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_topo.nc"
             desc    = "Antarctica bedrock and surface topography (BEDMAP2)"
             ref     = "Fretwell et al.: Bedmap2: improved ice bed, surface and &
@@ -79,13 +79,13 @@ contains
                           long_name="Ice mask",method="nn")
 
         ! Allocate the input grid variable
-        call grid_allocate(gTOPO,invar)
+        call grid_allocate(grid0,invar)
         
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -158,7 +158,7 @@ contains
         character(len=512) :: filename, infldr, prefix  
         character(len=1024) :: desc, ref 
 
-        type(grid_class)   :: gTOPO
+        type(grid_class)   :: grid0
         character(len=256) :: file_invariant
         type(var_defs), allocatable :: invariant(:)
         double precision, allocatable :: invar(:,:), invarb(:,:)
@@ -175,12 +175,12 @@ contains
         if (trim(domain) .eq. "Antarctica") then 
             
             ! Define topography (BEDMAP2) grid and input variable field
-            call grid_init(gTOPO,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
+            call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
             ! Define the input filenames
-            infldr         = "output/Antarctica/"
+            infldr         = "output/Antarctica/BEDMAP2-netcdf/"
             file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_vel.nc"
             desc    = "Antarctica surface velocity"
             ref     = "Rignot, E., Mouginot, J. and Scheuchl, B.: &
@@ -207,14 +207,14 @@ contains
                           long_name="Surface velocity, magnitude")
 
         ! Allocate the input grid variable
-        call grid_allocate(gTOPO,invar)
-        call grid_allocate(gTOPO,invarb)
+        call grid_allocate(grid0,invar)
+        call grid_allocate(grid0,invarb)
 
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -286,7 +286,7 @@ contains
         character(len=512) :: filename, infldr, prefix  
         character(len=1024) :: desc, ref 
 
-        type(grid_class)   :: gTOPO
+        type(grid_class)   :: grid0
         character(len=256) :: file_invariant
         type(var_defs), allocatable :: invariant(:)
         double precision, allocatable :: invar(:,:), invarb(:,:)
@@ -303,12 +303,12 @@ contains
         if (trim(domain) .eq. "Antarctica") then 
             
             ! Define topography (BEDMAP2) grid and input variable field
-            call grid_init(gTOPO,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
+            call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
             ! Define the input filenames
-            infldr         = "output/Antarctica/"
+            infldr         = "output/Antarctica/BEDMAP2-netcdf/"
             file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_acc.nc"
             desc    = "Antarctica climatological accumulation"
             ref     = "Arthern, R. J., Winebrenner, D. P. and Vaughan, D. G.: &
@@ -332,14 +332,14 @@ contains
                           long_name="Annual accumulation")
 
         ! Allocate the input grid variable
-        call grid_allocate(gTOPO,invar)
-        call grid_allocate(gTOPO,invarb)
+        call grid_allocate(grid0,invar)
+        call grid_allocate(grid0,invarb)
 
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
-        call map_init(map,gTOPO,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
