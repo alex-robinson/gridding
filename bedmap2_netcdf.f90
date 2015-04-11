@@ -58,7 +58,7 @@ program bedmap2_netcdf
     filename_acc  = "output/Antarctica/BEDMAP2-netcdf/"//trim(grid%name)//"_BEDMAP2_acc.nc"
     
     ! ====== TOPOGRAPHY ========
-    if (.TRUE.) then 
+    if (.FALSE.) then 
         ! Write grid information to output file
         call write_init(filename_topo,grid)
 
@@ -112,7 +112,7 @@ program bedmap2_netcdf
     end if 
 
     ! ====== Velocity ========
-    if (.FALSE.) then 
+    if (.TRUE.) then 
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Rignot velocities at 900 m resolution
