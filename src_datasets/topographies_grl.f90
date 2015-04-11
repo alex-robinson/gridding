@@ -210,7 +210,7 @@ contains
             end select 
 
             ! Define the input filenames
-            file_in = "data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19.nc"
+            file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19.nc"
             desc    = "BedMachine: Greenland dataset based on mass conservation, 19-Nov-2014 (v1.7)"
             ref     = "Morlighem, M., Rignot, E., Mouginot, J., Seroussi, H. and Larour, E., &
                       &Deeply incised submarine glacial valleys beneath the Greenland Ice Sheet, &
@@ -259,6 +259,11 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
+        ! Make sure the file can be opened 
+        write(*,*) "Reading: ",trim(file_in)
+        write(*,*) "nx = ", nc_size(file_in,"x")
+        write(*,*) "ny = ", nc_size(file_in,"y")
+        
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
