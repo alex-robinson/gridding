@@ -189,7 +189,7 @@ contains
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
-        integer :: thin_by = 5 
+        integer :: thin_by = 10 
         character(len=128) :: method 
 
         ! Define input grid
