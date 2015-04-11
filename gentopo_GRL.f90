@@ -79,7 +79,7 @@ program gentopo
     !
     ! =========================================================
 
-    call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=2.d0)
+    call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
 
 
     if (.FALSE.) then 
