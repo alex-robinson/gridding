@@ -201,7 +201,7 @@ contains
                     call grid_init(grid0,name="ESPG-3413-1.5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-637.925d0,dx=1.5d0,nx=1001,y0=-3349.425d0,dy=1.5d0,ny=1794, &
-                            lambda=-45.d0,phi=70.d0,alpha=7.5d0)
+                            lambda=-45.d0,phi=70.d0,alpha=7.2d0)
 
                 case DEFAULT
                     write(*,*) "Morlighem14_to_grid:: error: thin_by can only be 10."
