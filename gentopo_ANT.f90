@@ -4,6 +4,7 @@ program gentopo
     use ncio 
     use coordinates
     
+    use AN1CRUST
     use bedmap2
     use CERES
     use climber3a 

@@ -13,6 +13,7 @@ program gentopo
     use MAR 
     use NasaBasins
     use sediments 
+    use stratigraphy
     use topo_reconstructions 
     use topographies_grl 
 

@@ -91,34 +91,13 @@ $(objdir)/ncio.o: $(libdir)/ncio/ncio.f90
 $(objdir)/gridding_datasets.o: $(srcdir)/gridding_datasets.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/CERES.o: $(srcdir)/CERES.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/ECMWF.o: $(srcdir)/ECMWF.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/MAR.o: $(srcdir)/MAR.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/RACMO2.o: $(srcdir)/RACMO2.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/Rignot13_BasalMelt.o: $(srcdir)/Rignot13_BasalMelt.f90
+$(objdir)/AN1CRUST.o: $(srcdir)/AN1CRUST.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/bedmap2.o: $(srcdir)/bedmap2.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/sediments.o: $(srcdir)/sediments.f90
-	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
-
-$(objdir)/GeothermalHeatFlux.o: $(srcdir)/GeothermalHeatFlux.f90
+$(objdir)/CERES.o: $(srcdir)/CERES.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/climber2.o: $(srcdir)/climber2.f90
@@ -127,47 +106,76 @@ $(objdir)/climber2.o: $(srcdir)/climber2.f90
 $(objdir)/climber3a.o: $(srcdir)/climber3a.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/ECMWF.o: $(srcdir)/ECMWF.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/ETOPO.o: $(srcdir)/ETOPO.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/GeothermalHeatFlux.o: $(srcdir)/GeothermalHeatFlux.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/MAR.o: $(srcdir)/MAR.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/RACMO2.o: $(srcdir)/RACMO2.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/Rignot13_BasalMelt.o: $(srcdir)/Rignot13_BasalMelt.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/sediments.o: $(srcdir)/sediments.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/stratigraphy.o: $(srcdir)/stratigraphy.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/topo_reconstructions.o: $(srcdir)/topo_reconstructions.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 obj_datasets_GRL = $(objdir)/gridding_datasets.o \
-			   	   $(objdir)/topographies_grl.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
 			       $(objdir)/ECMWF.o \
+			       $(objdir)/ETOPO.o \
+			       $(objdir)/GeothermalHeatFlux.o \
 			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o \
 			       $(objdir)/sediments.o \
-			       $(objdir)/GeothermalHeatFlux.o \
-			       $(objdir)/ETOPO.o \
-			       $(objdir)/topo_reconstructions.o
+			       $(objdir)/stratigraphy.o \
+			       $(objdir)/topo_reconstructions.o \
+			       $(objdir)/topographies_grl.o
 
 obj_datasets_NH =  $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
-			       $(objdir)/ECMWF.o \
-			       $(objdir)/sediments.o \
-			       $(objdir)/GeothermalHeatFlux.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
+			       $(objdir)/ECMWF.o \
 			       $(objdir)/ETOPO.o \
-			       $(objdir)/topo_reconstructions.o
+			       $(objdir)/GeothermalHeatFlux.o \
+			       $(objdir)/topo_reconstructions.o \
+			       $(objdir)/sediments.o
 
 obj_datasets_ANT = $(objdir)/gridding_datasets.o \
-			       $(objdir)/CERES.o \
-			       $(objdir)/ECMWF.o \
+			       $(objdir)/AN1CRUST.o \
 			       $(objdir)/bedmap2.o \
+			       $(objdir)/CERES.o \
+			       $(objdir)/climber2.o \
+			       $(objdir)/climber3a.o \
+			       $(objdir)/ECMWF.o \
+			       $(objdir)/ETOPO.o \
+			       $(objdir)/GeothermalHeatFlux.o \
 			       $(objdir)/nasaBasins.o \
 				   $(objdir)/RACMO2.o \
 				   $(objdir)/Rignot13_BasalMelt.o \
 			       $(objdir)/sediments.o \
-			       $(objdir)/GeothermalHeatFlux.o \
-			       $(objdir)/climber2.o \
-			       $(objdir)/climber3a.o \
-			       $(objdir)/ETOPO.o \
 			       $(objdir)/topo_reconstructions.o
 
 ## Complete programs
