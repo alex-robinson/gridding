@@ -63,9 +63,11 @@ program gentopo
     !
     ! =========================================================
 
-    call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-    call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-    call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+    call An15litho_to_grid(outfldr,grid,"Antarctica",max_neighbors=5,lat_lim=1.0d0)
+
+!     call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!     call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4, lat_lim=2.d0)
     
