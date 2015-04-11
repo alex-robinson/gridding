@@ -210,7 +210,7 @@ contains
             end select 
 
             ! Define the input filenames
-            file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19.nc"
+            file_in = "data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19.nc"
             desc    = "BedMachine: Greenland dataset based on mass conservation, 19-Nov-2014 (v1.7)"
             ref     = "Morlighem, M., Rignot, E., Mouginot, J., Seroussi, H. and Larour, E., &
                       &Deeply incised submarine glacial valleys beneath the Greenland Ice Sheet, &
