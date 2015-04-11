@@ -49,8 +49,8 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
-                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
+                   lambda=0.d0,phi=-90.d0,alpha=24.7d0)
 
             ! Define the input filenames
             infldr         = "output/Antarctica/BEDMAP2-netcdf/"
@@ -176,8 +176,8 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
-                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
+                   lambda=0.d0,phi=-90.d0,alpha=24.7d0)
 
             ! Define the input filenames
             infldr         = "output/Antarctica/BEDMAP2-netcdf/"
@@ -304,8 +304,8 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3400.d0,dx=10.d0,nx=681,y0=-3400.d0,dy=10.d0,ny=681, &
-                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
+                   lambda=0.d0,phi=-90.d0,alpha=24.7d0)
 
             ! Define the input filenames
             infldr         = "output/Antarctica/BEDMAP2-netcdf/"
