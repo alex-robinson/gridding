@@ -53,12 +53,12 @@ program bedmap2_netcdf
     ! Allocate grid variable
     call grid_allocate(grid,var)
 
-    filename_topo = "output/Antarctica/"//trim(grid%name)//"_BEDMAP2_topo.nc"
-    filename_vel  = "output/Antarctica/"//trim(grid%name)//"_BEDMAP2_vel.nc"
-    filename_acc  = "output/Antarctica/"//trim(grid%name)//"_BEDMAP2_acc.nc"
+    filename_topo = "output/Antarctica/BEDMAP2-netcdf/"//trim(grid%name)//"_BEDMAP2_topo.nc"
+    filename_vel  = "output/Antarctica/BEDMAP2-netcdf/"//trim(grid%name)//"_BEDMAP2_vel.nc"
+    filename_acc  = "output/Antarctica/BEDMAP2-netcdf/"//trim(grid%name)//"_BEDMAP2_acc.nc"
     
     ! ====== TOPOGRAPHY ========
-    if (.FALSE.) then 
+    if (.TRUE.) then 
         ! Write grid information to output file
         call write_init(filename_topo,grid)
 
@@ -148,16 +148,28 @@ program bedmap2_netcdf
         write(*,*) "Interpolated vy."
         call nc_write(filename_vel,"v",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="m*a-1",long_name="Surface velocity, y-comp.")
-    
+        
+        call nc_read("data/Antarctica/antarctica_ice_velocity.nc","err",var0)
+        write(*,*) "Read err."
+        tmp = var0 
+        do j = 1, size(y)
+            var0(:,j) = tmp(:,size(y)-j+1)  
+        end do 
+        write(*,*) "Flipped err."
+        var = interp_nearest_fast(x=x,y=y,z=var0,xout=real(grid%G%x), &
+                                  yout=real(grid%G%y),max_dist_fac=1.2,missing_value=mv)
+        write(*,*) "Interpolated err."
+        call nc_write(filename_vel,"u",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
+                      units="m*a-1",long_name="Error estimate for magnitude of ice velocities")
+        
     end if 
 
     ! ====== Accumulation ========
-    if (.TRUE.) then 
+    if (.FALSE.) then 
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Arthern accumulation at 1 km resolution
-!         call bedmap2_dims(x,y,var0,x0=-3949.50,dx=2.0,nx=3949,y0=-3949.5,dy=2.0,ny=4150)
-        call bedmap2_dims(x,y,var0,x0=-3949.50,dx=1.0,nx=7899,y0=-3949.5,dy=1.0,ny=8300)
+        call bedmap2_dims(x,y,var0,x0=-3949.0,dx=1.0,nx=7899,y0=-3949.0,dy=1.0,ny=8300)
         if (allocated(tmp)) deallocate(tmp)
         allocate(tmp(size(x),size(y)))
 
@@ -171,7 +183,7 @@ program bedmap2_netcdf
 
         var = interp_nearest_fast(x=x,y=y,z=var0,xout=real(grid%G%x), &
                                   yout=real(grid%G%y),max_dist_fac=1.2,missing_value=mv)
-        write(*,*) "Interpolated vx."
+        write(*,*) "Interpolated accum."
         call nc_write(filename_acc,"accum",real(var),dim1="xc",dim2="yc",missing_value=real(mv), &
                       units="mm*a-1",long_name="Annual accumulation")
         
