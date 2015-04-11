@@ -40,6 +40,7 @@ contains
         integer, allocatable          :: outmask(:,:)
         
         integer :: nx, ny
+        double precision, parameter :: sigma = 50   ! kilometers
 
         ! Define the input filenames
         file_in = "/data/sicopolis/data/Antarctica/AN1-CRUST/AN1-CRUST.grd"
@@ -89,8 +90,9 @@ contains
         call nc_read(file_in,"z",invar,missing_value=mv)
         where (abs(invar) .gt. 1d6) invar = mv 
 
-        call map_field(map,"z",invar,outvar,outmask,method="nn",fill=.TRUE.,missing_value=mv)
-!         call fill_weighted(outvar,missing_value=mv)
+        call map_field(map,"z",invar,outvar,outmask,method="nng",sigma=sigma,fill=.TRUE.,missing_value=mv)
+        where (abs(outvar) .gt. 1d6) outvar = mv 
+        call fill_weighted(outvar,missing_value=mv)
 
         call nc_write(filename,"H_litho",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             
