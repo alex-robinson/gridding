@@ -192,7 +192,7 @@ contains
         character(len=128) :: method 
 
         ! Make sure the file can be opened 
-        file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset_tmp.nc"
+        file_in = "MCdataset_tmp.nc"
         write(*,*) "Reading: ",trim(file_in)
         write(*,*) "nx = ", nc_size(file_in,"x")
         write(*,*) "ny = ", nc_size(file_in,"y")
