@@ -196,7 +196,7 @@ contains
         integer :: status, ncid 
 
         ! Make sure the file can be opened 
-        file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19.nc"
+        file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19_NetCDF3.nc"
         write(*,*) "Reading nf90: ",trim(file_in)
 
         status = nf90_open(path=trim(file_in), mode = nf90_nowrite, ncid = ncid)
