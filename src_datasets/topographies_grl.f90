@@ -187,10 +187,16 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:)
-        double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 10 
         character(len=128) :: method 
+
+        ! Make sure the file can be opened 
+        file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19.nc"
+        write(*,*) "Reading: ",trim(file_in)
+        write(*,*) "nx = ", nc_size(file_in,"x")
+        write(*,*) "ny = ", nc_size(file_in,"y")
+        
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
@@ -259,11 +265,6 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! Make sure the file can be opened 
-        write(*,*) "Reading: ",trim(file_in)
-        write(*,*) "nx = ", nc_size(file_in,"x")
-        write(*,*) "ny = ", nc_size(file_in,"y")
-        
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
