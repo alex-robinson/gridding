@@ -203,7 +203,7 @@ contains
         if (status /= nf90_noerr) then
             write(*,*) "nf90 error: ", status 
             write(*,*) nf90_strerror(status)
-
+        end if 
         
 
         write(*,*) "Reading: ",trim(file_in)
