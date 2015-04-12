@@ -200,8 +200,10 @@ contains
         write(*,*) "Reading nf90: ",trim(file_in)
 
         status = nf90_open(path=trim(file_in), mode = nf90_nowrite, ncid = ncid)
-        if (status /= nf90_noerr) write(*,*) "nf90 error: ", status 
-        
+        if (status /= nf90_noerr) then
+            write(*,*) "nf90 error: ", status 
+            write(*,*) nf90_strerror(status)
+
         
 
         write(*,*) "Reading: ",trim(file_in)
