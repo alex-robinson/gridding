@@ -179,7 +179,7 @@ contains
         character(len=1024) :: desc, ref 
 
         type(grid_class)   :: grid0
-        character(len=256) :: file_in
+        character(len=512) :: file_in
         type(var_defs), allocatable :: vars(:)
         double precision, allocatable :: invar(:,:) 
 
@@ -194,8 +194,8 @@ contains
         ! Make sure the file can be opened 
         file_in = "MCdataset_tmp.nc"
         write(*,*) "Reading: ",trim(file_in)
-        write(*,*) "nx = ", nc_size(file_in,"x")
-        write(*,*) "ny = ", nc_size(file_in,"y")
+        write(*,*) "nx = ", nc_size(trim(file_in),"x")
+        write(*,*) "ny = ", nc_size(trim(file_in),"y")
         
 
         ! Define input grid
