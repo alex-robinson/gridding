@@ -249,13 +249,16 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(vars(5))
+        allocate(vars(6))
         call def_var_info(vars(1),trim(file_in),"bed",      "zb",units="m",long_name="Bedrock elevation")
         call def_var_info(vars(2),trim(file_in),"surface",  "zs",units="m",long_name="Surface elevation")
         call def_var_info(vars(3),trim(file_in),"thickness","H",units="m",long_name="Ice thickness")
         call def_var_info(vars(4),trim(file_in),"errbed",   "zb_err",units="m",long_name="Bedrock / ice thickness error")
         call def_var_info(vars(5),trim(file_in),"mask",     "mask",units="(0 - 3)", &
                           long_name="(0 = ocean, 1 = ice-free land, 2 = grounded ice, 3 = floating ice)",method="nn")
+        call def_var_info(vars(6),trim(file_in),"source",     "mask_source",units="(0 - 3)", &
+                          long_name="data source (0 = none, 1 = gimpdem, 2 = Mass conservation, &
+                                    &4 = interpolation, 5 = hydrostatic equilibrium, 6=kriging)",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
