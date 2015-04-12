@@ -5,8 +5,6 @@ module topographies_grl
     use interp2D 
     use ncio 
     
-    use netcdf 
-
     implicit none 
 
     private 
@@ -195,24 +193,6 @@ contains
 
         integer :: status, ncid 
 
-        ! Make sure the file can be opened 
-        file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19_NetCDF3.nc"
-        write(*,*) "Reading nf90: ",trim(file_in)
-
-        status = nf90_open(path=trim(file_in), mode = nf90_nowrite, ncid = ncid)
-        if (status /= nf90_noerr) then
-            write(*,*) "nf90 error: ", status 
-            write(*,*) nf90_strerror(status)
-        end if 
-        
-
-        write(*,*) "Reading: ",trim(file_in)
-        call nc_read_attr(file_in,"CDI",method)
-        write(*,*) "CDI: ",trim(method)
-        write(*,*) "nx = ", nc_size(file_in,"x")
-        write(*,*) "ny = ", nc_size(file_in,"y")
-        
-
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
             
@@ -297,7 +277,8 @@ contains
             end if 
 
             method = "radius"
-            if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
+            if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
+            if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv*0.75d0,fill=.TRUE.,missing_value=mv)
