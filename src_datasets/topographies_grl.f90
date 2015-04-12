@@ -5,6 +5,8 @@ module topographies_grl
     use interp2D 
     use ncio 
     
+    use netcdf 
+
     implicit none 
 
     private 
@@ -191,8 +193,17 @@ contains
         integer :: thin_by = 10 
         character(len=128) :: method 
 
+        integer :: status, ncid 
+
         ! Make sure the file can be opened 
         file_in = "MCdataset_tmp.nc"
+        write(*,*) "Reading nf90: ",trim(file_in)
+
+        status = nf90_open(path=trim(file_in), mode = nf90_nowrite, ncid = ncid)
+        if (status /= nf90_noerr) write(*,*) "nf90 error: ", status 
+        
+        
+
         write(*,*) "Reading: ",trim(file_in)
         call nc_read_attr(file_in,"CDI",method)
         write(*,*) "CDI: ",trim(method)
