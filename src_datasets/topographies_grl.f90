@@ -194,8 +194,10 @@ contains
         ! Make sure the file can be opened 
         file_in = "MCdataset_tmp.nc"
         write(*,*) "Reading: ",trim(file_in)
-        write(*,*) "nx = ", nc_size(trim(file_in),"x")
-        write(*,*) "ny = ", nc_size(trim(file_in),"y")
+        call nc_read_attr(file_in,"CDI",method)
+        write(*,*) "CDI: ",trim(method)
+        write(*,*) "nx = ", nc_size(file_in,"x")
+        write(*,*) "ny = ", nc_size(file_in,"y")
         
 
         ! Define input grid
