@@ -137,7 +137,7 @@ contains
         double precision :: x1, y1, x2, y2 
         integer :: i, j 
 
-        ! Fields available from grid_class object:
+        ! Helpful fields available from grid_class object:
         ! grid%x    : 2D array of projected x-values [km]
         ! grid%y    : 2D array of projected y-values [km]
         ! grid%lon  : 2D array of lon-values [degrees]

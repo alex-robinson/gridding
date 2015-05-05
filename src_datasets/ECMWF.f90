@@ -39,8 +39,8 @@ contains
         type(inp_type)     :: inp
 
         type(grid_class)   :: gECMWF 
-        character(len=256) :: file_invariant, file_surface, files_pres(9)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
+        character(len=256) :: file_invariant, file_surface, files_pres(9), file_precip
+        type(var_defs), allocatable :: invariant(:), surf(:), pres(:), precip(:)
         double precision, allocatable :: invar(:,:) 
         integer :: plev(9) 
 
@@ -54,91 +54,41 @@ contains
         character(len=512) :: filename_clim 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
 
-!         ! Define ECMWF input grid
-!         if (trim(domain) .eq. "GRL075") then 
-            
-!             ! Initialize the grid
-!             call grid_init(gECMWF,name="ECMWF-GRL075",mtype="latlon",units="kilometers",lon180=.TRUE., &
-!                            x0=-100.d0,dx=0.75d0,nx=161,y0=49.5d0,dy=0.75d0,ny=55)
-            
-!             ! Assign the filenames
-!             file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-invariant_historical_mon_197901-201212.nc"
-!             file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-surface_historical_mon_197901-201212.nc"
-!             files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-1000Mb_historical_mon_197901-201212.nc"
-!             files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-950Mb_historical_mon_197901-201212.nc"
-!             files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-850Mb_historical_mon_197901-201212.nc"
-!             files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-750Mb_historical_mon_197901-201212.nc"
-!             files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-700Mb_historical_mon_197901-201212.nc"
-!             files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-650Mb_historical_mon_197901-201212.nc"
-!             files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-600Mb_historical_mon_197901-201212.nc"
-!             files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-550Mb_historical_mon_197901-201212.nc"
-!             files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-GRL-500Mb_historical_mon_197901-201212.nc"
+        ! Assign the filenames
+        file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-invariant_historical_mon_197901-201212.nc"
+        file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-surface_historical_mon_197901-201212.nc"
+        file_precip    = "/data/sicopolis/data/ECMWF/ERA-INTERIM-sf-tp_historical_mon_197901-201412.nc"
+        files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-1000Mb_historical_mon_197901-201212.nc"
+        files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-950Mb_historical_mon_197901-201212.nc"
+        files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-850Mb_historical_mon_197901-201212.nc"
+        files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
+        files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-700Mb_historical_mon_197901-201212.nc"
+        files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-650Mb_historical_mon_197901-201212.nc"
+        files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-600Mb_historical_mon_197901-201212.nc"
+        files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-550Mb_historical_mon_197901-201212.nc"
+        files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
 
-!             desc    = "Regional Greenland subset of the ERA-Interim dataset"
-!             ref     = "Dee et al., 2011, BAMS, &
-!                       &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
+        desc    = "ERA-Interim dataset"
+        ref     = "Dee et al., 2011, BAMS, &
+                  &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
+        
+        ! Initialize the grid
+        nx = nc_size(file_invariant,"longitude")
+        ny = nc_size(file_invariant,"latitude")
+        allocate(inp%lon(nx),inp%lat(ny))
+        call nc_read(file_invariant,"longitude",inp%lon)
+        call nc_read(file_invariant,"latitude", inp%lat)
 
-!         else if (trim(domain) .eq. "ANT075") then 
+        ! Flip latitudes because it is reversed in the file
+        allocate(inp%tmp(ny))
+        inp%tmp = inp%lat
+        do i = 1, ny 
+            inp%lat(i) = inp%tmp(ny-i+1)
+        end do 
+        deallocate(inp%tmp)
 
-!             ! Initialize the grid
-!             call grid_init(gECMWF,name="ECMWF-ANT075",mtype="latlon",units="kilometers",lon180=.TRUE., &
-!                            x0=-180.d0,dx=0.75d0,nx=480,y0=-90.d0,dy=0.75d0,ny=67)
-            
-!             ! Assign the filenames
-!             file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-invariant_historical_mon_197901-201212.nc"
-!             file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-surface_historical_mon_197901-201212.nc"
-!             files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-1000Mb_historical_mon_197901-201212.nc"
-!             files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-950Mb_historical_mon_197901-201212.nc"
-!             files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-850Mb_historical_mon_197901-201212.nc"
-!             files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-750Mb_historical_mon_197901-201212.nc"
-!             files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-700Mb_historical_mon_197901-201212.nc"
-!             files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-650Mb_historical_mon_197901-201212.nc"
-!             files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-600Mb_historical_mon_197901-201212.nc"
-!             files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-550Mb_historical_mon_197901-201212.nc"
-!             files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-ANT-500Mb_historical_mon_197901-201212.nc"
-
-!             desc    = "Regional Antarctica subset of the ERA-Interim dataset"
-!             ref     = "Dee et al., 2011, BAMS, &
-!                       &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
-
-!     else ! GLOBAL DOMAIN
-
-            ! Assign the filenames
-            file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-invariant_historical_mon_197901-201212.nc"
-            file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-surface_historical_mon_197901-201212.nc"
-            files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-1000Mb_historical_mon_197901-201212.nc"
-            files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-950Mb_historical_mon_197901-201212.nc"
-            files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-850Mb_historical_mon_197901-201212.nc"
-            files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
-            files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-700Mb_historical_mon_197901-201212.nc"
-            files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-650Mb_historical_mon_197901-201212.nc"
-            files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-600Mb_historical_mon_197901-201212.nc"
-            files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-550Mb_historical_mon_197901-201212.nc"
-            files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
-
-            desc    = "ERA-Interim dataset"
-            ref     = "Dee et al., 2011, BAMS, &
-                      &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
-            
-            ! Initialize the grid
-            nx = nc_size(file_invariant,"longitude")
-            ny = nc_size(file_invariant,"latitude")
-            allocate(inp%lon(nx),inp%lat(ny))
-            call nc_read(file_invariant,"longitude",inp%lon)
-            call nc_read(file_invariant,"latitude", inp%lat)
-
-            ! Flip latitudes because it is reversed in the file
-            allocate(inp%tmp(ny))
-            inp%tmp = inp%lat
-            do i = 1, ny 
-                inp%lat(i) = inp%tmp(ny-i+1)
-            end do 
-            deallocate(inp%tmp)
-
-            call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
-                           x=inp%lon,y=inp%lat)
-            
-!         end if 
+        call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
+                       x=inp%lon,y=inp%lat)
 
         ! ## First make file for surface fields including invariants ##
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM_197901-201212.nc"
@@ -186,6 +136,12 @@ contains
         call def_var_info(surf(12),trim(file_surface),"sst","sst",units="K", &
                           long_name="Sea surface temperature")
 
+        allocate(precip(2))
+        call def_var_info(precip( 1),trim(file_precip),"sf", "sf", units="kg m**-2 d**-1", &
+                          long_name="Snowfall",conv=1d3)
+        call def_var_info(precip( 2),trim(file_precip),"tp", "pr", units="kg m**-2 d**-1", &
+                          long_name="Precipitation",conv=1d3)
+        
         allocate(pres(5))
         call def_var_info(pres( 1),"None","t", "p_t",units="K",         plev="plev",filenames=files_pres, &
                           long_name="Temperature")
@@ -247,9 +203,37 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
 
 
-            ! ## SURFACE FIELDS ##
-            do i = 1, size(surf)
-                var_now = surf(i)
+!             ! ## SURFACE FIELDS ##
+!             do i = 1, size(surf)
+!                 var_now = surf(i)
+
+!                 q = 0 
+!                 do k = 1, nyr 
+
+!                     year = 1978 + k 
+!                     write(*,*) trim(var_now%nm_in)," :",year
+
+!                     do m = 1, nm 
+!                         q = q+1 
+!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
+!                                      missing_value=mv)
+!                         call flip_lat(invar)
+!                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
+!                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+!                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
+!                     end do 
+!                 end do
+                
+!                 ! Write variable metadata
+!                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+!                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+                
+!             end do  
+
+            ! ## PRECIP FIELDS ##
+            do i = 1, size(precip)
+                var_now = precip(i)
 
                 q = 0 
                 do k = 1, nyr 
@@ -261,6 +245,7 @@ contains
                         q = q+1 
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
                                      missing_value=mv)
+                        where (invar .ne. mv) invar = invar*var_now%conv 
                         call flip_lat(invar)
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
@@ -275,6 +260,8 @@ contains
                 
             end do  
 
+
+            ! ## PRESSURE FIELDS ##
             do l = 1, size(files_pres)   ! Loop over pressure layers
 
                 ! ## Make one file for each pressure level ##
@@ -378,6 +365,23 @@ contains
                 
             end do 
 
+            do i = 1, size(precip)
+                var_now = precip(i)
+                do m = 1, nm  
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
+                                 missing_value=mv)
+                    var2D = time_average(var3D)
+                    call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                  start=[1,1,m],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
+                end do 
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+                
+            end do 
+
             do l = 1, size(files_pres)   ! Loop over pressure layers
 
                 ! ## Make one file for each pressure level ##
@@ -430,6 +434,9 @@ contains
         return 
 
     end subroutine ecmwf_to_grid
+
+
+
 
 
     subroutine flip_lat(var)
