@@ -12,7 +12,7 @@ module ECMWF
     
 contains 
 
-    subroutine ecmwf_to_grid(outfldr,grid,domain,sigma,max_neighbors,lat_lim,clim_range)
+    subroutine ecmwf_to_grid(outfldr,grid,sigma,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -22,13 +22,14 @@ contains
 
         implicit none 
 
-        character(len=*)    :: domain, outfldr 
+        character(len=*)    :: outfldr 
         type(grid_class)    :: grid 
         double precision, optional :: sigma
         integer, optional   :: max_neighbors 
         double precision, optional :: lat_lim 
         integer, optional   :: clim_range(2) 
         character(len=512)  :: filename 
+        character(len=512)  :: subfldr, cmd 
         character(len=1024) :: desc, ref 
 
         type inp_type 
@@ -90,16 +91,28 @@ contains
         call grid_init(gECMWF,name="ECMWF-075",mtype="latlon",units="kilometers",lon180=.TRUE., &
                        x=inp%lon,y=inp%lat)
 
+        ! Add a subfolder to outfldr to hold all of the ECMWF files
+        subfldr = "ERA-INT"
+        cmd = "mkdir "//trim(outfldr)//"/"//trim(subfldr)
+        call system(cmd)
+
         ! ## First make file for surface fields including invariants ##
-        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM_197901-201212.nc"
+        write(filename,"(a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                                trim(grid%name)//"_ERA-INT_197901-201212.nc"
 
         ! For climatology
         if (present(clim_range)) then  
             k0 = clim_range(1) - 1979 + 1
             nk = clim_range(2) - clim_range(1) + 1 
 
-            write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
-                "_ERA-INTERIM_",clim_range(1),"-",clim_range(2),".nc"
+            ! Add a subfolder to outfldr to hold all of the ECMWF files
+            subfldr = "ERA-INT"
+            cmd = "mkdir "//trim(outfldr)//"_clim/"//trim(subfldr)
+            call system(cmd)
+
+            ! Make filename for the climatologies
+            write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+                    trim(grid%name)//"_ERA-INT_",clim_range(1),"-",clim_range(2),".nc"
         end if 
 
         ! Define the pressure levels to be mapped
@@ -203,33 +216,33 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
 
 
-!             ! ## SURFACE FIELDS ##
-!             do i = 1, size(surf)
-!                 var_now = surf(i)
+            ! ## SURFACE FIELDS ##
+            do i = 1, size(surf)
+                var_now = surf(i)
 
-!                 q = 0 
-!                 do k = 1, nyr 
+                q = 0 
+                do k = 1, nyr 
 
-!                     year = 1978 + k 
-!                     write(*,*) trim(var_now%nm_in)," :",year
+                    year = 1978 + k 
+                    write(*,*) trim(var_now%nm_in)," :",year
 
-!                     do m = 1, nm 
-!                         q = q+1 
-!                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
-!                                      missing_value=mv)
-!                         call flip_lat(invar)
-!                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
-!                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
-!                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
-!                     end do 
-!                 end do
+                    do m = 1, nm 
+                        q = q+1 
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
+                                     missing_value=mv)
+                        call flip_lat(invar)
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
+                        call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                      start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
+                    end do 
+                end do
                 
-!                 ! Write variable metadata
-!                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-!                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-!                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
                 
-!             end do  
+            end do  
 
             ! ## PRECIP FIELDS ##
             do i = 1, size(precip)
@@ -266,11 +279,11 @@ contains
 
                 ! ## Make one file for each pressure level ##
                 if (plev(l) .ge. 1000) then 
-                    write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb_197901-201212.nc"
+                    write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                                               trim(grid%name)//"_ERA-INT-",plev(l),"Mb_197901-201212.nc"
                 else
-                    write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb_197901-201212.nc"
+                    write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                                               trim(grid%name)//"_ERA-INT-",plev(l),"Mb_197901-201212.nc"
                 end if 
 
                 ! Initialize the output file
@@ -386,15 +399,15 @@ contains
 
                 ! ## Make one file for each pressure level ##
                 if (plev(l) .ge. 1000) then 
-                    write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb_197901-201212.nc"
-                    write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
+                    write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                                               trim(grid%name)//"_ERA-INT-",plev(l),"Mb_197901-201212.nc"
+                    write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+                                               trim(grid%name)//"_ERA-INT-",plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 else
-                    write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb_197901-201212.nc"
-                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)//"_ERA-INTERIM-", &
-                                               plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
+                    write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                                               trim(grid%name)//"_ERA-INT-",plev(l),"Mb_197901-201212.nc"
+                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+                                               trim(grid%name)//"_ERA-INT-",plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 end if 
 
                 ! Initialize the output file
