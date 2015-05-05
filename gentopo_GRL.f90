@@ -80,17 +80,18 @@ program gentopo
     !
     ! =========================================================
 
-    call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
-
+    call ecmwf_to_grid(outfldr, grid,"Global",sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
+    call ecmwf_to_grid( outfldr,grid,"Global",clim_range=[1981,2010])
 
     if (.FALSE.) then 
+
+    call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
+
     call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)
 
     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
-    call ecmwf_to_grid(outfldr, grid,"Global",sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
-    call ecmwf_to_grid( outfldr,grid,"Global",clim_range=[1981,2010])
-
+    
     call etopo1_to_grid(outfldr,grid,"Greenland",max_neighbors=1,lat_lim=1.d0)
   
     call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
