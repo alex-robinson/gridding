@@ -461,8 +461,8 @@ contains
 
         character(len=*) :: outfldr
         type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: sigma, lat_lim 
+        integer, optional :: max_neighbors 
+        double precision, optional :: sigma, lat_lim 
         integer, optional   :: clim_range(2) 
         character(len=512)  :: filename, subfldr, filename_clim 
         character(len=1024) :: desc, ref, cmd
@@ -554,7 +554,7 @@ contains
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
 
-        if (.not. present(clim_range)) then 
+        if (present(sigma) .and. present(max_neighbors) .and. present(lat_lim)) then 
 
         ! Initialize the output file
         call nc_create(filename)
