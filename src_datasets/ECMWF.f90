@@ -591,12 +591,12 @@ contains
                 call replace(file_in,"{year}",trim(year))
                 
                 ! Read in current variable
-                call nc_read(file_in,var_now%nm_out,inp%var,missing_value=mv, &
+                call nc_read(file_in,var_now%nm_in,inp%var,missing_value=mv, &
                              start=[1,1,d,m],count=[nx,ny,1,1])
                 where(abs(inp%var) .ge. 1d10) inp%var = mv 
 
                 ! Map the 2D field
-                call map_field(map, var_now%nm_out,inp%var,outvar,outmask,"nng", &
+                call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
                                fill=.TRUE.,missing_value=mv,sigma=sigma)
 
                 ! Clean up infinite values or all missing layers
@@ -634,12 +634,12 @@ contains
         do d = 1, nz 
  
             ! Read in mask 
-            call nc_read(file_in,var_now%nm_in,inp%mask,missing_value=int(mv), &
+            call nc_read(file_in,var_now%nm_out,inp%mask,missing_value=int(mv), &
                          start=[1,1,1,d],count=[nx,ny,1,1])
             where(inp%mask == mv) inp%mask = 0 
 
             ! Map the 2D variable
-            call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,method="nn", &
+            call map_field(map,var_now%nm_out,dble(inp%mask),outvar,outmask,method="nn", &
                           fill=.TRUE.,missing_value=mv)
 
             ! Write output mask to output file
