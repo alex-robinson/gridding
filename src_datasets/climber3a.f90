@@ -201,7 +201,7 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:)
+            double precision, allocatable :: lon(:), lat(:), depth(:)
             double precision, allocatable :: var(:,:)
             integer,          allocatable :: mask(:,:)
         end type 
@@ -235,16 +235,11 @@ contains
         ny = nc_size(file_in,"YT_J")
         nz = nc_size(file_in,"ZT_K")
 
-        allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz),inp%depth(nz))
+        allocate(inp%lon(nx),inp%lat(ny),inp%depth(nz))
 
         call nc_read(file_in,"XT_I",inp%lon)
         call nc_read(file_in,"YT_J",inp%lat)
         call nc_read(file_in,"ZT_K",inp%depth)
-
-        ! Make z negative and reverse it (rel to ocean surface)
-        do k = 1, nz 
-            inp%z_ocn(k) = -inp%depth(nz-k+1)
-        end do  
 
         ! Define CLIMBER3a points and input variable field
         call grid_init(grid0,name="climber3a-ocn",mtype="latlon",units="degrees", &
@@ -254,7 +249,7 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(2))
-        call def_var_info(vars( 1),trim(file_in),"TEMP","to_ann",units="degrees Celcius", &
+        call def_var_info(vars( 1),trim(file_in),"TEMP","to",units="degrees Celcius", &
                           long_name="Potential temperature (annual mean)",method="nng")
         call def_var_info(vars( 2),trim(file_in),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
@@ -270,7 +265,7 @@ contains
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x, units="kilometers")
         call nc_write_dim(filename,"yc",   x=grid%G%y, units="kilometers")
-        call nc_write_dim(filename,"z_ocn",x=inp%z_ocn,units="kilometers")
+        call nc_write_dim(filename,"depth",x=inp%depth,units="meters")
 
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
@@ -286,21 +281,21 @@ contains
             var_now = vars(1)
 
             ! Read in current variable (starting from last to reverse depth vector)
-            call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
-                         start=[1,1,nz-k+1],count=[nx,ny,1])
-            where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
+            call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv, &
+                         start=[1,1,k],count=[nx,ny,1])
+            where(abs(inp%var) .ge. 1d10) inp%var = mv 
 
             call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
-                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
+                           fill=.TRUE.,missing_value=mv,sigma=sigma)
 
             ! Clean up infinite values or all missing layers
             ! (eg, for deep bathymetry levels for GRL domain)
             where(outvar .ne. outvar .or. &
-                  count(outvar.eq.missing_value) .eq. grid%npts) outvar = 1.d0
+                  count(outvar.eq.mv) .eq. grid%npts) outvar = 1.d0
 
             ! Write output variable to output file
-            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
-                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="depth", &
+                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
 
             ! Also map mask 
             var_now = vars(2) 
@@ -310,11 +305,11 @@ contains
             where(inp%var == missing_value) inp%mask = 0 
 
             call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value)
+                          fill=.TRUE.,missing_value=mv)
 
             ! Write output mask to output file
-            call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="z_ocn", &
-                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+            call nc_write(filename,var_now%nm_out,int(outvar),dim1="xc",dim2="yc",dim3="depth", &
+                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=int(mv))
         
         end do 
 
