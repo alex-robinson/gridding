@@ -571,6 +571,8 @@ contains
 
             write(year,"(i4)") int(inp%time(t)) 
 
+            write(*,*) "YEAR = ", year 
+            
             ! Map variable for each depth level
             do k = 1, nz 
 
@@ -593,13 +595,19 @@ contains
 
                     ! Clean up infinite values or all missing layers
                     ! (eg, for deep bathymetry levels for GRL domain)
-                    where(outvar .ne. outvar .or. &
-                          count(outvar.eq.mv) .eq. grid%npts) outvar = 1.d0
-
+                    if (trim(var_now%nm_out) .eq. "to") then
+                        where(outvar .ne. outvar .or. &
+                            count(outvar.eq.mv) .eq. grid%npts) outvar = 1.d0
+                    end if 
+                    if (trim(var_now%nm_out) .eq. "so") then
+                        where(outvar .ne. outvar .or. &
+                            count(outvar.eq.mv) .eq. grid%npts) outvar = 35.d0
+                    end if 
+                    
                     ! Write output variable to output file
                     call nc_write(filename,var_now%nm_out,real(outvar), &
-                                  dim1="xc",dim2="yc",dim3="depth", &
-                                  start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+                                  dim1="xc",dim2="yc",dim3="depth",dim4="time", &
+                                  start=[1,1,k,t],count=[grid%G%nx,grid%G%ny,1,1])
 
                 end do 
 
