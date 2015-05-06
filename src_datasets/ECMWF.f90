@@ -502,15 +502,20 @@ contains
         write(filename,"(a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                               trim(grid%name)//"_ERA-INT-ORAS4_195801-201412.nc"
 
+        ! Get correct filename for thetao, 2014
+        file_in = trim(file_in_template)
+        call replace(file_in,"{var}","thetao")
+        call replace(file_in,"{year}","2014")
+                    
         ! Load the domain information 
-        nx = nc_size(file_in_template,"lon")
-        ny = nc_size(file_in_template,"lat")
-        nz = nc_size(file_in_template,"depth")
+        nx = nc_size(file_in,"lon")
+        ny = nc_size(file_in,"lat")
+        nz = nc_size(file_in,"depth")
         allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz),inp%depth(nz))
 
-        call nc_read(file_in_template,"lon",inp%lon)
-        call nc_read(file_in_template,"lat",inp%lat)
-        call nc_read(file_in_template,"depth",inp%depth)
+        call nc_read(file_in,"lon",inp%lon)
+        call nc_read(file_in,"lat",inp%lat)
+        call nc_read(file_in,"depth",inp%depth)
 
         ! Make z negative and reverse it (rel to ocean surface)
         do k = 1, nz 
