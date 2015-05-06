@@ -683,8 +683,8 @@ contains
             call nc_create(filename_clim)
             call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
             call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename_clim,"depth",x=inp%depth,units="meters")
             call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-            call nc_write_dim(filename,"depth",x=inp%depth,units="meters")
             call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
             
             ! Write meta data 
