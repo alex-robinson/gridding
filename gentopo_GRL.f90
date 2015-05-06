@@ -80,7 +80,7 @@ program gentopo
     !
     ! =========================================================
 
-    call ecmwf_ocn_to_grid(outfldr,grid,sigma=20.d0,max_neighbors=4,lat_lim=2.d0)
+    call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
     
     if (.FALSE.) then 
 
