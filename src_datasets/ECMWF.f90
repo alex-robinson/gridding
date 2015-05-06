@@ -560,7 +560,7 @@ contains
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x, units="kilometers")
         call nc_write_dim(filename,"yc",   x=grid%G%y, units="kilometers")
-        call nc_write_dim(filename,"depth",x=inp%depth,units="kilometers")
+        call nc_write_dim(filename,"depth",x=inp%depth,units="meters")
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call nc_write_dim(filename,"time", x=inp%time, units="year")
 
@@ -634,12 +634,12 @@ contains
         do d = 1, nz 
  
             ! Read in mask 
-            call nc_read(file_in,var_now%nm_out,inp%mask,missing_value=int(mv), &
+            call nc_read(file_in,var_now%nm_in,inp%mask,missing_value=int(mv), &
                          start=[1,1,1,d],count=[nx,ny,1,1])
             where(inp%mask == mv) inp%mask = 0 
 
             ! Map the 2D variable
-            call map_field(map,var_now%nm_out,dble(inp%mask),outvar,outmask,method="nn", &
+            call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,method="nn", &
                           fill=.TRUE.,missing_value=mv)
 
             ! Write output mask to output file
@@ -684,13 +684,14 @@ contains
             call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
             call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
             call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call nc_write_dim(filename,"depth",x=inp%depth,units="meters")
             call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
             
             ! Write meta data 
             call nc_write_attr(filename_clim,"Description",desc)
             call nc_write_attr(filename_clim,"Reference",ref)
 
-            do i = 1, size(vars)
+            do i = 1, 2
                 var_now = vars(i)
                 do d = 1, nz 
                 do m = 1, nm  
@@ -709,6 +710,14 @@ contains
                 
             end do 
 
+            ! Mask too 
+            var_now = vars(3)
+            do d = 1, nz 
+                call nc_read(filename,var_now%nm_out,var2D,start=[1,1,d],count=[grid%G%nx,grid%G%ny,1], &
+                                     missing_value=mv)
+                call nc_write(filename_clim,var_now%nm_out,int(var2D),dim1="xc",dim2="yc",dim3="depth", &
+                              start=[1,1,d],count=[grid%G%nx,grid%G%ny,1],missing_value=int(mv))
+            end do 
         end if 
 
 
