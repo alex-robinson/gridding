@@ -547,14 +547,14 @@ contains
         call def_var_info(vars( 3),trim(file_in_template),"mask","mask_ocn",units="1", &
                           long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
 
-        ! Initialize mappings
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
 
         if (present(sigma) .and. present(max_neighbors) .and. present(lat_lim)) then 
+
+        ! Initialize mappings
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize the output file
         call nc_create(filename)
