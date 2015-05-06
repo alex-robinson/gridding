@@ -9,7 +9,8 @@ module ECMWF
 
     private 
     public :: ecmwf_to_grid
-    
+    public :: ecmwf_ocn_to_grid 
+
 contains 
 
     subroutine ecmwf_to_grid(outfldr,grid,sigma,max_neighbors,lat_lim,clim_range)
@@ -449,6 +450,193 @@ contains
     end subroutine ecmwf_to_grid
 
 
+    subroutine ecmwf_ocn_to_grid(outfldr,grid,sigma,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       ECMWF ORAS4 oceanic DATA
+        !
+        ! =========================================================
+        implicit none 
+
+        character(len=*) :: outfldr
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: sigma, lat_lim 
+        character(len=512)  :: filename, subfldr
+        character(len=1024) :: desc, ref, cmd
+
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:), z_ocn(:), depth(:), time(:)
+            double precision, allocatable :: var(:,:)
+            integer,          allocatable :: mask(:,:)
+        end type 
+
+        type(inp_type)     :: inp
+        type(grid_class)   :: grid0
+        character(len=256) :: fldr_in, file_in, file_in_template 
+        type(var_defs), allocatable :: vars(:)
+        integer :: nx, ny, nz, nt 
+
+        type(map_class)  :: map
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        integer :: q, k, m, i, l, n_var, t
+        character(len=4) :: year 
+
+        ! Define the input filenames
+        fldr_in          = "/data/sicopolis/data/ECMWF_ORAS4/"
+        file_in_template = trim(fldr_in)//"{var}_oras4_1m_{year}_grid_1x1.nc"
+
+        desc    = "ECMWF ORAS4 oceanic reanalysis output"
+        ref     = "source folder: "//trim(fldr_in)
+
+        ! Add a subfolder to outfldr to hold all of the ECMWF files
+        subfldr = "ERA-INT-ORAS4"
+        cmd = "mkdir "//trim(outfldr)//"/"//trim(subfldr)
+        call system(cmd)
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                              trim(grid%name)//"_ERA-INT-ORAS4_195801-201412.nc"
+
+        ! Load the domain information 
+        nx = nc_size(file_in_template,"lon")
+        ny = nc_size(file_in_template,"lat")
+        nz = nc_size(file_in_template,"depth")
+        allocate(inp%lon(nx),inp%lat(ny),inp%z_ocn(nz),inp%depth(nz))
+
+        call nc_read(file_in_template,"lon",inp%lon)
+        call nc_read(file_in_template,"lat",inp%lat)
+        call nc_read(file_in_template,"depth",inp%depth)
+
+        ! Make z negative and reverse it (rel to ocean surface)
+        do k = 1, nz 
+            inp%z_ocn(k) = -inp%depth(nz-k+1)
+        end do  
+
+        ! Define time info too 
+        nt = 2014-1958+1 
+        allocate(inp%time(nt))
+        do k = 1, nt 
+            inp%time(k) = 1958.d0 + (k-1)
+        end do 
+        
+        ! Define CLIMBER3a points and input variable field
+        call grid_init(grid0,name="ORAS4-1DEG",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x=inp%lon,y=inp%lat )
+        call grid_allocate(grid0,inp%var)
+        call grid_allocate(grid0,inp%mask)
+
+        ! Define the variables to be mapped 
+        allocate(vars(3))
+        call def_var_info(vars( 1),trim(file_in_template),"thetao","to",units="degrees Celcius", &
+                          long_name="Potential temperature",method="nng")
+        call def_var_info(vars( 2),trim(file_in_template),"so","so",units="psu", &
+                          long_name="Salinity",method="nng")
+        call def_var_info(vars( 3),trim(file_in_template),"mask","mask_ocn",units="1", &
+                          long_name="Land-ocean mask (0=land, 1=ocean)",method="nn")
+
+        ! Initialize mappings
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x, units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y, units="kilometers")
+        call nc_write_dim(filename,"depth",x=inp%depth,units="kilometers")
+        call nc_write_dim(filename,"time", x=inp%time, units="year")
+
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! ## Map variables ##
+        
+        ! Map variables for each year 
+        do t = 1, nt
+
+            write(year,"(i4)") int(inp%time(t)) 
+
+            ! Map variable for each depth level
+            do k = 1, nz 
+
+                do q = 1, 2 
+
+                    var_now = vars(q)
+                    ! Get correct filename
+                    file_in = trim(var_now%filename)
+                    call replace(file_in,"{var}",trim(var_now%nm_in))
+                    call replace(file_in,"{year}",trim(year))
+                    
+                    ! Read in current variable
+                    call nc_read(file_in,var_now%nm_in,inp%var,missing_value=mv, &
+                                 start=[1,1,k],count=[nx,ny,1])
+                    where(abs(inp%var) .ge. 1d10) inp%var = mv 
+
+                    ! Map the 2D field
+                    call map_field(map, var_now%nm_in,inp%var,outvar,outmask,"nng", &
+                                   fill=.TRUE.,missing_value=mv,sigma=sigma)
+
+                    ! Clean up infinite values or all missing layers
+                    ! (eg, for deep bathymetry levels for GRL domain)
+                    where(outvar .ne. outvar .or. &
+                          count(outvar.eq.mv) .eq. grid%npts) outvar = 1.d0
+
+                    ! Write output variable to output file
+                    call nc_write(filename,var_now%nm_out,real(outvar), &
+                                  dim1="xc",dim2="yc",dim3="depth", &
+                                  start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+
+                end do 
+
+            end do 
+
+        end do 
+
+        ! Also map mask
+        ! Map variable for each depth level
+
+        var_now = vars(3) 
+        ! note: filename taken from last file processed above 
+
+        do k = 1, nz 
+ 
+            ! Read in mask 
+            call nc_read(file_in,var_now%nm_in,inp%mask,missing_value=int(mv), &
+                         start=[1,1,k],count=[nx,ny,1])
+            where(inp%mask == mv) inp%mask = 0 
+
+            ! Map the 2D variable
+            call map_field(map,var_now%nm_in,dble(inp%mask),outvar,outmask,method="nn", &
+                          fill=.TRUE.,missing_value=mv)
+
+            ! Write output mask to output file
+            call nc_write(filename,var_now%nm_out,int(outvar), &
+                          dim1="xc",dim2="yc",dim3="depth", &
+                          start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+        
+        end do 
+
+        ! Write variable metadata
+        do q = 1, size(vars)
+            var_now = vars(q)
+            call nc_write_attr(filename,var_now%nm_out,"units",    var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+        end do 
+
+        return 
+
+    end subroutine ecmwf_ocn_to_grid
 
 
 

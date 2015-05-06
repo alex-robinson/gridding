@@ -102,4 +102,29 @@ contains
         return
     end subroutine thin 
 
+    subroutine replace(s,text,rep,outs)
+        ! Adapted from FUNCTION Replace_Text:
+        ! http://fortranwiki.org/fortran/show/String_Functions
+        CHARACTER(len=*)           :: s,text,rep
+        CHARACTER(len=*), optional :: outs
+        INTEGER :: i, nt, nr
+
+        character(len=LEN(s)+100) :: tmps  ! Temp string to hold output 
+
+        tmps = s ; nt = LEN_TRIM(text) ; nr = LEN_TRIM(rep)
+        DO
+           i = INDEX(tmps,text(:nt)) ; IF (i == 0) EXIT
+           tmps = tmps(:i-1) // rep(:nr) // tmps(i+nt:)
+        END DO
+        
+        if (present(outs)) then 
+            outs = trim(tmps)
+        else 
+            s = trim(tmps)
+        end if 
+
+        return 
+        
+    end subroutine replace
+
 end module gridding_datasets
