@@ -635,7 +635,7 @@ contains
  
             ! Read in mask 
             call nc_read(file_in,var_now%nm_in,inp%mask,missing_value=int(mv), &
-                         start=[1,1,1,d],count=[nx,ny,1,1])
+                         start=[1,1,d,1],count=[nx,ny,1,1])
             where(inp%mask == mv) inp%mask = 0 
 
             ! Map the 2D variable
