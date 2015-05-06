@@ -664,7 +664,7 @@ contains
             nk = clim_range(2) - clim_range(1) + 1 
 
             ! Add a subfolder to outfldr to hold all of the ECMWF files
-            subfldr = "ERA-INT"
+            subfldr = "ERA-INT-ORAS4"
             cmd = "mkdir "//trim(outfldr)//"_clim/"//trim(subfldr)
             call system(cmd)
 
