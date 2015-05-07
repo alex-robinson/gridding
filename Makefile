@@ -3,7 +3,7 @@
 
 # PATH options
 objdir = .obj
-libdir = ..
+libdir = libs
 srcdir = src_datasets
 
 # Command-line options at make call
@@ -85,7 +85,10 @@ else
 endif
 
 ## Individual libraries or modules ##
-$(objdir)/ncio.o: $(libdir)/ncio/ncio.f90
+$(objdir)/nml.o: $(libdir)/nml.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
+$(objdir)/control.o: $(srcdir)/control.f90 $(objdir)/nml.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/gridding_datasets.o: $(srcdir)/gridding_datasets.f90
@@ -139,7 +142,28 @@ $(objdir)/topo_reconstructions.o: $(srcdir)/topo_reconstructions.f90
 $(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-obj_datasets_GRL = $(objdir)/gridding_datasets.o \
+obj_datasets =     $(objdir)/control.o \
+				   $(objdir)/nml.o \
+				   $(objdir)/gridding_datasets.o \
+			       $(objdir)/AN1CRUST.o \
+			       $(objdir)/bedmap2.o \
+			       $(objdir)/CERES.o \
+			       $(objdir)/climber2.o \
+			       $(objdir)/climber3a.o \
+			       $(objdir)/ECMWF.o \
+			       $(objdir)/ETOPO.o \
+			       $(objdir)/GeothermalHeatFlux.o \
+			       $(objdir)/MAR.o \
+			       $(objdir)/nasaBasins.o \
+				   $(objdir)/RACMO2.o \
+				   $(objdir)/Rignot13_BasalMelt.o \
+			       $(objdir)/sediments.o \
+			       $(objdir)/stratigraphy.o \
+			       $(objdir)/topo_reconstructions.o \
+			       $(objdir)/topographies_grl.o
+
+obj_datasets_GRL = $(objdir)/control.o \
+				   $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
@@ -153,7 +177,8 @@ obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			       $(objdir)/topo_reconstructions.o \
 			       $(objdir)/topographies_grl.o
 
-obj_datasets_NH =  $(objdir)/gridding_datasets.o \
+obj_datasets_NH =  $(objdir)/control.o \
+				   $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
@@ -163,7 +188,8 @@ obj_datasets_NH =  $(objdir)/gridding_datasets.o \
 			       $(objdir)/topo_reconstructions.o \
 			       $(objdir)/sediments.o
 
-obj_datasets_ANT = $(objdir)/gridding_datasets.o \
+obj_datasets_ANT = $(objdir)/control.o \
+				   $(objdir)/gridding_datasets.o \
 			       $(objdir)/AN1CRUST.o \
 			       $(objdir)/bedmap2.o \
 			       $(objdir)/CERES.o \
@@ -179,6 +205,12 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/topo_reconstructions.o
 
 ## Complete programs
+
+gen_gridded: $(obj_datasets) 
+	$(FC) $(DFLAGS) $(FLAGS) -o gen_gridded.x $^ gen_gridded.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gen_gridded.x is ready."
+	@echo " "
 
 GRL: $(obj_datasets_GRL) 
 	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
