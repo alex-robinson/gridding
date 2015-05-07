@@ -108,11 +108,11 @@ contains
 
             ! Add a subfolder to outfldr to hold all of the ECMWF files
             subfldr = "ERA-INT"
-            cmd = "mkdir "//trim(outfldr)//"_clim/"//trim(subfldr)
+            cmd = "mkdir "//trim(outfldr)//"/"//trim(subfldr)
             call system(cmd)
 
             ! Make filename for the climatologies
-            write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+            write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                     trim(grid%name)//"_ERA-INT_",clim_range(1),"-",clim_range(2),".nc"
         end if 
 
@@ -402,12 +402,12 @@ contains
                 if (plev(l) .ge. 1000) then 
                     write(filename,"(a,i4,a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                                                trim(grid%name)//"_ERA-INT-",plev(l),"Mb_197901-201212.nc"
-                    write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+                    write(filename_clim,"(a,i4,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                                                trim(grid%name)//"_ERA-INT-",plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 else
                     write(filename,"(a,i3,a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                                                trim(grid%name)//"_ERA-INT-",plev(l),"Mb_197901-201212.nc"
-                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+                    write(filename_clim,"(a,i3,a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                                                trim(grid%name)//"_ERA-INT-",plev(l),"Mb_",clim_range(1),"-",clim_range(2),".nc"
                 end if 
 
@@ -665,12 +665,12 @@ contains
 
             ! Add a subfolder to outfldr to hold all of the ECMWF files
             subfldr = "ERA-INT-ORAS4"
-            cmd = "mkdir "//trim(outfldr)//"_clim/"//trim(subfldr)
+            cmd = "mkdir "//trim(outfldr)//"/"//trim(subfldr)
             call system(cmd)
 
             ! Make filename for the climatologies
             write(filename_clim,"(a,i4,a1,i4,a3)")  &
-                    trim(outfldr)//"_clim/"//trim(subfldr)//"/"// &
+                    trim(outfldr)//"/"//trim(subfldr)//"/"// &
                     trim(grid%name)//"_ERA-INT-ORAS4_",clim_range(1),"-",clim_range(2),".nc"
 
 

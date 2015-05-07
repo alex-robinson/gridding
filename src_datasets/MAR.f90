@@ -89,7 +89,7 @@ contains
                 k0 = clim_range(1) - year0+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
-                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
                     "_MARv3.5-ERA-30km-monthly_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
@@ -123,7 +123,7 @@ contains
                 k0 = clim_range(1) - year0+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
-                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
                     "_MARv3.5-30km-monthly-MIROC5-rcp85_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
@@ -438,7 +438,7 @@ contains
 !                 k0 = clim_range(1) - year0+1
 !                 nk = clim_range(2) - clim_range(1) + 1 
 
-!                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+!                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
 !                     "_MARv3.3-15km-monthly-ERA-Interim_",clim_range(1),"-",clim_range(2),".nc"
 !             end if 
 
@@ -469,7 +469,7 @@ contains
 !                 k0 = clim_range(1) - year0+1
 !                 nk = clim_range(2) - clim_range(1) + 1 
 
-!                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+!                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
 !                     "_MARv3.3-30km-monthly-MIROC5-rcp85_",clim_range(1),"-",clim_range(2),".nc"
 !             end if 
 

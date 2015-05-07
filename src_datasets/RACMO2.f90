@@ -84,7 +84,7 @@ contains
                 k0 = clim_range(1) - year0+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
-                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
                     "_RACMO23-ERA-INTERIM_monthly_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
@@ -342,7 +342,7 @@ contains
                 k0 = clim_range(1) - year0+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
-                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
                     "_RACMO2-ANT3K55_HadCM3-A1B-monthly_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
@@ -370,7 +370,7 @@ contains
                 k0 = clim_range(1) - year0+1
                 nk = clim_range(2) - clim_range(1) + 1 
 
-                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"_clim/"//trim(grid%name)// &
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
                     "_RACMO2-ANT3K55_HadCM3-c20-monthly_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 

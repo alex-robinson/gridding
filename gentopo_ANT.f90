@@ -66,7 +66,7 @@ program gentopo
 !     call An15litho_to_grid(outfldr,grid,"Antarctica",max_neighbors=5,lat_lim=1.0d0)
 
 !     call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-!     call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+    call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !     call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
 !     call CERES_to_grid(outfldr,grid,"Global",max_neighbors=4, lat_lim=2.d0)
@@ -108,22 +108,22 @@ program gentopo
 !     call ghfDavies_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
     
-    ! CLIMBER-3alpha
-    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
-                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
-                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
-                               path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+!     ! CLIMBER-3alpha
+!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
+!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
+!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
+!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
     
-    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
-                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
-                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
-                               path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
+!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
+!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
+!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
     
     write(*,*)
     write(*,*) "Regridding program finished."
