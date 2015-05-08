@@ -7,6 +7,8 @@ module ECMWF
     
     implicit none 
 
+    double precision, parameter :: sec_day = 86400.d0 
+
     private 
     public :: ecmwf_to_grid
     public :: ecmwf_ocn_to_grid 
@@ -152,9 +154,9 @@ contains
 
         allocate(precip(2))
         call def_var_info(precip( 1),trim(file_precip),"sf", "sf", units="kg m**-2 d**-1", &
-                          long_name="Snowfall",conv=1d3)
+                          long_name="Snowfall",conv=sec_day*1d3)  ! m/s => mm/d
         call def_var_info(precip( 2),trim(file_precip),"tp", "pr", units="kg m**-2 d**-1", &
-                          long_name="Precipitation",conv=1d3)
+                          long_name="Precipitation",conv=sec_day*1d3)  ! m/s => mm/d
         
         allocate(pres(5))
         call def_var_info(pres( 1),"None","t", "p_t",units="K",         plev="plev",filenames=files_pres, &

@@ -162,8 +162,7 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/topo_reconstructions.o \
 			       $(objdir)/topographies_grl.o
 
-obj_datasets_GRL = $(objdir)/control.o \
-				   $(objdir)/gridding_datasets.o \
+obj_datasets_GRL = $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
@@ -177,8 +176,7 @@ obj_datasets_GRL = $(objdir)/control.o \
 			       $(objdir)/topo_reconstructions.o \
 			       $(objdir)/topographies_grl.o
 
-obj_datasets_NH =  $(objdir)/control.o \
-				   $(objdir)/gridding_datasets.o \
+obj_datasets_NH =  $(objdir)/gridding_datasets.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
@@ -188,8 +186,7 @@ obj_datasets_NH =  $(objdir)/control.o \
 			       $(objdir)/topo_reconstructions.o \
 			       $(objdir)/sediments.o
 
-obj_datasets_ANT = $(objdir)/control.o \
-				   $(objdir)/gridding_datasets.o \
+obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 			       $(objdir)/AN1CRUST.o \
 			       $(objdir)/bedmap2.o \
 			       $(objdir)/CERES.o \
