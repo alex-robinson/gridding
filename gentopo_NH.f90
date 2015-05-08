@@ -27,7 +27,7 @@ program gentopo
     ! =========================================================
  
     gridname = "NH-40KM"
-    outfldr  = "output/NH/"//trim(gridname)
+    outfldr  = "output/North/"//trim(gridname)
 
     ! =========================================================
     !
