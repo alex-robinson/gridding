@@ -834,7 +834,7 @@ contains
         call def_var_info(surf(2),trim(file_pres),"q","rhum",units="%", &
                           long_name="Relative humidity")
 
-        nyr = 2002-1958+1
+        nyr = 2001-1958+1
         nm  = 12 
 
         if (present(max_neighbors) .and. present(lat_lim)) then 
