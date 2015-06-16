@@ -831,7 +831,7 @@ contains
         allocate(surf(2))
         call def_var_info(surf(1),trim(file_surface),"t2m","t2m",units="K", &
                           long_name="Near-surface temperature (2-m)")
-        call def_var_info(surf(2),trim(file_pres),"q","rhum",units="%", &
+        call def_var_info(surf(2),trim(file_pres),"r","rhum",units="%", &
                           long_name="Relative humidity")
 
         nyr = 2001-1958+1
