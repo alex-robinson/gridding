@@ -37,8 +37,8 @@ program gen_gridded
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-40KM"
+    domain    = "Greenland"
+    grid_name = "GRL-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -68,7 +68,10 @@ program gen_gridded
 
 !     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
-    
+
+    call ecmwf40_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+
 !     call etopo1_to_grid(outfldr,grid,"Antarctica",max_neighbors=1,lat_lim=1.d0)
   
 !     ! Paleo topography 

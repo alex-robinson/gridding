@@ -12,7 +12,8 @@ module ECMWF
     private 
     public :: ecmwf_to_grid
     public :: ecmwf_ocn_to_grid 
-
+    public :: ecmwf40_to_grid
+    
 contains 
 
     subroutine ecmwf_to_grid(outfldr,grid,sigma,max_neighbors,lat_lim,clim_range)
@@ -727,6 +728,241 @@ contains
 
     end subroutine ecmwf_ocn_to_grid
 
+    subroutine ecmwf40_to_grid(outfldr,grid,sigma,max_neighbors,lat_lim,clim_range)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       ECMWF DATA (ERA-40 1958-2001)
+        !
+        ! ========================================================= 
+
+        implicit none 
+
+        character(len=*)    :: outfldr 
+        type(grid_class)    :: grid 
+        double precision, optional :: sigma
+        integer, optional   :: max_neighbors 
+        double precision, optional :: lat_lim 
+        integer, optional   :: clim_range(2) 
+        character(len=512)  :: filename 
+        character(len=512)  :: subfldr, cmd 
+        character(len=1024) :: desc, ref 
+
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:), tmp(:)
+            double precision, allocatable :: var(:,:)
+        end type 
+
+        type(inp_type)     :: inp
+
+        type(grid_class)   :: gECMWF 
+        character(len=256) :: file_invariant, file_surface, file_pres
+        type(var_defs), allocatable :: invariant(:), surf(:), pres(:)
+        double precision, allocatable :: invar(:,:) 
+        integer :: plev(9) 
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        integer :: nx, ny, nyr, nm, q, k, year, m, i, l 
+        integer :: yearf, k0, nk 
+        character(len=512) :: filename_clim 
+        double precision, allocatable :: var3D(:,:,:), var2D(:,:)
+
+        ! Assign the filenames
+        file_invariant = "/data/sicopolis/data/ECMWF_old/era.40.invariant.nc"
+        file_surface   = "/data/sicopolis/data/ECMWF_old/era.40.monthly.surface.nc"
+        file_pres      = "/data/sicopolis/data/ECMWF_old/era.40.monthly.nc"
+
+        desc    = "ERA-40 dataset"
+        ref     = "Uppala et al., 2005, Quart. J. R. Meteorol. Soc., 131, 2961-3012, &
+                  &doi:10.1256/qj.04.176"
+        
+        ! Initialize the grid
+        nx = nc_size(file_invariant,"longitude")
+        ny = nc_size(file_invariant,"latitude")
+        allocate(inp%lon(nx),inp%lat(ny))
+        call nc_read(file_invariant,"longitude",inp%lon)
+        call nc_read(file_invariant,"latitude", inp%lat)
+
+        ! Flip latitudes because it is reversed in the file
+        allocate(inp%tmp(ny))
+        inp%tmp = inp%lat
+        do i = 1, ny 
+            inp%lat(i) = inp%tmp(ny-i+1)
+        end do 
+        deallocate(inp%tmp)
+
+        call grid_init(gECMWF,name="ECMWF-250",mtype="latlon",units="kilometers",lon180=.TRUE., &
+                       x=inp%lon,y=inp%lat)
+
+        ! Add a subfolder to outfldr to hold all of the ECMWF files
+        subfldr = "ERA-40"
+        cmd = "mkdir "//trim(outfldr)//"/"//trim(subfldr)
+        call system(cmd)
+
+        ! ## First make file for surface fields including invariants ##
+        write(filename,"(a)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                                trim(grid%name)//"_ERA-40_195801-200112.nc"
+
+        ! For climatology
+        if (present(clim_range)) then  
+            k0 = clim_range(1) - 1958 + 1
+            nk = clim_range(2) - clim_range(1) + 1 
+
+            ! Add a subfolder to outfldr to hold all of the ECMWF files
+            subfldr = "ERA-40"
+            cmd = "mkdir "//trim(outfldr)//"/"//trim(subfldr)
+            call system(cmd)
+
+            ! Make filename for the climatologies
+            write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
+                    trim(grid%name)//"_ERA-40_",clim_range(1),"-",clim_range(2),".nc"
+        end if 
+
+        ! Define the variables to be mapped 
+        
+        allocate(invariant(1))
+        call def_var_info(invariant(1),trim(file_invariant),"z","zs",units="m", &
+                          long_name="Surface elevation",conv=1.d0/9.81d0)
+
+        allocate(surf(2))
+        call def_var_info(surf(1),trim(file_surface),"t2m","t2m",units="K", &
+                          long_name="Near-surface temperature (2-m)")
+        call def_var_info(surf(2),trim(file_pres),"q","rhum",units="%", &
+                          long_name="Relative humidity")
+
+        nyr = 2012-1958+1
+        nm  = 12 
+
+        if (present(max_neighbors) .and. present(lat_lim)) then 
+
+            ! Make sure Gaussian filter sigma available 
+            if (.not. present(sigma)) then 
+                write(*,*) "ecmwf_to_grid:: error:", "sigma must be provided for Gaussian filtering step."
+                stop 
+            end if 
+
+            ! Allocate the input grid variable
+            call grid_allocate(gECMWF,invar)
+
+            ! Initialize mapping
+            call map_init(map,gECMWF,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+            ! Initialize output variable arrays
+            call grid_allocate(grid,outvar)
+            call grid_allocate(grid,outmask)    
+
+            ! Initialize the output file
+            call nc_create(filename)
+            call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename,"plev", x=dble(plev),units="hPa")
+            call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call nc_write_dim(filename,"time", x=1958,dx=1,nx=44,units="years",calendar="360_day")
+            call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
+            ! ## INVARIANT FIELDS ##
+            var_now = invariant(1) 
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar, &
+                         start=[1,1,1],count=[gECMWF%G%nx,gECMWF%G%ny,1],missing_value=mv)
+            call flip_lat(invar)
+            invar = invar*var_now%conv 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+
+
+            ! ## SURFACE FIELDS ##
+            do i = 1, size(surf)
+                var_now = surf(i)
+
+                q = 4   ! Start at record 4 to avoid loading Sep-Dec of 1957!! 
+                do k = 1, nyr 
+
+                    year = 1957 + k 
+                    write(*,*) trim(var_now%nm_in)," :",year
+
+                    do m = 1, nm 
+                        q = q+1 
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
+                                     missing_value=mv)
+                        call flip_lat(invar)
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
+                        call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                      start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
+                    end do 
+                end do
+                
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+                
+            end do  
+
+        end if 
+
+        if (present(clim_range)) then 
+
+            ! Create climatology too (month by month)
+
+            call grid_allocate(grid,var2D)
+            allocate(var3D(grid%G%nx,grid%G%ny,nk))    
+            
+            ! Initialize the output file
+            call nc_create(filename_clim)
+            call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
+            
+            ! Write meta data 
+            call nc_write_attr(filename_clim,"Description",desc)
+            call nc_write_attr(filename_clim,"Reference",ref)
+
+            ! ## INVARIANT FIELDS ##
+            var_now = invariant(1) 
+            call nc_read(filename,var_now%nm_out,var2D,missing_value=mv)
+            call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",missing_value=real(mv))
+
+            ! Write variable metadata
+            call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+            do i = 1, size(surf)
+                var_now = surf(i)
+                do m = 1, nm  
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
+                                 missing_value=mv)
+                    var2D = time_average(var3D)
+                    call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                  start=[1,1,m],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
+                end do 
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+                
+            end do 
+
+        end if 
+
+        return 
+
+    end subroutine ecmwf40_to_grid
 
 
     subroutine flip_lat(var)
