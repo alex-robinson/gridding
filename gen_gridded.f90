@@ -57,20 +57,19 @@ program gen_gridded
 
     ! == Global datasets - applicable to all domains ==
 
-!     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0)
-!     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ghfMaule_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0)
+    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
 
-!     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
-!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
+    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
 
     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
@@ -99,10 +98,11 @@ program gen_gridded
     if (trim(domain) .eq. "Antarctica") then 
         ! == Antarctica only datasets ==
 
-!         call An15litho_to_grid(outfldr,grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
+!         call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
 !         call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 !         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
 !         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0)
         
@@ -125,12 +125,13 @@ program gen_gridded
     if (trim(domain) .eq. "Greenland") then 
         ! == Greenland only datasets ==
 
-!         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)   
-!         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
-!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
-!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
-!         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-!         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)   
+        call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+        call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
+        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+        call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+        call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
     
     end if 
 
