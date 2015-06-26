@@ -33,6 +33,11 @@ contains
 
             ! GREENLAND DOMAINS 
 
+            case("GRL-100KM")
+                call grid_init(grid,name="GRL-100KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=100.d0,nx=18,dy=100.d0,ny=32, &
+                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
             case("GRL-40KM")
                 call grid_init(grid,name="GRL-40KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=40.d0,nx=45,dy=40.d0,ny=75, &
