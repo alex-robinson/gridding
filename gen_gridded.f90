@@ -38,7 +38,7 @@ program gen_gridded
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-120KM"
+    grid_name = "NH-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -65,14 +65,14 @@ program gen_gridded
 !     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
 
 !     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
 
-    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
 
 !     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
 !     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
