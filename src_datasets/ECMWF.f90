@@ -155,9 +155,9 @@ contains
 
         allocate(precip(2))
         call def_var_info(precip( 1),trim(file_precip),"sf", "sf", units="kg m**-2 d**-1", &
-                          long_name="Snowfall",conv=1d3)       ! m/d => mm/d
+                          long_name="Snowfall",conv=1d3/3.d0)       ! m/d => mm/d  (with correction bc measurements counted for 3 hrs!)
         call def_var_info(precip( 2),trim(file_precip),"tp", "pr", units="kg m**-2 d**-1", &
-                          long_name="Precipitation",conv=1d3)  ! m/d => mm/d
+                          long_name="Precipitation",conv=1d3/3.d0)  ! m/d => mm/d (with correction bc measurements counted for 3 hrs!)
         
         allocate(pres(5))
         call def_var_info(pres( 1),"None","t", "p_t",units="K",         plev="plev",filenames=files_pres, &
