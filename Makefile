@@ -109,6 +109,9 @@ $(objdir)/climber2.o: $(srcdir)/climber2.f90
 $(objdir)/climber3a.o: $(srcdir)/climber3a.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/davini2015.o: $(srcdir)/davini2015.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/ECMWF.o: $(srcdir)/ECMWF.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -150,6 +153,7 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/CERES.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o \
+			       $(objdir)/davini2015.o \
 			       $(objdir)/ECMWF.o \
 			       $(objdir)/ETOPO.o \
 			       $(objdir)/GeothermalHeatFlux.o \

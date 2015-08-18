@@ -11,6 +11,7 @@ program gen_gridded
     use CERES
     use climber2
     use climber3a 
+    use davini2015
     use ECMWF 
     use ETOPO 
     use GeothermalHeatFlux 
@@ -37,8 +38,8 @@ program gen_gridded
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-40KM"
+    domain    = "Greenland"
+    grid_name = "GRL-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -65,8 +66,8 @@ program gen_gridded
 !     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
 
 !     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
@@ -131,6 +132,12 @@ program gen_gridded
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 !         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
 !         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        
+        path = "data/Davini_GreenlandAMOC/"
+        call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
+                                path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+        call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
+                                path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
     
     end if 
 
