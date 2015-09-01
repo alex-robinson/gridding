@@ -35,8 +35,8 @@ contains
         type inp_type 
             double precision, allocatable :: lon(:), lat(:), var(:,:)
             double precision, allocatable :: zs(:,:) 
-            double precision :: lapse_ann    = 8.0d0 
-            double precision :: lapse_summer = 6.5d0 
+            double precision :: lapse_ann    = 8.0d-3 
+            double precision :: lapse_summer = 6.5d-3
         end type 
 
         type(inp_type)     :: inp

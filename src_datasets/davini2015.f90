@@ -77,13 +77,29 @@ contains
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
         ! Define the variables to be mapped 
-        allocate(vars(3))
+        allocate(vars(11))
         call def_var_info(vars( 1),trim(file_in),"tas","t2m",units="Kelvin", &
                           long_name="Near-surface temperature (2-m)",method="nng")
         call def_var_info(vars( 2),trim(file_in),"pr","pr",units="mm*d**-1", &
                           long_name="Precipitation",method="nng")
         call def_var_info(vars( 3),trim(file_in),"al","al",units="1", &
                           long_name="Surface albedo",method="nng")
+        call def_var_info(vars( 4),trim(file_in),"uas","uas",units="m*s**-1", &
+                          long_name="Surface velocity, x-component",method="nng")
+        call def_var_info(vars( 5),trim(file_in),"vas","vas",units="m*s**-1", &
+                          long_name="Surface velocity, y-component",method="nng")
+        call def_var_info(vars( 6),trim(file_in),"uvas","uvas",units="m*s**-1", &
+                          long_name="Surface velocity, magnitude",method="nng")
+        call def_var_info(vars( 7),trim(file_in),"p700_u","p700_u",units="m*s**-1", &
+                          long_name="700 Mb velocity, x-component",method="nng")
+        call def_var_info(vars( 8),trim(file_in),"p700_v","p700_v",units="m*s**-1", &
+                          long_name="700 Mb velocity, y-component",method="nng")
+        call def_var_info(vars( 9),trim(file_in),"p700_uv","p700_uv",units="m*s**-1", &
+                          long_name="700 Mb velocity, magnitude",method="nng")
+        call def_var_info(vars(10),trim(file_in),"p700_Z","p700_Z",units="m**2*s**-2", &
+                          long_name="700 Mb geopotential",method="nng")
+        call def_var_info(vars(11),trim(file_in),"p700_z","p700_z",units="m", &
+                          long_name="700 Mb geopotential height",method="nng")
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
