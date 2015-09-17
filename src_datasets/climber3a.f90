@@ -12,7 +12,7 @@ module climber3a
     public :: climber3a_atm_to_grid
     public :: climber3a_ocn_to_grid
     public :: climber3a_jorge_to_grid
-    
+
     ! For jorge testing 
     type g40_type  
         double precision, allocatable :: lon(:), lat(:)
@@ -386,7 +386,7 @@ contains
         double precision, allocatable :: invar(:) 
 
         type(points_class)   :: pts0
-        character(len=256) :: fldr_in, file_in_topo, file_in, nm_topo 
+        character(len=256) :: fldr_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
 
@@ -402,8 +402,6 @@ contains
 
         ! Define the input filenames
         fldr_in      = trim(path_in)
-        file_in_topo = trim(fldr_in)//trim(domain)//"_horo.cdf"
-        file_in      = trim(fldr_in)//trim(domain)//".cdf"
 
         desc    = "CLIMBER-3alpha simulation output"
         ref     = "source folder: "//trim(fldr_in)
@@ -482,6 +480,8 @@ contains
         do i = 1, size(vars)
             var_now = vars(i)
 
+            write(*,*) "NOW: ", trim(var_now%nm_out)
+            
             select case(trim(var_now%nm_out))
                 case("t2m_ann")
                     invar = g40%tann 
