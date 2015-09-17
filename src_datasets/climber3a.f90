@@ -41,7 +41,7 @@ contains
 
         type(inp_type)     :: inp
         type(grid_class)   :: grid0
-        character(len=256) :: fldr_in, file_in_topo, file_in
+        character(len=256) :: fldr_in, file_in_topo, file_in, nm_topo 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np 
 
@@ -52,9 +52,14 @@ contains
 
         integer :: q, k, m, i, l, n_var 
 
+        ! For intermediate interpolation 
+        type(grid_class)   :: grid0hi
+        type(inp_type)     :: inphi
+
+
         ! Define the input filenames
         fldr_in      = trim(path_in)
-        file_in_topo = trim(fldr_in)//"horo.cdf"
+        file_in_topo = trim(fldr_in)//trim(domain)//"_horo.cdf"
         file_in      = trim(fldr_in)//trim(domain)//".cdf"
 
         desc    = "CLIMBER-3alpha simulation output"
@@ -115,8 +120,9 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! Load reference topography in order to adjust temps to sea-level temps 
-        call nc_read(file_in_topo,"HORO_PRESENT",inp%zs,missing_value=missing_value)
+        ! Load reference topography in order to adjust temps to sea-level temps  
+        call nc_read(file_in_topo,"HORO",inp%zs,missing_value=missing_value) 
+
         write(*,*) "input zs : ", minval(inp%zs), maxval(inp%zs)
         where(inp%zs .le. 1.d0) inp%zs = 0.d0  ! Clean-up climber ocean points 
 

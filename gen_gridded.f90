@@ -29,6 +29,7 @@ program gen_gridded
     type(grid_class)   :: grid
     character(len=256) :: domain, grid_name, outfldr 
     character(len=256) :: path 
+    real(8) :: sigma1, sigma2 
 
     write(*,*) 
 
@@ -75,21 +76,41 @@ program gen_gridded
 !     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
 
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
-!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
-!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
-!                                path_in=path,sigma=250.d0,max_neighbors=10,lat_lim=5.d0)
+    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+    sigma1 = 250.d0 
+    sigma2 = 100.d0 
+
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008",grid,domain="present", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
     
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
-!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
-!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
-!                                path_in=path,sigma=100.d0,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7strong_ocean", &
+                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="lgm_1p7weak_ocean", &
+                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008",grid,domain="present_ocean", &
+                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+
+    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008hi/"
+    sigma1 = 10.d0 
+    sigma2 = 10.d0 
+
+    call climber3a_atm_to_grid(outfldr,"Montoya2008hi",grid,domain="lgm_1p7strong", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008hi",grid,domain="lgm_1p7weak", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_atm_to_grid(outfldr,"Montoya2008hi",grid,domain="present", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+    
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008hi",grid,domain="lgm_1p7strong_ocean", &
+                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008hi",grid,domain="lgm_1p7weak_ocean", &
+                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+    call climber3a_ocn_to_grid(outfldr,"Montoya2008hi",grid,domain="present_ocean", &
+                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
 
 !     path = "data/climber_data/NCO2_nc/"
 !     call climber2_atm_to_grid(outfldr,"Ganopolski2011",grid,sim="860ka", &
@@ -133,11 +154,11 @@ program gen_gridded
 !         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
 !         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
         
-        path = "data/Davini_GreenlandAMOC/"
-        call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
-                                path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
-        call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
-                                path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+!         path = "data/Davini_GreenlandAMOC/"
+!         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
+!                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+!         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
+!                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
     
     end if 
 
