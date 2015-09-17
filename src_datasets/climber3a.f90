@@ -70,15 +70,25 @@ contains
                               trim(grid%name)//"_"//trim(domain)//".nc"
 
         ! Load the domain information 
-        nx = nc_size(file_in_topo,"XT_I")
-        ny = nc_size(file_in_topo,"YT_J")
+        if (nc_exists_var(file_in_topo,"XT_I")) then 
+            nx = nc_size(file_in_topo,"XT_I")
+            ny = nc_size(file_in_topo,"YT_J")
+        else
+            nx = nc_size(file_in_topo,"lon")
+            ny = nc_size(file_in_topo,"lat")
+        end if 
         np = nx*ny 
 
         allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny))
         allocate(inp%zs(nx,ny))
 
-        call nc_read(file_in_topo,"XT_I",inp%lon)
-        call nc_read(file_in_topo,"YT_J",inp%lat)
+        if (nc_exists_var(file_in_topo,"XT_I")) then 
+            call nc_read(file_in_topo,"XT_I",inp%lon)
+            call nc_read(file_in_topo,"YT_J",inp%lat)
+        else 
+            call nc_read(file_in_topo,"lon",inp%lon)
+            call nc_read(file_in_topo,"lat",inp%lat)
+        end if 
         
         ! Define CLIMBER3a points and input variable field
         call grid_init(grid0,name="climber3a-atmos",mtype="latlon",units="degrees", &
