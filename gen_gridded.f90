@@ -39,8 +39,8 @@ program gen_gridded
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-40KM"
+    domain    = "North"
+    grid_name = "NH-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
