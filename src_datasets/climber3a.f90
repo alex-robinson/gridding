@@ -480,8 +480,6 @@ contains
         do i = 1, size(vars)
             var_now = vars(i)
 
-            write(*,*) "NOW: ", trim(var_now%nm_out)
-
             select case(trim(var_now%nm_out))
                 case("t2m_ann")
                     invar = g40%tann 
@@ -489,8 +487,14 @@ contains
                     invar = g40%tsum 
                 case("pr_ann")
                     invar = g40%prec 
-
+                case default 
+                    write(*,*) "CASE NOT FOUND: "//trim(var_now%nm_out)
+                    stop 
+                    
             end select 
+
+            write(*,*) "NOW: ", trim(var_now%nm_out)
+            write(*,*) "invar: ", minval(invar), maxval(invar)
 
             ! Scale to sea-level temperature for interpolation
             if (trim(var_now%nm_out) .eq. "t2m_sum") &
