@@ -53,9 +53,7 @@ contains
         integer :: q, k, m, i, l, n_var 
 
         ! For intermediate interpolation 
-        type(grid_class)   :: grid0hi
-        type(inp_type)     :: inphi
-
+        character(len=256) :: c3_grid
 
         ! Define the input filenames
         fldr_in      = trim(path_in)
@@ -73,9 +71,11 @@ contains
         if (nc_exists_var(file_in_topo,"XT_I")) then 
             nx = nc_size(file_in_topo,"XT_I")
             ny = nc_size(file_in_topo,"YT_J")
+            c3_grid = "climber3a-atmos"
         else
             nx = nc_size(file_in_topo,"lon")
             ny = nc_size(file_in_topo,"lat")
+            c3_grid = "climber3a-atmos-hi"
         end if 
         np = nx*ny 
 
@@ -91,7 +91,7 @@ contains
         end if 
         
         ! Define CLIMBER3a points and input variable field
-        call grid_init(grid0,name="climber3a-atmos",mtype="latlon",units="degrees", &
+        call grid_init(grid0,name=c3_grid,mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat )
 
 !         ! Define CLIMBER3a hi resolution intermediate interpolation grid
@@ -115,10 +115,6 @@ contains
         ! Initialize mappings
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 !         call map_init(map0hi,grid0,grid0hi,max_neighbors=10,lat_lim=8.d0,fldr="maps",load=.FALSE.)
-!         call map_init(maphi,grid0hi,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
-!         ! Initialize mapping
-!         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize the output file
         call nc_create(filename)
@@ -235,6 +231,8 @@ contains
 
         integer :: q, k, m, i, l, n_var 
 
+        character(len=256) :: c3_grid
+
         ! Define the input filenames
         fldr_in      = trim(path_in)
         file_in      = trim(fldr_in)//trim(domain)//".cdf"
@@ -247,14 +245,26 @@ contains
                               trim(grid%name)//"_"//trim(domain)//".nc"
 
         ! Load the domain information 
-        nx = nc_size(file_in,"XT_I")
-        ny = nc_size(file_in,"YT_J")
+        if (nc_exists_var(file_in,"XT_I")) then 
+            nx = nc_size(file_in,"XT_I")
+            ny = nc_size(file_in,"YT_J")
+            c3_grid = "climber3a-ocn"
+        else 
+            nx = nc_size(file_in,"lon")
+            ny = nc_size(file_in,"lat")
+            c3_grid = "climber3a-ocn-hi"
+        end if 
         nz = nc_size(file_in,"ZT_K")
 
         allocate(inp%lon(nx),inp%lat(ny),inp%depth(nz))
 
-        call nc_read(file_in,"XT_I",inp%lon)
-        call nc_read(file_in,"YT_J",inp%lat)
+        if (nc_exists_var(file_in,"XT_I")) then 
+            call nc_read(file_in,"XT_I",inp%lon)
+            call nc_read(file_in,"YT_J",inp%lat)
+        else 
+            call nc_read(file_in,"lon",inp%lon)
+            call nc_read(file_in,"lat",inp%lat)
+        end if
         call nc_read(file_in,"ZT_K",inp%depth)
 
         ! Define CLIMBER3a points and input variable field
