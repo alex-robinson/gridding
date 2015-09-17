@@ -422,11 +422,11 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(3))
-        call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="degrees Celcius", &
+        call def_var_info(vars( 1),"None","TS_ANN","t2m_ann",units="degrees Celcius", &
                           long_name="Near-surface temperature (2-m), annual mean",method="nng")
-        call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_sum",units="degrees Celcius", &
+        call def_var_info(vars( 2),"None","TS_JJA","t2m_sum",units="degrees Celcius", &
                           long_name="Near-surface temperature (2-m), summer mean",method="nng")
-        call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
+        call def_var_info(vars( 3),"None","PRC_ANN","pr_ann",units="mm*d**-1", &
                           long_name="Precipitation, annual mean",method="nng")
 
         ! Initialize output variable arrays
@@ -481,7 +481,7 @@ contains
             var_now = vars(i)
 
             write(*,*) "NOW: ", trim(var_now%nm_out)
-            
+
             select case(trim(var_now%nm_out))
                 case("t2m_ann")
                     invar = g40%tann 
