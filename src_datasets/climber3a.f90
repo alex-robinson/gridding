@@ -495,8 +495,7 @@ contains
 
             write(*,*) "NOW: ", trim(var_now%nm_out)
             write(*,*) "invar: ", minval(invar), maxval(invar)
-            write(*,*) "outzs: ", minval(outzs), maxval(outzs)
-
+            
             ! Scale to sea-level temperature for interpolation
             if (trim(var_now%nm_out) .eq. "t2m_sum") &
                 invar = invar + lapse_summer*g40%zs 
@@ -507,11 +506,16 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn", &
                           fill=.TRUE.,missing_value=missing_value)
             
+            write(*,*) "outvar: ", minval(outvar), maxval(outvar)
+            
             ! Re-scale to near-surface temp for writing to file
             if (trim(var_now%nm_out) .eq. "t2m_sum") &
                 outvar = outvar - lapse_summer*outzs 
             if (trim(var_now%nm_out) .eq. "t2m_ann") &
                 outvar = outvar - lapse_ann*outzs 
+
+            write(*,*) "outvar: ", minval(outvar), maxval(outvar)
+            write(*,*) "outzs: ", minval(outzs), maxval(outzs)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
