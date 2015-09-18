@@ -493,8 +493,8 @@ contains
 
             end select 
 
-            write(*,*) "NOW: ", trim(var_now%nm_out)
-            write(*,*) "invar: ", minval(invar), maxval(invar)
+!             write(*,*) "NOW: ", trim(var_now%nm_out)
+!             write(*,*) "invar: ", minval(invar), maxval(invar)
             
             ! Scale to sea-level temperature for interpolation
             if (trim(var_now%nm_out) .eq. "t2m_sum") &
@@ -506,7 +506,7 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn", &
                           fill=.TRUE.,missing_value=missing_value)
             
-            write(*,*) "outvar: ", minval(outvar), maxval(outvar)
+!             write(*,*) "outvar: ", minval(outvar), maxval(outvar)
             
             ! Re-scale to near-surface temp for writing to file
             if (trim(var_now%nm_out) .eq. "t2m_sum") &
