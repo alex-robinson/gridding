@@ -28,18 +28,35 @@ ifeq ($(env),manto) ## env=manto
 
 else ifeq ($(env),eolo) ## env=eolo
 
-    ## IFORT OPTIONS ##
-    FC  = ifort
-    INC_NC  = -I/home/fispalma22/work/librairies/netcdflib/include
-    LIB_NC  = -L/home/fispalma22/work/librairies/netcdflib/lib -lnetcdf
-    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+#    ## IFORT OPTIONS ##
+#    FC  = ifort
+#    INC_NC  = -I/home/fispalma22/work/librairies/netcdflib/include
+#    LIB_NC  = -L/home/fispalma22/work/librairies/netcdflib/lib -lnetcdf
+#    INC_COORD = -I/home/fispalma25/robinson/models/EURICE/coord/.obj
+#    LIB_COORD = /home/fispalma25/robinson/models/EURICE/coord/libcoordinates.a
+#    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+#
+#    FLAGS    = -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC)
+#    LFLAGS   = $(LIB_COORD) $(LIB_NC) $(LIB_MKL)
+#
+#    DFLAGS   = -vec-report0 -O2 -fp-model precise
+#    ifeq ($(debug), 1)
+#        DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -fp-model precise
+#    endif
 
-    FLAGS    = -module $(objdir) -L$(objdir) $(INC_NC)
-    LFLAGS   = $(LIB_NC) $(LIB_MKL)
+    ## GFORTRAN OPTIONS ##
+    FC  = gfortran
+    INC_NC  = -I/home/fispalma25/apps/netcdf/netcdf/include
+    LIB_NC  = -L/home/fispalma25/apps/netcdf/netcdf/lib -lnetcdff -lnetcdf
+    INC_COORD = -I/home/fispalma25/apps/coordinates/.obj
+    LIB_COORD = /home/fispalma25/apps/coordinates/libcoordinates.a
 
-    DFLAGS   = -vec-report0 -O2 -fp-model precise
-    ifeq ($(debug), 1)
-        DFLAGS   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -fp-model precise
+    FLAGS  = -I$(objdir) -J$(objdir) $(INC_COORD) $(INC_NC)
+    LFLAGS = $(LIB_COORD) $(LIB_NC)
+
+    DFLAGS = -O3
+    ifeq ($(debug), 1)  # ,underflow
+        DFLAGS   = -w -g -p -ggdb -ffpe-trap=invalid,zero,overflow -fbacktrace -fcheck=all
     endif
 
 else ifeq ($(env),airaki) ## env=airaki
@@ -49,7 +66,7 @@ else ifeq ($(env),airaki) ## env=airaki
     INC_NC  = -I/opt/local/include
     LIB_NC  = -L/opt/local/lib -lnetcdff -lnetcdf
     INC_COORD = -I/Users/robinson/models/EURICE/coord/.obj
-	LIB_COORD = /Users/robinson/models/EURICE/coord/libcoordinates.a
+    LIB_COORD = /Users/robinson/models/EURICE/coord/libcoordinates.a
 
     FLAGS  = -I$(objdir) -J$(objdir) $(INC_COORD) $(INC_NC) 
     LFLAGS = $(LIB_COORD) $(LIB_NC)
