@@ -89,6 +89,8 @@ program gen_gridded
     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="present", &
                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
     
+    write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma2), "km"
+    call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong_ocean", &
                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak_ocean", &
