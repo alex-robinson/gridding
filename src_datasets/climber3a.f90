@@ -514,8 +514,8 @@ contains
             if (trim(var_now%nm_out) .eq. "t2m_ann") &
                 outvar = outvar - lapse_ann*outzs 
 
-            write(*,*) "outvar: ", minval(outvar), maxval(outvar)
-            write(*,*) "outzs: ", minval(outzs), maxval(outzs)
+!             write(*,*) "outvar: ", minval(outvar), maxval(outvar)
+!             write(*,*) "outzs: ", minval(outzs), maxval(outzs)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
