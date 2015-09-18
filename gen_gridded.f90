@@ -77,7 +77,7 @@ program gen_gridded
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
 
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-    sigma1 = 250.d0 
+    sigma1 = 400.d0 
     sigma2 = 100.d0 
     write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma1), "km"
     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
