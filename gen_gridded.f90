@@ -108,10 +108,13 @@ program gen_gridded
 !                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
     
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008_jorgebilin/"
-    call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="lgm_1p7weak", &
-                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="present", &
-                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="lgm_1p7weak", &
+!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0,load_topo=.TRUE.)
+!     call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="present", &
+!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0,load_topo=.TRUE.)
+    
+    call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="climatology", &
+                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0,load_topo=.FALSE.)
     
 !     path = "data/climber_data/NCO2_nc/"
 !     call climber2_atm_to_grid(outfldr,"Ganopolski2011",grid,sim="860ka", &

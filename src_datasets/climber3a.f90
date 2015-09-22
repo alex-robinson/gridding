@@ -360,7 +360,8 @@ contains
     end subroutine climber3a_ocn_to_grid
 
 
-    subroutine climber3a_jorge_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
+    subroutine climber3a_jorge_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim, &
+                                       load_topo)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -375,7 +376,8 @@ contains
         type(grid_class) :: grid 
         integer :: max_neighbors 
         double precision :: sigma, lat_lim 
-
+        logical :: load_topo 
+        
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -414,7 +416,7 @@ contains
         np = 58081
         allocate(invar(np))
         c3_grid = "g40"
-        call load_g40(g40,fldr_in,dataset=trim(domain))
+        call load_g40(g40,fldr_in,dataset=trim(domain),load_topo=load_topo)
 
         ! Define CLIMBER3a points and input variable field
         call points_init(pts0,name=c3_grid,mtype="latlon",units="degrees", &
@@ -523,12 +525,13 @@ contains
 
     end subroutine climber3a_jorge_to_grid
 
-    subroutine load_g40(g40,fldr,dataset)
+    subroutine load_g40(g40,fldr,dataset,load_topo)
         implicit none 
 
         type(g40_type)     :: g40 
         character(len=*)   :: fldr, dataset 
         character(len=512) :: filename 
+        logical :: load_topo 
 
         integer :: n = 58081   ! Number of points 
 
@@ -544,10 +547,12 @@ contains
         g40%lat = read_vector(filename,n=n,col=6,skip=2)
 
         filename = trim(fldr)//"/"//trim(dataset)//".g40"
-        g40%zs    = read_vector(filename,n=n,col=4,skip=2)
+        g40%prec  = read_vector(filename,n=n,col=1,skip=2)
         g40%tann  = read_vector(filename,n=n,col=2,skip=2)
         g40%tsum  = read_vector(filename,n=n,col=3,skip=2)
-        g40%prec  = read_vector(filename,n=n,col=1,skip=2)
+        
+        g40%zs = 0.d0 
+        if (load_topo) g40%zs    = read_vector(filename,n=n,col=4,skip=2)
         
         write(*,*) "Loaded g40 dataset: "//trim(dataset)
         write(*,*) "lon: ", minval(g40%lon), maxval(g40%lon)
