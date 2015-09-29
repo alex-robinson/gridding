@@ -106,11 +106,11 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(3))
         call def_var_info(vars( 1),trim(file_in),"TS_ANN","t2m_ann",units="degrees Celcius", &
-                          long_name="Near-surface temperature (2-m), annual mean",method="nng")
+                          long_name="Near-surface temperature (2-m), annual mean",method="nn")
         call def_var_info(vars( 2),trim(file_in),"TS_JJA","t2m_sum",units="degrees Celcius", &
-                          long_name="Near-surface temperature (2-m), summer mean",method="nng")
+                          long_name="Near-surface temperature (2-m), summer mean",method="nn")
         call def_var_info(vars( 3),trim(file_in),"PRC_ANN","pr_ann",units="mm*d**-1", &
-                          long_name="Precipitation, annual mean",method="nng")
+                          long_name="Precipitation, annual mean",method="nn")
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -138,7 +138,7 @@ contains
         where(inp%zs .le. 1.d0) inp%zs = 0.d0  ! Clean-up climber ocean points 
 
         ! Map zs to new grid
-        call map_field(map,"zs",inp%zs,outzs,outmask,"nng", &
+        call map_field(map,"zs",inp%zs,outzs,outmask,"nn", &
                           fill=.TRUE.,missing_value=missing_value,sigma=sigma)
         call nc_write(filename,"zs",real(outzs),dim1="xc",dim2="yc")
 
