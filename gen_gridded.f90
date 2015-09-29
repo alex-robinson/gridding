@@ -79,9 +79,7 @@ program gen_gridded
     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
     sigma1 = 250.d0 
     sigma2 = 100.d0 
-!     write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma1), "km"
-!     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
-    subfldr = "Montoya2008_nn"
+    write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma1), "km"
     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
 
     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong", &
