@@ -772,9 +772,12 @@ contains
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
 
         ! Assign the filenames
-        file_invariant = "/data/sicopolis/data/ECMWF_old/era.40.invariant.nc"
-        file_surface   = "/data/sicopolis/data/ECMWF_old/era.40.monthly.surface.nc"
-        file_pres      = "/data/sicopolis/data/ECMWF_old/era.40.monthly.nc"
+!         file_invariant = "/data/sicopolis/data/ECMWF_old/era.40.invariant.nc"
+!         file_surface   = "/data/sicopolis/data/ECMWF_old/era.40.monthly.surface.nc"
+!         file_pres      = "/data/sicopolis/data/ECMWF_old/era.40.monthly.nc"
+        file_invariant = "/data/sicopolis/data/ECMWF_ERA40/ERA-40-invariant_historical_mon_195709-200208.nc"
+        file_surface   = "/data/sicopolis/data/ECMWF_ERA40/ERA-40-surface_historical_mon_195709-200208.nc"
+        file_pres      = "/data/sicopolis/data/ECMWF_ERA40/ERA-40-1000Mb_historical_mon_195709-200208.nc"
 
         desc    = "ERA-40 dataset"
         ref     = "Uppala et al., 2005, Quart. J. R. Meteorol. Soc., 131, 2961-3012, &
@@ -831,6 +834,10 @@ contains
         allocate(surf(2))
         call def_var_info(surf(1),trim(file_surface),"t2m","t2m",units="K", &
                           long_name="Near-surface temperature (2-m)")
+        call def_var_info(surf(1),trim(file_surface),"cp","pr",units="mm/day", &
+                          long_name="Precipitation")
+        call def_var_info(surf(1),trim(file_surface),"sf","sf",units="mm/day", &
+                          long_name="Snowfall")
         call def_var_info(surf(2),trim(file_pres),"r","rhum",units="%", &
                           long_name="Relative humidity")
 
@@ -947,6 +954,12 @@ contains
                     call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
                                  missing_value=mv)
                     var2D = time_average(var3D)
+
+                    if (trim(var_now%nm_out) .eq. "pr") then 
+                        call nc_read(filename,"lsp",var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
+                                 missing_value=mv)
+                        var2D = var2D + time_average(var3D)
+                    end if 
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                                   start=[1,1,m],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
                 end do 
