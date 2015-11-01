@@ -758,7 +758,7 @@ contains
         type(grid_class)   :: gECMWF 
         character(len=256) :: file_invariant, file_surface, file_pres
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:)
-        double precision, allocatable :: invar(:,:) 
+        double precision, allocatable :: invar(:,:), invar2(:,:)
         integer :: plev(9) 
 
         type(map_class)  :: map 
@@ -834,10 +834,10 @@ contains
         allocate(surf(4))
         call def_var_info(surf(1),trim(file_surface),"t2m","t2m",units="K", &
                           long_name="Near-surface temperature (2-m)")
-        call def_var_info(surf(2),trim(file_surface),"cp","pr",units="mm/day", &
-                          long_name="Precipitation")
-        call def_var_info(surf(3),trim(file_surface),"sf","sf",units="mm/day", &
-                          long_name="Snowfall")
+        call def_var_info(surf(2),trim(file_surface),"cp","pr",units="mm/d", &
+                          long_name="Precipitation",conv=1d-3)   ! m/d => mm/d
+        call def_var_info(surf(3),trim(file_surface),"sf","sf",units="mm/d", &
+                          long_name="Snowfall",conv=1d-3)        ! m/d => mm/d
         call def_var_info(surf(4),trim(file_pres),"r","rhum",units="%", &
                           long_name="Relative humidity")
 
@@ -854,6 +854,7 @@ contains
 
             ! Allocate the input grid variable
             call grid_allocate(gECMWF,invar)
+            call grid_allocate(gECMWF,invar2)
 
             ! Initialize mapping
             call map_init(map,gECMWF,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -905,6 +906,16 @@ contains
                         call nc_read(trim(var_now%filename),var_now%nm_in,invar,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
                                      missing_value=mv)
                         call flip_lat(invar)
+
+                        if (trim(var_now%nm_out) .eq. "pr") then 
+                            call nc_read(trim(var_now%filename),"lsp",invar2,start=[1,1,q],count=[gECMWF%G%nx,gECMWF%G%ny,1], &
+                                        missing_value=mv)
+                            call flip_lat(invar2)
+                            invar = invar + invar2
+                        end if 
+
+                        invar = invar*var_now%conv 
+
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",sigma=sigma,missing_value=mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),  dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1],missing_value=real(mv))
@@ -954,12 +965,6 @@ contains
                     call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
                                  missing_value=mv)
                     var2D = time_average(var3D)
-
-                    if (trim(var_now%nm_out) .eq. "pr") then 
-                        call nc_read(filename,"lsp",var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk], &
-                                 missing_value=mv)
-                        var2D = var2D + time_average(var3D)
-                    end if 
                     call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                                   start=[1,1,m],count=[grid%G%nx,grid%G%ny,1],missing_value=real(mv))
                 end do 
