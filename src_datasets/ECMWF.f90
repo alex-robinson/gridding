@@ -835,9 +835,9 @@ contains
         call def_var_info(surf(1),trim(file_surface),"t2m","t2m",units="K", &
                           long_name="Near-surface temperature (2-m)")
         call def_var_info(surf(2),trim(file_surface),"cp","pr",units="mm/d", &
-                          long_name="Precipitation",conv=1d-3)   ! m/d => mm/d
+                          long_name="Precipitation",conv=1d-3*86400.d0)   ! m/s => mm/d
         call def_var_info(surf(3),trim(file_surface),"sf","sf",units="mm/d", &
-                          long_name="Snowfall",conv=1d-3)        ! m/d => mm/d
+                          long_name="Snowfall",conv=1d-3*86400.d0)        ! m/s => mm/d
         call def_var_info(surf(4),trim(file_pres),"r","rhum",units="%", &
                           long_name="Relative humidity")
 
