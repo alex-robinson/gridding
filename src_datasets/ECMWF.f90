@@ -831,14 +831,14 @@ contains
         call def_var_info(invariant(1),trim(file_invariant),"z","zs",units="m", &
                           long_name="Surface elevation",conv=1.d0/9.81d0)
 
-        allocate(surf(2))
+        allocate(surf(4))
         call def_var_info(surf(1),trim(file_surface),"t2m","t2m",units="K", &
                           long_name="Near-surface temperature (2-m)")
-        call def_var_info(surf(1),trim(file_surface),"cp","pr",units="mm/day", &
+        call def_var_info(surf(2),trim(file_surface),"cp","pr",units="mm/day", &
                           long_name="Precipitation")
-        call def_var_info(surf(1),trim(file_surface),"sf","sf",units="mm/day", &
+        call def_var_info(surf(3),trim(file_surface),"sf","sf",units="mm/day", &
                           long_name="Snowfall")
-        call def_var_info(surf(2),trim(file_pres),"r","rhum",units="%", &
+        call def_var_info(surf(4),trim(file_pres),"r","rhum",units="%", &
                           long_name="Relative humidity")
 
         nyr = 2001-1958+1
