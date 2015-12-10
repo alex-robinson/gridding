@@ -69,13 +69,15 @@ program gen_gridded
     
 !     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
 !     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
 !     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
+!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
 
 !     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
 !     sigma1 = 250.d0 
