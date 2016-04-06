@@ -39,8 +39,8 @@ program gen_gridded
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-20KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -79,27 +79,27 @@ program gen_gridded
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
 
-    path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-    sigma1 = 250.d0 
-    sigma2 = 100.d0 
-    write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma1), "km"
-    call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
+!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
+!     sigma1 = 250.d0 
+!     sigma2 = 100.d0 
+!     write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma1), "km"
+!     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
 
-    call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong", &
-                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak", &
-                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="present", &
-                               path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong", &
+!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak", &
+!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="present", &
+!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
     
-    write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma2), "km"
-    call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
-    call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong_ocean", &
-                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak_ocean", &
-                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
-    call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="present_ocean", &
-                               path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+!     write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma2), "km"
+!     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
+!     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong_ocean", &
+!                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak_ocean", &
+!                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
+!     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="present_ocean", &
+!                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
 
 !     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008hi/"
 !     sigma1 = 10.d0 
@@ -131,7 +131,7 @@ program gen_gridded
 !         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 !         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0)
+        call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0)
         
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
