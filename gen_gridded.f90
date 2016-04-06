@@ -124,7 +124,8 @@ program gen_gridded
 
     if (trim(domain) .eq. "Antarctica") then 
         ! == Antarctica only datasets ==
-
+        write(*,*) "Processing Antarctica..."
+        
 !         call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
 !         call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
