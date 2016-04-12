@@ -61,13 +61,17 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_BMELT-R13.nc"
 
-            write(*,*) "filename = ",trim(filename)
+!             ! Define topography (BEDMAP2/rignot) grid and input variable field
+!             call grid_init(grid0,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
+!                    x0=-2800.d0,dx=10.d0,nx=561,y0=2800.d0,dy=-10.d0,ny=561, &
+!                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
-            ! Define topography (BEDMAP2/rignot) grid and input variable field
             call grid_init(grid0,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-2800.d0,dx=10.d0,nx=561,y0=2800.d0,dy=-10.d0,ny=561, &
-                   lambda=0.1d0,phi=-90.d0,alpha=19.0d0)
+                   x0=-2800.d0,dx=10.d0,nx=51,y0=2800.d0,dy=-10.d0,ny=51, &
+                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
+            stop 
+            
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars(1),file_in,"melt_actual","bm_actual",units="m*a-1", &
@@ -78,10 +82,8 @@ contains
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
 
-        write(*,*) "Allocating tmp"
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp1(5601,5601))  ! bedmap2-rignot array
-        write(*,*) "Allocated tmp"
 
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
