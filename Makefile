@@ -224,6 +224,12 @@ obj_datasets_ANT = $(objdir)/gridding_datasets.o \
 
 ## Complete programs
 
+gen_gridded2: $(obj_datasets) 
+	$(FC) $(DFLAGS) $(FLAGS) -o gen_gridded2.x $^ gen_gridded.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gen_gridded2.x is ready."
+	@echo " "
+
 gen_gridded: $(obj_datasets) 
 	$(FC) $(DFLAGS) $(FLAGS) -o gen_gridded.x $^ gen_gridded.f90 $(LFLAGS)
 	@echo " "
