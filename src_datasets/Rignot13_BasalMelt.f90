@@ -62,11 +62,11 @@ contains
                               "_BMELT-R13.nc"
 
             write(*,*) "filename = ",trim(filename)
-            
+
             ! Define topography (BEDMAP2/rignot) grid and input variable field
             call grid_init(grid0,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
                    x0=-2800.d0,dx=10.d0,nx=561,y0=2800.d0,dy=-10.d0,ny=561, &
-                   lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+                   lambda=0.1d0,phi=-90.d0,alpha=19.0d0)
 
         ! Define the variables to be mapped 
         allocate(vars(2))
