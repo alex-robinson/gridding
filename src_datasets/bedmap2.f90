@@ -47,13 +47,9 @@ contains
         ! Define input grid
         if (trim(domain) .eq. "Antarctica") then 
             
-!             ! Define topography (BEDMAP2) grid and input variable field
-!             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-!                    x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
-!                    lambda=0.d0,phi=-90.d0,alpha=24.7d0)
-
+            ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3333.d0,dx=10.d0,nx=66,y0=-3333.d0,dy=10.d0,ny=66, &
+                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
                    lambda=0.d0,phi=-90.d0,alpha=24.7d0)
 
             ! Define the input filenames
