@@ -9,7 +9,7 @@
 # @ file_limit = unlimited
 # @ nofile_limit = unlimited
 # @ core_limit = unlimited
-# @ executable = gen_gridded.x
+# @ executable = gridder.x
 # @ arguments =  "" 
 # @ input = /dev/null
 # @ output = out.out
