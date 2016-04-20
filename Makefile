@@ -183,75 +183,24 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/topo_reconstructions.o \
 			       $(objdir)/topographies_grl.o
 
-obj_datasets_GRL = $(objdir)/gridding_datasets.o \
-			       $(objdir)/CERES.o \
+obj_datasets_climber = $(objdir)/control.o \
+				   $(objdir)/nml.o \
+				   $(objdir)/gridding_datasets.o \
 			       $(objdir)/climber2.o \
-			       $(objdir)/climber3a.o \
-			       $(objdir)/ECMWF.o \
-			       $(objdir)/ETOPO.o \
-			       $(objdir)/GeothermalHeatFlux.o \
-			       $(objdir)/MAR.o \
-			       $(objdir)/nasaBasins.o \
-			       $(objdir)/sediments.o \
-			       $(objdir)/stratigraphy.o \
-			       $(objdir)/topo_reconstructions.o \
-			       $(objdir)/topographies_grl.o
-
-obj_datasets_NH =  $(objdir)/gridding_datasets.o \
-			       $(objdir)/CERES.o \
-			       $(objdir)/climber2.o \
-			       $(objdir)/climber3a.o \
-			       $(objdir)/ECMWF.o \
-			       $(objdir)/ETOPO.o \
-			       $(objdir)/GeothermalHeatFlux.o \
-			       $(objdir)/topo_reconstructions.o \
-			       $(objdir)/sediments.o
-
-obj_datasets_ANT = $(objdir)/gridding_datasets.o \
-			       $(objdir)/AN1CRUST.o \
-			       $(objdir)/bedmap2.o \
-			       $(objdir)/CERES.o \
-			       $(objdir)/climber2.o \
-			       $(objdir)/climber3a.o \
-			       $(objdir)/ECMWF.o \
-			       $(objdir)/ETOPO.o \
-			       $(objdir)/GeothermalHeatFlux.o \
-			       $(objdir)/nasaBasins.o \
-				   $(objdir)/RACMO2.o \
-				   $(objdir)/Rignot13_BasalMelt.o \
-			       $(objdir)/sediments.o \
-			       $(objdir)/topo_reconstructions.o
+			       $(objdir)/climber3a.o
 
 ## Complete programs
 
-gen_gridded2: $(obj_datasets) 
-	$(FC) $(DFLAGS) $(FLAGS) -o gen_gridded2.x $^ gen_gridded.f90 $(LFLAGS)
+gridder: $(obj_datasets) 
+	$(FC) $(DFLAGS) $(FLAGS) -o gridder.x $^ gridder.f90 $(LFLAGS)
 	@echo " "
-	@echo "    gen_gridded2.x is ready."
-	@echo " "
-
-gen_gridded: $(obj_datasets) 
-	$(FC) $(DFLAGS) $(FLAGS) -o gen_gridded.x $^ gen_gridded.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gen_gridded.x is ready."
+	@echo "    gridder.x is ready."
 	@echo " "
 
-GRL: $(obj_datasets_GRL) 
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_GRL.x $^ gentopo_GRL.f90 $(LFLAGS)
+gridder_climber: $(obj_datasets_climber) 
+	$(FC) $(DFLAGS) $(FLAGS) -o gridder_climber.x $^ gridder_climber.f90 $(LFLAGS)
 	@echo " "
-	@echo "    gentopo_GRL.x is ready."
-	@echo " "
-
-NH: $(obj_datasets_NH)
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_NH.x $^ gentopo_NH.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_NH.x is ready."
-	@echo " "
-
-ANT: $(obj_datasets_ANT)
-	$(FC) $(DFLAGS) $(FLAGS) -o gentopo_ANT.x $^ gentopo_ANT.f90 $(LFLAGS)
-	@echo " "
-	@echo "    gentopo_ANT.x is ready."
+	@echo "    gridder_climber.x is ready."
 	@echo " "
 
 marclean: $(objdir)/ncio.o

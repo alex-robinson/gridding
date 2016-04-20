@@ -1,5 +1,5 @@
 
-program gen_gridded
+program gridder
 
     use ncio 
     use coordinates
@@ -29,7 +29,6 @@ program gen_gridded
     type(grid_class)   :: grid
     character(len=256) :: domain, grid_name, outfldr 
     character(len=256) :: path, subfldr  
-    real(8) :: sigma1, sigma2 
 
     write(*,*) 
 
@@ -79,55 +78,12 @@ program gen_gridded
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
 
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008/"
-!     sigma1 = 250.d0 
-!     sigma2 = 100.d0 
-!     write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma1), "km"
-!     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
-
-!     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,subfldr,grid,domain="present", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-    
-!     write(subfldr,"(a15,i3,a2)") "Montoya2008_sig", int(sigma2), "km"
-!     call system("mkdir -p "//trim(outfldr)//"/"//trim(subfldr))
-!     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7strong_ocean", &
-!                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="lgm_1p7weak_ocean", &
-!                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_ocn_to_grid(outfldr,subfldr,grid,domain="present_ocean", &
-!                                path_in=path,sigma=sigma2,max_neighbors=10,lat_lim=5.d0)
-
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008hi/"
-!     sigma1 = 10.d0 
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008hi",grid,domain="lgm_1p7strong", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008hi",grid,domain="lgm_1p7weak", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-!     call climber3a_atm_to_grid(outfldr,"Montoya2008hi",grid,domain="present", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0)
-    
-!     path = "/data/sicopolis/data/CLIMBER3a/Montoya2008_jorgebilin/"
-!     call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="lgm_1p7weak", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0,load_topo=.TRUE.)
-!     call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="present", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0,load_topo=.TRUE.)
-!     call climber3a_jorge_to_grid(outfldr,"Montoya2008_jorgebilin",grid,domain="climatology", &
-!                                path_in=path,sigma=sigma1,max_neighbors=10,lat_lim=5.d0,load_topo=.FALSE.)
-    
-!     path = "data/climber_data/NCO2_nc/"
-!     call climber2_atm_to_grid(outfldr,"Ganopolski2011",grid,sim="860ka", &
-!                               path_in=path,max_neighbors=4,lat_lim=20.d0)
-
     if (trim(domain) .eq. "Antarctica") then 
         ! == Antarctica only datasets ==
         write(*,*) "Processing Antarctica..."
         
 !         call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
-        call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!         call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
@@ -174,5 +130,5 @@ program gen_gridded
     write(*,*) "Regridding program finished."
     write(*,*)
 
-end program gen_gridded
+end program gridder
 
