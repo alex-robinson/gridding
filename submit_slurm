@@ -1,0 +1,17 @@
+#! /bin/bash
+
+#SBATCH --qos=short
+#SBATCH --job-name=gridding
+##SBATCH --mem=50000 
+#SBATCH --account=anthroia
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=REQUEUE
+#SBATCH --mail-user=robinson@pik-potsdam.de
+#SBATCH --output=out.out
+#SBATCH --error=out.err
+#SBATCH --time=5:00:00
+
+# Run the job
+./gridder.x 
+
