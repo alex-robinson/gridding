@@ -76,12 +76,12 @@ else ifeq ($(env),airaki) ## env=airaki
         DFLAGS   = -w -g -p -ggdb -ffpe-trap=invalid,zero,overflow -fbacktrace -fcheck=all
     endif
 
-else ifeq ($(env),iplex) ## env=iplex
+else ifeq ($(env),pik) ## env=pik
 
     ## IFORT OPTIONS ##
     FC  = ifort
-    INC_NC  = -I/home/robinson/apps/netcdf/netcdf/include
-    LIB_NC  = -L/home/robinson/apps/netcdf/netcdf/lib -lnetcdf
+    INC_NC  = -I/p/system/packages/netcdf-fortran/4.4.2/serial/intel-16.0.0/include
+    LIB_NC  = -L/p/system/packages/netcdf-fortran/4.4.2/serial/intel-16.0.0/lib -lnetcdff -L/p/system/packages/netcdf-c/4.3.3.1/serial//lib -lnetcdf
     LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
     INC_COORD = -I/p/projects/tumble/robinson/EURICE/coord/.obj
 	LIB_COORD = /p/projects/tumble/robinson/EURICE/coord/libcoordinates.a
