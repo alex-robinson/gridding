@@ -86,7 +86,7 @@ else ifeq ($(env),pik) ## env=pik
     INC_COORD = -I/p/projects/tumble/robinson/EURICE/coord/.obj
 	LIB_COORD = /p/projects/tumble/robinson/EURICE/coord/libcoordinates.a
 
-    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC) 
+    FLAGS    = -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC) 
     LFLAGS   = $(LIB_COORD) $(LIB_NC)
 
     DFLAGS   = -O3
