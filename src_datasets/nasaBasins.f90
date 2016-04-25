@@ -42,7 +42,7 @@ contains
         integer, allocatable :: inds(:)
         integer :: nb, q 
         logical :: in_basin 
-        double precision, parameter :: tol = 1d-5 
+        double precision, parameter :: tol = 5d-6 
 
         ! Get input data (from polygon files)
         if (trim(domain) .eq. "Antarctica") then 
