@@ -105,8 +105,10 @@ contains
             call thin(invar,tmp1,by=10)
             where( invar .eq. 0.d0 ) invar = mv
 
+            ! Make sure outvar is initialized with missing values 
+            outvar = mv 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=mv,sigma=200.d0)
+                          fill=.FALSE.,missing_value=mv,sigma=200.d0)
 !             call fill_mean(outvar,missing_value=mv)
             where(outvar .eq. mv) outvar = 0.d0 
 
