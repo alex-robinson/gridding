@@ -67,8 +67,8 @@ contains
 
             case("ANT-40KM")
                 call grid_init(grid,name="ANT-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=151,dy=40.d0,ny=141, &
-                               lambda=0.d0,phi=-90.d0,alpha=21.4d0)
+                               lon180=.TRUE.,dx=40.d0,nx=156,dy=40.d0,ny=146, &
+                               lambda=0.d0,phi=-90.d0,alpha=22.2d0)
 
             case("ANT-20KM")
                 call grid_init(grid,name="ANT-20KM",mtype="stereographic",units="kilometers", &

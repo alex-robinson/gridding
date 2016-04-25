@@ -49,7 +49,7 @@ program gridder
     ! =========================================================
 
     call domain_definition(grid,grid_name)
-    
+ 
     ! =========================================================
     !
     ! DATASET TO GRID CALCULATIONS
