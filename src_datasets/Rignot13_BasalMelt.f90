@@ -69,9 +69,9 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars(1),file_in,"melt_actual","bm_actual",units="m*a-1", &
-                          long_name="Basal melt rate, actual present day",method="nn")
+                          long_name="Basal melt rate, actual present day",method="nng")
         call def_var_info(vars(2),file_in,"melt_steadystate","bm_equil",units="m*a-1", &
-                          long_name="Basal melt rate, shelf equilibrium",method="nn")
+                          long_name="Basal melt rate, shelf equilibrium",method="nng")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
@@ -106,7 +106,7 @@ contains
             where( invar .eq. 0.d0 ) invar = mv
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=mv,sigma=20.d0)
+                          fill=.TRUE.,missing_value=mv,sigma=200.d0)
 !             call fill_mean(outvar,missing_value=mv)
             where(outvar .eq. mv) outvar = 0.d0 
 
