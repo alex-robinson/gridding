@@ -56,12 +56,12 @@ contains
             case("Bamber01-20KM")
                 call grid_init(grid,name="Bamber01-20KM",mtype="polar_stereographic",units="kilometers", &
                                lon180=.TRUE.,x0=-800.d0,dx=20.d0,nx=76,y0=-3400.d0,dy=20.d0,ny=141, &
-                               lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+                               lambda=-39.d0,phi=90.d0,alpha=7.4d0)
 
             case("Bamber01-10KM")
                 call grid_init(grid,name="Bamber01-10KM",mtype="polar_stereographic",units="kilometers", &
                                lon180=.TRUE.,x0=-800.d0,dx=10.d0,nx=151,y0=-3400.d0,dy=10.d0,ny=281, &
-                               lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+                               lambda=-39.d0,phi=90.d0,alpha=7.4d0)
 
             ! ANTARCTICA DOMAINS ======================= 
 
