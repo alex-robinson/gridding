@@ -106,7 +106,7 @@ contains
             where( invar .eq. 0.d0 ) invar = mv
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=mv,sigma=80.d0)
+                          fill=.TRUE.,missing_value=mv,sigma=20.d0)
 !             call fill_mean(outvar,missing_value=mv)
             where(outvar .eq. mv) outvar = 0.d0 
 
