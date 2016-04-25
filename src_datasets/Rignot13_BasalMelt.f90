@@ -106,9 +106,9 @@ contains
 !             where( invar .eq. missing_value ) invar = 0.d0 
             where( invar .eq. 0.d0 ) invar = mv
 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
-                          fill=.TRUE.,missing_value=mv)
-            call fill_mean(outvar,missing_value=mv)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+                          fill=.FALSE.,missing_value=mv)
+!             call fill_mean(outvar,missing_value=mv)
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
