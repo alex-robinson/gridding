@@ -109,7 +109,8 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
                           fill=.TRUE.,missing_value=mv)
 !             call fill_mean(outvar,missing_value=mv)
-
+            where(outvar .eq. mv) outvar = 0.d0 
+            
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
             ! Write variable metadata
