@@ -69,9 +69,9 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars(1),file_in,"melt_actual","bm_actual",units="m*a-1", &
-                          long_name="Basal melt rate, actual present day")
+                          long_name="Basal melt rate, actual present day",method="nn")
         call def_var_info(vars(2),file_in,"melt_steadystate","bm_equil",units="m*a-1", &
-                          long_name="Basal melt rate, shelf equilibrium")
+                          long_name="Basal melt rate, shelf equilibrium",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
