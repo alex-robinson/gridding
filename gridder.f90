@@ -38,8 +38,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-40KM"
+    domain    = "Greenland"
+    grid_name = "Bamber01-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -49,7 +49,7 @@ program gridder
     ! =========================================================
 
     call domain_definition(grid,grid_name)
- 
+
     ! =========================================================
     !
     ! DATASET TO GRID CALCULATIONS
@@ -83,7 +83,7 @@ program gridder
         write(*,*) "Processing Antarctica..."
         
 !         call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
-        call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!         call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
@@ -108,13 +108,14 @@ program gridder
 
     if (trim(domain) .eq. "Greenland") then 
         ! == Greenland only datasets ==
+        write(*,*) "Processing Greenland..."
 
 !         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0)   
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
-!         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+        call nasaBasins_to_grid(outfldr,grid,"Greenland")
 !         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
         
 !         path = "data/Davini_GreenlandAMOC/"

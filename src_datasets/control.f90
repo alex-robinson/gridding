@@ -31,7 +31,7 @@ contains
 
         select case(trim(grid_name))
 
-            ! GREENLAND DOMAINS 
+            ! GREENLAND DOMAINS =======================
 
             case("GRL-120KM")
                 call grid_init(grid,name="GRL-120KM",mtype="stereographic",units="kilometers", &
@@ -63,19 +63,24 @@ contains
                                lon180=.TRUE.,x0=-800.d0,dx=10.d0,nx=151,y0=-3400.d0,dy=10.d0,ny=281, &
                                lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
-            ! ANTARCTICA DOMAINS 
+            ! ANTARCTICA DOMAINS ======================= 
 
             case("ANT-40KM")
-                call grid_init(grid,name="ANT-40KM",mtype="stereographic",units="kilometers", &
+                call grid_init(grid,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=40.d0,nx=156,dy=40.d0,ny=146, &
-                               lambda=0.d0,phi=-90.d0,alpha=22.2d0)
+                               lambda=0.d0,phi=-90.d0,alpha=22.1d0)
 
             case("ANT-20KM")
-                call grid_init(grid,name="ANT-20KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=20.d0,nx=301,dy=20.d0,ny=281, &
-                               lambda=0.d0,phi=-90.d0,alpha=21.4d0)
+                call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=20.d0,nx=311,dy=20.d0,ny=291, &
+                               lambda=0.d0,phi=-90.d0,alpha=22.1d0)
 
-            ! NORTH DOMAINS 
+            case("ANT-10KM")
+                call grid_init(grid,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=10.d0,nx=621,dy=10.d0,ny=581, &
+                               lambda=0.d0,phi=-90.d0,alpha=22.1d0)
+
+            ! NORTH DOMAINS ======================= 
 
             case("NH-40KM")
                 call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
