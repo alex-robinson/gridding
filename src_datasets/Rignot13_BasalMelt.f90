@@ -69,9 +69,9 @@ contains
         ! Define the variables to be mapped 
         allocate(vars(2))
         call def_var_info(vars(1),file_in,"melt_actual","bm_actual",units="m*a-1", &
-                          long_name="Basal melt rate, actual present day",method="nn")
+                          long_name="Basal melt rate, actual present day",method="nng")
         call def_var_info(vars(2),file_in,"melt_steadystate","bm_equil",units="m*a-1", &
-                          long_name="Basal melt rate, shelf equilibrium",method="nn")
+                          long_name="Basal melt rate, shelf equilibrium",method="nng")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
@@ -103,14 +103,13 @@ contains
             var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
             call thin(invar,tmp1,by=10)
-!             where( invar .eq. missing_value ) invar = 0.d0 
             where( invar .eq. 0.d0 ) invar = mv
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=mv)
+                          fill=.TRUE.,missing_value=mv,sigma=100.d3)
 !             call fill_mean(outvar,missing_value=mv)
             where(outvar .eq. mv) outvar = 0.d0 
-            
+
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
             ! Write variable metadata
