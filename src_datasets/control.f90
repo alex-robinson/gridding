@@ -59,7 +59,7 @@ contains
                                lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
             case("Bamber01-10KM")
-                call grid_init(grid,name="Bamber01-10KM",mtype="stereographic",units="kilometers", &
+                call grid_init(grid,name="Bamber01-10KM",mtype="polar_stereographic",units="kilometers", &
                                lon180=.TRUE.,x0=-800.d0,dx=10.d0,nx=151,y0=-3400.d0,dy=10.d0,ny=281, &
                                lambda=-39.d0,phi=90.d0,alpha=7.5d0)
 
@@ -67,13 +67,13 @@ contains
 
             case("ANT-40KM")
                 call grid_init(grid,name="ANT-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=141,dy=40.d0,ny=141, &
-                               lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+                               lon180=.TRUE.,dx=40.d0,nx=151,dy=40.d0,ny=141, &
+                               lambda=0.d0,phi=-90.d0,alpha=21.4d0)
 
             case("ANT-20KM")
                 call grid_init(grid,name="ANT-20KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=20.d0,nx=281,dy=20.d0,ny=281, &
-                               lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+                               lon180=.TRUE.,dx=20.d0,nx=301,dy=20.d0,ny=281, &
+                               lambda=0.d0,phi=-90.d0,alpha=21.4d0)
 
             ! NORTH DOMAINS 
 
