@@ -14,7 +14,7 @@ module bedmap2
 
 contains 
 
-    subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -27,7 +27,7 @@ contains
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim 
+        double precision :: lat_lim, grad_lim  
         character(len=512) :: filename, infldr, prefix  
         character(len=1024) :: desc, ref 
 
@@ -43,6 +43,15 @@ contains
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+        character(len=128) :: grad_lim_str  
+
+        grad_lim_str = "" 
+        if (grad_lim .gt. 0.09d0) then 
+            write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
+        else if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
+        end if 
+
 
         ! Define input grid
         if (trim(domain) .eq. "Antarctica") then 
@@ -62,7 +71,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-BEDMAP2.nc"
+                              "_TOPO-BEDMAP2"//trim(grad_lim_str)//".nc"
 
         else
 
@@ -105,15 +114,15 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
-            call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
+            call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
             call thin(invar,tmp1,by=10)
             if (trim(var_now%nm_out) .eq. "H" .or. &
                 trim(var_now%nm_out) .eq. "zs") then 
-                where( invar .eq. missing_value ) invar = 0.d0 
+                where( invar .eq. mv ) invar = 0.d0 
             end if
             if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=missing_value,fill_value=-1001.d0)
-!                 call fill_mean(invar,missing_value=missing_value)
+                call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
+!                 call fill_mean(invar,missing_value=mv)
             end if 
             if (trim(var_now%nm_out) .eq. "mask_ice") then 
                 where ( invar .eq. 1.d0 ) invar = 3.d0 
@@ -121,12 +130,12 @@ contains
                 where ( invar .eq. missing_value ) invar = 0.d0 
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=missing_value)
-            call fill_mean(outvar,missing_value=missing_value)
+                          fill=.TRUE.,missing_value=mv)
+            call fill_mean(outvar,missing_value=mv)
             if (var_now%method .eq. "nn") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")
+                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=nint(mv))
             else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             end if 
 
             ! Write variable metadata
@@ -137,6 +146,37 @@ contains
             
         end do 
 
+        ! Modify variables for consistency and gradient limit 
+
+        ! Allocate helper arrays
+        call grid_allocate(grid,zs)
+        call grid_allocate(grid,zb)
+        call grid_allocate(grid,H)
+
+        ! Re-load data
+        call nc_read(filename,"zs",zs)
+        call nc_read(filename,"zb",zb)
+        
+        ! Update H to match zs and zb, and write it 
+        H = zs-zb 
+        call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+
+
+        ! Apply gradient limit as needed
+        if (grad_lim .gt. 0.d0) then 
+            ! Limit the gradient (m/m) to below threshold 
+            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+        
+            ! Write fields 
+            call nc_write(filename,"zs_sm",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zb_sm",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+            H = zs-zb 
+            call nc_write(filename,"H_sm",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        end if
+        
         return 
 
     end subroutine bedmap2_to_grid

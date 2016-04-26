@@ -129,7 +129,7 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,40.d3, &
                           fill=fill,missing_value=mv,sigma=sigma)
             if (fill) then 
-                call fill_mean(outvar,missing_value=mv)
+                call fill_weighted(outvar,missing_value=mv)
             else 
                 where(outvar .eq. mv) outvar = 0.d0 
             end if 
