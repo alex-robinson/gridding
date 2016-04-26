@@ -48,7 +48,7 @@ contains
         if (grad_lim .gt. 0.09d0) then 
             write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
         else if (grad_lim .gt. 0.d0) then 
-            write(grad_lim_str,"(a,f4.1)") "_gl", grad_lim 
+            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
         end if 
 
         ! Define input grid
@@ -178,8 +178,8 @@ contains
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
             ! Limit the gradient (m/m) to below threshold 
-            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim)
-            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim)
+            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
         
             ! Write fields 
             call nc_write(filename,"zs_sm",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
