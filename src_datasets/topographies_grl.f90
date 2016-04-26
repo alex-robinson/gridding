@@ -13,7 +13,7 @@ module topographies_grl
 
 contains 
 
-    subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -26,7 +26,7 @@ contains
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim 
+        double precision :: lat_lim, grad_lim 
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -42,7 +42,12 @@ contains
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
-        character(len=128) :: method 
+        character(len=128) :: method, grad_lim_str  
+
+        grad_lim_str = "0.0" 
+        if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f3.1)") "gl", grad_lim 
+        end if 
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
@@ -78,7 +83,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-B13.nc"
+                              "_TOPO-B13"//trim(grad_lim_str)//".nc"
 
         else
 
@@ -124,8 +129,6 @@ contains
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
             call thin(invar,tmp,by=thin_by)
 
-            write(*,*) "1:   ", trim(var_now%nm_in), minval(invar), maxval(invar)
-
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
@@ -139,9 +142,6 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv*0.75d0,fill=.TRUE.,missing_value=mv)
             
-            write(*,*) "2:   ", trim(var_now%nm_in), minval(invar),  maxval(invar)
-            write(*,*) "2:   ", trim(var_now%nm_in), minval(outvar), maxval(outvar)
-
             if (var_now%method .eq. "nn") then 
                 call fill_nearest(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
@@ -157,6 +157,37 @@ contains
             
         end do 
 
+        ! Modify variables for consistency and gradient limit 
+
+        ! Allocate helper arrays
+        call grid_allocate(grid,zs)
+        call grid_allocate(grid,zb)
+        call grid_allocate(grid,H)
+
+        ! Re-load data
+        call nc_read(filename,"zs",zs)
+        call nc_read(filename,"zb",zb)
+        
+        ! Update H to match zs and zb, and write it 
+        H = zs-zb 
+        call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+
+
+        ! Apply gradient limit as needed
+        if (grad_lim .gt. 0.d0) then 
+            ! Limit the gradient (m/m) to below threshold 
+            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim)
+            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim)
+        
+            ! Write fields 
+            call nc_write(filename,"zs_sm",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zb_sm",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+            H = zs-zb 
+            call nc_write(filename,"H_sm",real(H_sm),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        end if
+        
         return 
 
     end subroutine Bamber13_to_grid
