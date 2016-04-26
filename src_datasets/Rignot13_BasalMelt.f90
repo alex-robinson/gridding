@@ -14,7 +14,7 @@ module Rignot13_BasalMelt
     
 contains 
 
-    subroutine Rignot13_BasalMelt_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine Rignot13_BasalMelt_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,fill,sigma)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -33,6 +33,8 @@ contains
         double precision :: lat_lim 
         character(len=512) :: filename, infldr, prefix  
         character(len=1024) :: desc, ref 
+        double precision :: sigma 
+        logical :: fill
 
         type(grid_class)   :: grid0
         character(len=256) :: file_in
@@ -47,6 +49,23 @@ contains
         double precision, allocatable :: xax(:), yax(:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+        character(len=256) :: method, method_str, fill_str 
+
+        ! Determine the method to use here 
+        method = "nn" 
+        if (sigma .gt. 0.d0) method = "nng" 
+
+        method_str = "nn" 
+        if (sigma .gt. 0.d0) then 
+            if (sigma .gt. 99.d0) then 
+                write(method_str,"(a,i3)") trim(method), int(sigma) 
+            else
+                write(method_str,"(a,i2)") trim(method), int(sigma) 
+            end if 
+        end if 
+
+        fill_str = "_nofill"
+        if (fill) fill_str = "_fill" 
 
             ! Define the input filenames
             infldr  = "/data/sicopolis/data/Antarctica/"
@@ -59,7 +78,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_BMELT-R13.nc"
+                              "_BMELT-R13_"//trim(method_str)//trim(fill_str)//".nc"
 
             ! Define topography (BEDMAP2/rignot) grid and input variable field
             call grid_init(grid0,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
@@ -68,10 +87,10 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(2))
-        call def_var_info(vars(1),file_in,"melt_actual","bm_actual",units="m*a-1", &
-                          long_name="Basal melt rate, actual present day",method="nng")
-        call def_var_info(vars(2),file_in,"melt_steadystate","bm_equil",units="m*a-1", &
-                          long_name="Basal melt rate, shelf equilibrium",method="nng")
+        call def_var_info(vars(1),file_in,"melt_actual","bm_actual",units="m*a**-1", &
+                          long_name="Basal melt rate, actual present day",method=trim(method))
+        call def_var_info(vars(2),file_in,"melt_steadystate","bm_equil",units="m*a**-1", &
+                          long_name="Basal melt rate, shelf equilibrium",method=trim(method))
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
@@ -107,10 +126,13 @@ contains
 
             ! Make sure outvar is initialized with missing values 
             outvar = mv 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.FALSE.,missing_value=mv,sigma=200.d0)
-!             call fill_mean(outvar,missing_value=mv)
-            where(outvar .eq. mv) outvar = 0.d0 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,40.d3, &
+                          fill=fill,missing_value=mv,sigma=sigma)
+            if (fill) then 
+                call fill_mean(outvar,missing_value=mv)
+            else 
+                where(outvar .eq. mv) outvar = 0.d0 
+            end if 
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
