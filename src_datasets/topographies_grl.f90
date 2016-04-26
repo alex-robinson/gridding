@@ -45,8 +45,10 @@ contains
         character(len=128) :: method, grad_lim_str  
 
         grad_lim_str = "" 
-        if (grad_lim .gt. 0.d0) then 
+        if (grad_lim .gt. 0.09d0) then 
             write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
+        else if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f4.1)") "_gl", grad_lim 
         end if 
 
         ! Define input grid
