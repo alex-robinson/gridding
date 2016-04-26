@@ -184,7 +184,7 @@ contains
             call nc_write(filename,"zb_sm",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
             
             H = zs-zb 
-            call nc_write(filename,"H_sm",real(H_sm),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"H_sm",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
 
         end if
         
