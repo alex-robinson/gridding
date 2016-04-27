@@ -2,6 +2,7 @@ module ETOPO
 
     use gridding_datasets
     use coordinates 
+    use interp2D 
     use ncio 
     
     implicit none 
@@ -11,7 +12,7 @@ module ETOPO
     
 contains 
 
-    subroutine etopo1_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine etopo1_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -23,7 +24,7 @@ contains
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim 
+        double precision :: lat_lim, grad_lim  
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -42,8 +43,17 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
+        double precision, allocatable :: zs(:,:), zb(:,:), H(:,:)
 
         integer :: q, k, m, i, l, n_var 
+        character(len=128) :: grad_lim_str  
+
+        grad_lim_str = "" 
+        if (grad_lim .gt. 0.09d0) then 
+            write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
+        else if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
+        end if 
 
         ! Define the input filenames
         fldr_in    = "/data/sicopolis/data/ETOPO/"
@@ -55,7 +65,7 @@ contains
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"// &
-                              trim(grid%name)//"_TOPO-ETOPO1.nc"
+                              trim(grid%name)//"_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
 
         ! Get the input dimensions
         nx = nc_size(file_in_1,"lon")
@@ -117,6 +127,36 @@ contains
             
         end do 
 
+        ! Modify variables for consistency and gradient limit 
+
+        ! Allocate helper arrays
+        call grid_allocate(grid,zs)
+        call grid_allocate(grid,zb)
+        call grid_allocate(grid,H)
+
+        ! Re-load data
+        call nc_read(filename,"zs",zs)
+        call nc_read(filename,"zb",zb)
+        
+        ! Update H to match zs and zb, and write it 
+        H = zs-zb 
+        call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Apply gradient limit as needed
+        if (grad_lim .gt. 0.d0) then 
+            ! Limit the gradient (m/m) to below threshold 
+            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+        
+            ! Write fields 
+            call nc_write(filename,"zs_sm",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zb_sm",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+            H = zs-zb 
+            call nc_write(filename,"H_sm",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        end if
+        
         return 
 
     end subroutine etopo1_to_grid
