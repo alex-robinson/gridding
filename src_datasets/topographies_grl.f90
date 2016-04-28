@@ -95,9 +95,9 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(4))
-        call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation")
-        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation")
-        call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness")
+        call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation",method="nng")
+        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation",method="nng")
+        call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness",method="nng")
         call def_var_info(vars(4),trim(file_in),"LandMask",      "mask",units="(0 - 4)", &
                           long_name="Land mask",method="nn")
 
@@ -138,11 +138,11 @@ contains
                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
             end if 
 
-            method = "radius"
+            method = "nng"
             if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
-                           radius=grid%G%dx*grid%xy_conv*0.75d0,fill=.TRUE.,missing_value=mv)
+                           sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
                 call fill_nearest(outvar,missing_value=mv)
@@ -182,11 +182,11 @@ contains
             call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
         
             ! Write fields 
-            call nc_write(filename,"zs_sm",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
-            call nc_write(filename,"zb_sm",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
             
             H = zs-zb 
-            call nc_write(filename,"H_sm",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
 
         end if
         

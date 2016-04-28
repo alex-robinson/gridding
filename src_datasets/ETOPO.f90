@@ -115,7 +115,7 @@ contains
 
             ! Map variable to new grid
             call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,sigma=20.d0,missing_value=missing_value)
+                          fill=.TRUE.,sigma=grid%G%dx*0.5,missing_value=missing_value)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
@@ -149,11 +149,11 @@ contains
             call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
         
             ! Write fields 
-            call nc_write(filename,"zs_sm",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
-            call nc_write(filename,"zb_sm",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
             
             H = zs-zb 
-            call nc_write(filename,"H_sm",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+            call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
 
         end if
         
