@@ -170,26 +170,26 @@ contains
         call nc_read(filename,"zs",zs)
         call nc_read(filename,"zb",zb)
         
-        ! Update H to match zs and zb, and write it 
-        H = zs-zb 
-        call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
-
-
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
             ! Limit the gradient (m/m) to below threshold 
             call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
             call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
-        
-            ! Write fields 
-            call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
-            call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
             
-            H = zs-zb 
-            call nc_write(filename,"H",real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+        end if 
 
-        end if
+        ! Update H to match zs and zb, and write it 
+        H = zs-zb 
+        where (H .lt. 1.d0) 
+            H  = 0.d0 
+            zs = zb 
+        end where 
         
+        ! Re-write fields 
+        call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
+
         return 
 
     end subroutine Bamber13_to_grid
