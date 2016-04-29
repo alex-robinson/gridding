@@ -83,8 +83,7 @@ contains
                       &doi: 10.1126/science.1235798, 2013."
 
             ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_BMELT-R13_"//trim(method_str)//trim(fill_str)//".nc"
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_BMELT-R13.nc"
 
             ! Define topography (BEDMAP2/rignot) grid and input variable field
             call grid_init(grid0,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
@@ -151,7 +150,8 @@ contains
         
         ! First load basin mask 
         write(file_basins,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_BASINS-nasa.nc"
-
+        write(*,*) "Reading basin mask: ", trim(file_basins)
+        
         call nc_read(file_basins,"basin",basins)
 
         ! ===== Smoothed with extrapolation of mean basin value ===== 
