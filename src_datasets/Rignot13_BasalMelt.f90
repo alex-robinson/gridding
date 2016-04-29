@@ -51,6 +51,12 @@ contains
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
         character(len=256) :: method, method_str, fill_str 
 
+        character(len=56)  :: nm_out 
+        character(len=512) :: file_basins 
+        integer, allocatable :: basins(:,:)
+        double precision :: basin_ave 
+        logical, allocatable :: mask_basin(:,:) 
+
         ! Determine the method to use here 
         method = "nn" 
         if (sigma .gt. 0.d0) method = "nng" 
@@ -126,13 +132,9 @@ contains
 
             ! Make sure outvar is initialized with missing values 
             outvar = mv 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,40.d3, &
-                          fill=fill,missing_value=mv,sigma=sigma)
-            if (fill) then 
-                call fill_weighted(outvar,missing_value=mv)
-            else 
-                where(outvar .eq. mv) outvar = 0.d0 
-            end if 
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn",40.d3, &
+                          fill=.FALSE.,missing_value=mv,sigma=sigma)
+            where(outvar .eq. mv) outvar = 0.d0 
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
 
@@ -142,6 +144,64 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
         end do 
+
+        ! Now output some variants to the original data
+        call grid_allocate(grid,basins)    
+        call grid_allocate(grid,mask_basin)    
+        
+        ! First load basin mask 
+        write(file_basins,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_BASINS-nasa.nc"
+
+        call nc_read(file_basins,"basin",basins)
+
+        ! ===== Smoothed with extrapolation of mean basin value ===== 
+        var_now = vars(1) 
+        call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
+        call thin(invar,tmp1,by=10)
+        where( invar .eq. 0.d0 ) invar = mv
+
+        ! Make sure outvar is initialized with missing values 
+        outvar = mv 
+        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",40.d3, &
+                      fill=.TRUE.,missing_value=mv,sigma=sigma)
+        
+        do q = 1, maxval(basins)
+            mask_basin = (outvar .ne. mv) .and. (basins .eq. q)
+            basin_ave = sum(outvar,mask=mask_basin) / count(mask_basin)
+            where ( (outvar .eq. mv) .and. (basins .eq. q) ) outvar = basin_ave 
+        end do 
+
+        nm_out = trim(var_now%nm_out)//"_sm"
+        call nc_write(filename,nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+        call nc_write_attr(filename,var_now%nm_out,"long_name", &
+                            trim(var_now%long_name)//" (nng + basin average)")
+        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+        ! ===== Mean basin value everywhere ===== 
+        var_now = vars(1) 
+        call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
+        call thin(invar,tmp1,by=10)
+        where( invar .eq. 0.d0 ) invar = mv
+
+        ! Make sure outvar is initialized with missing values 
+        outvar = mv 
+        call map_field(map,var_now%nm_in,invar,outvar,outmask,"nn",40.d3, &
+                      fill=.FALSE.,missing_value=mv,sigma=sigma)
+
+        do q = 1, maxval(basins)
+            mask_basin = (outvar .ne. mv) .and. (basins .eq. q)
+            basin_ave = sum(outvar,mask=mask_basin) / count(mask_basin)
+            where ( (basins .eq. q) ) outvar = basin_ave 
+        end do 
+
+        nm_out = trim(var_now%nm_out)//"_ave"
+        call nc_write(filename,nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+        call nc_write_attr(filename,var_now%nm_out,"long_name", &
+                            trim(var_now%long_name)//" (basin average)")
+        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
 
         return 
 

@@ -38,8 +38,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "Bamber01-20KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -59,7 +59,7 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
 !     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0.05d0)
+!     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0.05d0)
 !     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
@@ -88,17 +88,9 @@ program gridder
 !         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 !         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                         fill=.TRUE.,sigma=200.d0)
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                         fill=.TRUE.,sigma=100.d0)
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                         fill=.TRUE.,sigma=50.d0)
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                         fill=.TRUE.,sigma=20.d0)
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                         fill=.FALSE.,sigma=0.d0)
-        
+        call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
+                                        fill=.TRUE.,sigma=100.d0)
+
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
 !         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
