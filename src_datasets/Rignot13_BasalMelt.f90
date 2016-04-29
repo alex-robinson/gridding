@@ -164,7 +164,7 @@ contains
         ! Make sure outvar is initialized with missing values 
         outvar = mv 
         call map_field(map,var_now%nm_in,invar,outvar,outmask,"nng",40.d3, &
-                      fill=.TRUE.,missing_value=mv,sigma=sigma)
+                      fill=.FALSE.,missing_value=mv,sigma=sigma)
         
         do q = 1, maxval(basins)
             mask_basin = (outvar .ne. mv) .and. (basins .eq. q)
