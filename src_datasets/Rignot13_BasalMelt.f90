@@ -151,8 +151,9 @@ contains
         ! First load basin mask 
         write(file_basins,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_BASINS-nasa.nc"
         write(*,*) "Reading basin mask: ", trim(file_basins)
-        
+        write(*,*) "size(basins)", size(basins)
         call nc_read(file_basins,"basin",basins)
+        write(*,*) "Read mask."
 
         ! ===== Smoothed with extrapolation of mean basin value ===== 
         var_now = vars(1) 
