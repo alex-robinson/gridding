@@ -122,7 +122,7 @@ contains
             end if
 
             if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
+!                 call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
 !                 call fill_mean(invar,missing_value=mv)
                 call fill_nearest(invar,missing_value=mv)
             end if 
@@ -159,6 +159,7 @@ contains
         ! Re-load data
         call nc_read(filename,"zs",zs)
         call nc_read(filename,"zb",zb)
+        call nc_read(filename,"H",H)
         
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
@@ -168,17 +169,26 @@ contains
             
         end if 
 
-        ! Update H to match zs and zb, and write it 
-        H = zs-zb 
-        where (H .lt. 1.d0) 
-            H  = 0.d0 
-            zs = zb 
+        ! Limit H to > 1m, zs=0 where there is no ice and make grounded ice thickness consistent
+        where (H .lt. 1.d0) H  = 0.d0 
+        where (H .eq. 0.d0) zs = 0.d0 
+        where (abs((zs-zb)-H) .lt. 5.d0) H = zs-zb 
+
+        ! Update mask 
+        outvar = 0.d0 
+        where(zb .gt. 0.d0 .and. H .eq. 0.d0)
+            outvar = 1.d0 
+        else where(abs(zs-zb)-H) .lt. 1.d0) 
+            outvar = 2.d0 
+        else where(H .gt. 0.d0) 
+            outvar = 3.d0 
         end where 
-        
+
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
         call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"mask",nint(outvar),dim1="xc",dim2="yc",missing_value=nint(mv))
 
         return 
 
