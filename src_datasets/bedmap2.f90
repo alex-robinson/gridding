@@ -81,9 +81,9 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(4))
-        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m",long_name="Surface elevation",method="nn")
-        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m",long_name="Bedrock elevation",method="nn")
-        call def_var_info(invariant(3),file_invariant,"H","H",units="m",long_name="Ice thickness",method="nn")
+        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m",long_name="Surface elevation",method="nng")
+        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m",long_name="Bedrock elevation",method="nng")
+        call def_var_info(invariant(3),file_invariant,"H","H",units="m",long_name="Ice thickness",method="nng")
         call def_var_info(invariant(4),file_invariant,"mask_ice","mask_ice",units="(0 - 1)", &
                           long_name="Ice mask",method="nn")
 
@@ -120,18 +120,21 @@ contains
                 trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-!             if (trim(var_now%nm_out) .eq. "zb") then 
-!                 call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
-! !                 call fill_mean(invar,missing_value=mv)
-!             end if 
+
+            if (trim(var_now%nm_out) .eq. "zb") then 
+                call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
+!                 call fill_mean(invar,missing_value=mv)
+                call fill_nearest(invar,missing_value=mv)
+            end if 
+
             if (trim(var_now%nm_out) .eq. "mask_ice") then 
                 where ( invar .eq. 1.d0 ) invar = 3.d0 
                 where ( invar .eq. 0.d0 ) invar = 2.d0 
                 where ( invar .eq. missing_value ) invar = 0.d0 
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,missing_value=mv)
-            call fill_mean(outvar,missing_value=mv)
+                          fill=.TRUE.,sigma=grid%G%dx*0.5,missing_value=mv)
+            call fill_nearest(outvar,missing_value=mv)
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=nint(mv))
             else
