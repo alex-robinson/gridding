@@ -160,6 +160,7 @@ contains
         call nc_read(filename,"zs",zs)
         call nc_read(filename,"zb",zb)
         call nc_read(filename,"H",H)
+        call nc_read(filename,"mask_ice",outvar)
         
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
@@ -172,8 +173,11 @@ contains
         ! Limit H to > 1m, zs=0 where there is no ice and make grounded ice thickness consistent
         where (H .lt. 1.d0) H  = 0.d0 
         where (H .eq. 0.d0) zs = 0.d0 
-        where (abs((zs-zb)-H) .lt. 5.d0) H = zs-zb 
+        where (abs((zs-zb)-H) .lt. 10.d0) H = zs-zb 
 
+        ! Update mask and H 
+!         where (outvar .eq. 2.d0) H = zs-zb 
+            
         ! Update mask 
         outvar = 0.d0 
         where(zb .gt. 0.d0 .and. H .eq. 0.d0)
