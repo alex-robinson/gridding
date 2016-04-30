@@ -120,10 +120,10 @@ contains
                 trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-            if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
-!                 call fill_mean(invar,missing_value=mv)
-            end if 
+!             if (trim(var_now%nm_out) .eq. "zb") then 
+!                 call fill_mean(invar,missing_value=mv,fill_value=-1001.d0)
+! !                 call fill_mean(invar,missing_value=mv)
+!             end if 
             if (trim(var_now%nm_out) .eq. "mask_ice") then 
                 where ( invar .eq. 1.d0 ) invar = 3.d0 
                 where ( invar .eq. 0.d0 ) invar = 2.d0 
