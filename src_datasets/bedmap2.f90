@@ -173,20 +173,21 @@ contains
         ! Limit H to > 1m, zs=0 where there is no ice and make grounded ice thickness consistent
         where (H .lt. 1.d0) H  = 0.d0 
         where (H .eq. 0.d0) zs = 0.d0 
-        where (abs((zs-zb)-H) .lt. 10.d0) H = zs-zb 
+!         where (abs((zs-zb)-H) .lt. 10.d0) H = zs-zb 
 
         ! Update mask and H 
-!         where (outvar .eq. 2.d0) H = zs-zb 
+        where (outvar .eq. 2.d0) H = zs-zb 
+        where (zs     .eq. 0.d0) outvar = 0.d0 
             
-        ! Update mask 
-        outvar = 0.d0 
-        where(zb .gt. 0.d0 .and. H .eq. 0.d0)
-            outvar = 1.d0 
-        else where(abs((zs-zb)-H) .lt. 1.d0) 
-            outvar = 2.d0 
-        else where(H .gt. 0.d0) 
-            outvar = 3.d0 
-        end where 
+!         ! Update mask 
+!         outvar = 0.d0 
+!         where(zb .gt. 0.d0 .and. H .eq. 0.d0)
+!             outvar = 1.d0 
+!         else where(abs((zs-zb)-H) .lt. 1.d0) 
+!             outvar = 2.d0 
+!         else where(H .gt. 0.d0) 
+!             outvar = 3.d0 
+!         end where 
 
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
