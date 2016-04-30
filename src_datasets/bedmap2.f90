@@ -178,7 +178,7 @@ contains
         outvar = 0.d0 
         where(zb .gt. 0.d0 .and. H .eq. 0.d0)
             outvar = 1.d0 
-        else where(abs(zs-zb)-H) .lt. 1.d0) 
+        else where(abs((zs-zb)-H) .lt. 1.d0) 
             outvar = 2.d0 
         else where(H .gt. 0.d0) 
             outvar = 3.d0 
