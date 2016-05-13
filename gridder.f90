@@ -38,8 +38,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-40KM"
+    domain    = "North"
+    grid_name = "NH-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -59,7 +59,7 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
 !     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0.05d0)
+    call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0.05d0)
 !     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
@@ -83,7 +83,7 @@ program gridder
         write(*,*) "Processing Antarctica..."
         
 !         call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
-        call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
+!         call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
 !         call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
@@ -111,7 +111,7 @@ program gridder
         ! == Greenland only datasets ==
         write(*,*) "Processing Greenland..."
 
-        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0,grad_lim=0.05d0)   
+!         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=2.d0,grad_lim=0.05d0)   
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=1.d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
