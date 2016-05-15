@@ -254,9 +254,9 @@ contains
         ! Ellesmere Island
         if (allocated(xp)) deallocate(xp)
         if (allocated(yp)) deallocate(yp)
-        allocate(xp(6),yp(6)) 
-        xp = [-59.3,-60.0,-70.8,-78.0,-102.0,-88.7 ]
-        yp = [ 85.0, 82.4, 79.7, 76.0,  78.0, 85.0 ]
+        allocate(xp(7),yp(7)) 
+        xp = [-59.3,-60.0,-70.8,-78.0,-99.5,-96.7,-88.7 ]
+        yp = [ 85.0, 82.4, 79.7, 76.0, 81.0, 81.6, 85.0 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 2 
 
