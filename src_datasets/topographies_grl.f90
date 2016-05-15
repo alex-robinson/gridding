@@ -180,12 +180,12 @@ contains
         
         allocate(xp(4),yp(4))
         xp = [-63.5,-57.7,-53.9,-57.7]
-        yp = [ 69.6, 67.3, 63.3, 62.8]
+        yp = [ 69.6, 67.3, 63.3, 55.0]
 
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         call nc_write(filename,"mask_reg",mask_reg,dim1="xc",dim2="yc")
         
-        where (mask_reg) zb = -2000.d0 
+        where (mask_reg) zb = -1500.d0 
 
         ! ======================================================
 
