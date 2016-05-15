@@ -173,6 +173,7 @@ contains
         ! Re-load data
         call nc_read(filename,"zs",zs)
         call nc_read(filename,"zb",zb)
+        call nc_read(filename,"H",H)
         
         ! Eliminate problematic regions for this domain ========
         call grid_allocate(grid,mask_reg)    
