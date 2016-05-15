@@ -219,6 +219,9 @@ contains
             zs = zb 
         end where 
         
+        ! Also make sure zs is always higher than zb 
+        where (zs .lt. zb) zs = zb 
+            
         ! Now make sure zs is zero over the ocean
         where (zs .lt. 0.d0) zs = 0.d0 
 
