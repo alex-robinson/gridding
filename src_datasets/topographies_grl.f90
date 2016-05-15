@@ -235,6 +235,21 @@ contains
         call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
 
+        ! Define new masks ==========
+
+        ! ocean-land-ice-shelf (0,1,2,3) mask 
+        outmask = 0     ! Ocean
+        where (zs .gt. 0.d0) outmask = 1    ! Land
+        where ( H .gt. 0.d0) outmask = 2    ! Grounded ice
+        where (zs .gt. 0.d0 .and. zs-zb .gt. H) outmask = 3   ! Floating ice 
+
+        call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=real(mv), &
+                      long_name="Mask (ocean=0,land=1,grounded-ice=2,floating-ice=3)")
+
+
+        ! ===========================
+
+
         return 
 
     end subroutine Bamber13_to_grid
