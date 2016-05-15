@@ -176,7 +176,8 @@ contains
         
         ! Eliminate problematic regions for this domain ========
         ! (shallow sea in Baffin Bay, etc)
-
+        call grid_allocate(grid,mask_reg)    
+        
         allocate(xp(4),yp(4))
         xp = [-63.5,-57.7,-53.9,-57.7]
         yp = [ 69.6, 67.3, 63.3, 62.8]
