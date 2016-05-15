@@ -246,6 +246,16 @@ contains
         call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
                       long_name="Mask (ocean=0,land=1,grounded-ice=2,floating-ice=3)")
 
+        ! Region masks
+
+        ! Greenland
+        outmask = 1 
+
+        ! Ellsmere Island 
+        xp = [-59.3,-60.0,-70.8,-76.6 ]
+        yp = [ 84.9, 82.4, 79.7, 76.6 ]
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (mask_reg) outmask = 2 
 
         ! ===========================
 
