@@ -243,7 +243,7 @@ contains
         where ( H .gt. 0.d0) outmask = 2    ! Grounded ice
         where (zs .gt. 0.d0 .and. zs-zb .gt. H) outmask = 3   ! Floating ice 
 
-        call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=real(mv), &
+        call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
                       long_name="Mask (ocean=0,land=1,grounded-ice=2,floating-ice=3)")
 
 
