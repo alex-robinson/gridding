@@ -3,6 +3,7 @@ module topographies_grl
     use gridding_datasets
     use coordinates
     use interp2D 
+    use polygons 
     use ncio 
     
     implicit none 
@@ -43,6 +44,9 @@ contains
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
         character(len=128) :: method, grad_lim_str  
+
+        logical, allocatable :: mask_reg(:,:)
+        real(4), allocatable :: xp(:), yp(:) 
 
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
@@ -170,6 +174,19 @@ contains
         call nc_read(filename,"zs",zs)
         call nc_read(filename,"zb",zb)
         
+        ! Eliminate problematic regions for this domain ========
+        ! (shallow sea in Baffin Bay, etc)
+
+        allocate(xp(4),yp(4))
+        xp = [-63.5,-57.7,-53.9,-57.7]
+        yp = [ 69.6, 67.3, 63.3, 62.8]
+
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        call nc_write(filename,"mask_reg",mask_reg,dim1="xc",dim2="yc")
+        
+        ! ======================================================
+
+
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
             ! Limit the gradient (m/m) to below threshold 
