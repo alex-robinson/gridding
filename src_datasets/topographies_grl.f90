@@ -142,7 +142,7 @@ contains
                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
             end if 
 
-            method = "nng"
+            method = "nn"
             if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
@@ -255,8 +255,8 @@ contains
         if (allocated(xp)) deallocate(xp)
         if (allocated(yp)) deallocate(yp)
         allocate(xp(7),yp(7)) 
-        xp = [-59.3,-60.0,-70.8,-78.0,-99.5,-96.7,-88.7 ]
-        yp = [ 85.0, 82.4, 79.7, 76.0, 81.0, 81.6, 85.0 ]
+        xp = [-59.3,-60.0,-70.8,-78.0,-99.5,-98.8,-88.7 ]
+        yp = [ 85.0, 82.4, 79.7, 76.0, 81.0, 81.2, 85.0 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 2 
 
