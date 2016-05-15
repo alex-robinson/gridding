@@ -175,29 +175,33 @@ contains
         call nc_read(filename,"zb",zb)
         
         ! Eliminate problematic regions for this domain ========
-        ! (shallow sea in Baffin Bay, etc)
         call grid_allocate(grid,mask_reg)    
         
+        ! Baffin Bay
         allocate(xp(4),yp(4))
         xp = [-63.5,-57.7,-53.9,-57.7]
         yp = [ 69.6, 67.3, 63.3, 55.0]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-!         call nc_write(filename,"mask_reg",mask_reg,dim1="xc",dim2="yc")
-        
         where (mask_reg .and. zb .gt. -600.d0) zb = mv 
 
+        ! Iceland 
         xp = [-17.0,-23.8,-31.2,-22.1]
         yp = [ 69.1, 68.6, 64.1, 63.2]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. 0.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
 
+        ! Land in the Northeast corner
         xp = [  5.1, -4.5, 22.0, 22.1]
         yp = [ 78.8, 83.5, 80.1, 80.2]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. 0.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
 
+        ! Replaces problematic regions with regional mean values or zero for surface
         call fill_weighted(zb,missing_value=mv)
-        
+        call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
+
         ! ======================================================
 
 
