@@ -251,11 +251,14 @@ contains
         ! Greenland
         outmask = 1 
 
-        ! Ellsmere Island 
+        ! Ellesmere Island 
         xp = [-59.3,-60.0,-70.8,-76.6 ]
         yp = [ 84.9, 82.4, 79.7, 76.6 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 2 
+
+        call nc_write(filename,"mask_reg", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
+                      long_name="Region mask (Greenland=1,Ellesmere Island=2)")
 
         ! ===========================
 
