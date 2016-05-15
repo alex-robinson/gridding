@@ -185,7 +185,7 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         call nc_write(filename,"mask_reg",mask_reg,dim1="xc",dim2="yc")
         
-        where (mask_reg) zb = -1500.d0 
+        where (mask_reg .and. zb .gt. -600.d0) zb = -1500.d0 
 
         ! ======================================================
 
