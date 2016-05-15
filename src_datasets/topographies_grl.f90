@@ -255,8 +255,8 @@ contains
         if (allocated(xp)) deallocate(xp)
         if (allocated(yp)) deallocate(yp)
         allocate(xp(6),yp(6)) 
-        xp = [-59.3,-60.0,-70.8,-76.6,-99.0,-88.7 ]
-        yp = [ 85.0, 82.4, 79.7, 76.6, 82.0, 85.0 ]
+        xp = [-59.3,-60.0,-70.8,-76.6,-102.0,-88.7 ]
+        yp = [ 85.0, 82.4, 79.7, 76.6,  82.0, 85.0 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 2 
 
