@@ -214,20 +214,20 @@ contains
         end if 
 
         ! First clean up the field based on original H
-        where (H .lt. 1.d0) 
-            H  = 0.d0 
-            zs = zb 
-        end where 
+!         where (H .lt. 1.d0) 
+!             H  = 0.d0 
+!             zs = zb 
+!         end where 
         
-        ! Also make sure zs is always higher than zb 
-        where (zs .lt. zb) zs = zb 
+!         ! Also make sure zs is always higher than zb 
+!         where (zs .lt. zb) zs = zb 
             
-        ! Adjust H again for consistency
-        H = 0.d0 
-        where (zs .ne. 0.d0) H = zs-zb 
+!         ! Adjust H again for consistency
+!         H = 0.d0 
+!         where (zs .ne. 0.d0) H = zs-zb 
 
-        ! Now make sure zs is zero over the ocean
-        where (zs .lt. 0.d0) zs = 0.d0 
+!         ! Now make sure zs is zero over the ocean
+!         where (zs .lt. 0.d0) zs = 0.d0 
 
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
