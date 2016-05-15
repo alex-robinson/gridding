@@ -213,13 +213,11 @@ contains
             
         end if 
 
-        ! Update H to match zs and zb, and write it 
-        H = zs-zb 
-        where (H .lt. 1.d0) 
-            H  = 0.d0 
-            zs = zb 
-        end where 
-        
+        ! Update H to match zs and zb, and write it
+        where (zs .lt. 0.d0) zs = 0.d0 
+        H = 0.d0 
+        where (zs .ne. 0.d0) H = zs-zb 
+
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
         call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
