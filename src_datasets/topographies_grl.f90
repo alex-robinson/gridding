@@ -213,8 +213,16 @@ contains
             
         end if 
 
-        ! Update H to match zs and zb, and write it
+        ! First clean up the field based on original H
+        where (H .lt. 1.d0) 
+            H  = 0.d0 
+            zs = zb 
+        end where 
+        
+        ! Now make sure zs is zero over the ocean
         where (zs .lt. 0.d0) zs = 0.d0 
+
+        ! Adjust H again for consistency
         H = 0.d0 
         where (zs .ne. 0.d0) H = zs-zb 
 
