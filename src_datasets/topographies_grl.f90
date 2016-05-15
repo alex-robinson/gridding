@@ -222,12 +222,12 @@ contains
         ! Also make sure zs is always higher than zb 
         where (zs .lt. zb) zs = zb 
             
-        ! Now make sure zs is zero over the ocean
-        where (zs .lt. 0.d0) zs = 0.d0 
-
         ! Adjust H again for consistency
         H = 0.d0 
         where (zs .ne. 0.d0) H = zs-zb 
+
+        ! Now make sure zs is zero over the ocean
+        where (zs .lt. 0.d0) zs = 0.d0 
 
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
