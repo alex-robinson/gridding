@@ -180,7 +180,7 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
                 
             ! ===== Mean basin value everywhere ===== 
-            var_now = vars(1) 
+            var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
             call thin(invar,tmp1,by=10)
             where( invar .eq. 0.d0 ) invar = mv
