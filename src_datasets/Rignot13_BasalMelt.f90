@@ -172,6 +172,9 @@ contains
                 where ( (outvar .eq. mv) .and. (basins .eq. q) ) outvar = basin_ave 
             end do 
 
+            ! Fill in missing values 
+            call fill_mean(outvar,missing_value=mv)
+
             nm_out = trim(var_now%nm_out)//"_sm"
             call nc_write(filename,nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
@@ -192,9 +195,15 @@ contains
 
             do q = 1, maxval(basins)
                 mask_basin = (outvar .ne. mv) .and. (basins .eq. q)
-                basin_ave = sum(outvar,mask=mask_basin) / count(mask_basin)
+                basin_ave = mv
+                if (count(mask_basin) .gt. 0) then 
+                    basin_ave = sum(outvar,mask=mask_basin) / count(mask_basin)
+                end if 
                 where ( (basins .eq. q) ) outvar = basin_ave 
             end do 
+
+            ! Fill in missing values 
+            call fill_mean(outvar,missing_value=mv)
 
             nm_out = trim(var_now%nm_out)//"_ave"
             call nc_write(filename,nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
