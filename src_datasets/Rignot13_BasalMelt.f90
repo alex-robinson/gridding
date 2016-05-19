@@ -168,7 +168,10 @@ contains
             
             do q = 1, maxval(basins)
                 mask_basin = (outvar .ne. mv) .and. (basins .eq. q)
-                basin_ave = sum(outvar,mask=mask_basin) / count(mask_basin)
+                basin_ave = mv
+                if (count(mask_basin) .gt. 0) then 
+                    basin_ave = sum(outvar,mask=mask_basin) / count(mask_basin)
+                end if 
                 where ( (outvar .eq. mv) .and. (basins .eq. q) ) outvar = basin_ave 
             end do 
 
