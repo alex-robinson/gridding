@@ -276,6 +276,7 @@ contains
         !
         !       TOPO DATA
         !       http://sites.uci.edu/morlighem/dataproducts/mass-conservation-dataset/
+        !       ftp://sidads.colorado.edu/DATASETS/IDBMG4_BedMachineGr/
         ! =========================================================
         
         implicit none 
@@ -320,8 +321,8 @@ contains
             end select 
 
             ! Define the input filenames
-            file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2014-11-19_NetCDF3.nc"
-            desc    = "BedMachine: Greenland dataset based on mass conservation, 19-Nov-2014 (v1.7)"
+            file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2015-04-27.nc"
+            desc    = "BedMachine: Greenland dataset based on mass conservation, 2015-04-27 (v2.0)"
             ref     = "Morlighem, M., Rignot, E., Mouginot, J., Seroussi, H. and Larour, E., &
                       &Deeply incised submarine glacial valleys beneath the Greenland Ice Sheet, &
                       &Nat. Geosci., 7, 418-422, doi:10.1038/ngeo2167, 2014. \n&
@@ -385,12 +386,12 @@ contains
                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
             end if 
 
-            method = "radius"
+            method = "nng"
             if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
-                           radius=grid%G%dx*grid%xy_conv*0.75d0,fill=.TRUE.,missing_value=mv)
+                           sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
                 call fill_nearest(outvar,missing_value=mv)
