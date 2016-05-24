@@ -178,8 +178,8 @@ contains
         where (mask_reg) zs = mv 
 
         ! Bad island with ice 
-        xp = [165.40, 160.99, 166.28, 162.11]
-        yp = [-67.57, -67.06, -66.19, -65.71]
+        xp = [167.0, 159.0, 166.28, 162.11]
+        yp = [-67.7, -67.1, -66.19, -65.71]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) zb = mv 
         where (mask_reg) zs = mv 
