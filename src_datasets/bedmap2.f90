@@ -187,7 +187,7 @@ contains
         ! Replaces problematic regions with regional mean values or zero for surface
         where (zb .eq. mv) H = 0.d0 
         where (zb .eq. mv) outvar = 0.d0 
-        
+
         call fill_weighted(zb,missing_value=mv)
         call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
 
@@ -202,7 +202,7 @@ contains
         ! Update mask and H 
         where (H .lt. 1.d0) H  = 0.d0 
         where (H .eq. 0.d0) zs = 0.d0 
-        where (outvar .eq. 2.d0) H = zs-zb 
+        where (outvar .eq. 2.d0 .and. zs .gt. 0.d0) H = zs-zb 
         where (zs     .eq. 0.d0) outvar = 0.d0 
 
         ! Re-write fields 
