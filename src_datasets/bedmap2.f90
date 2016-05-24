@@ -186,6 +186,8 @@ contains
 
         ! Replaces problematic regions with regional mean values or zero for surface
         where (zb .eq. mv) H = 0.d0 
+        where (zb .eq. mv) outvar = 0.d0 
+        
         call fill_weighted(zb,missing_value=mv)
         call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
 
