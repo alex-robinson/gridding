@@ -189,19 +189,19 @@ contains
 !         call fill_weighted(zb,missing_value=mv)
 !         call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
 
-        ! Apply gradient limit as needed
-        if (grad_lim .gt. 0.d0) then 
-            ! Limit the gradient (m/m) to below threshold 
-            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
-            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+!         ! Apply gradient limit as needed
+!         if (grad_lim .gt. 0.d0) then 
+!             ! Limit the gradient (m/m) to below threshold 
+!             call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+!             call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
             
-        end if 
+!         end if 
 
         ! Update mask and H 
-        where (H .lt. 1.d0) H  = 0.d0 
-        where (H .eq. 0.d0) zs = 0.d0 
-        where (outvar .eq. 2.d0) H = zs-zb 
-        where (zs     .eq. 0.d0) outvar = 0.d0 
+        where (H .ne. mv .and. H .lt. 1.d0) H  = 0.d0 
+        where (H .ne. mv .and. H .eq. 0.d0) zs = 0.d0 
+        where (outvar .ne. mv .and. outvar .eq. 2.d0) H = zs-zb 
+        where (zs .ne. mv .and. zs     .eq. 0.d0) outvar = 0.d0 
 
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
