@@ -176,6 +176,7 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) zb = mv 
         where (mask_reg) zs = mv 
+        call nc_write(filename,"mask_reg1",mask_reg,dim1="xc",dim2="yc")
 
         ! Bad island with ice 
         xp = [167.0, 159.0, 160.0, 162.11]
@@ -183,6 +184,7 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) zb = mv 
         where (mask_reg) zs = mv 
+        call nc_write(filename,"mask_reg2",mask_reg,dim1="xc",dim2="yc")
 
         ! Replaces problematic regions with regional mean values or zero for surface
         where (zb .eq. mv) H = 0.d0 
@@ -198,10 +200,10 @@ contains
         end if 
 
         ! Update mask and H 
-        where (H .ne. mv .and. H .lt. 1.d0) H  = 0.d0 
-        where (H .ne. mv .and. H .eq. 0.d0) zs = 0.d0 
-        where (outvar .ne. mv .and. outvar .eq. 2.d0) H = zs-zb 
-        where (zs .ne. mv .and. zs     .eq. 0.d0) outvar = 0.d0 
+        where (H .lt. 1.d0) H  = 0.d0 
+        where (H .eq. 0.d0) zs = 0.d0 
+        where (outvar .eq. 2.d0) H = zs-zb 
+        where (zs     .eq. 0.d0) outvar = 0.d0 
 
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
