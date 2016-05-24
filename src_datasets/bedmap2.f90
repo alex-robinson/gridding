@@ -46,6 +46,9 @@ contains
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
         character(len=128) :: grad_lim_str  
 
+        double precision, allocatable :: zb0(:,:)
+        character(len=512) :: filename0
+
         logical, allocatable :: mask_reg(:,:)
         real(4), allocatable :: xp(:), yp(:) 
 
@@ -77,6 +80,9 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-BEDMAP2"//trim(grad_lim_str)//".nc"
 
+            ! Define filename holding ETOPO1 data
+            write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
@@ -159,6 +165,7 @@ contains
         call grid_allocate(grid,zs)
         call grid_allocate(grid,zb)
         call grid_allocate(grid,H)
+        call grid_allocate(grid,zb0)
 
         ! Re-load data
         call nc_read(filename,"zs",zs)
@@ -166,6 +173,10 @@ contains
         call nc_read(filename,"H",H)
         call nc_read(filename,"mask_ice",outvar)
         
+        ! Also load etopo bedrock, use it to replace high latitude regions 
+        call nc_read(filename0,"zb",zb0)
+        where (grid%lat > -60.d0) zb = zb0 
+
         ! Eliminate problematic regions for this domain ========
         call grid_allocate(grid,mask_reg)    
         
