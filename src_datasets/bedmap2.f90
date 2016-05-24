@@ -174,30 +174,28 @@ contains
         xp = [-44.51, -43.51, -45.49, -44.49]
         yp = [-59.87, -60.35, -60.36, -60.85]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) zb = mv 
-        where (mask_reg) zs = mv 
-        call nc_write(filename,"mask_reg1",mask_reg,dim1="xc",dim2="yc")
+        where (mask_reg .and. H .gt. 0) zb = mv 
+        where (mask_reg .and. H .gt. 0) zs = mv 
 
         ! Bad island with ice 
         xp = [167.0, 159.0, 160.0, 169.5]
-        yp = [-67.7, -67.1, -63.9, -65.0]
+        yp = [-67.7, -68.0, -64.1, -65.0]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) zb = mv 
-        where (mask_reg) zs = mv 
-        call nc_write(filename,"mask_reg2",mask_reg,dim1="xc",dim2="yc")
+        where (mask_reg .and. H .gt. 0) zb = mv 
+        where (mask_reg .and. H .gt. 0) zs = mv 
 
         ! Replaces problematic regions with regional mean values or zero for surface
         where (zb .eq. mv) H = 0.d0 
         call fill_weighted(zb,missing_value=mv)
         call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
 
-        ! Apply gradient limit as needed
-        if (grad_lim .gt. 0.d0) then 
-            ! Limit the gradient (m/m) to below threshold 
-            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
-            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+!         ! Apply gradient limit as needed
+!         if (grad_lim .gt. 0.d0) then 
+!             ! Limit the gradient (m/m) to below threshold 
+!             call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+!             call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
             
-        end if 
+!         end if 
 
         ! Update mask and H 
         where (H .lt. 1.d0) H  = 0.d0 
