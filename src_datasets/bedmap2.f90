@@ -143,7 +143,7 @@ contains
                 where ( invar .eq. missing_value ) invar = 0.d0 
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,sigma=grid%G%dx*0.5,missing_value=mv)
+                          fill=.TRUE.,sigma=grid%G%dx*1.0,missing_value=mv)
             call fill_mean(outvar,missing_value=mv)
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=nint(mv))
