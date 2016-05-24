@@ -208,6 +208,7 @@ contains
         call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
         call nc_write(filename,"mask",nint(outvar),dim1="xc",dim2="yc",missing_value=nint(mv))
+        call nc_write(filename,"mask_reg",mask_reg,dim1="xc",dim2="yc")
 
         return 
 
