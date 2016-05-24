@@ -179,8 +179,8 @@ contains
         call nc_write(filename,"mask_reg1",mask_reg,dim1="xc",dim2="yc")
 
         ! Bad island with ice 
-        xp = [167.0, 159.0, 160.0, 162.11]
-        yp = [-67.7, -67.1, -63.9, -65.71]
+        xp = [167.0, 159.0, 160.0, 169.5]
+        yp = [-67.7, -67.1, -63.9, -65.0]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) zb = mv 
         where (mask_reg) zs = mv 
