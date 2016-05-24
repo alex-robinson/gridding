@@ -2,7 +2,8 @@ module bedmap2
 
     use gridding_datasets
     use coordinates 
-    use interp2D
+    use interp2D 
+    use polygons 
     use ncio 
     
     implicit none 
@@ -44,6 +45,9 @@ contains
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
         character(len=128) :: grad_lim_str  
+
+        logical, allocatable :: mask_reg(:,:)
+        real(4), allocatable :: xp(:), yp(:) 
 
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
@@ -133,7 +137,7 @@ contains
                 where ( invar .eq. missing_value ) invar = 0.d0 
             end if 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
-                          fill=.TRUE.,sigma=grid%G%dx*1.5,missing_value=mv)
+                          fill=.TRUE.,sigma=grid%G%dx*0.5,missing_value=mv)
             call fill_mean(outvar,missing_value=mv)
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=nint(mv))
@@ -162,6 +166,29 @@ contains
         call nc_read(filename,"H",H)
         call nc_read(filename,"mask_ice",outvar)
         
+        ! Eliminate problematic regions for this domain ========
+        call grid_allocate(grid,mask_reg)    
+        
+        ! Bad island with ice 
+        allocate(xp(4),yp(4))
+        xp = [-44.51, -43.51, -45.49, -44.49]
+        yp = [-59.87, -60.35, -60.36, -60.85]
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (mask_reg) zb = mv 
+        where (mask_reg) zs = mv 
+
+        ! Bad island with ice 
+        xp = [165.40, 160.99, 166.28, 162.11]
+        yp = [-67.57, -67.06, -66.19, -65.71]
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (mask_reg) zb = mv 
+        where (mask_reg) zs = mv 
+
+        ! Replaces problematic regions with regional mean values or zero for surface
+        where (zb .eq. mv) H = 0.d0 
+        call fill_weighted(zb,missing_value=mv)
+        call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
+
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
             ! Limit the gradient (m/m) to below threshold 

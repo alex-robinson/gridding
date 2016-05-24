@@ -15,6 +15,7 @@ program gridder
     use ECMWF 
     use ETOPO 
     use GeothermalHeatFlux 
+    use grisli_g40
     use MAR 
     use NasaBasins 
     use RACMO2 
@@ -104,7 +105,10 @@ program gridder
         !      This dataset is not used for now...
         !call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",max_neighbors=20,lat_lim=0.5d0)
         !call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",clim_range=[1980,1999])
-    
+        
+        ! Testing old grisli fields 
+!         call g40_topo_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
+
     end if 
 
     if (trim(domain) .eq. "Greenland") then 
