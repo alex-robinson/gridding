@@ -5,6 +5,7 @@ module Rignot13_BasalMelt
     use planet 
     use oblimap_projection_module 
     use interp2D
+    use gaussian_filter
     use ncio 
     
     implicit none 
@@ -44,7 +45,7 @@ contains
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:), tmp1(:,:), tmp2(:,:), tmp3(:,:)
+        double precision, allocatable :: outvar(:,:), tmp1(:,:), tmp2(:,:)
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: xax(:), yax(:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
@@ -185,7 +186,7 @@ contains
                                 trim(var_now%long_name)//" (nng + basin average)")
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
                 
-            ! ===== Mean basin value everywhere ===== 
+            ! ===== Mean basin value everywhere, then smoothed ==========
             var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
             call thin(invar,tmp1,by=10)
@@ -208,6 +209,10 @@ contains
             ! Fill in missing values 
             call fill_mean(outvar,missing_value=mv)
 
+            call grid_allocate(grid,tmp2)
+            tmp2 = outvar
+            call filter_gaussian(input=tmp2,output=outvar,sigma=sigma,dx=grid%G%dx,mask=tmp2.ne.mv)
+        
             nm_out = trim(var_now%nm_out)//"_ave"
             call nc_write(filename,nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
