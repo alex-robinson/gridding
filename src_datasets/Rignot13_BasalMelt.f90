@@ -206,13 +206,14 @@ contains
                 where ( (basins .eq. q) ) outvar = basin_ave 
             end do 
 
-            ! Fill in missing values 
-            call fill_mean(outvar,missing_value=mv)
-
             call grid_allocate(grid,tmp2)
             tmp2 = outvar
             call filter_gaussian(input=tmp2,output=outvar,sigma=sigma,dx=grid%G%dx,mask=tmp2.ne.mv)
         
+            ! Fill in missing values 
+            call fill_mean(outvar,missing_value=mv)
+
+            
             nm_out = trim(var_now%nm_out)//"_ave"
             call nc_write(filename,nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
