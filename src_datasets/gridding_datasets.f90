@@ -124,13 +124,13 @@ contains
 
         do i = 1, by 
             do j = 1, by 
-                wts(i,j) = 1.d0 / sqrt((i-real(by)/2.d0)**2+(j-real(by)/2.d0)**2)
+                wts(i,j) = sqrt((i-real(by)/2.d0)**2+(j-real(by)/2.d0)**2)
             end do 
         end do 
 
         write(*,*) "weights: ", by 
-        do i = 1, by 
-            write(*,"(20g11.2)") wts(:,j)
+        do j = 1, by 
+            write(*,"(20e11.2)") wts(:,j)
         end do 
         stop 
 
