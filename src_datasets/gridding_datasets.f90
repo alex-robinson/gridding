@@ -127,6 +127,7 @@ contains
                 wts(i,j) = sqrt((i-real(by)/2.d0)**2+(j-real(by)/2.d0)**2)
             end do 
         end do 
+        wts = 1.0 - wts / max(wts)
 
         write(*,*) "weights: ", by 
         do j = 1, by 
@@ -137,10 +138,10 @@ contains
         var1 = missing_value 
 
         i1 = 0
-        do i = 1, nx, by 
+        do i = by/2, nx, by 
             i1 = i1+1 
             j1 = 0 
-            do j = 1, ny, by  
+            do j = by/2, ny, by  
                 j1 = j1 + 1 
                 if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
                     var1(i1,j1) = var(i,j)
