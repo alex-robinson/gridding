@@ -119,7 +119,7 @@ contains
         ny = size(var,2) 
 
         ! Define weights for neighbor averaging 
-        nxn = (by/2)-1
+        nxn = (by-1)/2
         allocate(wts(by,by))
 
         do i = 1, by 
@@ -130,22 +130,16 @@ contains
         wts = 1.0 - wts / maxval(wts)
         wts = wts / sum(wts) 
 
-        write(*,*) "weights: ", by 
-        do j = 1, by 
-            write(*,"(20e11.2)") wts(:,j)
-        end do 
-        stop 
-
         var1 = missing_value 
 
         i1 = 0
-        do i = (by-1)/2, nx, by 
+        do i = nxn+1, nx-nxn, by 
             i1 = i1+1 
             j1 = 0 
-            do j = (by-1)/2, ny, by  
+            do j = nxn+1, ny-nxn, by  
                 j1 = j1 + 1 
                 if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
-                    var1(i1,j1) = var(i,j)
+                    var1(i1,j1) = var(i-nxn:i+nxn,j-nxn:j+nxn)*wts
             end do 
         end do 
 
