@@ -127,7 +127,7 @@ contains
                 wts(i,j) = sqrt((i-real(by)/2.d0)**2+(j-real(by)/2.d0)**2)
             end do 
         end do 
-        wts = 1.0 - wts / max(wts)
+        wts = 1.0 - wts / maxval(wts)
 
         write(*,*) "weights: ", by 
         do j = 1, by 
