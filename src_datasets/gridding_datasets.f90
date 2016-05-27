@@ -132,7 +132,8 @@ contains
         do i = 1, by 
             write(*,"(20g10.1)") wts(:,j)
         end do 
-
+        stop 
+        
         var1 = missing_value 
 
         i1 = 0
