@@ -124,7 +124,7 @@ contains
 
         do i = 1, by 
             do j = 1, by 
-                wts(i,j) = sqrt((i-real(by)/2.d0)**2+(j-real(by)/2.d0)**2)
+                wts(i,j) = sqrt((i-1-real(by)/2.d0)**2+(j-1-real(by)/2.d0)**2)
             end do 
         end do 
         wts = 1.0 - wts / maxval(wts)
