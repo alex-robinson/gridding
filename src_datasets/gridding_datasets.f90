@@ -102,6 +102,53 @@ contains
         return
     end subroutine thin 
 
+    ! Extract a lower resolution average version of an input array
+    ! (new array should be a multiple of input array)
+    subroutine thin_ave(var1,var,by)
+        implicit none
+
+        double precision, dimension(:,:) :: var, var1 
+        integer :: by 
+        integer :: i,j, nx, ny 
+        integer :: i1, j1
+
+        double precision, allocatable :: wts(:,:)
+        integer :: nxn 
+
+        nx = size(var,1)
+        ny = size(var,2) 
+
+        ! Define weights for neighbor averaging 
+        nxn = (by/2)-1
+        allocate(wts(by,by))
+
+        do i = 1, by 
+            do j = 1, by 
+                wts(i,j) = 1.d0 / sqrt((i-by/2.d0)**2+(j-by/2.d0)**2)
+            end do 
+        end do 
+
+        write(*,*) "weights: ", by 
+        do i = 1, by 
+            write(*,"(20g10.1)") wts(:,j)
+        end do 
+
+        var1 = missing_value 
+
+        i1 = 0
+        do i = 1, nx, by 
+            i1 = i1+1 
+            j1 = 0 
+            do j = 1, ny, by  
+                j1 = j1 + 1 
+                if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
+                    var1(i1,j1) = var(i,j)
+            end do 
+        end do 
+
+        return
+    end subroutine thin_ave 
+
     subroutine replace(s,text,rep,outs)
         ! Adapted from FUNCTION Replace_Text:
         ! http://fortranwiki.org/fortran/show/String_Functions
