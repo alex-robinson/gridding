@@ -125,7 +125,7 @@ contains
         do i = 1, size(invariant)
             var_now = invariant(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
-            call thin(invar,tmp1,by=10)
+            call thin_ave(invar,tmp1,by=10)
             if (trim(var_now%nm_out) .eq. "H" .or. &
                 trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
@@ -321,15 +321,15 @@ contains
             var_now = invariant(i) 
             if (trim(var_now%nm_out) .eq. "uv") then 
                 call nc_read(var_now%filename,"u",tmp1,missing_value=missing_value)
-                call thin(invar,tmp1,by=10)
+                call thin_ave(invar,tmp1,by=10)
                 where( invar .eq. missing_value ) invar = 0.d0 
                 call nc_read(var_now%filename,"v",tmp1,missing_value=missing_value)
-                call thin(invarb,tmp1,by=10)
+                call thin_ave(invarb,tmp1,by=10)
                 where( invarb .eq. missing_value ) invarb = 0.d0 
                 invar = dsqrt(invar**2 + invarb**2)
             else
                 call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-                call thin(invar,tmp1,by=10)
+                call thin_ave(invar,tmp1,by=10)
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if 
 
@@ -444,7 +444,7 @@ contains
         ! ## FIELDS ##
         var_now = invariant(1) 
         call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-        call thin(invar,tmp1,by=10)
+        call thin_ave(invar,tmp1,by=10)
 !         where( invar .eq. missing_value ) invar = 0.d0 
     
         call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
