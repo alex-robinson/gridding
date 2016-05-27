@@ -139,7 +139,7 @@ contains
             do j = nxn+1, ny-nxn, by  
                 j1 = j1 + 1 
                 if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
-                    var1(i1,j1) = var(i-nxn:i+nxn,j-nxn:j+nxn)*wts
+                    var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts)
             end do 
         end do 
 
