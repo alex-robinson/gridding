@@ -43,7 +43,7 @@ contains
         double precision, parameter :: sigma = 30   ! kilometers
 
         ! Define the input filenames
-        file_in = "/data/sicopolis/data/Antarctica/AN1-CRUST/AN1-CRUST.grd"
+        file_in = "/data/sicopolis/data/Antarctica/AN1/AN1-CRUST.grd"
         desc    = "AN1-CRUST: A Moho depth map"
         ref     = "Meijian, A., Wiens, D., Yue, Z., Mei, F., Nyblade, A. A., &
                   &Kanao, M., Yuansheng, L., Maggi, A., Lévêque, J., &
