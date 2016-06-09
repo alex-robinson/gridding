@@ -185,21 +185,19 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg .and. zb .gt. -600.d0) zb = mv 
 
-!         ! Iceland 
-!         xp = [-17.0,-23.8,-31.2,-22.1]
-!         yp = [ 69.1, 68.6, 64.1, 63.2]
-!         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-!         where (mask_reg .and. zb .gt. -200.d0) zb = mv 
-!         where (mask_reg .and. zb .gt. -200.d0) zs = mv 
-
-        ! Land in the Northeast corner
-        
-        
-        xp = [ -12.7, 1.6, 20.0, -12.7 ]
-        yp = [  84.8,78.0, 80.9,  84.8 ]
+        ! Iceland 
+        xp = [-17.0,-23.8,-31.2,-22.1]
+        yp = [ 69.1, 68.6, 64.1, 63.2]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -600.d0) zb = mv 
-        where (mask_reg .and. zb .gt. -600.d0) zs = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
+
+        ! Svalbard
+        xp = [ -12.7, 1.6, 20.0, -30.0 ]
+        yp = [  84.8,78.0, 81.0,  85.0 ]
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
 
         ! Replaces problematic regions with regional mean values or zero for surface
         call fill_weighted(zb,missing_value=mv)
@@ -271,8 +269,17 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 3 
 
+        ! Svalbard
+        if (allocated(xp)) deallocate(xp)
+        if (allocated(yp)) deallocate(yp)
+        allocate(xp(4),yp(4))
+        xp = [ -12.7, 1.6, 20.0, -30.0 ]
+        yp = [  84.8,78.0, 81.0,  85.0 ]
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (mask_reg) outmask = 4 
+
         call nc_write(filename,"mask_reg", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
-                      long_name="Region mask (Greenland=1,Ellesmere Island=2,Iceland=3)")
+                      long_name="Region mask (Greenland=1,Ellesmere Island=2,Iceland=3,Svalbard=4)")
 
         ! ===========================
 
