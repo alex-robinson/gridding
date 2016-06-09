@@ -261,8 +261,11 @@ contains
         where (mask_reg) outmask = 2 
 
         ! Iceland 
-        xp = [-17.0,-23.8,-31.2,-22.1]
-        yp = [ 69.1, 68.6, 64.1, 63.2]
+        if (allocated(xp)) deallocate(xp)
+        if (allocated(yp)) deallocate(yp)
+        allocate(xp(5),yp(5))
+        xp = [-16.6,-22.3,-25.7,-28.8,-25.1]
+        yp = [ 69.5, 69.2, 67.3, 65.7, 57.7]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 3 
 
