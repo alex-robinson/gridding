@@ -193,11 +193,13 @@ contains
 !         where (mask_reg .and. zb .gt. -200.d0) zs = mv 
 
         ! Land in the Northeast corner
-        xp = [  5.1, -4.5, 22.0, 22.1]
-        yp = [ 78.8, 83.5, 80.1, 80.2]
+        
+        
+        xp = [ -12.7, 1.6, 20.0, -12.7 ]
+        yp = [  84.8,78.0, 80.9,  84.8 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -500.d0) zb = mv 
-        where (mask_reg .and. zb .gt. -500.d0) zs = mv 
+        where (mask_reg .and. zb .gt. -600.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -600.d0) zs = mv 
 
         ! Replaces problematic regions with regional mean values or zero for surface
         call fill_weighted(zb,missing_value=mv)
