@@ -193,8 +193,11 @@ contains
         where (mask_reg .and. zb .gt. -200.d0) zs = mv 
 
         ! Svalbard
-        xp = [ -12.7, 1.6, 20.0, -30.0 ]
-        yp = [  84.8,78.0, 81.0,  85.0 ]
+        if (allocated(xp)) deallocate(xp)
+        if (allocated(yp)) deallocate(yp)
+        allocate(xp(5),yp(5))
+        xp = [ 40.0, 40.0, 20.0,  0.0, -10.0 ]
+        yp = [ 85.0, 80.0, 73.0, 75.0,  85.0 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg .and. zb .gt. -200.d0) zb = mv 
         where (mask_reg .and. zb .gt. -200.d0) zs = mv 
@@ -275,9 +278,6 @@ contains
         allocate(xp(5),yp(5))
         xp = [ 40.0, 40.0, 20.0,  0.0, -10.0 ]
         yp = [ 85.0, 80.0, 73.0, 75.0,  85.0 ]
-
-!         xp = [ -12.7, 1.6, 20.0, -30.0 ]
-!         yp = [  84.8,78.0, 81.0,  85.0 ]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 4 
 
