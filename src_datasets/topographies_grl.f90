@@ -185,19 +185,19 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg .and. zb .gt. -600.d0) zb = mv 
 
-        ! Iceland 
-        xp = [-17.0,-23.8,-31.2,-22.1]
-        yp = [ 69.1, 68.6, 64.1, 63.2]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
-        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
+!         ! Iceland 
+!         xp = [-17.0,-23.8,-31.2,-22.1]
+!         yp = [ 69.1, 68.6, 64.1, 63.2]
+!         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+!         where (mask_reg .and. zb .gt. -200.d0) zb = mv 
+!         where (mask_reg .and. zb .gt. -200.d0) zs = mv 
 
         ! Land in the Northeast corner
         xp = [  5.1, -4.5, 22.0, 22.1]
         yp = [ 78.8, 83.5, 80.1, 80.2]
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
-        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
+        where (mask_reg .and. zb .gt. -500.d0) zb = mv 
+        where (mask_reg .and. zb .gt. -500.d0) zs = mv 
 
         ! Replaces problematic regions with regional mean values or zero for surface
         call fill_weighted(zb,missing_value=mv)
@@ -260,8 +260,14 @@ contains
         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
         where (mask_reg) outmask = 2 
 
+        ! Iceland 
+        xp = [-17.0,-23.8,-31.2,-22.1]
+        yp = [ 69.1, 68.6, 64.1, 63.2]
+        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (mask_reg) outmask = 3 
+
         call nc_write(filename,"mask_reg", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
-                      long_name="Region mask (Greenland=1,Ellesmere Island=2)")
+                      long_name="Region mask (Greenland=1,Ellesmere Island=2,Iceland=3)")
 
         ! ===========================
 
