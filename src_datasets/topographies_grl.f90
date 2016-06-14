@@ -457,7 +457,7 @@ contains
         call nc_read(filename, "zb",zb,missing_value=mv)
         where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
-        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
 
         return 
