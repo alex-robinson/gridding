@@ -425,8 +425,9 @@ contains
             if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
 
+            outvar = mv 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
-                           sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
+                           sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
                 call fill_nearest(outvar,missing_value=mv)
