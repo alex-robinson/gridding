@@ -320,9 +320,16 @@ contains
         integer, allocatable          :: outmask(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 10 
-        character(len=128) :: method 
+        character(len=128) :: method, grad_lim_str  
 
         integer :: status, ncid 
+
+        grad_lim_str = "" 
+        if (grad_lim .gt. 0.09d0) then 
+            write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
+        else if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
+        end if 
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
