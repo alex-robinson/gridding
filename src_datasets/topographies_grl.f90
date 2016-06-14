@@ -316,7 +316,7 @@ contains
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
-        double precision, allocatable :: outvar(:,:), tmp(:,:)
+        double precision, allocatable :: outvar(:,:), tmp(:,:), tmp_rev(:,:)
         integer, allocatable          :: outmask(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 10 
@@ -340,7 +340,7 @@ contains
                     call grid_init(grid0,name="ESPG-3413-1.5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-637.925d0,dx=1.5d0,nx=1001,y0=-3349.425d0,dy=1.5d0,ny=1794, &
-                            lambda=-45.d0,phi=70.d0,alpha=7.2d0)
+                            lambda=-45.d0,phi=70.d0,alpha=19.0d0)
 
                 case DEFAULT
                     write(*,*) "Morlighem14_to_grid:: error: thin_by can only be 10."
@@ -382,6 +382,7 @@ contains
         call grid_allocate(grid0,invar)
 
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
+        allocate(tmp_rev(10018,17946))
         allocate(tmp(10018,17946))
 
         ! Initialize mapping
@@ -404,7 +405,8 @@ contains
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
-            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+            call nc_read(trim(var_now%filename),var_now%nm_in,tmp_rev,missing_value=mv)
+            tmp = tmp_rev(:,size(tmp,2):1)
             call thin(invar,tmp,by=thin_by)
 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
