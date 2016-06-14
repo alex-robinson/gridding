@@ -104,16 +104,21 @@ contains
 
     ! Extract a lower resolution average version of an input array
     ! (new array should be a multiple of input array)
-    subroutine thin_ave(var1,var,by)
+    subroutine thin_ave(var1,var,by,missing_value)
         implicit none
 
         double precision, dimension(:,:) :: var, var1 
         integer :: by 
+        double precision, optional :: missing_value 
         integer :: i,j, nx, ny 
         integer :: i1, j1
 
-        double precision, allocatable :: wts(:,:)
+        double precision, allocatable :: wts(:,:), wts_now(:,:)
+        double precision :: missing_val 
         integer :: nxn 
+
+        missing_val = -9999.0 
+        if (present(missing_value)) missing_val = missing_value
 
         nx = size(var,1)
         ny = size(var,2) 
@@ -121,6 +126,7 @@ contains
         ! Define weights for neighbor averaging 
         nxn = (by-1)/2
         allocate(wts(by,by))
+        allocate(wts_now(by,by))
 
         do i = 1, by 
             do j = 1, by 
@@ -130,7 +136,7 @@ contains
         wts = 1.0 - wts / maxval(wts)
         wts = wts / sum(wts) 
 
-        var1 = missing_value 
+        var1 = missing_val
 
         i1 = 0
         do i = nxn+1, nx-nxn, by 
@@ -138,8 +144,11 @@ contains
             j1 = 0 
             do j = nxn+1, ny-nxn, by  
                 j1 = j1 + 1 
-                if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
-                    var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts)
+                if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) then 
+                    wts_now = wts 
+                    where (var(i-nxn:i+nxn,j-nxn:j+nxn) .eq. missing_val) wts_now = 0.d0 
+                    var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
+                end if 
             end do 
         end do 
 
