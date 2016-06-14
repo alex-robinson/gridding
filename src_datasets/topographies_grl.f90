@@ -291,7 +291,7 @@ contains
 
     end subroutine Bamber13_to_grid
 
-    subroutine Morlighem14_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine Morlighem14_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -305,7 +305,7 @@ contains
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim 
+        double precision :: lat_lim, grad_lim  
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -351,7 +351,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-M14.nc"
+                              "_TOPO-M14"//trim(grad_lim_str)//".nc"
 
         else
 
