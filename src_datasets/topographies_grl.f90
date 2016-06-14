@@ -421,7 +421,7 @@ contains
                 where( invar .eq. mv ) invar = 0.d0 
             end if
 
-            method = "nng"
+            method = "nn"
             if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
 
