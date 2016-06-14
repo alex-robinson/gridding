@@ -321,8 +321,11 @@ contains
         integer :: q, k, m, i, l, n_var, j 
         integer :: thin_by = 10 
         character(len=128) :: method, grad_lim_str  
-
         integer :: status, ncid 
+
+        double precision, allocatable :: var_fill(:,:)
+        double precision, allocatable :: zs(:,:), zb(:,:), H(:,:)
+        character(len=512) :: filename0 
 
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
@@ -360,6 +363,9 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-M14"//trim(grad_lim_str)//".nc"
 
+            ! Define filename holding ETOPO1 data
+            write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
@@ -414,9 +420,6 @@ contains
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-            if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
-            end if 
 
             method = "nng"
             if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
@@ -429,7 +432,6 @@ contains
                 call fill_nearest(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
-                call fill_weighted(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             end if 
             
@@ -439,6 +441,24 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
         end do 
+
+
+        ! === Update specific variables from other information ===
+
+        call grid_allocate(grid,zs)
+        call grid_allocate(grid,zb)
+        call grid_allocate(grid,H)
+        call grid_allocate(grid,var_fill)
+        
+        
+        ! Bedrock from ETOPO-1 
+        ! Also load etopo bedrock, use it to replace high latitude regions 
+        call nc_read(filename0,"zb",var_fill)
+        call nc_read(filename, "zb",zb,missing_value=mv)
+        where(zb .eq. mv) zb = var_fill 
+        var_now = vars(1)
+        call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        
 
         return 
 
