@@ -64,13 +64,13 @@ contains
                     call grid_init(grid0,name="TOPO-B13-10KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
-                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+                            lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
                 case(5)
                     call grid_init(grid0,name="TOPO-B13-5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
-                            lambda=-39.d0,phi=90.d0,alpha=7.5d0)
+                            lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
                 case DEFAULT
                     write(*,*) "Bamber13_to_grid:: error: thin_by can only be 5 or 10."
@@ -318,7 +318,7 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp(:,:), tmp_rev(:,:)
         integer, allocatable          :: outmask(:,:)
-        integer :: q, k, m, i, l, n_var 
+        integer :: q, k, m, i, l, n_var, j 
         integer :: thin_by = 10 
         character(len=128) :: method, grad_lim_str  
 
@@ -340,7 +340,7 @@ contains
                     call grid_init(grid0,name="ESPG-3413-1.5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-637.925d0,dx=1.5d0,nx=1001,y0=-3349.425d0,dy=1.5d0,ny=1794, &
-                            lambda=-45.d0,phi=70.d0,alpha=19.0d0)
+                            lambda=-45.d0,phi=70.d0,alpha=20.0d0)
 
                 case DEFAULT
                     write(*,*) "Morlighem14_to_grid:: error: thin_by can only be 10."
@@ -406,7 +406,9 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp_rev,missing_value=mv)
-            tmp = tmp_rev(:,size(tmp,2):1)
+            do j = 1, size(tmp_rev,2)
+                tmp(:,j) = tmp_rev(:,size(tmp_rev,2)-j+1)
+            end do 
             call thin(invar,tmp,by=thin_by)
 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
