@@ -111,6 +111,9 @@ $(objdir)/control.o: $(srcdir)/control.f90 $(objdir)/nml.o
 $(objdir)/gridding_datasets.o: $(srcdir)/gridding_datasets.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/regions.o: $(srcdir)/regions.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/AN1CRUST.o: $(srcdir)/AN1CRUST.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -181,6 +184,7 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o \
 				   $(objdir)/RACMO2.o \
+				   $(objdir)/regions.o \
 				   $(objdir)/Rignot13_BasalMelt.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/stratigraphy.o \

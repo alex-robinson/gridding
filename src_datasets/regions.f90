@@ -8,14 +8,8 @@ module regions
 
     implicit none 
 
-
-    type region_type 
-        character(len=128) :: name 
-        double precision, allocatable :: lon(:), lat(:)
-
-    end type
-
-
+    private
+    public :: get_region_map_north 
 
 contains 
 
@@ -25,13 +19,18 @@ contains
         ! For a given grid (input), output a mask of the regions
         ! that overlap with it
 
-        implicit 
+        implicit none
 
         type(grid_class), intent(IN) :: grid 
         integer :: mask(grid%G%nx,grid%G%ny)
 
 
-        ! First convert lon/lat points to grid of interest, then check point_in_polygon
+        type(points_class), allocatable :: regs(:)
+        
+        ! First, generate all potential regions 
+!         call create_regions(regs)
+
+        ! First map latlon points to grid of interest, then check point_in_polygon
 !         mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
 !         where (mask_reg) outmask = 2 
 
@@ -40,63 +39,48 @@ contains
 
     end function get_region_map 
 
-    subroutine create_regions(regs)
+    function get_region_map_north(grid) result(mask)
+        ! For a given grid (input), output a mask of the regions
+        ! that overlap with it
 
-        implicit none 
+        implicit none
 
-        type(region_type), allocatable :: regs(:)
+        type(grid_class), intent(IN) :: grid 
+        integer :: mask(grid%G%nx,grid%G%ny)
+
+        type(points_class), allocatable :: regs(:)
+        logical :: in_reg(grid%G%nx,grid%G%ny)
+        integer :: q 
 
         ! Allocate the region_type to hold all regions of interest
-        allocate(regs(10))
+        allocate(regs(3))
 
         ! === Define each region ===
 
-        ! Ellesmere Island
-        call region_init(regs(1),"Ellesmere Island",n=7)
-        xp = [-59.3,-60.0,-70.8,-78.0,-100.3,-98.8,-88.7 ]
-        yp = [ 85.0, 82.4, 79.7, 76.0,  80.9, 81.2, 85.0 ]
+        call points_init(regs(1),grid0=grid,name="Ellesmere Island", &
+                         x = [-59.3d0,-60.0d0,-70.8d0,-78.0d0,-100.3d0,-98.8d0,-88.7d0 ], &
+                         y = [ 85.0d0, 82.4d0, 79.7d0, 76.0d0,  80.9d0, 81.2d0, 85.0d0 ], &
+                         latlon=.TRUE.)
+
+        call points_init(regs(2),grid0=grid,name="Iceland", &
+                         x = [-16.6d0,-22.3d0,-25.7d0,-28.8d0,-25.1d0 ], &
+                         y = [ 69.5d0, 69.2d0, 67.3d0, 65.7d0, 57.7d0 ], &
+                         latlon=.TRUE.)
         
-        ! Iceland 
-        if (allocated(xp)) deallocate(xp)
-        if (allocated(yp)) deallocate(yp)
-        allocate(xp(5),yp(5))
-        xp = [-16.6,-22.3,-25.7,-28.8,-25.1]
-        yp = [ 69.5, 69.2, 67.3, 65.7, 57.7]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) outmask = 3 
-
-        ! Svalbard
-        if (allocated(xp)) deallocate(xp)
-        if (allocated(yp)) deallocate(yp)
-        allocate(xp(5),yp(5))
-        xp = [ 40.0, 40.0, 20.0,  0.0, -10.0 ]
-        yp = [ 85.0, 80.0, 73.0, 75.0,  85.0 ]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) outmask = 4 
-
+        call points_init(regs(3),grid0=grid,name="Svalbard", &
+                         x = [ 40.0d0, 40.0d0, 20.0d0,  0.0d0, -10.0d0 ], &
+                         y = [ 85.0d0, 80.0d0, 73.0d0, 75.0d0,  85.0d0 ], &
+                         latlon=.TRUE.)
+        
+        mask = 0 
+        do q = 1, size(regs)
+            in_reg = point_in_polygon(real(grid%x),real(grid%y),real(regs(q)%x),real(regs(q)%y))
+            where (in_reg) mask = q  
+        end do 
 
         return 
 
-    end subroutine create_regions
-
-
-    subroutine region_init(reg,name,n)
-
-        implicit none 
-
-        type(region_type), intent(INOUT) :: reg 
-        character(len=*),  intent(IN)    :: name 
-        integer,           intent(IN)    :: n 
-
-        reg%name = trim(name)
-        if (allocated(reg%lon)) deallocate(reg%lon)
-        allocate(reg%lon(n))
-        if (allocated(reg%lat)) deallocate(reg%lat)
-        allocate(reg%lat(n))
-
-        return 
-
-    end subroutine region_init 
+    end function get_region_map_north
 
 end module regions
 

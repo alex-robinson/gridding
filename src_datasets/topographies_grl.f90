@@ -5,7 +5,8 @@ module topographies_grl
     use interp2D 
     use polygons 
     use ncio 
-    
+    use regions 
+
     implicit none 
 
     private 
@@ -47,6 +48,10 @@ contains
 
         logical, allocatable :: mask_reg(:,:)
         real(4), allocatable :: xp(:), yp(:) 
+        integer, allocatable :: mask_reg1(:,:)
+
+        call grid_allocate(grid,mask_reg)    
+        mask_reg1 = get_region_map_north(grid)
 
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
@@ -125,6 +130,9 @@ contains
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
+        call nc_write(filename,"mask_reg",mask_reg1,dim1="xc",dim2="yc")
+        stop 
+        
         ! Write meta data 
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
@@ -176,8 +184,7 @@ contains
         call nc_read(filename,"H",H)
         
         ! Eliminate problematic regions for this domain ========
-        call grid_allocate(grid,mask_reg)    
-        
+    
         ! Baffin Bay
         allocate(xp(4),yp(4))
         xp = [-63.5,-57.7,-53.9,-57.7]
@@ -426,8 +433,8 @@ contains
             if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
 
             outvar = mv 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,method,
-                           radius=grid%G%dx*grid%conv_xy, &
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+                           radius=grid%G%dx*grid%xy_conv, &
                            sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
