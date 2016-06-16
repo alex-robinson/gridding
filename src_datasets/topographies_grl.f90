@@ -51,6 +51,7 @@ contains
         integer, allocatable :: mask_reg1(:,:)
 
         call grid_allocate(grid,mask_reg)    
+        call grid_allocate(grid,mask_reg1)    
         mask_reg1 = get_region_map_north(grid)
 
         grad_lim_str = "" 
@@ -132,7 +133,7 @@ contains
         
         call nc_write(filename,"mask_reg",mask_reg1,dim1="xc",dim2="yc")
         stop 
-        
+
         ! Write meta data 
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
