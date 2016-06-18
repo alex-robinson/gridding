@@ -230,7 +230,7 @@ bedmap: $(objdir)/ncio.o
 	@echo " "
 
 points_to_latlon:
-	$(FC) $(DFLAGS) $(FLAGS) -o points_to_latlon.x $^ regions/points_to_latlon.f90 $(LFLAGS)
+	$(FC) $(DFLAGS) $(FLAGS) -o points_to_latlon.x $^ points_to_latlon.f90 $(LFLAGS)
 	@echo " "
 	@echo "    points_to_latlon.x is ready."
 	@echo " "
