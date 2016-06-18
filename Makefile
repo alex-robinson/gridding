@@ -229,6 +229,12 @@ bedmap: $(objdir)/ncio.o
 	@echo "    bedmap2_netcdf.x is ready."
 	@echo " "
 
+points_to_latlon:
+	$(FC) $(DFLAGS) $(FLAGS) -o points_to_latlon.x $^ regions/points_to_latlon.f90 $(LFLAGS)
+	@echo " "
+	@echo "    points_to_latlon.x is ready."
+	@echo " "
+
 clean:
 	rm -f *.x $(objdir)/*.o $(objdir)/*.mod
 

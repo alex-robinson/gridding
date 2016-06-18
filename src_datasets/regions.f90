@@ -49,11 +49,12 @@ contains
         integer :: mask(grid%G%nx,grid%G%ny)
 
         type(points_class), allocatable :: regs(:)
+        type(points_class) :: pts 
         logical :: in_reg(grid%G%nx,grid%G%ny)
         integer :: q 
 
         ! Allocate the region_type to hold all regions of interest
-        allocate(regs(3))
+        allocate(regs(4))
 
         ! === Define each region ===
 
@@ -72,6 +73,12 @@ contains
                          y = [ 85.0d0, 80.0d0, 73.0d0, 75.0d0,  85.0d0 ], &
                          latlon=.TRUE.)
         
+        call points_init(pts,name="pts-B13",mtype="polar_stereographic",units="kilometers", &
+                         filename="polygon_grl_Bamber2013.txt", &
+                         lon180=.TRUE.,lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+        call points_init(regs(4),grid0=grid,name="Greenland",x=pts%lon,y=pts%lat,latlon=.TRUE.)
+        
+
         mask = 0 
         do q = 1, size(regs)
             in_reg = point_in_polygon(real(grid%x),real(grid%y),real(regs(q)%x),real(regs(q)%y))

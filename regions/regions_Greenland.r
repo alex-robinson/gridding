@@ -13,29 +13,29 @@ image.plot(topo$projection_x_coordinate,
 if (FALSE) {
     coords <- locator(type="l")
     poly_grl = data.frame(x=coords$x,y=coords$y)
-    my.write.table(poly_grl,"poly_grl.txt")
+    my.write.table(poly_grl,"polygon_grl_Bamber2013.txt")
 
     coords <- locator(type="l")
     poly_grl_inner = data.frame(x=coords$x,y=coords$y)
-    my.write.table(poly_grl_inner,"poly_grl_inner.txt")
+    my.write.table(poly_grl_inner,"polygon_grl-inner_Bamber2013.txt")
 
     coords <- locator(type="l")
     poly_iceland = data.frame(x=coords$x,y=coords$y)
-    my.write.table(poly_iceland,"poly_iceland.txt")
+    my.write.table(poly_iceland,"polygon_iceland_Bamber2013.txt")
 
     coords <- locator(type="l")
     poly_ellesmere = data.frame(x=coords$x,y=coords$y)
-    my.write.table(poly_ellesmere,"poly_ellesmere.txt")
+    my.write.table(poly_ellesmere,"polygon_ellesmere_Bamber2013.txt")
 
     coords <- locator(type="l")
-    poly_svalbaard = data.frame(x=coords$x,y=coords$y)
-    my.write.table(poly_svalbaard,"poly_svalbaard.txt")
+    poly_svalbard = data.frame(x=coords$x,y=coords$y)
+    my.write.table(poly_svalbard,"polygon_svalbard_Bamber2013.txt")
 } else {
-    poly_grl       = read.table("poly_grl.txt",header=TRUE)
-    poly_grl_inner = read.table("poly_grl_inner.txt",header=TRUE)
-    poly_iceland   = read.table("poly_iceland.txt",header=TRUE)
-    poly_ellesmere = read.table("poly_ellesmere.txt",header=TRUE)
-    poly_svalbaard = read.table("poly_svalbaard.txt",header=TRUE)
+    poly_grl       = read.table("polygon_grl_Bamber2013.txt",header=TRUE)
+    poly_grl_inner = read.table("polygon_grl-inner_Bamber2013.txt",header=TRUE)
+    poly_iceland   = read.table("polygon_iceland_Bamber2013.txt",header=TRUE)
+    poly_ellesmere = read.table("polygon_ellesmere_Bamber2013.txt",header=TRUE)
+    poly_svalbard = read.table("polygon_svalbard_Bamber2013.txt",header=TRUE)
        
 }
 
