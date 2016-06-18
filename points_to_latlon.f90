@@ -20,7 +20,7 @@ program points_to_latlon
         filename_in  = "regions/Bamber2013/polygon_"//trim(regions(q))//"_Bamber2013.txt"
         filename_out = "regions/polygon_"//trim(regions(q))//".txt"
         
-        call points_init(pts,name="pts-B13",mtype="polar_stereographic",units="kilometers", &
+        call points_init(pts,name="pts-B13",mtype="polar_stereographic",units="meters", &
                              filename=filename_in,skip=1,lon180=.TRUE.,lambda=-39.d0,phi=71.d0,alpha=19.0d0)
         
         call write_ascii(filename_out,pts%lon,pts%lat,xnm="lon",ynm="lat")
