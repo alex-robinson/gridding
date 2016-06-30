@@ -48,11 +48,11 @@ contains
 
         logical, allocatable :: mask_reg(:,:)
         real(4), allocatable :: xp(:), yp(:) 
-        integer, allocatable :: mask_reg1(:,:)
+        real(4), allocatable :: mask_reg1(:,:)
 
         call grid_allocate(grid,mask_reg)    
         call grid_allocate(grid,mask_reg1)    
-        mask_reg1 = get_region_map_north(grid)
+        mask_reg1 = get_region_map_greenland(grid)
 
         write(*,*) "mask_reg1: ", minval(mask_reg1), maxval(mask_reg1)
         
