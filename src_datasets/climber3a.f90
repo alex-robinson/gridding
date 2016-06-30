@@ -566,28 +566,5 @@ contains
 
     end subroutine load_g40 
 
-    function read_vector(filename,n,col,skip) result(var)
-        implicit none 
-
-        character(len=*) :: filename 
-        integer :: n, col, skip 
-        real(8) :: var(n), tmp(50)
-        character(len=10) :: tmpc
-        integer :: i 
-
-        open(16,file=trim(filename),status="old")
-        do i = 1, skip
-            read(16,*) tmpc 
-        end do 
-
-        do i = 1, n 
-            read(16,*) tmp(1:col-1), var(i)
-        end do 
-
-        close(16)
-
-        return
-    end function read_vector
-
 end module climber3a 
 

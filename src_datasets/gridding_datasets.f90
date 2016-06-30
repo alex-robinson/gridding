@@ -73,6 +73,31 @@ contains
 
     end subroutine def_var_info
 
+    function read_vector(filename,n,col,skip) result(var)
+        ! Read a column of data from an ascii file
+        
+        implicit none 
+
+        character(len=*) :: filename 
+        integer :: n, col, skip 
+        real(8) :: var(n), tmp(50)
+        character(len=10) :: tmpc
+        integer :: i 
+
+        open(16,file=trim(filename),status="old")
+        do i = 1, skip
+            read(16,*) tmpc 
+        end do 
+
+        do i = 1, n 
+            read(16,*) tmp(1:col-1), var(i)
+        end do 
+
+        close(16)
+
+        return
+    end function read_vector
+
     ! Extract a thinner version of an input array
     ! (new array should be a multiple of input array)
     subroutine thin(var1,var,by,missing_value)
@@ -140,16 +165,7 @@ contains
             end do 
         end do 
         wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
-!         wts = 1.0 - wts / maxval(wts)
         wts = wts / sum(wts) 
-
-!         write(*,*) 
-!         write(*,*) "Weights..."
-!         write(*,*) 
-!         do j = 1, by 
-!             write(*,"(20g14.3)") wts(:,j)
-!         end do 
-!         stop 
 
         var1 = missing_val
 

@@ -10,7 +10,8 @@ module topo_reconstructions
     public :: ICE6GC_to_grid
     public :: ICE5G_to_grid
     public :: LGMsimpson_to_grid 
-
+    public :: huy3_to_grid
+    
 contains 
 
     subroutine ICE6GC_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -279,7 +280,6 @@ contains
 
     end subroutine ICE5G_to_grid
 
-
     subroutine LGMsimpson_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
@@ -378,6 +378,112 @@ contains
         return 
 
     end subroutine LGMsimpson_to_grid
+
+    subroutine huy3_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       Huy3 GLACIAL MASK DATA
+        !       from Lecavalier et al. (2014)
+        !
+        ! =========================================================
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:)
+            double precision, allocatable :: var(:)
+        end type 
+
+        type(inp_type)     :: inp
+        integer            :: np 
+        type(points_class) :: points0
+        character(len=256) :: fldr_in, prefix, suffix 
+        character(len=512) :: file_in 
+        real(4)            :: times(40)
+        character(len=4)   :: times_str(40), year_str
+
+        type(map_class)  :: map 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        ! Define the input filenames
+        fldr_in         = "/data/sicopolis/data/huy3_extent/"
+        prefix          = trim(fldr_in)//"ice_mask."
+        suffix          = ".xyz"
+
+        times = [21.0,20.0,19.0,18.0,17.0,16.5,16.0,15.5,15.0,14.5,14.0,13.5, &
+                 13.0,12.5,12.0,11.5,11.0,10.5,10.0,9.5,9.0,8.5,8.0,7.5,7.0,6.5, &
+                 6.0,5.5,5.0,4.5,4.0,3.5,3.0,2.5,2.0,1.5,1.0,0.5,0.1,0.0]
+        times_str = ["21  ","20  ","19  ","18  ","17  ","16p5","16  ","15p5","15  ","14p5","14  ","13p5", &
+                 "13  ","12p5","12  ","11p5","11  ","10p5","10  ","9p5 ","9   ","8p5 ","8   ","7p5 ","7   ","6p5 ", &
+                 "6   ","5p5 ","5   ","4p5 ","4   ","3p5 ","3   ","2p5 ","2   ","1p5 ","1   ","0p5 ","0p1 ","0   "]
+
+        desc    = "Reconstructed Greenland ice sheet extent during the last deglaciation"
+        ref     = "Lecavalier, B. S., Milne, G. a., Simpson, M. J. R., Wake, L., Huybrechts, P., &
+                  &Tarasov, L., Kjeldsen, K. K., Funder, S., Long, A. J., Woodroffe, S., &
+                  &Dyke, A. S., et al.: A model of Greenland ice sheet deglaciation &
+                  &constrained by observations of relative sea level and ice extent, &
+                  &Quat. Sci. Rev., 102, 54–84, doi:10.1016/j.quascirev.2014.07.018, 2014."
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"// &
+                              trim(grid%name)//"_TOPO-LGM-L14.nc"
+
+        ! Define the input data 
+        np = 1014
+
+        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+
+        ! Define the input points
+        file_in = trim(prefix)//"0"//trim(suffix)
+        inp%lon = read_vector(file_in,n=np,col=1,skip=0)
+        inp%lat = read_vector(file_in,n=np,col=2,skip=0)
+        call points_init(points0,name="huy3",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x=inp%lon,y=inp%lat)
+
+        ! Initialize mapping
+        call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)     
+
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"time", x=times,units="ka BP",unlimited=.TRUE.)
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! Read in current variable
+        inp%var = read_vector(file_in,n=np,col=3,skip=0)
+
+        ! Map variable to new grid
+        call map_field(map,"mask",inp%var,outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,"mask",int(outvar),dim1="xc",dim2="yc",dim3="time",missing_value=int(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"mask","units","1")
+        call nc_write_attr(filename,"mask","long_name", &
+                 "Mask of ice sheet at extent through the last deglaciation (21 ka BP to present)")
+        call nc_write_attr(filename,"mask","coordinates","lat2D lon2D")
+
+        return 
+
+    end subroutine huy3_to_grid
 
 end module topo_reconstructions 
 
