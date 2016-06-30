@@ -110,7 +110,7 @@ contains
         allocate(tmp(2501,3001))
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -335,6 +335,11 @@ contains
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
+
+            if (trim(var_now%nm_out) .eq. "zs") then
+                write(*,*) "maxval(zs): ", maxval(invar)
+                stop 
+            end if 
 
             method = "radius"
             if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
