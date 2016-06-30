@@ -133,6 +133,8 @@ contains
         allocate(wts(by,by))
         allocate(wts_now(by,by))
 
+        wts = 1.0 
+
         do i = 1, by 
             do j = 1, by 
                 wts(i,j) = sqrt((i-1-real(by-1)/2.d0)**2+(j-1-real(by-1)/2.d0)**2)
@@ -145,10 +147,10 @@ contains
         write(*,*) "Weights..."
         write(*,*) 
 
-        do i = 1, by 
-            write(*,"(20g12.3)") wts(:,j)
+        do j = 1, by 
+            write(*,"(20g14.3)") wts(:,j)
         end do 
-        
+
         stop 
 
         var1 = missing_val
