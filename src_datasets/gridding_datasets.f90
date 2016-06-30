@@ -134,23 +134,21 @@ contains
         allocate(wts_now(by,by))
 
         wts = 1.0 
-
         do i = 1, by 
             do j = 1, by 
                 wts(i,j) = sqrt((i-1-real(by-1)/2.d0)**2+(j-1-real(by-1)/2.d0)**2)
             end do 
         end do 
+        wts = wts**2 
         wts = 1.0 - wts / maxval(wts)
         wts = wts / sum(wts) 
 
         write(*,*) 
         write(*,*) "Weights..."
         write(*,*) 
-
         do j = 1, by 
             write(*,"(20g14.3)") wts(:,j)
         end do 
-
         stop 
 
         var1 = missing_val
