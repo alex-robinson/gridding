@@ -442,7 +442,7 @@ contains
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
         ! Define the input points
-        file_in = trim(prefix)//"0"//trim(suffix)
+        file_in = trim(prefix)//"21"//trim(suffix)
         inp%lon = read_vector(file_in,n=np,col=1,skip=0)
         inp%lat = read_vector(file_in,n=np,col=2,skip=0)
         call points_init(points0,name="huy3",mtype="latlon",units="degrees", &
@@ -473,7 +473,8 @@ contains
         call map_field(map,"mask",inp%var,outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
 
         ! Write output variable to output file
-        call nc_write(filename,"mask",int(outvar),dim1="xc",dim2="yc",dim3="time",missing_value=int(mv))
+        call nc_write(filename,"mask",int(outvar),dim1="xc",dim2="yc",dim3="time",missing_value=int(mv), &
+                      start=[1,1,1],count=[grid%G%nx,grid%G%ny,1])
 
         ! Write variable metadata
         call nc_write_attr(filename,"mask","units","1")
