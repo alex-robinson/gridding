@@ -75,18 +75,23 @@ contains
 
     ! Extract a thinner version of an input array
     ! (new array should be a multiple of input array)
-    subroutine thin(var1,var,by)
+    subroutine thin(var1,var,by,missing_value)
         implicit none
 
         double precision, dimension(:,:) :: var, var1 
         integer :: by 
+        double precision, optional :: missing_value 
         integer :: i,j, nx, ny 
         integer :: i1, j1
+        double precision :: missing_val 
+
+        missing_val = -9999.0 
+        if (present(missing_value)) missing_val = missing_value
 
         nx = size(var,1)
         ny = size(var,2) 
 
-        var1 = missing_value 
+        var1 = missing_val
 
         i1 = 0
         do i = 1, nx, by 

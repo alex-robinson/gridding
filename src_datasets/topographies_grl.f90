@@ -330,7 +330,7 @@ contains
             do j = 1, size(tmp_rev,2)
                 tmp(:,j) = tmp_rev(:,size(tmp_rev,2)-j+1)
             end do 
-            call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+            call thin(invar,tmp,by=thin_by,missing_value=mv)
 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
@@ -338,7 +338,7 @@ contains
 
             if (trim(var_now%nm_out) .eq. "zs") then
                 write(*,*) "maxval(zs): ", maxval(invar)
-                stop 
+!                 stop 
             end if 
 
             method = "radius"
