@@ -11,7 +11,7 @@ module topo_reconstructions
     public :: ICE5G_to_grid
     public :: LGMsimpson_to_grid 
     public :: huy3_to_grid
-    
+
 contains 
 
     subroutine ICE6GC_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
@@ -414,7 +414,7 @@ contains
         integer, allocatable          :: outmask(:,:)
 
         ! Define the input filenames
-        fldr_in         = "/data/sicopolis/data/huy3_extent/"
+        fldr_in         = "/data/sicopolis/data/Greenland/huy3_extent/"
         prefix          = trim(fldr_in)//"ice_mask."
         suffix          = ".xyz"
 
