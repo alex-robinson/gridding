@@ -46,16 +46,6 @@ contains
         integer :: thin_by = 5 
         character(len=128) :: method, grad_lim_str  
 
-        logical, allocatable :: mask_reg(:,:)
-        real(4), allocatable :: xp(:), yp(:) 
-        real(4), allocatable :: mask_reg1(:,:)
-
-        call grid_allocate(grid,mask_reg)    
-        call grid_allocate(grid,mask_reg1)    
-        mask_reg1 = get_region_map_greenland(grid)
-
-        write(*,*) "mask_reg1: ", minval(mask_reg1), maxval(mask_reg1)
-        
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
             write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
@@ -133,9 +123,6 @@ contains
         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
-        call nc_write(filename,"mask_reg",mask_reg1,dim1="xc",dim2="yc")
-        stop 
-
         ! Write meta data 
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
@@ -187,37 +174,7 @@ contains
         call nc_read(filename,"H",H)
         
         ! Eliminate problematic regions for this domain ========
-    
-        ! Baffin Bay
-        allocate(xp(4),yp(4))
-        xp = [-63.5,-57.7,-53.9,-57.7]
-        yp = [ 69.6, 67.3, 63.3, 55.0]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -600.d0) zb = mv 
-
-        ! Iceland 
-        xp = [-17.0,-23.8,-31.2,-22.1]
-        yp = [ 69.1, 68.6, 64.1, 63.2]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
-        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
-
-        ! Svalbard
-        if (allocated(xp)) deallocate(xp)
-        if (allocated(yp)) deallocate(yp)
-        allocate(xp(5),yp(5))
-        xp = [ 40.0, 40.0, 20.0,  0.0, -10.0 ]
-        yp = [ 85.0, 80.0, 73.0, 75.0,  85.0 ]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg .and. zb .gt. -200.d0) zb = mv 
-        where (mask_reg .and. zb .gt. -200.d0) zs = mv 
-
-        ! Replaces problematic regions with regional mean values or zero for surface
-        call fill_weighted(zb,missing_value=mv)
-        call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
-
-        ! ======================================================
-
+        call clean_greenland(zs,zb,grid)
 
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
@@ -227,21 +184,7 @@ contains
             
         end if 
 
-        ! First clean up the field based on original H
-        where (H .lt. 1.d0) 
-            H  = 0.d0 
-            zs = zb 
-        end where 
-        
-        ! Also make sure zs is always higher than zb 
-        where (zs .lt. zb) zs = zb 
-        
-        ! Now make sure zs is zero over the ocean
-        where (zs .lt. 0.d0) zs = 0.d0 
-
-        ! Adjust H again for consistency
-        H = 0.d0 
-        where (zs .ne. 0.d0) H = zs-zb 
+        call clean_thickness(zs,zb,H)
 
         ! Re-write fields 
         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
@@ -258,44 +201,6 @@ contains
 
         call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
                       long_name="Mask (ocean=0,land=1,grounded-ice=2,floating-ice=3)")
-
-        ! Region masks
-
-        ! Greenland
-        outmask = 1 
-
-        ! Ellesmere Island
-        if (allocated(xp)) deallocate(xp)
-        if (allocated(yp)) deallocate(yp)
-        allocate(xp(7),yp(7)) 
-        xp = [-59.3,-60.0,-70.8,-78.0,-100.3,-98.8,-88.7 ]
-        yp = [ 85.0, 82.4, 79.7, 76.0,  80.9, 81.2, 85.0 ]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) outmask = 2 
-
-        ! Iceland 
-        if (allocated(xp)) deallocate(xp)
-        if (allocated(yp)) deallocate(yp)
-        allocate(xp(5),yp(5))
-        xp = [-16.6,-22.3,-25.7,-28.8,-25.1]
-        yp = [ 69.5, 69.2, 67.3, 65.7, 57.7]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) outmask = 3 
-
-        ! Svalbard
-        if (allocated(xp)) deallocate(xp)
-        if (allocated(yp)) deallocate(yp)
-        allocate(xp(5),yp(5))
-        xp = [ 40.0, 40.0, 20.0,  0.0, -10.0 ]
-        yp = [ 85.0, 80.0, 73.0, 75.0,  85.0 ]
-        mask_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
-        where (mask_reg) outmask = 4 
-
-        call nc_write(filename,"mask_reg", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
-                      long_name="Region mask (Greenland=1,Ellesmere Island=2,Iceland=3,Svalbard=4)")
-
-        ! ===========================
-
 
         return 
 
@@ -461,7 +366,6 @@ contains
         call grid_allocate(grid,H)
         call grid_allocate(grid,var_fill)
         
-        
         ! Bedrock from ETOPO-1 
         ! Also load etopo bedrock, use it to replace high latitude regions 
         call nc_read(filename0,"zb",var_fill)
@@ -471,8 +375,122 @@ contains
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
 
+        ! Modify variables for consistency and gradient limit 
+
+        ! Re-load data
+        call nc_read(filename,"zs",zs)
+        call nc_read(filename,"zb",zb)
+        call nc_read(filename,"H",H)
+        
+        ! Eliminate problematic regions for this domain ========
+        call clean_greenland(zs,zb,grid)
+
+        ! Apply gradient limit as needed
+        if (grad_lim .gt. 0.d0) then 
+            ! Limit the gradient (m/m) to below threshold 
+            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            
+        end if 
+
+        call clean_thickness(zs,zb,H)
+
+        ! Re-write fields 
+        call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Define new masks ==========
+
+        ! ocean-land-ice-shelf (0,1,2,3) mask 
+        outmask = 0     ! Ocean
+        where (zs .gt. 0.d0) outmask = 1    ! Land
+        where ( H .gt. 0.d0) outmask = 2    ! Grounded ice
+        where (zs .gt. 0.d0 .and. zs-zb .gt. H) outmask = 3   ! Floating ice 
+
+        call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
+                      long_name="Mask (ocean=0,land=1,grounded-ice=2,floating-ice=3)")
+
         return 
 
     end subroutine Morlighem14_to_grid
+
+    subroutine clean_thickness(zs,zb,H)
+
+        implicit none 
+
+        double precision, intent(INOUT) :: zs(:,:), zb(:,:), H(:,:)
+        
+        ! First clean up the field based on original H
+        where (H .lt. 1.d0) 
+            H  = 0.d0 
+            zs = zb 
+        end where 
+        
+        ! Also make sure zs is always higher than zb 
+        where (zs .lt. zb) zs = zb 
+        
+        ! Now make sure zs is zero over the ocean
+        where (zs .lt. 0.d0) zs = 0.d0 
+
+        ! Adjust H again for consistency
+        H = 0.d0 
+        where (zs .ne. 0.d0) H = zs-zb 
+
+        return 
+
+    end subroutine clean_thickness
+
+    subroutine clean_greenland(zs,zb,grid)
+
+        implicit none 
+
+        double precision, intent(INOUT) :: zs(:,:), zb(:,:)
+        type(grid_class), intent(IN)    :: grid 
+
+        real(4), allocatable :: xp(:), yp(:) 
+        logical, allocatable :: in_reg(:,:)
+
+        call grid_allocate(grid,in_reg)    
+
+        ! Baffin Bay
+        if (allocated(xp)) deallocate(xp)
+        if (allocated(yp)) deallocate(yp)
+        allocate(xp(4),yp(4))
+        xp = [-63.5,-57.7,-53.9,-57.7]
+        yp = [ 69.6, 67.3, 63.3, 55.0]
+        in_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+        where (in_reg .and. zb .gt. -600.d0) zb = mv 
+
+!         ! Iceland 
+!         if (allocated(xp)) deallocate(xp)
+!         if (allocated(yp)) deallocate(yp)
+!         allocate(xp(4),yp(4))
+!         xp = [-17.0,-23.8,-31.2,-22.1]
+!         yp = [ 69.1, 68.6, 64.1, 63.2]
+!         in_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+!         where (in_reg .and. zb .gt. -200.d0) zb = mv 
+!         where (in_reg .and. zb .gt. -200.d0) zs = mv 
+
+!         ! Svalbard
+!         if (allocated(xp)) deallocate(xp)
+!         if (allocated(yp)) deallocate(yp)
+!         allocate(xp(5),yp(5))
+!         xp = [ 40.0, 40.0, 20.0,  0.0, -10.0 ]
+!         yp = [ 85.0, 80.0, 73.0, 75.0,  85.0 ]
+!         in_reg = point_in_polygon(real(grid%lon),real(grid%lat),xp,yp) 
+!         where (in_reg .and. zb .gt. -200.d0) zb = mv 
+!         where (in_reg .and. zb .gt. -200.d0) zs = mv 
+    
+        ! Note: Iceland and Svalbard can be masked out via the regions mask,
+        !       so there is no need to modify the topography here. 
+
+        ! Replaces problematic regions with regional mean values or zero for surface
+        call fill_weighted(zb,missing_value=mv)
+        call fill_weighted(zs,missing_value=mv,fill_value=0.d0)
+
+        return 
+
+    end subroutine clean_greenland
 
 end module topographies_grl 

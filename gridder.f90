@@ -19,6 +19,7 @@ program gridder
     use MAR 
     use NasaBasins 
     use RACMO2 
+    use regions
     use Rignot13_BasalMelt  
     use sediments 
     use stratigraphy
@@ -50,6 +51,9 @@ program gridder
     ! =========================================================
 
     call domain_definition(grid,grid_name) 
+
+    ! Write a regional mask 
+    call write_regions(outfldr,grid,domain)
 
     ! =========================================================
     !
@@ -117,7 +121,7 @@ program gridder
 
         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0,grad_lim=0.05d0)   
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-!         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=8,lat_lim=1.d0,grad_lim=0.05d0)
+        call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=8,lat_lim=1.d0,grad_lim=0.05d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 !         call nasaBasins_to_grid(outfldr,grid,"Greenland")
