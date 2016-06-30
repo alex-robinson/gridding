@@ -412,7 +412,8 @@ contains
         type(map_class)  :: map 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
-
+        integer :: q 
+        
         ! Define the input filenames
         fldr_in         = "/data/sicopolis/data/Greenland/huy3_extent/"
         prefix          = trim(fldr_in)//"ice_mask."
@@ -449,7 +450,7 @@ contains
                          lon180=.TRUE.,x=inp%lon,y=inp%lat)
 
         ! Initialize mapping
-        call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
+        call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -466,15 +467,22 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! Read in current variable
-        inp%var = read_vector(file_in,n=np,col=3,skip=0)
+        do q = 1, size(times) 
 
-        ! Map variable to new grid
-        call map_field(map,"mask",inp%var,outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
+            ! Determine current filename 
+            file_in = trim(prefix)//trim(times_str(q))//trim(suffix)
 
-        ! Write output variable to output file
-        call nc_write(filename,"mask",int(outvar),dim1="xc",dim2="yc",dim3="time",missing_value=int(mv), &
-                      start=[1,1,1],count=[grid%G%nx,grid%G%ny,1])
+            ! Read in current variable
+            inp%var = read_vector(file_in,n=np,col=3,skip=0)
+
+            ! Map variable to new grid
+            call map_field(map,"mask",inp%var,outvar,outmask,"nn",fill=.TRUE.,missing_value=mv)
+
+            ! Write output variable to output file
+            call nc_write(filename,"mask",int(outvar),dim1="xc",dim2="yc",dim3="time",missing_value=int(mv), &
+                          start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
+
+        end do 
 
         ! Write variable metadata
         call nc_write_attr(filename,"mask","units","1")
