@@ -437,7 +437,7 @@ contains
                               trim(grid%name)//"_TOPO-LGM-L14.nc"
 
         ! Define the input data 
-        np = 1014
+        np = 11703
 
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
@@ -449,7 +449,7 @@ contains
                          lon180=.TRUE.,x=inp%lon,y=inp%lat)
 
         ! Initialize mapping
-        call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,points0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
