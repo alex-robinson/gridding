@@ -152,8 +152,10 @@ contains
                 if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) then 
                     wts_now = wts 
                     where (var(i-nxn:i+nxn,j-nxn:j+nxn) .eq. missing_val) wts_now = 0.d0
-                    if (sum(wts_now) .gt. 0.d0) & 
+                    if (sum(wts_now) .gt. 0.d0) then 
+                        wts_now = wts_now / sum(wts_now) 
                         var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
+                    end if 
                 end if 
             end do 
         end do 
