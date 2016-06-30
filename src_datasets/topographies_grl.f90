@@ -337,7 +337,7 @@ contains
             end if
 
             if (trim(var_now%nm_out) .eq. "zs") then
-                write(*,*) "maxval(zs): ", maxval(invar)
+                write(*,*) "maxval(zs): ", maxval(invar), maxval(tmp)
 !                 stop 
             end if 
 

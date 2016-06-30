@@ -141,6 +141,16 @@ contains
         wts = 1.0 - wts / maxval(wts)
         wts = wts / sum(wts) 
 
+        write(*,*) 
+        write(*,*) "Weights..."
+        write(*,*) 
+
+        do i = 1, by 
+            write(*,"(20g12.3)") wts(:,j)
+        end do 
+        
+        stop 
+
         var1 = missing_val
 
         i1 = 0
