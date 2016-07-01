@@ -76,7 +76,7 @@ contains
                     ! Original Bamber grid (1KM)
                     call grid_init(grid0,name="TOPO-B13-1KM",mtype="polar_stereographic", &
                                 units="kilometers",lon180=.TRUE., &
-                                x0=-1300.d0,dx=5.d0,nx=2501,y0=-3500.d0,dy=5.d0,ny=3001, &
+                                x0=-1300.d0,dx=1.d0,nx=2501,y0=-3500.d0,dy=1.d0,ny=3001, &
                                 lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
                 case DEFAULT
