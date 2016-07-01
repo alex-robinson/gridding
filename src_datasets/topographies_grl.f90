@@ -47,7 +47,7 @@ contains
         integer :: thin_by = 5 
         character(len=128) :: method, grad_lim_str  
         character(len=512) :: filename0 
-        
+
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
             write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
@@ -141,11 +141,12 @@ contains
 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
 
-            if (var_now%method .eq. "nn") then 
-                call thin(invar,tmp,by=thin_by,missing_value=mv)
-            else 
-                call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
-            end if 
+            call thin(invar,tmp,by=thin_by,missing_value=mv)
+!             if (var_now%method .eq. "nn") then 
+!                 call thin(invar,tmp,by=thin_by,missing_value=mv)
+!             else 
+!                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+!             end if 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
