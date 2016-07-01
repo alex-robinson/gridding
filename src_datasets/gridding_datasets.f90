@@ -170,17 +170,12 @@ contains
         wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
 
-        do j = 1, by 
-            write(*,"(20g12.3)") wts(:,j)
-        end do 
-        stop 
-        
         var1 = missing_val
 
-        i1 = 0
+        i1 = 1
         do i = nxn+1, nx-nxn, by 
             i1 = i1+1 
-            j1 = 0 
+            j1 = 1 
             do j = nxn+1, ny-nxn, by  
                 j1 = j1 + 1 
 
