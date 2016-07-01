@@ -63,13 +63,13 @@ contains
                 case(10)
                     call grid_init(grid0,name="TOPO-B13-10KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
-                            x0=-1300.d0,dx=10.d0,nx=251,y0=-3500.d0,dy=10.d0,ny=301, &
+                            x0=-1295.d0,dx=10.d0,nx=251,y0=-3495.d0,dy=10.d0,ny=301, &
                             lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
                 case(5)
                     call grid_init(grid0,name="TOPO-B13-5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
-                            x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
+                            x0=-1297.5d0,dx=5.d0,nx=501,y0=-3497.5d0,dy=5.d0,ny=601, &
                             lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
                 case DEFAULT
@@ -115,7 +115,7 @@ contains
         allocate(tmp(2501,3001))
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
