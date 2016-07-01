@@ -131,7 +131,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
-            call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+            call thin(invar,tmp,by=thin_by,missing_value=mv)
 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
