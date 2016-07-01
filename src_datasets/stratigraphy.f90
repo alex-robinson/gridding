@@ -74,15 +74,6 @@ contains
             stop 
         end if 
 
-!         ! Define the variables to be mapped 
-!         allocate(vars(5))
-!         call def_var_info(vars(1),trim(file_in),"bed",      "zb",units="m",long_name="Bedrock elevation")
-!         call def_var_info(vars(2),trim(file_in),"surface",  "zs",units="m",long_name="Surface elevation")
-!         call def_var_info(vars(3),trim(file_in),"thickness","H",units="m",long_name="Ice thickness")
-!         call def_var_info(vars(4),trim(file_in),"errbed",   "zb_err",units="m",long_name="Bedrock / ice thickness error")
-!         call def_var_info(vars(5),trim(file_in),"mask",     "mask",units="(0 - 3)", &
-!                           long_name="(0 = ocean, 1 = ice-free land, 2 = grounded ice, 3 = floating ice)",method="nn")
-
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
 
@@ -119,7 +110,27 @@ contains
         write(*,*) "nx = ", nc_size(file_in,"x")
         write(*,*) "ny = ", nc_size(file_in,"y")
         
+        ! First process normalized ages
+        do q = 1, size(depth_norm)
+
+            call nc_read(file_in,"age_norm",invar,missing_value=mv, &
+                         start=[1,1,q],count=[grid0%G%nx,grid0%G%ny,1])
+            
+            outvar = mv 
+            call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
+                           radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+            
+            call nc_write(filename,"ice_age",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
+                          missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
         
+        end do 
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_now%nm_out,"units","kiloyears")
+        call nc_write_attr(filename,var_now%nm_out,"long_name","Age of ice at normalized depth")
+        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+
         return 
 
     end subroutine MacGregor15_to_grid
