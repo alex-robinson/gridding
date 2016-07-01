@@ -301,7 +301,6 @@ contains
 !                             x0=-637.925d0,dx=0.15d0,nx=10018,y0=-3349.425d0,dy=0.15d0,ny=17946, &
 !                             lambda=-45.d0,phi=70.d0,alpha=20.0d0)
 
-
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2015-04-27.nc"
             desc    = "BedMachine: Greenland dataset based on mass conservation, 2015-04-27 (v2.0)"
@@ -379,18 +378,16 @@ contains
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-
-            if (trim(var_now%nm_out) .eq. "zs") then
-                write(*,*) "maxval(zs): ", maxval(invar), maxval(tmp)
-!                 stop 
-            end if 
-
             
             outvar = mv 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv, &
                            sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
             
+            if (trim(var_now%nm_out) .eq. "zs") then
+                write(*,*) "maxval(zs): ", maxval(outvar), maxval(invar), maxval(tmp)
+            end if 
+
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
