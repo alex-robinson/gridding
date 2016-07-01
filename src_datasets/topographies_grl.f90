@@ -373,7 +373,7 @@ contains
             if (var_now%method .eq. "nn") then 
                 call thin(invar,tmp,by=thin_by,missing_value=mv)
             else 
-                call thin(invar,tmp,by=thin_by,missing_value=mv)
+                call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
             end if 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
@@ -385,7 +385,7 @@ contains
                            sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
             
             if (trim(var_now%nm_out) .eq. "zs") then
-                write(*,*) "maxval(zs): ", maxval(outvar), maxval(invar), maxval(tmp)
+                write(*,"(3f8.2)") "maxval(zs): ", maxval(outvar), maxval(invar), maxval(tmp)
             end if 
 
             if (var_now%method .eq. "nn") then 
