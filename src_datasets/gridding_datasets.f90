@@ -165,12 +165,11 @@ contains
                 wts(i,j) = sqrt((i-1-real(by-1)/2.d0)**2+(j-1-real(by-1)/2.d0)**2)
             end do 
         end do 
-        where(wts .eq. 0.0) wts = 1e-4
+        where(wts .eq. 0.0) wts = 1e-5
         wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
 
         var1 = missing_val
-        cnt  = 0 
 
         i1 = 0
         do i = nxn+1, nx-nxn, by 
@@ -184,17 +183,10 @@ contains
                 if (sum(wts_now) .gt. 0.d0) then 
                     wts_now = wts_now / sum(wts_now) 
                     var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
-                else 
-                    cnt = cnt+1
                 end if 
 
             end do 
         end do 
-
-        if (cnt .gt. 0) then 
-            write(*,*) "cnt = ", cnt 
-            stop 
-        end if 
 
         return
     end subroutine thin_ave 
