@@ -115,7 +115,8 @@ contains
 
             call nc_read(file_in,"age_norm",invar,missing_value=mv, &
                          start=[1,1,q],count=[grid0%G%nx,grid0%G%ny,1])
-            
+            where (abs(invar) .gt. 1d10) invar = mv 
+
             outvar = mv 
             call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
                            radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
@@ -126,11 +127,32 @@ contains
         end do 
 
         ! Write variable metadata
-        call nc_write_attr(filename,var_now%nm_out,"units","kiloyears")
-        call nc_write_attr(filename,var_now%nm_out,"long_name","Age of ice at normalized depth")
-        call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+        call nc_write_attr(filename,"ice_age","units","kiloyears")
+        call nc_write_attr(filename,"ice_age","long_name","Age of ice at normalized depth")
+        call nc_write_attr(filename,"ice_age","coordinates","lat2D lon2D")
             
 
+        ! Process isochronal depths
+        do q = 1, size(age_iso)
+
+            call nc_read(file_in,"depth_iso",invar,missing_value=mv, &
+                         start=[1,1,q],count=[grid0%G%nx,grid0%G%ny,1])
+            where (abs(invar) .gt. 1d10) invar = mv 
+
+            outvar = mv 
+            call map_field(map,"depth_iso",invar,outvar,outmask,method="radius", &
+                           radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+            
+            call nc_write(filename,"depth_iso",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
+                          missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
+        
+        end do 
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"depth_iso","units","normalized depth")
+        call nc_write_attr(filename,"depth_iso","long_name","Depth of isochronal layer")
+        call nc_write_attr(filename,"depth_iso","coordinates","lat2D lon2D")
+            
         return 
 
     end subroutine MacGregor15_to_grid
