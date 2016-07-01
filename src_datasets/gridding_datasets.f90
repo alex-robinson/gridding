@@ -146,7 +146,7 @@ contains
 
         double precision, allocatable :: wts(:,:), wts_now(:,:)
         double precision :: missing_val 
-        integer :: nxn, cnt 
+        integer :: nxn
 
         missing_val = -9999.0 
         if (present(missing_value)) missing_val = missing_value
@@ -165,10 +165,16 @@ contains
                 wts(i,j) = sqrt((i-1-real(by-1)/2.d0)**2+(j-1-real(by-1)/2.d0)**2)
             end do 
         end do 
-        where(wts .eq. 0.0) wts = 1e-8
+        where(wts .eq. 0.0) wts = minval(wts,mask=wts.gt.0.0) / 2.0 
+
         wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
 
+        do j = 1, by 
+            write(*,"(20g12.3)") wts(:,j)
+        end do 
+        stop 
+        
         var1 = missing_val
 
         i1 = 0
