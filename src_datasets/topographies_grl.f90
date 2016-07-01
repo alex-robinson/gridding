@@ -46,7 +46,8 @@ contains
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
         character(len=128) :: method, grad_lim_str  
-
+        character(len=512) :: filename0 
+        
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
             write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
@@ -90,6 +91,9 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-B13"//trim(grad_lim_str)//".nc"
 
+            ! Define filename holding ETOPO1 data
+            write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
