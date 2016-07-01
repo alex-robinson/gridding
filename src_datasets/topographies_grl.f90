@@ -44,7 +44,7 @@ contains
         double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
-        integer :: thin_by = 5 
+        integer :: thin_by = 1 
         character(len=128) :: method, grad_lim_str  
         character(len=512) :: filename0 
 
@@ -72,18 +72,20 @@ contains
                             x0=-1297.5d0,dx=5.d0,nx=501,y0=-3497.5d0,dy=5.d0,ny=601, &
                             lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
+                case(1)
+                    ! Original Bamber grid (1KM)
+                    call grid_init(grid0,name="TOPO-B13-1KM",mtype="polar_stereographic", &
+                                units="kilometers",lon180=.TRUE., &
+                                x0=-1300.d0,dx=5.d0,nx=2501,y0=-3500.d0,dy=5.d0,ny=3001, &
+                                lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+
                 case DEFAULT
-                    write(*,*) "Bamber13_to_grid:: error: thin_by can only be 5 or 10."
+                    write(*,*) "Bamber13_to_grid:: error: thin_by can only be 10, 5 or 1."
                     stop 
 
             end select 
 
-!             ! Original Bamber grid (1KM)
-!             call grid_init(grid0,name="TOPO-B13-1KM",mtype="polar_stereographic", &
-!                             units="kilometers",lon180=.TRUE., &
-!                             x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
-!                             lambda=-39.d0,phi=71.d0,alpha=19.0d0)
-
+                
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
             desc    = "Greenland bedrock and surface topography (V3)"
@@ -147,11 +149,16 @@ contains
 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
 
-            if (var_now%method .eq. "nn") then 
-                call thin(invar,tmp,by=thin_by,missing_value=mv)
+            if (thin_by .gt. 1) then 
+                if (var_now%method .eq. "nn") then 
+                    call thin(invar,tmp,by=thin_by,missing_value=mv)
+                else 
+                    call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+                end if 
             else 
-                call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+                invar = tmp 
             end if 
+
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
@@ -279,7 +286,7 @@ contains
                 case(10)  ! 150m => 1.5km 
                     call grid_init(grid0,name="ESPG-3413-1.5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
-                            x0=-637.925d0,dx=1.5d0,nx=1001,y0=-3349.425d0,dy=1.5d0,ny=1794, &
+                            x0=-637.175d0,dx=1.5d0,nx=1001,y0=-3348.675d0,dy=1.5d0,ny=1794, &
                             lambda=-45.d0,phi=70.d0,alpha=20.0d0)
 
                 case DEFAULT
@@ -287,6 +294,13 @@ contains
                     stop 
 
             end select 
+
+!             ! Default grid at 150 m resolution
+!             call grid_init(grid0,name="ESPG-3413-150M",mtype="polar_stereographic", &
+!                             units="kilometers",lon180=.TRUE., &
+!                             x0=-637.925d0,dx=0.15d0,nx=10018,y0=-3349.425d0,dy=0.15d0,ny=17946, &
+!                             lambda=-45.d0,phi=70.d0,alpha=20.0d0)
+
 
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/Morlighem2014_topo/MCdataset-2015-04-27.nc"
