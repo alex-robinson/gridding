@@ -167,7 +167,7 @@ contains
                 wts(i,j) = sqrt((i-1-real(by-1)/2.d0)**2+(j-1-real(by-1)/2.d0)**2)
             end do 
         end do 
-        where(wts .eq. 0.0) wts = minval(wts,mask=wts.gt.0.0) / 2.0 
+        where(wts .eq. 0.0) wts = minval(wts,mask=wts.gt.0.0) / 4.0 
 
         wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
