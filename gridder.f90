@@ -129,7 +129,7 @@ program gridder
 !         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
             
 !         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
-        call grlvel_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
+!         call grlvel_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
 
 !         path = "data/Davini_GreenlandAMOC/"
 !         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
