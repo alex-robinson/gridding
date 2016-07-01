@@ -172,10 +172,10 @@ contains
 
         var1 = missing_val
 
-        i1 = 1
+        i1 = 0
         do i = nxn+1, nx-nxn, by 
             i1 = i1+1 
-            j1 = 1 
+            j1 = 0 
             do j = nxn+1, ny-nxn, by  
                 j1 = j1 + 1 
 
