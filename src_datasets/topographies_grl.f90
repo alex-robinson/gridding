@@ -139,7 +139,6 @@ contains
             if (var_now%method .eq. "nn") then 
                 call thin(invar,tmp,by=thin_by,missing_value=mv)
             else 
-                write(*,*) "range(tmp): ",minval(tmp), maxval(tmp)
                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
             end if 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 

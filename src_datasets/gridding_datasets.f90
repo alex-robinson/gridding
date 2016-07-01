@@ -137,7 +137,8 @@ contains
     subroutine thin_ave(var1,var,by,missing_value)
         implicit none
 
-        double precision, dimension(:,:) :: var, var1 
+        double precision, intent(IN)  :: var(:,:)
+        double precision, intent(OUT) :: var1(:,:)
         integer :: by 
         double precision, optional :: missing_value 
         integer :: i,j, nx, ny 
@@ -164,6 +165,7 @@ contains
                 wts(i,j) = sqrt((i-1-real(by-1)/2.d0)**2+(j-1-real(by-1)/2.d0)**2)
             end do 
         end do 
+        where(wts .eq. 0.0) wts = 1e-4
         wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
 
@@ -176,16 +178,16 @@ contains
             j1 = 0 
             do j = nxn+1, ny-nxn, by  
                 j1 = j1 + 1 
-                if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) then 
-                    wts_now = wts 
-                    where (var(i-nxn:i+nxn,j-nxn:j+nxn) .eq. missing_val) wts_now = 0.d0
-                    if (sum(wts_now) .gt. 0.d0) then 
-                        wts_now = wts_now / sum(wts_now) 
-                        var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
-                    else 
-                        cnt = cnt+1
-                    end if 
+
+                wts_now = wts 
+                where (var(i-nxn:i+nxn,j-nxn:j+nxn) .eq. missing_val) wts_now = 0.d0
+                if (sum(wts_now) .gt. 0.d0) then 
+                    wts_now = wts_now / sum(wts_now) 
+                    var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
+                else 
+                    cnt = cnt+1
                 end if 
+
             end do 
         end do 
 
