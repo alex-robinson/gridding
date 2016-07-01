@@ -187,8 +187,8 @@ contains
                     wts_now = wts_now / sum(wts_now) 
                     var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
 
-                    if (sum(wts_now) .ne. 1.d0) then 
-                        write(*,*) "thin_ave:: error: wts_now should sum to 1.0: sum(wts_now)=",sum(wts_now)
+                    if ( dabs(sum(wts_now)-1.d0) .gt. 1d-5 ) then 
+                        write(*,*) "thin_ave:: error: sum(wts_now)=",sum(wts_now)
                         do j2 =1, by 
                             write(*,"(20g12.3)") wts_now(:,j2)
                         end do 
