@@ -169,7 +169,7 @@ contains
         end do 
         where(wts .eq. 0.0) wts = minval(wts,mask=wts.gt.0.0) / 2.0 
 
-        wts = 1.0 / (wts**2.5)    ! Shephard's distance weighting 
+        wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
 
         var1 = missing_val
