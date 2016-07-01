@@ -78,6 +78,12 @@ contains
 
             end select 
 
+!             ! Original Bamber grid (1KM)
+!             call grid_init(grid0,name="TOPO-B13-1KM",mtype="polar_stereographic", &
+!                             units="kilometers",lon180=.TRUE., &
+!                             x0=-1300.d0,dx=5.d0,nx=501,y0=-3500.d0,dy=5.d0,ny=601, &
+!                             lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
             desc    = "Greenland bedrock and surface topography (V3)"
@@ -115,7 +121,7 @@ contains
         allocate(tmp(2501,3001))
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -141,7 +147,6 @@ contains
 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
 
-!             call thin(invar,tmp,by=thin_by,missing_value=mv)
             if (var_now%method .eq. "nn") then 
                 call thin(invar,tmp,by=thin_by,missing_value=mv)
             else 
@@ -150,19 +155,13 @@ contains
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-!             if (trim(var_now%nm_out) .eq. "zb") then 
-!                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
-!             end if 
 
-            
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
-!                 call fill_nearest(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
-!                 call fill_weighted(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             end if 
             

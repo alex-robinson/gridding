@@ -106,7 +106,7 @@ contains
         double precision, dimension(:,:) :: var, var1 
         integer :: by 
         double precision, optional :: missing_value 
-        integer :: i,j, nx, ny 
+        integer :: i,j, nx, ny, nxn 
         integer :: i1, j1
         double precision :: missing_val 
 
@@ -115,14 +115,16 @@ contains
 
         nx = size(var,1)
         ny = size(var,2) 
+        
+        nxn = (by-1)/2
 
         var1 = missing_val
 
         i1 = 0
-        do i = 1, nx, by 
+        do i = nxn+1, nx, by 
             i1 = i1+1 
             j1 = 0 
-            do j = 1, ny, by  
+            do j = nxn+1, ny, by  
                 j1 = j1 + 1 
                 if (i1 .le. size(var1,1) .and. j1 .le. size(var1,2)) &
                     var1(i1,j1) = var(i,j)
