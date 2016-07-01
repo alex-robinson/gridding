@@ -143,7 +143,7 @@ contains
         double precision, intent(OUT) :: var1(:,:)
         integer :: by 
         double precision, optional :: missing_value 
-        integer :: i,j, nx, ny 
+        integer :: i,j, nx, ny, j2 
         integer :: i1, j1
 
         double precision, allocatable :: wts(:,:), wts_now(:,:)
@@ -189,8 +189,8 @@ contains
 
                     if (sum(wts_now) .ne. 1.d0) then 
                         write(*,*) "thin_ave:: error: wts_now should sum to 1.0: sum(wts_now)=",sum(wts_now)
-                        do j =1, by 
-                            write(*,"(20g12.3)") wts_now(:,j)
+                        do j2 =1, by 
+                            write(*,"(20g12.3)") wts_now(:,j2)
                         end do 
                         stop 
                     end if 
