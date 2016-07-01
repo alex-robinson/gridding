@@ -41,6 +41,7 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:)
+        double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 5 
@@ -144,19 +145,19 @@ contains
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-            if (trim(var_now%nm_out) .eq. "zb") then 
-                call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
-            end if 
+!             if (trim(var_now%nm_out) .eq. "zb") then 
+!                 call fill_mean(invar,missing_value=mv,fill_value=-1500.d0)
+!             end if 
 
             
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
-                call fill_nearest(outvar,missing_value=mv)
+!                 call fill_nearest(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
-                call fill_weighted(outvar,missing_value=mv)
+!                 call fill_weighted(outvar,missing_value=mv)
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             end if 
             
@@ -173,11 +174,22 @@ contains
         call grid_allocate(grid,zs)
         call grid_allocate(grid,zb)
         call grid_allocate(grid,H)
+        call grid_allocate(grid,var_fill)
+        
+        ! Bedrock from ETOPO-1 
+        ! Also load etopo bedrock, use it to replace high latitude regions 
+        call nc_read(filename0,"zb",var_fill)
+        call nc_read(filename, "zb",zb,missing_value=mv)
+        where(zb .eq. mv .or. zs .eq. 0.d0) zb = var_fill 
+        var_now = vars(1)
+        call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+        
 
         ! Re-load data
         call nc_read(filename,"zs",zs)
         call nc_read(filename,"zb",zb)
         call nc_read(filename,"H",H)
+        
         
         ! Eliminate problematic regions for this domain ========
         call clean_greenland(zs,zb,grid)
@@ -332,12 +344,20 @@ contains
         ! ## FIELDS ##
         do i = 1, size(vars)
             var_now = vars(i) 
+
+            method = "radius"
+            if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
+            if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
+
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp_rev,missing_value=mv)
             do j = 1, size(tmp_rev,2)
                 tmp(:,j) = tmp_rev(:,size(tmp_rev,2)-j+1)
             end do 
-            call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
-
+            if (var_now%method .eq. "nn") then 
+                call thin(invar,tmp,by=thin_by,missing_value=mv)
+            else 
+                call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+            end if 
             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
@@ -347,10 +367,7 @@ contains
 !                 stop 
             end if 
 
-            method = "radius"
-            if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
-            if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
-
+            
             outvar = mv 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv, &
