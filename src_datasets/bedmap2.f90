@@ -65,8 +65,11 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
+                   x0=-3328.d0,dx=10.d0,nx=666,y0=-3328.d0,dy=10.d0,ny=666, &
                    lambda=0.d0,phi=-90.d0,alpha=24.7d0)
+
+            ! Original x0,y0 values
+!             x0=-3333.d0, y0=-3333.d0 
 
             ! Define the input filenames
             infldr         = "output/Antarctica/BEDMAP2-netcdf/"
@@ -104,7 +107,7 @@ contains
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -125,7 +128,7 @@ contains
         do i = 1, size(invariant)
             var_now = invariant(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
-            call thin_ave(invar,tmp1,by=10)
+            call thin_ave(invar,tmp1,by=10,missing_value=mv)
             if (trim(var_now%nm_out) .eq. "H" .or. &
                 trim(var_now%nm_out) .eq. "zs") then 
                 where( invar .eq. mv ) invar = 0.d0 
@@ -261,7 +264,7 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
+                   x0=-3328.d0,dx=10.d0,nx=666,y0=-3328.d0,dy=10.d0,ny=666, &
                    lambda=0.d0,phi=-90.d0,alpha=24.7d0)
 
             ! Define the input filenames
@@ -299,7 +302,7 @@ contains
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -321,15 +324,15 @@ contains
             var_now = invariant(i) 
             if (trim(var_now%nm_out) .eq. "uv") then 
                 call nc_read(var_now%filename,"u",tmp1,missing_value=missing_value)
-                call thin_ave(invar,tmp1,by=10)
+                call thin_ave(invar,tmp1,by=10,missing_value=mv)
                 where( invar .eq. missing_value ) invar = 0.d0 
                 call nc_read(var_now%filename,"v",tmp1,missing_value=missing_value)
-                call thin_ave(invarb,tmp1,by=10)
+                call thin_ave(invarb,tmp1,by=10,missing_value=mv)
                 where( invarb .eq. missing_value ) invarb = 0.d0 
                 invar = dsqrt(invar**2 + invarb**2)
             else
                 call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-                call thin_ave(invar,tmp1,by=10)
+                call thin_ave(invar,tmp1,by=10,missing_value=mv)
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if 
 
@@ -389,7 +392,7 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3333.d0,dx=10.d0,nx=666,y0=-3333.d0,dy=10.d0,ny=666, &
+                   x0=-3328.d0,dx=10.d0,nx=666,y0=-3328.d0,dy=10.d0,ny=666, &
                    lambda=0.d0,phi=-90.d0,alpha=24.7d0)
 
             ! Define the input filenames
@@ -424,7 +427,7 @@ contains
         allocate(tmp1(6667,6667))  ! bedmap2 array
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -444,7 +447,7 @@ contains
         ! ## FIELDS ##
         var_now = invariant(1) 
         call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-        call thin_ave(invar,tmp1,by=10)
+        call thin_ave(invar,tmp1,by=10,missing_value=mv)
 !         where( invar .eq. missing_value ) invar = 0.d0 
     
         call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &

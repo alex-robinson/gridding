@@ -88,7 +88,7 @@ contains
 
             ! Define topography (BEDMAP2/rignot) grid and input variable field
             call grid_init(grid0,name="rignot-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-2800.d0,dx=10.d0,nx=561,y0=2800.d0,dy=-10.d0,ny=561, &
+                   x0=-2795.d0,dx=10.d0,nx=561,y0=2795.d0,dy=-10.d0,ny=561, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0)
 
         ! Define the variables to be mapped 
@@ -105,7 +105,7 @@ contains
         allocate(tmp1(5601,5601))  ! bedmap2-rignot array
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.FALSE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -127,7 +127,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
-            call thin_ave(invar,tmp1,by=10)
+            call thin_ave(invar,tmp1,by=10,missing_value=mv)
             where( invar .eq. 0.d0 ) invar = mv
 
             ! Make sure outvar is initialized with missing values 
@@ -159,7 +159,7 @@ contains
 
             var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
-            call thin_ave(invar,tmp1,by=10)
+            call thin_ave(invar,tmp1,by=10,missing_value=mv)
             where( invar .eq. 0.d0 ) invar = mv
 
             ! Make sure outvar is initialized with missing values 
