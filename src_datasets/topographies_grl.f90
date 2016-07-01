@@ -385,7 +385,7 @@ contains
                            sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
             
             if (trim(var_now%nm_out) .eq. "zs") then
-                write(*,"(3f8.2)") "maxval(zs): ", maxval(outvar), maxval(invar), maxval(tmp)
+                write(*,"(a,3f10.2)") "maxval(zs): ", maxval(outvar), maxval(invar), maxval(tmp)
             end if 
 
             if (var_now%method .eq. "nn") then 
