@@ -189,6 +189,7 @@ contains
 
                     if ( dabs(sum(wts_now)-1.d0) .gt. 1d-5 ) then 
                         write(*,*) "thin_ave:: error: sum(wts_now)=",sum(wts_now)
+                        write(*,*) i1, j1, i, j 
                         do j2 =1, by 
                             write(*,"(20g12.3)") wts_now(:,j2)
                         end do 
