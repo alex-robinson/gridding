@@ -75,7 +75,7 @@ contains
 
     function read_vector(filename,n,col,skip) result(var)
         ! Read a column of data from an ascii file
-        
+
         implicit none 
 
         character(len=*) :: filename 
@@ -145,7 +145,7 @@ contains
 
         double precision, allocatable :: wts(:,:), wts_now(:,:)
         double precision :: missing_val 
-        integer :: nxn 
+        integer :: nxn, cnt 
 
         missing_val = -9999.0 
         if (present(missing_value)) missing_val = missing_value
@@ -168,6 +168,7 @@ contains
         wts = wts / sum(wts) 
 
         var1 = missing_val
+        cnt  = 0 
 
         i1 = 0
         do i = nxn+1, nx-nxn, by 
@@ -181,10 +182,17 @@ contains
                     if (sum(wts_now) .gt. 0.d0) then 
                         wts_now = wts_now / sum(wts_now) 
                         var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
+                    else 
+                        cnt = cnt+1
                     end if 
                 end if 
             end do 
         end do 
+
+        if (cnt .gt. 0) then 
+            write(*,*) "cnt = ", cnt 
+            stop 
+        end if 
 
         return
     end subroutine thin_ave 
