@@ -169,7 +169,7 @@ contains
         end do 
         where(wts .eq. 0.0) wts = minval(wts,mask=wts.gt.0.0) / 2.0 
 
-        wts = 1.0 / (wts**2.0)    ! Shephard's distance weighting 
+        wts = 1.0 / (wts**2.5)    ! Shephard's distance weighting 
         wts = wts / sum(wts) 
 
         var1 = missing_val
@@ -186,15 +186,6 @@ contains
                 if (sum(wts_now) .gt. 0.d0) then 
                     wts_now = wts_now / sum(wts_now) 
                     var1(i1,j1) = sum(var(i-nxn:i+nxn,j-nxn:j+nxn)*wts_now)
-
-                    if ( dabs(sum(wts_now)-1.d0) .gt. 1d-5 ) then 
-                        write(*,*) "thin_ave:: error: sum(wts_now)=",sum(wts_now)
-                        write(*,*) i1, j1, i, j 
-                        do j2 =1, by 
-                            write(*,"(20g12.3)") wts_now(:,j2)
-                        end do 
-                        stop 
-                    end if 
                 end if 
 
             end do 
