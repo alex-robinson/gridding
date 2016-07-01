@@ -141,6 +141,9 @@ $(objdir)/ETOPO.o: $(srcdir)/ETOPO.f90
 $(objdir)/GeothermalHeatFlux.o: $(srcdir)/GeothermalHeatFlux.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/GreenlandVelocity.o: $(srcdir)/GreenlandVelocity.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/grisli_g40.o: $(srcdir)/grisli_g40.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -180,6 +183,7 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/ECMWF.o \
 			       $(objdir)/ETOPO.o \
 			       $(objdir)/GeothermalHeatFlux.o \
+			       $(objdir)/GreenlandVelocity.o \
 			       $(objdir)/grisli_g40.o \
 			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o \

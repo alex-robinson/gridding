@@ -15,6 +15,7 @@ program gridder
     use ECMWF 
     use ETOPO 
     use GeothermalHeatFlux 
+    use GreenlandVelocity
     use grisli_g40
     use MAR 
     use NasaBasins 
@@ -119,7 +120,7 @@ program gridder
         ! == Greenland only datasets ==
         write(*,*) "Processing Greenland..."
 
-!         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0,grad_lim=0.05d0)   
+        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0,grad_lim=0.05d0)   
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=8,lat_lim=1.d0,grad_lim=0.05d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
@@ -127,7 +128,8 @@ program gridder
 !         call nasaBasins_to_grid(outfldr,grid,"Greenland")
 !         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
             
-        call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+!         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        call grlvel_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
 
 !         path = "data/Davini_GreenlandAMOC/"
 !         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
