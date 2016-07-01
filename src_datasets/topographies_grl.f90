@@ -44,7 +44,7 @@ contains
         double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: q, k, m, i, l, n_var 
-        integer :: thin_by = 1 
+        integer :: thin_by = 5 
         character(len=128) :: method, grad_lim_str  
         character(len=512) :: filename0 
 
