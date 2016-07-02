@@ -178,12 +178,12 @@ contains
         end do 
 
         ! Write variable metadata
-        call nc_write_attr(filename,"depth_iso","units","normalized depth")
+        call nc_write_attr(filename,"depth_iso","units","m")
         call nc_write_attr(filename,"depth_iso","long_name","Depth of isochronal layer")
         call nc_write_attr(filename,"depth_iso","coordinates","lat2D lon2D")
         
         ! Write variable metadata
-        call nc_write_attr(filename,"depth_iso_err","units","normalized depth")
+        call nc_write_attr(filename,"depth_iso_err","units","m")
         call nc_write_attr(filename,"depth_iso_err","long_name","Error in depth of isochronal layer")
         call nc_write_attr(filename,"depth_iso_err","coordinates","lat2D lon2D")
         
