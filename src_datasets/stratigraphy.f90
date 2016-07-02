@@ -117,7 +117,7 @@ contains
             call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
                            radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
             
-            call nc_write(filename,"ice_age",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
+            call nc_write(filename,"ice_age",real(outvar)*1d-3,dim1="xc",dim2="yc",dim3="depth_norm", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
             
             call nc_read(file_in,"age_norm_uncert",invar,missing_value=mv, &
@@ -129,7 +129,7 @@ contains
             call map_field(map,"ice_age_err",invar,outvar,outmask,method="radius", &
                            radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
             
-            call nc_write(filename,"ice_age_err",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
+            call nc_write(filename,"ice_age_err",real(outvar)*1d-3,dim1="xc",dim2="yc",dim3="depth_norm", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
         
         end do 
@@ -193,6 +193,7 @@ contains
         outvar = mv 
         call map_field(map,"thick",invar,outvar,outmask,method="radius", &
                        radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+        where(outvar .eq. mv) outvar = 0.d0 
         
         call nc_write(filename,"H",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
         
