@@ -154,7 +154,23 @@ contains
         call nc_write_attr(filename,"depth_iso","units","normalized depth")
         call nc_write_attr(filename,"depth_iso","long_name","Depth of isochronal layer")
         call nc_write_attr(filename,"depth_iso","coordinates","lat2D lon2D")
-            
+        
+        ! Process reference thickness too
+        call nc_read(file_in,"thick",invar,missing_value=mv,start=[1,1],count=[grid0%G%nx,grid0%G%ny])
+        where (abs(invar) .gt. 1d8) invar = mv 
+        where (isnan(invar)) invar = mv 
+        
+        outvar = mv 
+        call map_field(map,"thick",invar,outvar,outmask,method="radius", &
+                       radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+        
+        call nc_write(filename,"H",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,"depth_iso","units","m")
+        call nc_write_attr(filename,"depth_iso","long_name","Ice thickness")
+        call nc_write_attr(filename,"depth_iso","coordinates","lat2D lon2D")
+        
         return 
 
     end subroutine MacGregor15_to_grid
