@@ -127,7 +127,8 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
-            call thin_ave(invar,tmp1,by=10,missing_value=mv)
+            call thin(invar,tmp1,by=10,missing_value=mv)
+!             call thin_ave(invar,tmp1,by=10,missing_value=mv)   ! Diffuses too much - check?
             where( invar .eq. 0.d0 ) invar = mv
 
             ! Make sure outvar is initialized with missing values 
@@ -159,7 +160,8 @@ contains
 
             var_now = vars(i) 
             call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=mv)
-            call thin_ave(invar,tmp1,by=10,missing_value=mv)
+            call thin(invar,tmp1,by=10,missing_value=mv)
+!             call thin_ave(invar,tmp1,by=10,missing_value=mv)   ! Diffuses too much - check?
             where( invar .eq. 0.d0 ) invar = mv
 
             ! Make sure outvar is initialized with missing values 
