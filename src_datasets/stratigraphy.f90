@@ -117,7 +117,7 @@ contains
                          start=[1,1,q],count=[grid0%G%nx,grid0%G%ny,1])
             where (abs(invar) .gt. 1d8) invar = mv 
             where (isnan(invar)) invar = mv 
-                
+
             outvar = mv 
             call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
                            radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
@@ -139,7 +139,8 @@ contains
             call nc_read(file_in,"depth_iso",invar,missing_value=mv, &
                          start=[1,1,q],count=[grid0%G%nx,grid0%G%ny,1])
             where (abs(invar) .gt. 1d8) invar = mv 
-
+            where (isnan(invar)) invar = mv 
+            
             outvar = mv 
             call map_field(map,"depth_iso",invar,outvar,outmask,method="radius", &
                            radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
