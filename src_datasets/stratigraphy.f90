@@ -115,13 +115,14 @@ contains
 
             call nc_read(file_in,"age_norm",invar,missing_value=mv, &
                          start=[1,1,q],count=[grid0%G%nx,grid0%G%ny,1])
-            write(*,*) "range(invar): ", minval(invar), maxval(invar)
             where (abs(invar) .gt. 1d8) invar = mv 
-            write(*,*) "range(invar): ", minval(invar), maxval(invar)
-            
+
             outvar = mv 
             call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
                            radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+            
+            write(*,*) "range(invar): ", minval(invar), maxval(invar), count(invar==mv)
+            write(*,*) "range(invar): ", minval(outvar), maxval(outvar), count(outvar==mv)
             
             call nc_write(filename,"ice_age",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
