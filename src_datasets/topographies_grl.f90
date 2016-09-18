@@ -43,7 +43,7 @@ contains
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
-        double precision, allocatable :: zb_neg(:,:) 
+        double precision, allocatable :: zb_neg(:,:), zs_sl(:,:)
 
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 1 
@@ -195,14 +195,34 @@ contains
                 invar = tmp 
             end if 
     
-            ! Set land points to zero (to avoid making fjords overly shallow)
-            where( invar .gt. 0.d0 ) invar = 0.d0 
+            ! Set land points to missing (to avoid making fjords overly shallow)
+            where( invar .gt. 0.d0 ) invar = mv 
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             call grid_allocate(grid,zb_neg)
             zb_neg = outvar 
+
+            var_now = vars(2)   ! SurfaceElevation 
+            method = "nn"
+
+            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+
+            if (thin_by .gt. 1) then 
+                call thin_ave(invar,tmp,by=thin_by,missing_value=mv) 
+            else 
+                invar = tmp 
+            end if 
+    
+            ! Set land points to missing (to avoid making fjords overly shallow)
+            where( invar .gt. 0.d0 ) invar = mv 
+
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+                           radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
+            
+            call grid_allocate(grid,zs_sl)
+            zs_sl = outvar 
         end if 
 
         ! Modify variables for consistency and gradient limit 
@@ -227,8 +247,9 @@ contains
         call nc_read(filename,"zb",zb)
         call nc_read(filename,"H",H)
         
-        ! Fill in fjords from second zb field
+        ! Fill in fjords from second zb and zs fields
         where (zb_neg .lt. 0.d0 .and. zb_neg .ne. mv) zb = zb_neg 
+        where (zs_sl  .ne. mv) zs = zs_sl 
         
         ! Eliminate problematic regions for this domain ========
         call clean_greenland(zs,zb,grid)
