@@ -41,8 +41,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-40KM"
+    domain    = "Greenland"
+    grid_name = "GRL-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -120,7 +120,7 @@ program gridder
         ! == Greenland only datasets ==
         write(*,*) "Processing Greenland..."
 
-!         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=16,lat_lim=0.5d0,grad_lim=0.05d0)   
+        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)   
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !         call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)

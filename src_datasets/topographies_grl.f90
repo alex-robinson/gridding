@@ -43,6 +43,8 @@ contains
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
+        double precision, allocatable :: zb_neg(:,:) 
+
         integer :: q, k, m, i, l, n_var 
         integer :: thin_by = 1 
         character(len=128) :: method, grad_lim_str  
@@ -179,6 +181,30 @@ contains
             
         end do 
 
+        ! Interpolate only below sea-level points for fjord filling
+        if (.TRUE.) then 
+
+            var_now = vars(1)   ! BedrockElevation 
+            method = "radius"
+
+            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+
+            if (thin_by .gt. 1) then 
+                call thin_ave(invar,tmp,by=thin_by,missing_value=mv) 
+            else 
+                invar = tmp 
+            end if 
+    
+            ! Set land points to zero (to avoid making fjords overly shallow)
+            where( invar .gt. 0.d0 ) invar = 0.d0 
+
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+                           radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
+            
+            call grid_allocate(grid,zb_neg)
+            zb_neg = outvar 
+        end if 
+
         ! Modify variables for consistency and gradient limit 
 
         ! Allocate helper arrays
@@ -187,7 +213,7 @@ contains
         call grid_allocate(grid,H)
         call grid_allocate(grid,var_fill)
         
-        ! Bedrock from ETOPO-1 
+        ! Bedrock from ETOPO-1
         ! Also load etopo bedrock, use it to replace high latitude regions 
         call nc_read(filename0,"zb",var_fill)
         call nc_read(filename, "zb",zb,missing_value=mv)
@@ -201,6 +227,8 @@ contains
         call nc_read(filename,"zb",zb)
         call nc_read(filename,"H",H)
         
+        ! Fill in fjords from second zb field
+        where (zb_neg .lt. 0.d0 .and. zb_neg .ne. mv) zb = zb_neg 
         
         ! Eliminate problematic regions for this domain ========
         call clean_greenland(zs,zb,grid)
