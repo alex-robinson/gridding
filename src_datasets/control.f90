@@ -58,6 +58,11 @@ contains
                                lon180=.TRUE.,dx=5.d0,nx=360,dy=5.d0,ny=600, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
+            case("GRL-1KM")
+                call grid_init(grid,name="GRL-1KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=1.d0,nx=1800,dy=1.d0,ny=3000, &
+                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
             case("Bamber01-20KM")
                 call grid_init(grid,name="Bamber01-20KM",mtype="polar_stereographic",units="kilometers", &
                                lon180=.TRUE.,x0=-800.d0,dx=20.d0,nx=76,y0=-3400.d0,dy=20.d0,ny=141, &
