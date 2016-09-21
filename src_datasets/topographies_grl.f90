@@ -182,7 +182,7 @@ contains
         end do 
 
         ! Interpolate only below sea-level points for fjord filling
-        if (.TRUE.) then 
+        if (.FALSE.) then 
 
             var_now = vars(1)   ! BedrockElevation 
             method = "radius"
@@ -223,6 +223,11 @@ contains
             
             call grid_allocate(grid,zs_sl)
             zs_sl = outvar 
+
+        else 
+            zb_neg = mv
+            zs_sl  = mv 
+
         end if 
 
         ! Modify variables for consistency and gradient limit 
