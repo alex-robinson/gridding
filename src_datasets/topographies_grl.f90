@@ -182,6 +182,9 @@ contains
         end do 
 
         ! Interpolate only below sea-level points for fjord filling
+        call grid_allocate(grid,zb_neg)
+        call grid_allocate(grid,zs_sl)
+        
         if (.FALSE.) then 
 
             var_now = vars(1)   ! BedrockElevation 
@@ -201,7 +204,6 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
-            call grid_allocate(grid,zb_neg)
             zb_neg = outvar 
 
             var_now = vars(2)   ! SurfaceElevation 
@@ -221,7 +223,6 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
-            call grid_allocate(grid,zs_sl)
             zs_sl = outvar 
 
         else 
