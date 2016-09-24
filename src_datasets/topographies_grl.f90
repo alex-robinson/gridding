@@ -184,7 +184,7 @@ contains
         ! Interpolate only below sea-level points for fjord filling
         call grid_allocate(grid,zb_neg)
         call grid_allocate(grid,zs_sl)
-        
+
         if (.FALSE.) then 
 
             var_now = vars(1)   ! BedrockElevation 
@@ -243,7 +243,8 @@ contains
         ! Also load etopo bedrock, use it to replace high latitude regions 
         call nc_read(filename0,"zb",var_fill)
         call nc_read(filename, "zb",zb,missing_value=mv)
-        where(zb .eq. mv .or. zs .eq. 0.d0) zb = var_fill 
+!         where(zb .eq. mv .or. zs .eq. 0.d0) zb = var_fill 
+        where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
