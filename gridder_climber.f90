@@ -24,8 +24,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-20KM"
+    domain    = "Greenland"
+    grid_name = "GRL-10KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
