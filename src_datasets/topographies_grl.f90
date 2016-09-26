@@ -46,7 +46,7 @@ contains
         double precision, allocatable :: zb_neg(:,:), zs_sl(:,:)
 
         integer :: q, k, m, i, l, n_var 
-        integer :: thin_by = 1 
+        integer :: thin_by = 10 
         character(len=128) :: method, grad_lim_str  
         character(len=512) :: filename0 
 
