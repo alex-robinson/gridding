@@ -112,9 +112,9 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(4))
-        call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation",method="nng")
-        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation",method="nng")
-        call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness",method="nng")
+        call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation",method="nn")
+        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation",method="nn")
+        call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness",method="nn")
         call def_var_info(vars(4),trim(file_in),"LandMask",      "mask",units="(0 - 4)", &
                           long_name="Land mask",method="nn")
 
@@ -221,7 +221,7 @@ contains
             where( invar .gt. 0.d0 ) invar = mv 
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
-                           radius=2.d0*grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
+                           radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             zs_sl = outvar 
 
