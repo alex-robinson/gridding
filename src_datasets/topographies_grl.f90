@@ -146,7 +146,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
 
-            method = "nng"
+            method = "nn"
             if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
