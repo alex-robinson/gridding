@@ -46,7 +46,7 @@ contains
         double precision, allocatable :: zb_neg(:,:), zs_sl(:,:)
 
         integer :: q, k, m, i, l, n_var 
-        integer :: thin_by = 10 
+        integer :: thin_by = 1 
         character(len=128) :: method, grad_lim_str  
         character(len=512) :: filename0 
 
@@ -62,6 +62,12 @@ contains
             
             ! Define topography (Bamber et al. 2013) grid and input variable field
             select case(thin_by)
+                case(20)
+                    call grid_init(grid0,name="TOPO-B13-20KM",mtype="polar_stereographic", &
+                            units="kilometers",lon180=.TRUE., &
+                            x0=-1290.d0,dx=20.d0,nx=126,y0=-3490.d0,dy=20.d0,ny=151, &
+                            lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+
                 case(10)
                     call grid_init(grid0,name="TOPO-B13-10KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
@@ -146,7 +152,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
 
-            method = "nn"
+            method = "nng"
             if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
 
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
