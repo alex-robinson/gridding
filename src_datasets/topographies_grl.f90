@@ -166,7 +166,7 @@ contains
             end if
 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
-                           radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx,fill=.TRUE.,missing_value=mv)
+                           radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
             
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
