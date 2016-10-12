@@ -35,32 +35,32 @@ contains
 
             case("GRL-120KM")
                 call grid_init(grid,name="GRL-120KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=120.d0,nx=15,dy=120.d0,ny=25, &
+                               lon180=.TRUE.,dx=120.d0,nx=16,dy=120.d0,ny=26, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("GRL-40KM")
                 call grid_init(grid,name="GRL-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=45,dy=40.d0,ny=75, &
+                               lon180=.TRUE.,dx=40.d0,nx=46,dy=40.d0,ny=76, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("GRL-20KM")
                 call grid_init(grid,name="GRL-20KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=20.d0,nx=90,dy=20.d0,ny=150, &
+                               lon180=.TRUE.,dx=20.d0,nx=91,dy=20.d0,ny=151, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("GRL-10KM")
                 call grid_init(grid,name="GRL-10KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=10.d0,nx=180,dy=10.d0,ny=300, &
+                               lon180=.TRUE.,dx=10.d0,nx=181,dy=10.d0,ny=301, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("GRL-5KM")
                 call grid_init(grid,name="GRL-5KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=5.d0,nx=360,dy=5.d0,ny=600, &
+                               lon180=.TRUE.,dx=5.d0,nx=361,dy=5.d0,ny=601, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("GRL-1KM")
                 call grid_init(grid,name="GRL-1KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=1.d0,nx=1800,dy=1.d0,ny=3000, &
+                               lon180=.TRUE.,dx=1.d0,nx=1801,dy=1.d0,ny=3001, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("Bamber01-20KM")
