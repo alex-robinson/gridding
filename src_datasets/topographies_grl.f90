@@ -8,10 +8,261 @@ module topographies_grl
     implicit none 
 
     private 
-    public :: Bamber13_to_grid
+    public :: Bamber13_to_grid !, Bamber13_to_grid_conserv
     public :: Morlighem14_to_grid 
 
 contains 
+
+!     subroutine Bamber13_to_grid_conserv(outfldr,grid)
+!         ! Convert the variables to the desired grid format and write to file
+!         ! =========================================================
+!         !
+!         !       TOPO DATA
+!         !
+!         ! =========================================================
+        
+!         implicit none 
+
+!         character(len=*), intent(IN) :: outfldr 
+!         type(grid_class), intent(IN) :: grid 
+
+!         ! Local variables
+!         character(len=512) :: filename 
+!         character(len=1024) :: desc, ref 
+
+!         type(grid_class)   :: grid00, grid0
+!         character(len=256) :: file_in
+!         type(var_defs), allocatable :: vars(:)
+!         double precision, allocatable :: invar(:,:) 
+
+!         type(map_class)  :: map 
+!         type(var_defs) :: var_now 
+!         double precision, allocatable :: outvar(:,:), tmp(:,:)
+!         integer, allocatable          :: outmask(:,:)
+!         double precision, allocatable :: var_fill(:,:)
+!         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
+!         double precision, allocatable :: zb_neg(:,:), zs_sl(:,:)
+
+!         integer :: q, k, m, i, l, n_var  
+!         character(len=128) :: method 
+!         character(len=512) :: filename0 
+
+!         ! Original grid (independent projection)
+!         call grid_init(grid00,name="TOPO-B13-1KM",mtype="polar_stereographic", &
+!                     units="kilometers",lon180=.TRUE., &
+!                     x0=-1300.d0,dx=1.d0,nx=2501,y0=-3500.d0,dy=1.d0,ny=3001, &
+!                     lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+
+!         ! Intermediate (very) high resolution grid (target projection)
+!         call grid_init(grid0,name="TOPO-B13-1KM",mtype="polar_stereographic", &
+!                     units="kilometers",lon180=.TRUE., &
+!                     x0=-1300.d0,dx=1.d0,nx=2501,y0=-3500.d0,dy=1.d0,ny=3001, &
+!                     lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+
+
+!             ! Define the input filenames
+!             file_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
+!             desc    = "Greenland bedrock and surface topography (V3)"
+!             ref     = "Bamber, J. L., Griggs, J. A., Hurkmans, R. T. W. L., &
+!                       &Dowdeswell, J. A., Gogineni, S. P., Howat, I., Mouginot, J., &
+!                       &Paden, J., Palmer, S., Rignot, E., and Steinhage, D.: &
+!                       &A new bed elevation dataset for Greenland, &
+!                       &The Cryosphere, 7, 499-510, doi:10.5194/tc-7-499-2013, 2013."
+
+!             ! Define the output filename 
+!             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+!                               "_TOPO-B13"//trim(grad_lim_str)//".nc"
+
+!             ! Define filename holding ETOPO1 data
+!             write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+!                               "_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
+!         else
+
+!             write(*,*) "Domain not recognized: ",trim(domain)
+!             stop 
+!         end if 
+
+!         ! Define the variables to be mapped 
+!         allocate(vars(4))
+!         call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation",method="nn")
+!         call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation",method="nn")
+!         call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness",method="nn")
+!         call def_var_info(vars(4),trim(file_in),"LandMask",      "mask",units="(0 - 4)", &
+!                           long_name="Land mask",method="nn")
+
+!         ! Allocate the input grid variable
+!         call grid_allocate(grid0,invar)
+
+!         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
+!         allocate(tmp(2501,3001))
+
+!         ! Initialize mapping
+!         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+!         ! Initialize output variable arrays
+!         call grid_allocate(grid,outvar)
+!         call grid_allocate(grid,outmask)    
+        
+!         ! Initialize the output file
+!         call nc_create(filename)
+!         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+!         call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+!         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+!         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+!         ! Write meta data 
+!         call nc_write_attr(filename,"Description",desc)
+!         call nc_write_attr(filename,"Reference",ref)
+
+!         ! ## FIELDS ##
+!         do i = 1, size(vars)
+!             var_now = vars(i) 
+
+!             method = "radius"
+!             if (trim(var_now%nm_out) .eq. "mask") method = "nn" 
+
+!             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+
+!             if (thin_by .gt. 1) then 
+!                 if (var_now%method .eq. "nn") then 
+!                     call thin(invar,tmp,by=thin_by,missing_value=mv)
+!                 else 
+!                     call thin_ave(invar,tmp,by=thin_by,missing_value=mv)
+!                 end if 
+!             else 
+!                 invar = tmp 
+!             end if 
+
+!             if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+!                 where( invar .eq. mv ) invar = 0.d0 
+!             end if
+
+!             outvar = mv 
+!             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+!                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
+            
+!             if (var_now%method .eq. "nn") then 
+!                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
+!             else
+!                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+!             end if 
+            
+!             ! Write variable metadata
+!             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+!             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+!         end do 
+
+!         ! Interpolate only below sea-level points for fjord filling
+!         call grid_allocate(grid,zb_neg)
+!         call grid_allocate(grid,zs_sl)
+
+!         if (.FALSE.) then 
+
+!             var_now = vars(1)   ! BedrockElevation 
+!             method = "radius"
+
+!             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+
+!             if (thin_by .gt. 1) then 
+!                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv) 
+!             else 
+!                 invar = tmp 
+!             end if 
+    
+!             ! Set land points to missing (to avoid making fjords overly shallow)
+!             where( invar .gt. 0.d0 ) invar = mv 
+
+!             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+!                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
+            
+!             zb_neg = outvar 
+
+!             var_now = vars(2)   ! SurfaceElevation 
+!             method = "nn"
+
+!             call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+
+!             if (thin_by .gt. 1) then 
+!                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv) 
+!             else 
+!                 invar = tmp 
+!             end if 
+    
+!             ! Set land points to missing (to avoid making fjords overly shallow)
+!             where( invar .gt. 0.d0 ) invar = mv 
+
+!             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
+!                            radius=grid%G%dx*grid%xy_conv,sigma=grid%G%dx*0.5d0,fill=.TRUE.,missing_value=mv)
+            
+!             zs_sl = outvar 
+
+!         else 
+!             zb_neg = mv
+!             zs_sl  = mv 
+
+!         end if 
+
+!         ! Modify variables for consistency and gradient limit 
+
+!         ! Allocate helper arrays
+!         call grid_allocate(grid,zs)
+!         call grid_allocate(grid,zb)
+!         call grid_allocate(grid,H)
+!         call grid_allocate(grid,var_fill)
+        
+!         ! Bedrock from ETOPO-1
+!         ! Also load etopo bedrock, use it to replace high latitude regions
+!         call nc_read(filename0,"zb",var_fill)
+!         call nc_read(filename, "zb",zb,missing_value=mv)
+!         call nc_read(filename, "zs",zs)  
+!         where(zb .eq. mv) zb = var_fill 
+!         var_now = vars(1)
+!         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+        
+
+!         ! Re-load data
+!         call nc_read(filename,"zs",zs)
+!         call nc_read(filename,"zb",zb)
+!         call nc_read(filename,"H",H)
+        
+!         ! Fill in fjords from second zb and zs fields
+!         where (zb_neg .lt. 0.d0 .and. zb_neg .ne. mv) zb = zb_neg 
+!         where (zs_sl  .ne. mv) zs = zs_sl 
+        
+!         ! Eliminate problematic regions for this domain ========
+!         call clean_greenland(zs,zb,grid)
+
+!         ! Apply gradient limit as needed
+!         if (grad_lim .gt. 0.d0) then 
+!             ! Limit the gradient (m/m) to below threshold 
+!             call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+!             call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            
+!         end if 
+
+!         call clean_thickness(zs,zb,H)
+
+!         ! Re-write fields 
+!         call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+!         call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+!         call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
+
+!         ! Define new masks ==========
+
+!         ! ocean-land-ice-shelf (0,1,2,3) mask 
+!         outmask = 0     ! Ocean
+!         where (zs .gt. 0.d0) outmask = 1    ! Land
+!         where ( H .gt. 0.d0) outmask = 2    ! Grounded ice
+!         where (zs .gt. 0.d0 .and. zs-zb .gt. H) outmask = 3   ! Floating ice 
+
+!         call nc_write(filename,"mask", outmask, dim1="xc",dim2="yc",missing_value=int(mv), &
+!                       long_name="Mask (ocean=0,land=1,grounded-ice=2,floating-ice=3)")
+
+!         return 
+
+!     end subroutine Bamber13_to_grid_conserv
 
     subroutine Bamber13_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
         ! Convert the variables to the desired grid format and write to file

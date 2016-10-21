@@ -114,6 +114,9 @@ $(objdir)/gridding_datasets.o: $(srcdir)/gridding_datasets.f90
 $(objdir)/regions.o: $(srcdir)/regions.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/generic.o: $(srcdir)/generic.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/AN1CRUST.o: $(srcdir)/AN1CRUST.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -174,6 +177,8 @@ $(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
 obj_datasets =     $(objdir)/control.o \
 				   $(objdir)/nml.o \
 				   $(objdir)/gridding_datasets.o \
+				   $(objdir)/generic.o \
+				   $(objdir)/regions.o \
 			       $(objdir)/AN1CRUST.o \
 			       $(objdir)/bedmap2.o \
 			       $(objdir)/CERES.o \
@@ -188,7 +193,6 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/MAR.o \
 			       $(objdir)/nasaBasins.o \
 				   $(objdir)/RACMO2.o \
-				   $(objdir)/regions.o \
 				   $(objdir)/Rignot13_BasalMelt.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/stratigraphy.o \
@@ -207,6 +211,12 @@ gridder: $(obj_datasets)
 	$(FC) $(DFLAGS) $(FLAGS) -o gridder.x $^ gridder.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gridder.x is ready."
+	@echo " "
+
+gridder_help: $(obj_datasets) 
+	$(FC) $(DFLAGS) $(FLAGS) -o gridder_help.x $^ gridder_help.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_help.x is ready."
 	@echo " "
 
 gridder_climber: $(obj_datasets_climber) 
