@@ -10,7 +10,7 @@ module generic
     public :: generic_to_grid_nn
 contains 
 
-    subroutine generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int)
+    subroutine generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac)
         ! Convert the variables to the desired grid format and write to file
         ! using nearest neighbor interpolation only 
 
@@ -20,6 +20,7 @@ contains
         character(len=*), intent(IN) :: outfldr, dataset, path_in
         character(len=*), intent(IN) :: vname(:)        ! List of variable names to interpolate
         character(len=*), intent(IN) :: vname_int(:)    ! List of variable names that are integers
+        integer, intent(IN), optional :: thin_fac
 
         ! Local variables
         character(len=512) :: filename
@@ -27,14 +28,19 @@ contains
         integer, parameter :: max_neighbors = 4 
         double precision :: lat_lim, dist_max 
         integer :: q, k 
-        double precision, allocatable :: var0(:,:), var1(:,:)
+        double precision, allocatable :: var0(:,:), var1(:,:), tmp(:,:)
         integer,          allocatable :: mask1(:,:)
         character(len=56) :: vname_now, units, long_name   
         logical :: is_int 
+        integer :: thin_by, nx00, ny00  
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid1%name)//"_"//trim(dataset)//".nc"
 
+        ! Determine whether the input variables should be thinned
+        ! to match the grid0 definition (default: no thinning)
+        thin_by = 1 
+        if (present(thin_fac)) thin_by = thin_fac 
 
         ! First get dist_max in meters
         dist_max = 2.0d0* max(sqrt((grid0%G%dx*grid0%xy_conv)**2+(grid0%G%dy*grid0%xy_conv)**2), &
@@ -57,6 +63,13 @@ contains
         call grid_allocate(grid1,var1)
         call grid_allocate(grid1,mask1)
 
+        ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
+        if (thin_by .gt. 1) then 
+            nx00 = (grid0%G%nx-1)*thin_by+1
+            ny00 = (grid0%G%ny-1)*thin_by+1
+            allocate(tmp(nx00,ny00))
+        end if 
+
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid1%G%x,units=trim(grid1%units))
@@ -78,6 +91,16 @@ contains
 
             ! Read in the original variable
             call nc_read(trim(path_in),vname_now,var0,missing_value=mv)
+
+            if (thin_by .gt. 1) then 
+                if (is_int) then 
+                    call thin(var0,tmp,by=thin_by,missing_value=mv)
+                else 
+                    call thin_ave(var0,tmp,by=thin_by,missing_value=mv)
+                end if 
+            else 
+                var0 = tmp 
+            end if 
 
             ! Map the variable
             var1 = mv 
