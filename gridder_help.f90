@@ -36,7 +36,7 @@ program gridder_help
 
     outfldr = "output/Greenland"
     dataset = "TOPO-B13"
-    path_in = "/data/sicopolis/data/Greenland_bedrock_topography_V3.nc"
+    path_in = "/data/sicopolis/data/Greenland/Greenland_bedrock_topography_V3.nc"
 
     allocate(vname(7),vname_int(1))
     vname(1)  = "BedrockElevation"

@@ -74,7 +74,6 @@ contains
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid1%G%x,units=trim(grid1%units))
         call nc_write_dim(filename,"yc",   x=grid1%G%y,units=trim(grid1%units))
-!         call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
         call grid_write(grid1,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Loop over the variables and perform the interpolation 
