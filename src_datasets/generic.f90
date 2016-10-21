@@ -24,7 +24,7 @@ contains
         ! Local variables
         character(len=512) :: filename
         type(map_class) :: map
-        integer, parameter :: max_neighbors = 100 
+        integer, parameter :: max_neighbors = 4 
         double precision :: lat_lim, dist_max 
         integer :: q, k 
         double precision, allocatable :: var0(:,:), var1(:,:)
@@ -37,8 +37,8 @@ contains
 
 
         ! First get dist_max in meters
-        dist_max = max(sqrt((grid0%G%dx*grid0%xy_conv)**2+(grid0%G%dy*grid0%xy_conv)**2), &
-                       sqrt((grid1%G%dx*grid1%xy_conv)**2+(grid1%G%dy*grid1%xy_conv)**2))
+        dist_max = 2.0d0* max(sqrt((grid0%G%dx*grid0%xy_conv)**2+(grid0%G%dy*grid0%xy_conv)**2), &
+                              sqrt((grid1%G%dx*grid1%xy_conv)**2+(grid1%G%dy*grid1%xy_conv)**2))
         
         ! Determine lat_lim assuming 1deg = 100km
         lat_lim  = dist_max / 100d3 
@@ -96,7 +96,7 @@ contains
 
             call nc_write_attr(filename,vname_now,"units",units)
             call nc_write_attr(filename,vname_now,"long_name",long_name)
-            
+
         end do 
 
 
