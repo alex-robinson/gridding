@@ -3,10 +3,9 @@ module regions
     ! This module defines regions globally (lat-lon)
     ! and returns them on the coordinates of interest (eg, polar_stereographic)
 
-    use coordinates 
-    use polygons 
-    use ncio 
-
+    use gridding_datasets
+    use coord
+    
     implicit none 
 
     real(4), parameter :: mask_index_north = 1.0  ! North

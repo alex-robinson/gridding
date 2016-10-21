@@ -1,12 +1,7 @@
 module Rignot13_BasalMelt
 
     use gridding_datasets
-    use coordinates 
-    use planet 
-    use oblimap_projection_module 
-    use interp2D
-    use gaussian_filter
-    use ncio 
+    use coord
     
     implicit none 
 

@@ -1,9 +1,7 @@
 module ECMWF 
 
     use gridding_datasets
-    use coordinates
-    use interp_time 
-    use ncio 
+    use coord
     
     implicit none 
 

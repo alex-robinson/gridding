@@ -1,11 +1,7 @@
 module MAR 
 
     use gridding_datasets
-    use coordinates
-    use interp2D
-    use interp_time 
-    use ncio 
-    
+    use coord
     use gaussian_filter 
 
     implicit none 

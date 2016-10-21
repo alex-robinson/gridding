@@ -1,12 +1,7 @@
 module nasaBasins 
 
     use gridding_datasets
-    use coordinates 
-    use polygons 
-    use index 
-    use interp_time
-    use interp2D 
-    use ncio 
+    use coord
     
     implicit none 
 

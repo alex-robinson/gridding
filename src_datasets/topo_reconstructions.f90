@@ -1,8 +1,7 @@
 module topo_reconstructions 
 
     use gridding_datasets
-    use coordinates 
-    use ncio 
+    use coord
     
     implicit none 
 

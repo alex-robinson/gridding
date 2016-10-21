@@ -1,10 +1,7 @@
 module RACMO2 
 
     use gridding_datasets
-    use coordinates
-    use interp2D
-    use interp_time 
-    use ncio 
+    use coord
     
     implicit none 
 

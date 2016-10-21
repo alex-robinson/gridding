@@ -2,7 +2,7 @@
 module control
 
     use nml 
-    use coordinates 
+    use coord 
 
     implicit none
 

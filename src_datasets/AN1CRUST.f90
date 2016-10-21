@@ -1,9 +1,7 @@
 module AN1CRUST
 
     use gridding_datasets
-    use coordinates
-    use interp2D 
-    use ncio 
+    use coord
     
     implicit none 
 

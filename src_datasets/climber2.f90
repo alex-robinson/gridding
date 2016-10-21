@@ -1,11 +1,9 @@
 module climber2 
 
     use gridding_datasets
-    use coordinates 
-    use interp2D 
+    use coord
     use gaussian_filter
-    use ncio 
-    
+
     implicit none 
 
     private 

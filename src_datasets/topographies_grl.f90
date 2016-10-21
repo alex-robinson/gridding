@@ -1,10 +1,8 @@
 module topographies_grl
 
     use gridding_datasets
-    use coordinates
-    use interp2D 
-    use polygons 
-    use ncio 
+    use coord
+
     use regions 
 
     implicit none 
