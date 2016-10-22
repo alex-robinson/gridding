@@ -68,6 +68,8 @@ contains
             nx00 = (grid0%G%nx-1)*thin_by+1
             ny00 = (grid0%G%ny-1)*thin_by+1
             allocate(tmp(nx00,ny00))
+        else 
+            call grid_allocate(grid0,tmp)
         end if 
 
         ! Initialize the output file
@@ -76,6 +78,8 @@ contains
         call nc_write_dim(filename,"yc",   x=grid1%G%y,units=trim(grid1%units))
         call grid_write(grid1,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
+        write(*,*) "dim(tmp): ", size(tmp,1), size(tmp,2)
+
         ! Loop over the variables and perform the interpolation 
         do q = 1, size(vname)
 
@@ -89,7 +93,7 @@ contains
             end do 
 
             ! Read in the original variable
-            call nc_read(trim(path_in),vname_now,var0,missing_value=mv)
+            call nc_read(trim(path_in),vname_now,tmp,missing_value=mv)
 
             if (thin_by .gt. 1) then 
                 if (is_int) then 
@@ -101,6 +105,9 @@ contains
                 var0 = tmp 
             end if 
 
+            write(*,*) "range(tmp):  ", minval(tmp), maxval(tmp)
+            write(*,*) "range(var0): ", minval(var0), maxval(var0)
+            
             ! Map the variable
             var1 = mv 
             call map_field(map,vname_now,var0,var1,mask1,method="nn", &
