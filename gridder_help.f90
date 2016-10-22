@@ -19,20 +19,20 @@ program gridder_help
 !     call grid_init(grid1,name="GRL-1KM",mtype="stereographic",units="kilometers", &
 !                    lon180=.TRUE.,dx=1.d0,nx=1801,dy=1.d0,ny=3001, &
 !                    lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-    
-    thin_fac = 1 
 
-    ! Original Bamber grid - thinned (2KM)
-    call grid_init(grid0,name="B13-2KM",mtype="polar_stereographic", &
+!     thin_fac = 1 
+
+    ! Original Bamber grid - thinned (3KM)
+    call grid_init(grid0,name="B13-3KM",mtype="polar_stereographic", &
                 units="kilometers",lon180=.TRUE., &
-                x0=-1299.d0,dx=2.d0,nx=1251,y0=-3499.d0,dy=2.d0,ny=1501, &
+                x0=-1298.5d0,dx=3.d0,nx=1251,y0=-3498.5d0,dy=3.d0,ny=1501, &
                 lambda=-39.d0,phi=71.d0,alpha=19.0d0)
 
-    call grid_init(grid1,name="GRL-2KM",mtype="stereographic",units="kilometers", &
-                   lon180=.TRUE.,dx=1.d0,nx=901,dy=1.d0,ny=1501, &
+    call grid_init(grid1,name="GRL-3KM",mtype="stereographic",units="kilometers", &
+                   lon180=.TRUE.,dx=3.d0,nx=901,dy=3.d0,ny=1501, &
                    lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
-    thin_fac = 2 
+    thin_fac = 3 
 
     outfldr = "output/Greenland"
     dataset = "TOPO-B13"
