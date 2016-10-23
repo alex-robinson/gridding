@@ -36,7 +36,7 @@ else ifeq ($(env),eolo) ## env=eolo
 #    LIB_COORD = /home/fispalma25/robinson/models/EURICE/coord/libcoordinates.a
 #    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 #
-#    FLAGS    = -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC)
+#    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC)
 #    LFLAGS   = $(LIB_COORD) $(LIB_NC) $(LIB_MKL)
 #
 #    DFLAGS   = -vec-report0 -O2 -fp-model precise
@@ -86,7 +86,7 @@ else ifeq ($(env),pik) ## env=pik
     INC_COORD = -I/p/projects/tumble/robinson/EURICE/coord/.obj
 	LIB_COORD = /p/projects/tumble/robinson/EURICE/coord/libcoordinates.a
 
-    FLAGS    = -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC) 
+    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC) 
     LFLAGS   = $(LIB_COORD) $(LIB_NC)
 
     DFLAGS   = -O3
