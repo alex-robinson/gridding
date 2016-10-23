@@ -225,7 +225,7 @@ gridder_climber: $(obj_datasets_climber)
 	@echo "    gridder_climber.x is ready."
 	@echo " "
 
-bedmap: $(objdir)/ncio.o
+bedmap:
 	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
 	@echo " "
 	@echo "    bedmap2_netcdf.x is ready."
