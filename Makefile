@@ -225,6 +225,12 @@ gridder_climber: $(obj_datasets_climber)
 	@echo "    gridder_climber.x is ready."
 	@echo " "
 
+bedmap: $(objdir)/ncio.o
+	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
+	@echo " "
+	@echo "    bedmap2_netcdf.x is ready."
+	@echo " "
+
 marclean: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o mar_rawclean.x $^ mar_rawclean.f90 $(LFLAGS)
 	@echo " "
@@ -235,12 +241,6 @@ marmonthly: $(objdir)/ncio.o
 	$(FC) $(DFLAGS) $(FLAGS) -o mar_calcmonthly.x $^ mar_calcmonthly.f90 $(LFLAGS)
 	@echo " "
 	@echo "    mar_calcmonthly.x is ready."
-	@echo " "
-
-bedmap: $(objdir)/ncio.o
-	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
-	@echo " "
-	@echo "    bedmap2_netcdf.x is ready."
 	@echo " "
 
 points_to_latlon:
