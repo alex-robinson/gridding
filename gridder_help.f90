@@ -16,7 +16,7 @@ program gridder_help
     !
     ! ====================================================
     
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
 !         ! Original Bamber grid (1KM)
 !         call grid_init(grid0,name="B13-1KM",mtype="polar_stereographic", &
@@ -68,7 +68,7 @@ program gridder_help
     !
     ! ====================================================
 
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
         ! Original BEDMAP2 grid - thinned (10KM)
         call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
@@ -76,6 +76,26 @@ program gridder_help
 
         call grid_init(grid1,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=10.d0,nx=625,dy=10.d0,ny=585,lambda=0.d0,phi=-71.d0)
+
+        thin_fac = 10 
+
+        outfldr = "output/Antarctica"
+        dataset = "TOPO-B13"
+        path_in = "output/Antarctica/BEDMAP2-netcdf/ANT-1KM_BEDMAP2_topo.nc"
+
+        allocate(vname(7),vname_int(1))
+        vname(1)  = "BedrockElevation"
+        vname(2)  = "SurfaceElevation"
+        vname(3)  = "IceThickness"
+        vname(4)  = "SurfaceRMSE"
+        vname(5)  = "BedrockError"
+        vname(6)  = "LandMask"
+        vname(7)  = "Geoid"
+
+        vname_int(1) = "LandMask"
+
+        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
 
     end if 
 

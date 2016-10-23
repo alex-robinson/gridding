@@ -42,13 +42,8 @@ program bedmap2_netcdf
     character(len=256) :: fnm, filename_topo, filename_vel, filename_acc
 
     ! Initialize the output grid
-    call grid_init(grid,name="ANT-1KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667, &
-                       lambda=0.d0,phi=-90.d0,alpha=24.7d0)
-
-!     call grid_init(grid,name="ANT-2KM",mtype="polar_stereographic",units="kilometers", &
-!                        lon180=.TRUE.,dx=2.d0,nx=3334,dy=2.d0,ny=3334, &
-!                        lambda=0.d0,phi=-90.d0,alpha=19.0d0)
+    call grid_init(grid,name="BEDMAP2-1KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=1.d0,nx=6667,dy=1.d0,ny=6667,lambda=0.d0,phi=-71.d0)
 
     ! Allocate grid variable
     call grid_allocate(grid,var)
@@ -58,7 +53,7 @@ program bedmap2_netcdf
     filename_acc  = "output/Antarctica/BEDMAP2-netcdf/"//trim(grid%name)//"_BEDMAP2_acc.nc"
     
     ! ====== TOPOGRAPHY ========
-    if (.FALSE.) then 
+    if (.TRUE.) then 
         ! Write grid information to output file
         call write_init(filename_topo,grid)
 
@@ -165,7 +160,7 @@ program bedmap2_netcdf
     end if 
 
     ! ====== Accumulation ========
-    if (.FALSE.) then 
+    if (.TRUE.) then 
         ! NOTE: This NN interpolation is really slow.. but only needs to be done once!
         
         ! ====== Arthern accumulation at 1 km resolution
