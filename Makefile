@@ -18,7 +18,7 @@ ifeq ($(env),manto) ## env=manto
     LIB_NC  = -L/home/jalvarez/work/librairies/netcdflib/lib -lnetcdf
     LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 
-    FLAGS    = -module $(objdir) -L$(objdir) $(INC_NC)
+    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_NC)
     LFLAGS   = $(LIB_NC) $(LIB_MKL)
 
     DFLAGS   = -vec-report0 -O2 -fp-model precise -i_dynamic 

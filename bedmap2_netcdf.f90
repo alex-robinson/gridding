@@ -26,7 +26,7 @@
 program bedmap2_netcdf
 
     use coord 
-    
+
     implicit none 
 
     real(4), parameter :: mv = -9999.0 
@@ -52,6 +52,12 @@ program bedmap2_netcdf
     
     ! ====== TOPOGRAPHY ========
     if (.TRUE.) then 
+
+        write(*,*) "Processing BEDMAP2 topography..."
+        write(*,*) size(var,1), size(var,2)
+        write(*,*) minval(grid%lon), maxval(grid%lon)
+        write(*,*) minval(grid%lat), maxval(grid%lat)
+        
         ! Write grid information to output file
         call write_init(filename_topo,grid)
 
@@ -199,7 +205,7 @@ contains
         call nc_write_dim(fnm,"yc",x=grid%G%y,units=grid%units)
 
         ! Add projection information if needed
-        call nc_write_map(fnm,grid%mtype,grid%proj%lambda,phi=grid%proj%phi, &
+        call nc_write_map(fnm,grid%mtype,grid%proj%lambda,phi=grid%proj%phi,alpha=grid%proj%alpha, &
                           x_e=grid%proj%x_e,y_n=grid%proj%y_n)
      
         call nc_write(fnm,"lon2D",real(grid%lon),dim1="xc",dim2="yc",grid_mapping=grid%name)
