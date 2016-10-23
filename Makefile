@@ -238,7 +238,7 @@ marmonthly: $(objdir)/ncio.o
 	@echo " "
 
 bedmap: $(objdir)/ncio.o
-	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 ../coord/libcoordinates.a $(LFLAGS)
+	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
 	@echo " "
 	@echo "    bedmap2_netcdf.x is ready."
 	@echo " "

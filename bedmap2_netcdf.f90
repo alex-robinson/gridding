@@ -25,10 +25,8 @@
 
 program bedmap2_netcdf
 
-    use ncio
-    use coordinates 
-    use interp2D 
-
+    use coord 
+    
     implicit none 
 
     real(4), parameter :: mv = -9999.0 
