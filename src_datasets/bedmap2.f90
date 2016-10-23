@@ -2,6 +2,7 @@ module bedmap2
 
     use gridding_datasets
     use coord
+    use ncio 
     
     implicit none 
 

@@ -2,8 +2,9 @@ module generic
     ! Use this module / routine to perform some generic interpolations 
 
     use gridding_datasets
-    use coord 
-
+    use coord
+    use ncio 
+    
     implicit none 
 
     private 

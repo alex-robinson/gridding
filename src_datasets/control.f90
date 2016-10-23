@@ -2,8 +2,9 @@
 module control
 
     use nml 
-    use coord 
-
+    use coord
+    use ncio 
+    
     implicit none
 
     type control_param_class 

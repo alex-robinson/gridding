@@ -2,6 +2,7 @@ module RACMO2
 
     use gridding_datasets
     use coord
+    use ncio 
     
     implicit none 
 

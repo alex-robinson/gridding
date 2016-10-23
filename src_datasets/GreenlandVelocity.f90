@@ -2,6 +2,7 @@ module GreenlandVelocity
 
     use gridding_datasets
     use coord
+    use ncio 
     
     implicit none 
 

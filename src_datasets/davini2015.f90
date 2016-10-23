@@ -2,6 +2,7 @@ module davini2015
 
     use gridding_datasets
     use coord
+    use ncio 
     use gaussian_filter
     
     implicit none 

@@ -2,7 +2,8 @@ module topographies_grl
 
     use gridding_datasets
     use coord
-
+    use ncio 
+    
     use regions 
 
     implicit none 

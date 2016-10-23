@@ -2,6 +2,7 @@ module Rignot13_BasalMelt
 
     use gridding_datasets
     use coord
+    use ncio 
     
     implicit none 
 
