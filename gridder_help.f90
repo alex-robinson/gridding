@@ -80,19 +80,16 @@ program gridder_help
         thin_fac = 10 
 
         outfldr = "output/Antarctica"
-        dataset = "TOPO-B13"
-        path_in = "output/Antarctica/BEDMAP2-netcdf/ANT-1KM_BEDMAP2_topo.nc"
+        dataset = "TOPO-BEDMAP2"
+        path_in = "/data/sicopolis/data/gridding_output/Antarctica/BEDMAP2-netcdf/BEDMAP2-1KM_BEDMAP2_topo.nc"
 
-        allocate(vname(7),vname_int(1))
-        vname(1)  = "BedrockElevation"
-        vname(2)  = "SurfaceElevation"
-        vname(3)  = "IceThickness"
-        vname(4)  = "SurfaceRMSE"
-        vname(5)  = "BedrockError"
-        vname(6)  = "LandMask"
-        vname(7)  = "Geoid"
+        allocate(vname(4),vname_int(1))
+        vname(1)  = "zs"
+        vname(2)  = "zb"
+        vname(3)  = "H"
+        vname(4)  = "mask_ice"
 
-        vname_int(1) = "LandMask"
+        vname_int(1) = "mask_ice"
 
         call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
 
