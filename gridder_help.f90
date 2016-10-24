@@ -101,7 +101,7 @@ program gridder_help
 
         if (allocated(vname)) deallocate(vname)
         if (allocated(vname_int)) deallocate(vname_int)
-        allocate(vname(4),vname_int(1))
+        allocate(vname(3),vname_int(1))
         vname(1)     = "u"
         vname(2)     = "v"
         vname(3)     = "err"
