@@ -1,5 +1,7 @@
 program gridder_help
-    
+    ! This program will help get high resolution datasets onto the same projection
+    ! as the basic ice_data grids. That way conservative interpolation is possible and easy.
+
     use coord 
     use generic 
 
@@ -16,7 +18,7 @@ program gridder_help
     !
     ! ====================================================
     
-    if (.FALSE.) then 
+    if (.TRUE.) then 
 
 !         ! Original Bamber grid (1KM)
 !         call grid_init(grid0,name="B13-1KM",mtype="polar_stereographic", &
@@ -68,7 +70,7 @@ program gridder_help
     !
     ! ====================================================
 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
         ! Original BEDMAP2 grid - thinned (10KM)
         call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &

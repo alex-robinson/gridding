@@ -157,7 +157,7 @@ contains
         ny = size(var,2) 
 
         ! Define weights for neighbor averaging 
-        nxn = (by-1)/2
+        nxn = ceiling( (by-1)/2 )
         allocate(wts(by,by))
         allocate(wts_now(by,by))
 
