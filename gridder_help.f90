@@ -79,20 +79,48 @@ program gridder_help
 
         thin_fac = 10 
 
+        ! ==== TOPOGRAPHY (BEDMAP2) =========
         outfldr = "output/Antarctica"
         dataset = "TOPO-BEDMAP2"
         path_in = "/data/sicopolis/data/gridding_output/Antarctica/BEDMAP2-netcdf/BEDMAP2-1KM_BEDMAP2_topo.nc"
 
         allocate(vname(4),vname_int(1))
-        vname(1)  = "zs"
-        vname(2)  = "zb"
-        vname(3)  = "H"
-        vname(4)  = "mask_ice"
+        vname(1)     = "zs"
+        vname(2)     = "zb"
+        vname(3)     = "H"
+        vname(4)     = "mask_ice"
 
         vname_int(1) = "mask_ice"
 
         call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
 
+        ! ==== VELOCITY (Rignot et al., 2011) =========
+        outfldr = "output/Antarctica"
+        dataset = "VEL-R11"
+        path_in = "/data/sicopolis/data/gridding_output/Antarctica/BEDMAP2-netcdf/BEDMAP2-1KM_BEDMAP2_vel.nc"
+
+        if (allocated(vname)) deallocate(vname)
+        if (allocated(vname_int)) deallocate(vname_int)
+        allocate(vname(4),vname_int(1))
+        vname(1)     = "u"
+        vname(2)     = "v"
+        vname(3)     = "err"
+        vname_int(1) = "None" 
+
+        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
+        ! ==== ACCUMULATION (Rignot et al., 2011) =========
+        outfldr = "output/Antarctica"
+        dataset = "ACC-A06"
+        path_in = "/data/sicopolis/data/gridding_output/Antarctica/BEDMAP2-netcdf/BEDMAP2-1KM_BEDMAP2_accum.nc"
+
+        if (allocated(vname)) deallocate(vname)
+        if (allocated(vname_int)) deallocate(vname_int)
+        allocate(vname(1),vname_int(1))
+        vname(1)     = "accum"
+        vname_int(1) = "None"
+
+        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
 
     end if 
 
