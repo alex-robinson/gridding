@@ -112,7 +112,7 @@ program gridder_help
         ! ==== ACCUMULATION (Rignot et al., 2011) =========
         outfldr = "output/Antarctica"
         dataset = "ACC-A06"
-        path_in = "/data/sicopolis/data/gridding_output/Antarctica/BEDMAP2-netcdf/BEDMAP2-1KM_BEDMAP2_accum.nc"
+        path_in = "/data/sicopolis/data/gridding_output/Antarctica/BEDMAP2-netcdf/BEDMAP2-1KM_BEDMAP2_acc.nc"
 
         if (allocated(vname)) deallocate(vname)
         if (allocated(vname_int)) deallocate(vname_int)
