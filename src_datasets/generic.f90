@@ -97,7 +97,7 @@ contains
             call nc_read(trim(path_in),vname_now,tmp,missing_value=mv)
 
             if (thin_by .gt. 1) then 
-                if (is_int) then 
+                if (is_int .or. thin_by .eq. 2) then 
                     call thin(var0,tmp,by=thin_by,missing_value=mv)
                 else 
                     call thin_ave(var0,tmp,by=thin_by,missing_value=mv)
@@ -106,8 +106,9 @@ contains
                 var0 = tmp 
             end if 
 
-            write(*,*) "range(tmp):  ", minval(tmp), maxval(tmp)
-            write(*,*) "range(var0): ", minval(var0), maxval(var0)
+            write(*,*) "range(var):         ", minval(tmp), maxval(tmp)
+            if (thin_by .gt. 1) &
+                write(*,*) "range(var_thinned): ", minval(var0), maxval(var0)
             
             ! Map the variable
             var1 = mv 
