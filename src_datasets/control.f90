@@ -76,26 +76,37 @@ contains
 
             ! ANTARCTICA DOMAINS ======================= 
 
+            case("ANT-80KM")
+                call grid_init(grid1,name="ANT-80KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=80.d0,nx=79,dy=80.d0,ny=74,lambda=0.d0,phi=-71.d0)
+
             case("ANT-40KM")
-                call grid_init(grid,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=156,dy=40.d0,ny=146, &
-                               lambda=0.d0,phi=-90.d0,alpha=22.1d0)
+                call grid_init(grid1,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=40.d0,nx=157,dy=40.d0,ny=147,lambda=0.d0,phi=-71.d0)
 
             case("ANT-20KM")
-                call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=20.d0,nx=311,dy=20.d0,ny=291, &
-                               lambda=0.d0,phi=-90.d0,alpha=22.1d0)
+                call grid_init(grid1,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=20.d0,nx=313,dy=20.d0,ny=293,lambda=0.d0,phi=-71.d0)
 
             case("ANT-10KM")
-                call grid_init(grid,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=10.d0,nx=621,dy=10.d0,ny=581, &
-                               lambda=0.d0,phi=-90.d0,alpha=22.1d0)
+                call grid_init(grid1,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=10.d0,nx=625,dy=10.d0,ny=585,lambda=0.d0,phi=-71.d0)
 
             ! NORTH DOMAINS ======================= 
 
             case("NH-40KM")
                 call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
+                               lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+            case("NH-20KM")
+                call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=20.d0,nx=449,dy=20.d0,ny=421, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+            case("NH-10KM")
+                call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=10.d0,nx=897,dy=10.d0,ny=840, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
             case DEFAULT
