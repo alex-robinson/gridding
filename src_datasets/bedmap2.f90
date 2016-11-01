@@ -13,7 +13,7 @@ module bedmap2
 
 contains 
 
-    subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
+    subroutine bedmap2_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -63,15 +63,14 @@ contains
             
             ! Define topography (BEDMAP2) grid and input variable field
             call grid_init(grid0,name="BEDMAP2-10KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-3328.d0,dx=10.d0,nx=666,y0=-3328.d0,dy=10.d0,ny=666, &
-                   lambda=0.d0,phi=-90.d0,alpha=24.7d0)
+                   x0=-3328.d0,dx=10.d0,nx=666,y0=-3328.d0,dy=10.d0,ny=666,lambda=0.d0,phi=-71.d0)
 
             ! Original x0,y0 values
 !             x0=-3333.d0, y0=-3333.d0 
 
             ! Define the input filenames
-            infldr         = "output/Antarctica/BEDMAP2-netcdf/"
-            file_invariant = trim(infldr)//"ANT-1KM_BEDMAP2_topo.nc"
+            infldr         = "output/Antarctica/"
+            file_invariant = trim(infldr)//"ANT-10KM_TOPO-BEDMAP2.nc"
             desc    = "Antarctica bedrock and surface topography (BEDMAP2)"
             ref     = "Fretwell et al.: Bedmap2: improved ice bed, surface and &
                       &thickness datasets for Antarctica, The Cryosphere, 7, 375-393, &
@@ -92,18 +91,14 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(4))
-        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m",long_name="Surface elevation",method="nng")
-        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m",long_name="Bedrock elevation",method="nng")
-        call def_var_info(invariant(3),file_invariant,"H","H",units="m",long_name="Ice thickness",method="nng")
-        call def_var_info(invariant(4),file_invariant,"mask_ice","mask_ice",units="(0 - 1)", &
-                          long_name="Ice mask",method="nn")
+        call def_var_info(invariant(1),file_invariant,"zs","zs",units="m",long_name="Surface elevation",method="con")
+        call def_var_info(invariant(2),file_invariant,"zb","zb",units="m",long_name="Bedrock elevation",method="con")
+        call def_var_info(invariant(3),file_invariant,"H","H",units="m",long_name="Ice thickness",method="con")
+        call def_var_info(invariant(4),file_invariant,"mask_ice","mask",units="(0 - 1)",long_name="Ice mask",method="nn")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
         
-        ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
-        allocate(tmp1(6667,6667))  ! bedmap2 array
-
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
