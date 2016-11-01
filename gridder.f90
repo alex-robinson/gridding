@@ -40,8 +40,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "North"
-    grid_name = "NH-40KM"
+    domain    = "Greenland"
+    grid_name = "GRL-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -120,22 +120,22 @@ program gridder
         write(*,*) "Processing Greenland..."
 
 !         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
-!         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-!         call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
+        call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+        call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
-!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
-!         call nasaBasins_to_grid(outfldr,grid,"Greenland")
-!         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
+        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+        call nasaBasins_to_grid(outfldr,grid,"Greenland")
+        call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
             
-!         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
-!         call grlvel_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
+        call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        call grlvel_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
 
-!         path = "data/Davini_GreenlandAMOC/"
-!         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
-!                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
-!         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
-!                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+        path = "data/Davini_GreenlandAMOC/"
+        call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
+                                path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+        call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
+                                path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
     
     end if 
 
