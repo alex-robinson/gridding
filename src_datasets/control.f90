@@ -77,19 +77,19 @@ contains
             ! ANTARCTICA DOMAINS ======================= 
 
             case("ANT-80KM")
-                call grid_init(grid1,name="ANT-80KM",mtype="polar_stereographic",units="kilometers", &
+                call grid_init(grid,name="ANT-80KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=80.d0,nx=79,dy=80.d0,ny=74,lambda=0.d0,phi=-71.d0)
 
             case("ANT-40KM")
-                call grid_init(grid1,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
+                call grid_init(grid,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=40.d0,nx=157,dy=40.d0,ny=147,lambda=0.d0,phi=-71.d0)
 
             case("ANT-20KM")
-                call grid_init(grid1,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
+                call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=20.d0,nx=313,dy=20.d0,ny=293,lambda=0.d0,phi=-71.d0)
 
             case("ANT-10KM")
-                call grid_init(grid1,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
+                call grid_init(grid,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=10.d0,nx=625,dy=10.d0,ny=585,lambda=0.d0,phi=-71.d0)
 
             ! NORTH DOMAINS ======================= 
