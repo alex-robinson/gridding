@@ -1,10 +1,9 @@
 
 program gridder
 
-    use ncio 
-    use coordinates
+    use coord 
     use control 
-
+    
     ! Datasets that can be gridded by this program (alphabetical)
     use climber2
     use climber3a 
@@ -24,8 +23,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-20KM"
+    domain    = "North"
+    grid_name = "NH-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
