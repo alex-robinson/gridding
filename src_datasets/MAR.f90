@@ -240,7 +240,7 @@ contains
                 var_now = invariant(i)
                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv)
                 outvar = missing_value
-                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
+                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=50.d0, &
                                fill=.TRUE.,missing_value=mv)
                 if (trim(var_now%method) .eq. "nn") then 
                     call fill_nearest(outvar,missing_value=mv)
@@ -286,7 +286,7 @@ contains
 
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
-                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",radius=50.d0, &
                                        fill=.TRUE.,missing_value=mv)
                         tmp = outvar 
                         call fill_weighted(tmp,missing_value=mv)
@@ -538,7 +538,7 @@ contains
 !                 var_now = invariant(i)
 !                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv)
 !                 outvar = missing_value
-!                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
+!                 call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=50.d0, &
 !                                fill=.TRUE.,missing_value=mv)
 !                 if (var_now%fill) call fill_mean(outvar,missing_value=mv,fill_value=0.d0)
 !                 if (trim(var_now%method) .eq. "nn") then 
@@ -571,7 +571,7 @@ contains
 !                                  start=[1,1,q],count=[gMAR%G%nx,gMAR%G%ny,1])
 !                         where (invar .ne. missing_value) invar = invar*var_now%conv 
 !                         outvar = missing_value 
-!                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",50.d3, &
+!                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",radius=50.d0, &
 !                                        fill=.TRUE.,missing_value=mv)
 !                         if (var_now%fill) call fill_weighted(outvar,missing_value=mv)
 !                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
@@ -732,7 +732,7 @@ contains
 !             var_now = invariant(i) 
 !             call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv)
 !             outvar = missing_value 
-!             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,100.d3, &
+!             call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=100.d0, &
 !                            fill=.FALSE.,missing_value=mv)
 !             if (var_now%method .eq. "nn") then 
 !                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",units=var_now%units_out)
@@ -769,7 +769,7 @@ contains
 !                     end if
 !                     where (invar .ne. missing_value) invar = invar*var_now%conv 
 !                     outvar = missing_value 
-!                     call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
+!                     call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",radius=100.d0, &
 !                                    fill=.FALSE.,missing_value=mv)
 !                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
 !                                   units=var_now%units_out,start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])

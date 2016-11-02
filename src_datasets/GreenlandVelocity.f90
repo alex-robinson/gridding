@@ -90,7 +90,7 @@ contains
         ! Read in current variable, map it, and write it
         call nc_read(file_in,"surfvelx",inp%var,start=[1,1,1],count=[nx,ny,1],missing_value=mv)
         where(inp%var .eq. 0.0) inp%var = mv 
-        call map_field(map,"surfvelx",inp%var,outvar,outmask,"radius",fill=.TRUE.,missing_value=mv,radius=grid%G%dx*grid%xy_conv)
+        call map_field(map,"surfvelx",inp%var,outvar,outmask,"radius",fill=.TRUE.,missing_value=mv,radius=grid%G%dx)
         call nc_write(filename,"Ux_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata
@@ -101,7 +101,7 @@ contains
 
         call nc_read(file_in,"surfvely",inp%var,start=[1,1,1],count=[nx,ny,1],missing_value=mv)
         where(inp%var .eq. 0.0) inp%var = mv 
-        call map_field(map,"surfvely",inp%var,outvar,outmask,"radius",fill=.TRUE.,missing_value=mv,radius=grid%G%dx*grid%xy_conv)
+        call map_field(map,"surfvely",inp%var,outvar,outmask,"radius",fill=.TRUE.,missing_value=mv,radius=grid%G%dx)
         call nc_write(filename,"Uy_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata

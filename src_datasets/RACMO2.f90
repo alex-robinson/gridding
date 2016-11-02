@@ -169,7 +169,7 @@ contains
                 call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
                              start=[1,1],count=[nx,ny])
                 outvar = missing_value
-                call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,50.d3, &
+                call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=50.d0, &
                                fill=.TRUE.,missing_value=missing_value)
                 if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
                 if (trim(var_now%method) .eq. "nn") then 
@@ -202,7 +202,7 @@ contains
                                  start=[1,1,q],count=[nx,ny,1])
                         where (inp%var .ne. missing_value) inp%var = inp%var*var_now%conv 
                         outvar = missing_value 
-                        call map_field(map,var_now%nm_in,inp%var,outvar,outmask,"shepard",100.d3, &
+                        call map_field(map,var_now%nm_in,inp%var,outvar,outmask,"shepard",radius=100.d0, &
                                        fill=.FALSE.,missing_value=mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),units=var_now%units_out, &
                                       dim1="xc",dim2="yc",dim3="month",dim4="time", &
@@ -523,7 +523,7 @@ contains
                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=missing_value, &
                              start=[1,1],count=[nx,ny])
                 outvar = missing_value
-                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,50.d3, &
+                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=50.d0, &
                                fill=.TRUE.,missing_value=missing_value)
                 if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
                 if (trim(var_now%method) .eq. "nn") then 
@@ -563,7 +563,7 @@ contains
                         end if
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
-                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",100.d3, &
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",radius=100.d0, &
                                        fill=.FALSE.,missing_value=missing_value)
                         call nc_write(filename,var_now%nm_out,real(outvar),units=var_now%units_out, &
                                       dim1="xc",dim2="yc",dim3="month",dim4="time", &

@@ -113,7 +113,7 @@ contains
             ! Map the variable
             var1 = mv 
             call map_field(map,vname_now,var0,var1,mask1,method="nn", &
-                           radius=dist_max*grid1%xy_conv,fill=.FALSE.,missing_value=mv)
+                           radius=dist_max,fill=.FALSE.,missing_value=mv)
             
             if (is_int) then 
                 call nc_write(filename,vname_now,nint(var1),dim1="xc",dim2="yc",missing_value=int(mv))

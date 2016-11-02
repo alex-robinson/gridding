@@ -139,7 +139,7 @@ contains
                 where ( invar .eq. 0.d0 ) invar = 2.d0 
                 where ( invar .eq. missing_value ) invar = 0.d0 
             end if 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=50.d0, &
                           fill=.TRUE.,sigma=grid%G%dx*0.5,missing_value=mv)
             call fill_mean(outvar,missing_value=mv)
             if (var_now%method .eq. "nn") then 
@@ -333,7 +333,7 @@ contains
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if 
 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=20.d0, &
                           fill=.TRUE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
@@ -448,7 +448,7 @@ contains
 !         call thin_ave(invar,tmp1,by=10,missing_value=mv)
 !         where( invar .eq. missing_value ) invar = 0.d0 
     
-        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,20.d3, &
+        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=20.d0, &
                       fill=.TRUE.,missing_value=missing_value)
         call fill_weighted(outvar,missing_value=missing_value)
         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")

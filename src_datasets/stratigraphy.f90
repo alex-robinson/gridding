@@ -114,7 +114,7 @@ contains
 
             outvar = mv 
             call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
-                           radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             where(outvar .ne. mv) outvar = outvar*1d-3
             
             call nc_write(filename,"ice_age",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
@@ -127,7 +127,7 @@ contains
 
             outvar = mv 
             call map_field(map,"ice_age_err",invar,outvar,outmask,method="radius", &
-                           radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             where(outvar .ne. mv) outvar = outvar*1d-3
 
             call nc_write(filename,"ice_age_err",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
@@ -157,7 +157,7 @@ contains
             
             outvar = mv 
             call map_field(map,"depth_iso",invar,outvar,outmask,method="radius", &
-                           radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             
             call nc_write(filename,"depth_iso",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
@@ -169,7 +169,7 @@ contains
             
             outvar = mv 
             call map_field(map,"depth_iso_err",invar,outvar,outmask,method="radius", &
-                           radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             
             call nc_write(filename,"depth_iso_err",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
@@ -193,7 +193,7 @@ contains
         
         outvar = mv 
         call map_field(map,"thick",invar,outvar,outmask,method="radius", &
-                       radius=grid%G%dx*grid%xy_conv,fill=.FALSE.,missing_value=mv)
+                       radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
         where(outvar .eq. mv) outvar = 0.d0 
 
         call nc_write(filename,"H",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
