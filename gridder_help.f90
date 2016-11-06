@@ -139,11 +139,11 @@ program gridder_help
     if (.TRUE.) then 
 
         ! Original NH-40KM grid
-        call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+        call grid_init(grid0,name="NH-40KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
-        call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+        call grid_init(grid1,name="NH-40KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
