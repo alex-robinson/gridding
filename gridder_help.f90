@@ -18,7 +18,7 @@ program gridder_help
     !
     ! ====================================================
     
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
 !         ! Original Bamber grid (1KM)
 !         call grid_init(grid0,name="B13-1KM",mtype="polar_stereographic", &
@@ -123,6 +123,47 @@ program gridder_help
         vname_int(1) = "None"
 
         call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
+    end if 
+
+
+
+    ! ====================================================
+    !
+    ! Climber3 - NORTH
+    ! Banderas2015 datafiles using old NH-40KM domain
+    ! translated to new NH-40KM domain 
+    !
+    ! ====================================================
+    
+    if (.TRUE.) then 
+
+        ! Original NH-40KM grid
+        call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+        call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+        thin_fac = 1 
+
+        outfldr = "output/North"
+        dataset = "holo_c3a_atm_ice5g_corr"
+        path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_holo_c3a_atm_ice5g_corr.nc"
+
+        allocate(vname(5),vname_int(1))
+        vname(1)  = "zs"
+        vname(2)  = "mask_land"
+        vname(3)  = "t2m_ann"
+        vname(4)  = "t2m_sum"
+        vname(5)  = "pr_ann"
+
+        vname_int(1) = "mask_land"
+
+        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
 
     end if 
 
