@@ -261,10 +261,10 @@ contains
                 
                 if (is_int) then 
                     call nc_write(filename,vname_now,nint(var1),dim1="xc",dim2="yc",dim3=trim(dnames(3)),missing_value=int(mv), &
-                                  start=[1,1,k],count=[dims(1),dims(2),1])
+                                  start=[1,1,k],count=[grid1%G%nx,grid1%G%ny,1])
                 else
                     call nc_write(filename,vname_now,real(var1),dim1="xc",dim2="yc",dim3=trim(dnames(3)),missing_value=real(mv), &
-                                  start=[1,1,k],count=[dims(1),dims(2),1])
+                                  start=[1,1,k],count=[grid1%G%nx,grid1%G%ny,1])
                 end if 
             
             end do ! end 3rd dimension loop 
