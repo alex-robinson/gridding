@@ -188,7 +188,7 @@ program gridder_help
         datasets(2) = "interstadial_c3a_ocn"
         datasets(3) = "stadial_c3a_ocn"
 
-        deallocate(vname,name_int)
+        deallocate(vname,vname_int)
         allocate(vname(2),vname_int(1))
         vname(1)  = "to"
         vname(2)  = "mask_ocn"
