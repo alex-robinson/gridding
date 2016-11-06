@@ -10,7 +10,7 @@ module generic
     private 
     public :: generic_to_grid_nn
     public :: generic_to_grid_3D_nn
-    
+
 contains 
 
     subroutine generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac)
@@ -37,6 +37,10 @@ contains
         logical :: is_int 
         integer :: thin_by, nx00, ny00  
 
+        write(*,*) trim(outfldr)
+        write(*,*) trim(grid1%name)
+        write(*,*) trim(dataset)
+        
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid1%name)//"_"//trim(dataset)//".nc"
 
