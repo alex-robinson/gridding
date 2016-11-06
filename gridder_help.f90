@@ -174,8 +174,8 @@ program gridder_help
         vname_int(1) = "mask_land"
 
         do q = 1, size(datasets)
-        
-            path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_"//trim(datasets(q))//".nc"
+            dataset = datasets(q)
+            path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_"//trim(dataset)//".nc"
             call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
 
         end do 
@@ -196,8 +196,8 @@ program gridder_help
         vname_int(1) = "mask_ocn"
 
         do q = 1, size(datasets)
-        
-            path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_"//trim(datasets(q))//".nc"
+            dataset = datasets(q)
+            path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_"//trim(dataset)//".nc"
             call generic_to_grid_3D_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
 
         end do 
