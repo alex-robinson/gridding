@@ -12,6 +12,9 @@ program gridder_help
     character(len=56), allocatable :: vname(:), vname_int(:)
     integer :: thin_fac
 
+    character(len=512), allocatable :: datasets(:)
+    integer :: q 
+
     ! ====================================================
     !
     ! Bamber et al. 2013 - GREENLAND 
@@ -150,9 +153,17 @@ program gridder_help
         thin_fac = 1 
 
         outfldr = "output/North"
-        dataset = "holo_c3a_atm_ice5g_corr"
-        path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_holo_c3a_atm_ice5g_corr.nc"
 
+        ! == ATMOSPHERIC DATASETS == 
+
+        allocate(datasets(6))
+        datasets(1) = "holo_c3a_atm_ice5g_corr"
+        datasets(2) = "holo_c3a_atm"
+        datasets(3) = "interstadial_c3a_atm_ice5g_corr"
+        datasets(4) = "interstadial_c3a_atm"
+        datasets(5) = "stadial_c3a_atm_ice5g_corr"
+        datasets(6) = "stadial_c3a_atm"
+        
         allocate(vname(5),vname_int(1))
         vname(1)  = "zs"
         vname(2)  = "mask_land"
@@ -162,8 +173,33 @@ program gridder_help
 
         vname_int(1) = "mask_land"
 
-        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+        do q = 1, size(datasets)
+        
+            path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_"//trim(datasets(q))//".nc"
+            call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
 
+        end do 
+
+        ! == OCEAN DATASETS == 
+
+        deallocate(datasets)
+        allocate(datasets(3))
+        datasets(1) = "holo_c3a_ocn"
+        datasets(2) = "interstadial_c3a_ocn"
+        datasets(3) = "stadial_c3a_ocn"
+
+        allocate(vname(2),vname_int(1))
+        vname(1)  = "to"
+        vname(2)  = "mask_ocn"
+
+        vname_int(1) = "mask_ocn"
+
+        do q = 1, size(datasets)
+        
+            path_in = "output/North/NH-40KM_old/Banderas2015/NH-40KM_"//trim(datasets(q))//".nc"
+            call generic_to_grid_3D_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
+        end do 
 
     end if 
 
