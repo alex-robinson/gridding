@@ -265,7 +265,7 @@ program gridder_help
         dataset = "BEDMAP2"
         path_in = "/data/sicopolis/data/gridding_output/Antarctica_old/ANT-40KM/ANT-40KM_TOPO-BEDMAP2.nc"
 
-        allocate(vname(4),vname_int(2))
+        allocate(vname(5),vname_int(2))
         vname(1)     = "zs"
         vname(2)     = "zb"
         vname(3)     = "H"
