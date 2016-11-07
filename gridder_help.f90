@@ -223,11 +223,11 @@ program gridder_help
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
         thin_fac = 1 
-        
+
         ! ==== TOPOGRAPHY (BEDMAP2) =========
         outfldr = "output/Greenland/GRL-20KM"
-        dataset = "TOPO-B13"
-        path_in = "/data/sicopolis/data/gridding_output/Greenland_old/GRL-20KM/GRL-20KM_TOPO-B13.nc"
+        dataset = "TOPO-M14"
+        path_in = "/data/sicopolis/data/gridding_output/Greenland_old/GRL-20KM/GRL-20KM_TOPO-M14.nc"
 
         allocate(vname(4),vname_int(1))
         vname(1)     = "zs"
