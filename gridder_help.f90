@@ -325,7 +325,7 @@ program gridder_help
         path_in = "/data/sicopolis/data/gridding_output/Antarctica_old/ANT-40KM/ANT-40KM_ACC-A06.nc"
 
         allocate(vname(1),vname_int(1))
-        vname(1)     = "acc"
+        vname(1)     = "accum"
 
         vname_int(1) = "None"
 
