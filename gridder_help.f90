@@ -203,14 +203,14 @@ program gridder_help
     end if 
 
 
-        ! ====================================================
+    ! ====================================================
     !
     ! BAMBER 2013 - GREENLAND
     ! *To get old ice_data into new domain quickly
     !
     ! ====================================================
 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
         ! Original grid
         call grid_init(grid0,name="GRL-20KM_old",mtype="stereographic",units="kilometers", &
@@ -241,5 +241,42 @@ program gridder_help
 
     end if 
 
+    ! ====================================================
+    !
+    ! BEDMAP2 - ANTARCTICA
+    ! *To get old ice_data into new domain quickly
+    !
+    ! ====================================================
+
+    if (.TRUE.) then 
+
+        ! Original grid
+        call grid_init(grid0,name="ANT-40KM_old",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=40.d0,nx=156,dy=40.d0,ny=146,lambda=0.d0,phi=-71.d0)
+
+        ! New grid
+        call grid_init(grid1,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=40.d0,nx=157,dy=40.d0,ny=147,lambda=0.d0,phi=-71.d0)
+
+        thin_fac = 1 
+
+        ! ==== TOPOGRAPHY (BEDMAP2) =========
+        outfldr = "output/Antarctica/ANT-40KM"
+        dataset = "BEDMAP2"
+        path_in = "/data/sicopolis/data/gridding_output/Antarctica_old/ANT-40KM/ANT-40KM_TOPO-BEDMAP2.nc"
+
+        allocate(vname(4),vname_int(2))
+        vname(1)     = "zs"
+        vname(2)     = "zb"
+        vname(3)     = "H"
+        vname(4)     = "mask_ice"
+        vname(5)     = "mask"
+
+        vname_int(1) = "mask_ice"
+        vname_int(2) = "mask"
+
+        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
+    end if 
 
 end program gridder_help 
