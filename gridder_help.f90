@@ -82,8 +82,6 @@ program gridder_help
         call grid_init(grid1,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=10.d0,nx=625,dy=10.d0,ny=585,lambda=0.d0,phi=-71.d0)
 
-        thin_fac = 10 
-
         ! ==== TOPOGRAPHY (BEDMAP2) =========
         outfldr = "output/Antarctica"
         dataset = "TOPO-BEDMAP2"
@@ -139,7 +137,7 @@ program gridder_help
     !
     ! ====================================================
     
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
         ! Original NH-40KM grid
         call grid_init(grid0,name="NH-40KM",mtype="stereographic",units="kilometers", &
@@ -203,5 +201,43 @@ program gridder_help
         end do 
 
     end if 
+
+
+        ! ====================================================
+    !
+    ! BAMBER 2013 - GREENLAND
+    ! *To get old ice_data into new domain quickly
+    !
+    ! ====================================================
+
+    if (.TRUE.) then 
+
+        ! Original grid
+        call grid_init(grid0,name="GRL-20KM_old",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=20.d0,nx=90,dy=20.d0,ny=150, &
+                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+        ! New grid
+        call grid_init(grid1,name="GRL-20KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=20.d0,nx=91,dy=20.d0,ny=151, &
+                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+        ! ==== TOPOGRAPHY (BEDMAP2) =========
+        outfldr = "output/Greenland/GRL-20KM"
+        dataset = "TOPO-B13"
+        path_in = "/data/sicopolis/data/gridding_output/Greenland_old/GRL-20KM/GRL-20KM_TOPO-B13.nc"
+
+        allocate(vname(4),vname_int(1))
+        vname(1)     = "zs"
+        vname(2)     = "zb"
+        vname(3)     = "H"
+        vname(4)     = "mask"
+
+        vname_int(1) = "mask"
+
+        call generic_to_grid_nn(grid0,grid1,outfldr,dataset,path_in,vname,vname_int,thin_fac=thin_fac)
+
+    end if 
+
 
 end program gridder_help 
