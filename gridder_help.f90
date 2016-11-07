@@ -222,6 +222,8 @@ program gridder_help
                                lon180=.TRUE.,dx=20.d0,nx=91,dy=20.d0,ny=151, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
+        thin_fac = 1 
+        
         ! ==== TOPOGRAPHY (BEDMAP2) =========
         outfldr = "output/Greenland/GRL-20KM"
         dataset = "TOPO-B13"
