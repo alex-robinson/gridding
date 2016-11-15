@@ -46,7 +46,7 @@ contains
         type(grid_class) :: grid
         double precision :: lat_lim
         character(len=1024) :: path
-        character(len=512)  :: filename 
+        character(len=512)  :: filename_in, filename  
         character(len=1024) :: desc, ref 
         character(len=1024) :: var_name, var_name_out, long_name, units  
         
@@ -62,19 +62,19 @@ contains
 
         ! ### Define input information #####
         path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
-        filename = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
+        filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
 
         ! Allocate input field dimensions
-        nx0 = nc_size(filename,"londim")
-        ny0 = nc_size(filename,"latdim")
+        nx0 = nc_size(filename_in,"londim")
+        ny0 = nc_size(filename_in,"latdim")
         allocate(inp%lon(nx0),inp%lat(ny0))
         allocate(inp%var(nx0,ny0))
 
         write(*,*) "nx0, ny0: ", nx0, ny0 
 
         ! Load lat/lon 
-        call nc_read(filename,"lon",inp%lon)
-        call nc_read(filename,"lat",inp%lat)
+        call nc_read(filename_in,"lon",inp%lon)
+        call nc_read(filename_in,"lat",inp%lat)
         
         write(*,*) "range(lon): ", minval(inp%lon), maxval(inp%lon)
         write(*,*) "range(lat): ", minval(inp%lat), maxval(inp%lat)
@@ -113,12 +113,16 @@ contains
         units        = "m" 
 
         path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
-        filename = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
-        call nc_read(filename,var_name,inp%var,missing_value=real(mv))
+        filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
+        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv))
+
+        write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
         var = nearest_to_grid(grid,inp%lon,inp%lat,inp%var,latlon=.TRUE., &
                               max_dist=10e3,lat_lim=0.1)
+        
+        write(*,*) "output range(var): ", minval(var), maxval(var)
         
         ! Write output variable to output file
         call nc_write(filename,var_name_out,real(var),dim1="xc",dim2="yc")
