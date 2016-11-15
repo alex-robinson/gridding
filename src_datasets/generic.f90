@@ -364,7 +364,7 @@ contains
         ! Local variables 
         logical, allocatable :: x_mask(:), y_mask(:)
         real(4) :: max_distance 
-        integer :: i0, j0 
+        integer :: i0, j0, npts  
         real(4) :: dist, dist_min 
 
         ! Planet parameters ("WGS84")
@@ -391,6 +391,8 @@ contains
         j = -1 
         dist_min = 1e10 
 
+        npts = size(x)*size(y) 
+
         do i0 = 1, size(x)
         do j0 = 1, size(y)
 
@@ -414,6 +416,9 @@ contains
 
             end if 
 
+            ! Output every 1% rows to check progress
+            if (mod(i0*j0,npts/100)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
+                                    "  ",i0*j0, " / ",npts,"   : ", dist_min
         end do 
         end do 
 
