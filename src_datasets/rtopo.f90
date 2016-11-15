@@ -66,7 +66,7 @@ contains
 
         ! Allocate input field dimensions
         nx0 = nc_size(filename,"londim")
-        ny0 = nc_size(filename,"londim")
+        ny0 = nc_size(filename,"latdim")
         allocate(inp%lon(nx0),inp%lat(ny0))
         allocate(inp%var(nx0,ny0))
 
