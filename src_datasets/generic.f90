@@ -327,6 +327,7 @@ contains
             call find_nearest_grid(inow,jnow,x,y,xout,yout,is_latlon, &
                                    ymask=abs(y-yout).le. lat_limit)
 
+            ! Only update output array if valid neighbor was found
             if (inow .gt. 0 .and. jnow .gt. 0) then 
                 zout(i,j) = z(inow,jnow)
             end if 
@@ -335,7 +336,7 @@ contains
 
             ! Output every 10% rows to check progress
             if (mod(i,grid%G%nx/10)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
-                                    "  ",i, " / ",grid%npts,"   : ", zout(i,j) 
+                                    "  ",i, " / ",grid%G%nx,"   : ", zout(i,j) 
         end do 
 
 
@@ -393,15 +394,15 @@ contains
         do i0 = 1, size(x)
         do j0 = 1, size(y)
 
-            if (x_mask(i0) .and. y_mask(i0)) then 
+            if (x_mask(i0) .and. y_mask(j0)) then 
 
                 if (latlon) then
                     ! Use planetary (latlon) values
-                    dist = planet_distance(a,f,x(i0),y(i0),xout,yout)
+                    dist = planet_distance(a,f,x(i0),y(j0),xout,yout)
 
                 else
                     ! Use cartesian values to determine distance
-                    dist = cartesian_distance(x(i0),y(i0),xout,yout)                    
+                    dist = cartesian_distance(x(i0),y(j0),xout,yout)                    
 
                 end if 
 
