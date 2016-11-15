@@ -65,8 +65,8 @@ contains
         filename = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
 
         ! Allocate input field dimensions
-        nx0 = nc_size(filename,"lon")
-        ny0 = nc_size(filename,"lat")
+        nx0 = nc_size(filename,"londim")
+        ny0 = nc_size(filename,"londim")
         allocate(inp%lon(nx0),inp%lat(ny0))
         allocate(inp%var(nx0,ny0))
 
