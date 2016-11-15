@@ -262,7 +262,7 @@ program gridder_help
 
         ! ==== TOPOGRAPHY (BEDMAP2) =========
         outfldr = "output/Antarctica/ANT-40KM"
-        dataset = "BEDMAP2"
+        dataset = "TOPO-BEDMAP2"
         path_in = "/data/sicopolis/data/gridding_output/Antarctica_old/ANT-40KM/ANT-40KM_TOPO-BEDMAP2.nc"
 
         allocate(vname(5),vname_int(2))
@@ -307,7 +307,7 @@ program gridder_help
 
     end if 
 
-    if (.TRUE.) then 
+    if (.FALSE.) then 
 
         ! Original grid
         call grid_init(grid0,name="ANT-40KM_old",mtype="polar_stereographic",units="kilometers", &

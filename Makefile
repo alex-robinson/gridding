@@ -162,6 +162,9 @@ $(objdir)/RACMO2.o: $(srcdir)/RACMO2.f90
 $(objdir)/Rignot13_BasalMelt.o: $(srcdir)/Rignot13_BasalMelt.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
+$(objdir)/rtopo.o: $(srcdir)/rtopo.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/sediments.o: $(srcdir)/sediments.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -194,6 +197,7 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/nasaBasins.o \
 				   $(objdir)/RACMO2.o \
 				   $(objdir)/Rignot13_BasalMelt.o \
+				   $(objdir)/rtopo.o \
 			       $(objdir)/sediments.o \
 			       $(objdir)/stratigraphy.o \
 			       $(objdir)/topo_reconstructions.o \
