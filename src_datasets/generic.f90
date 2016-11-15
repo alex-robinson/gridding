@@ -314,7 +314,7 @@ contains
         call grid_allocate(grid,jj)
 
         if (is_latlon) then 
-            call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%G%lat),is_latlon,lat_lim)
+            call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%lat),is_latlon,lat_lim)
         else
             call find_nearest_grid(ii,jj,x,y,real(grid%x),real(grid%y),is_latlon,lat_lim)
         end if 
