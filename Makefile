@@ -162,7 +162,7 @@ $(objdir)/RACMO2.o: $(srcdir)/RACMO2.f90
 $(objdir)/Rignot13_BasalMelt.o: $(srcdir)/Rignot13_BasalMelt.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
-$(objdir)/rtopo.o: $(srcdir)/rtopo.f90
+$(objdir)/rtopo.o: $(srcdir)/rtopo.f90 $(objdir)/generic.o
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 $(objdir)/sediments.o: $(srcdir)/sediments.f90

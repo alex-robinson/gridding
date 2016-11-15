@@ -10,6 +10,7 @@ module generic
     private 
     public :: generic_to_grid_nn
     public :: generic_to_grid_3D_nn
+    public :: nearest_to_grid 
 
 contains 
 
@@ -283,6 +284,138 @@ contains
         return 
 
     end subroutine generic_to_grid_3D_nn
+
+
+
+    function nearest_to_grid(grid,x,y,z,latlon,max_dist,lat_lim) result(zout)
+
+        implicit none 
+
+        type(grid_class), intent(IN) :: grid 
+        real(4), intent(IN) :: x(:), y(:), z(:,:)
+        logical, intent(IN), optional :: latlon
+        real(4), intent(IN), optional :: max_dist  
+        real(4), intent(IN), optional :: lat_lim  
+        real(4) :: zout(grid%G%nx,grid%G%ny)
+
+        ! Local variables 
+        logical :: is_latlon
+        real(4) :: lat_limit 
+        integer :: i, j, inow, jnow 
+        real(4) :: xout,  yout 
+
+        ! Check if this is a latlon grid 
+        is_latlon = .TRUE.
+        if (present(latlon)) is_latlon = .FALSE. 
+
+        lat_limit = 10.0 ! 10 degrees by default 
+        if (present(lat_lim)) lat_limit = lat_lim 
+
+        zout = mv 
+
+        do i = 1, grid%G%nx 
+        do j = 1, grid%G%ny 
+
+            if (is_latlon) then 
+                xout = grid%lon(i,j)
+                yout = grid%lat(i,j) 
+            else 
+                xout = grid%x(i,j)
+                yout = grid%y(i,j) 
+            end if 
+
+            call find_nearest_grid(inow,jnow,x,y,xout,yout,is_latlon, &
+                                   ymask=abs(y-yout).le. lat_limit)
+
+            if (inow .gt. 0 .and. jnow .gt. 0) then 
+                zout(i,j) = z(inow,jnow)
+            end if 
+
+        end do 
+        end do 
+
+
+        return 
+
+
+    end function nearest_to_grid
+
+
+
+    subroutine find_nearest_grid(i,j,x,y,xout,yout,latlon,xmask,ymask,max_dist)
+        ! Return the indices (i,j) of the x(nx), y(ny)
+        ! grid point that is closest to the desired xout/yout values
+        ! Distances measured in [m]
+
+        implicit none 
+
+        integer, intent(OUT) :: i, j 
+        real(4), intent(IN)  :: x(:), y(:)
+        real(4), intent(IN)  :: xout, yout 
+        logical, intent(IN) :: latlon 
+        logical, intent(IN), optional :: xmask(:), ymask(:) 
+        real(4), intent(IN), optional :: max_dist 
+        
+        ! Local variables 
+        logical, allocatable :: x_mask(:), y_mask(:)
+        real(4) :: max_distance 
+        integer :: i0, j0 
+        real(4) :: dist, dist_min 
+
+        ! Planet parameters ("WGS84")
+        real(8), parameter :: a = 6378137.0d0             ! Equatorial ellipsoid radius,   a in Snyder, WGS84
+        real(8), parameter :: f = 1.0d0/298.257223563d0   ! Flattening of the ellipsoid
+                
+
+        ! Mask out indices that are not valid for this search
+        allocate(x_mask(size(x)))
+        x_mask = .TRUE. 
+        if (present(xmask)) x_mask = xmask 
+
+        allocate(y_mask(size(y)))
+        y_mask = .TRUE. 
+        if (present(ymask)) y_mask = ymask 
+        
+        ! Confirm maximum distance of interest 
+        max_distance = 1e10
+        if (present(max_dist)) max_distance = max_dist 
+
+
+        ! Loop over grid and find nearest neighbor indices 
+        i = -1
+        j = -1 
+        dist_min = 1e10 
+
+        do i0 = 1, size(x)
+        do j0 = 1, size(y)
+
+            if (x_mask(i0) .and. y_mask(i0)) then 
+
+                if (latlon) then
+                    ! Use planetary (latlon) values
+                    dist = planet_distance(a,f,x(i0),y(i0),xout,yout)
+
+                else
+                    ! Use cartesian values to determine distance
+                    dist = cartesian_distance(x(i0),y(i0),xout,yout)                    
+
+                end if 
+
+                if (dist .lt. max_distance .and. dist .lt. dist_min) then 
+                    i = i0 
+                    j = j0 
+                    dist_min = dist 
+                end if 
+
+            end if 
+
+        end do 
+        end do 
+
+        return 
+
+    end subroutine find_nearest_grid
+
 
 !     subroutine var_to_grid(grid0,grid1,path_in,path_out,vdef,vtype,method,thin_fac)
 !         ! Convert the variables to the desired grid format and write to file
