@@ -371,6 +371,10 @@ contains
         max_distance = 1e10
         if (present(max_dist)) max_distance = max_dist 
 
+        ! Initialize to missing indices everywhere
+        ii = -1
+        jj = -1 
+
         do i1 = 1, size(xout)
             do j1 = 1, size(yout)
                 ! Loop over target grid and find all nn indices 
@@ -379,23 +383,23 @@ contains
                 xout_now = xout(i1)
                 yout_now = yout(j1)
 
-                ! Initialize to missing indices 
-                ii(i1,j1) = -1
-                jj(i1,j1) = -1 
+                ! Reset the minimum distance
                 dist_min = 1e10 
 
                 ! Loop over grid and find nearest neighbor indices 
                 do j0 = 1, size(y)
 
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
-                        ! Only check here, if the y-point is in range 
+                        ! Only check here, if the y-point is within range 
 
                         do i0 = 1, size(x)
 
                             if (latlon) then
+
                                 ! Use planetary (latlon) values
                                 dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
-
+                                write(*,*) "dist: ", x(i0), y(j0), xout_now, yout_now, dist  
+                                stop 
                             else
                                 ! Use cartesian values to determine distance
                                 dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
