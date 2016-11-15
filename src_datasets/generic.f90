@@ -406,8 +406,7 @@ contains
 
                                 ! Use planetary (latlon) values
                                 dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
-                                
-                                write(*,*) "dist: ", i0, j0, x(i0), y(j0), xout_now, yout_now, dist 
+!                                 write(*,*) "dist: ", i0, j0, x(i0), y(j0), xout_now, yout_now, dist 
 
                             else
                                 ! Use cartesian values to determine distance
@@ -424,7 +423,7 @@ contains
                         end do 
 
                         stop 
-                        
+
                     end if 
 
                 end do 
