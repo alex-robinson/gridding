@@ -331,7 +331,11 @@ contains
                 zout(i,j) = z(inow,jnow)
             end if 
 
-        end do 
+        end do
+
+            ! Output every 10% rows to check progress
+            if (mod(i,grid%G%nx/10)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
+                                    "  ",i, " / ",grid%npts,"   : ", zout(i,j) 
         end do 
 
 
