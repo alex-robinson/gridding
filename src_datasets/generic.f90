@@ -388,7 +388,10 @@ contains
 
                 ! Loop over grid and find nearest neighbor indices 
                 do j0 = 1, size(y)
-
+                    dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
+                    write(*,*) "dist: ", x(i0), y(j0), xout_now, yout_now, dist  
+                    stop 
+                    
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
 
@@ -398,8 +401,7 @@ contains
 
                                 ! Use planetary (latlon) values
                                 dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
-                                write(*,*) "dist: ", x(i0), y(j0), xout_now, yout_now, dist  
-                                stop 
+                                
                             else
                                 ! Use cartesian values to determine distance
                                 dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
