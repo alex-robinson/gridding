@@ -129,7 +129,7 @@ contains
         call nearest_to_grid(zout=var,grid=grid,x=inp%lon,y=inp%lat,z=inp%var,latlon=.TRUE., &
                              max_dist=10e3,lat_lim=0.1)
 
-        write(*,*) "output range(var): ", minval(var), maxval(var)
+        write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
         
         ! Write output variable to output file
         call nc_write(filename,var_name_out,real(var),dim1="xc",dim2="yc")

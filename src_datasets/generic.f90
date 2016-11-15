@@ -364,6 +364,7 @@ contains
         real(4) :: dist, dist_min 
         real(4) :: xout_now, yout_now 
         integer :: nx1, ny1 
+        integer :: j00, j01 
 
         ! Planet parameters ("WGS84")
         real(8), parameter :: a = 6378137.0d0             ! Equatorial ellipsoid radius,   a in Snyder, WGS84
@@ -379,12 +380,15 @@ contains
         max_distance = 1e10
         if (present(max_dist)) max_distance = max_dist 
 
+
         ! Initialize to missing indices everywhere
         ii = -1
         jj = -1 
 
-        do i1 = 1, nx1
-            do j1 = 1, ny1 
+        do j1 = 1, ny1
+
+            do i1 = 1, nx1
+            
                 ! Loop over target grid and find all nn indices 
 
                 ! Define current target point of interest
@@ -400,14 +404,17 @@ contains
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
 
+                        write(*,*) "Found some points in lat_limit: ", j0 
+
                         do i0 = 1, size(x)
 
                             if (latlon) then
 
                                 ! Use planetary (latlon) values
                                 dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
-!                                 write(*,*) "dist: ", i0, j0, x(i0), y(j0), xout_now, yout_now, dist 
-
+                                write(*,*) "dist: ", i0, j0, x(i0), y(j0), xout_now, yout_now, dist 
+                                stop 
+                                
                             else
                                 ! Use cartesian values to determine distance
                                 dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
@@ -429,8 +436,8 @@ contains
             end do 
 
             ! Output every 1% rows to check progress
-            if (mod(i1,ceiling(size(xout)/100.0))==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
-                                    "  ",i1, " / ",size(xout),"   : ", dist_min 
+            if (mod(j1,ceiling(size(yout)/100.0))==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
+                                    "  ",j1, " / ",size(yout),"   : ", dist_min 
         end do 
 
         return 
