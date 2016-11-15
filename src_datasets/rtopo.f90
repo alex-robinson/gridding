@@ -9,7 +9,7 @@ module rtopo
 
     private 
     public :: rtopo_latlon_to_grid 
-    public :: rtopo_to_grid 
+!     public :: rtopo_to_grid 
 
 contains 
 
@@ -58,6 +58,11 @@ contains
         type(inp_type)     :: inp
         integer :: nx0, ny0 
 
+        type neighbs_type 
+            integer, allocatable :: i(:,:), j(:,:) 
+        end type 
+        type(neighbs_type) :: nbs 
+
         real(4), allocatable :: var(:,:) 
 
         ! ### Define input information #####
@@ -89,6 +94,8 @@ contains
         
         ! Allocate output variable
         call grid_allocate(grid,var)
+        call grid_allocate(grid,nbs%i)
+        call grid_allocate(grid,nbs%j)
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
@@ -119,9 +126,9 @@ contains
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
-        var = nearest_to_grid(grid,inp%lon,inp%lat,inp%var,latlon=.TRUE., &
-                              max_dist=10e3,lat_lim=0.1)
-        
+        call nearest_to_grid(zout=var,grid=grid,x=inp%lon,y=inp%lat,z=inp%var,latlon=.TRUE., &
+                             max_dist=10e3,lat_lim=0.1)
+
         write(*,*) "output range(var): ", minval(var), maxval(var)
         
         ! Write output variable to output file
@@ -138,45 +145,78 @@ contains
     end subroutine rtopo_latlon_to_grid
 
     
-    subroutine rtopo_to_grid(outfldr,grid,domain)
-        ! Convert the variables to the desired grid format and write to file
-        ! =========================================================
-        !
-        !       RTOPO DATA
-        !       * Given rtopo data on a regional grid, perform 
-        !       * normal interpolation using mapping methods
-        !
-        ! =========================================================
-        ! PATH: /p/projects/megarun/greenrise/datasets/rtopo-2/
-        ! londim = 43201
-        ! latdim = 21601
-        ! lon, lat 
-        ! 
-        ! RTopo-2.0.1_30sec_bedrock_topography.nc : bedrock_topography
-        ! long_name = "ocean bathymetry; surface topography of continents; bedrock topography under grounded or floating ice"
-        ! RTopo-2.0.1_30sec_aux.nc : amask
-        ! long_name = "ice ocean rock mask"
-        ! RTopo-2.0.1_30sec_ice_base_topography.nc : ice_base_topography
-        ! long_name = "ice base topography for the Antarctic and Greenland ice sheets / ice shelves (ice draft for ice shelves and floating glaciers; zero in absence of ice)"
-        ! RTopo-2.0.1_30sec_surface_elevation.nc : surface_elevation
-        ! long_name = "upper ice surface height for the Antarctic and Greenland ice sheets / ice shelves (bedrock topography for ice-free continent; zero for ocean)"
+!     subroutine rtopo_to_grid(outfldr,grid,domain)
+!         ! Convert the variables to the desired grid format and write to file
+!         ! =========================================================
+!         !
+!         !       RTOPO DATA
+!         !       * Given rtopo data on a regional grid, perform 
+!         !       * normal interpolation using mapping methods
+!         !
+!         ! =========================================================
+!         ! PATH: /p/projects/megarun/greenrise/datasets/rtopo-2/
+!         ! londim = 43201
+!         ! latdim = 21601
+!         ! lon, lat 
+!         ! 
+!         ! RTopo-2.0.1_30sec_bedrock_topography.nc : bedrock_topography
+!         ! long_name = "ocean bathymetry; surface topography of continents; bedrock topography under grounded or floating ice"
+!         ! RTopo-2.0.1_30sec_aux.nc : amask
+!         ! long_name = "ice ocean rock mask"
+!         ! RTopo-2.0.1_30sec_ice_base_topography.nc : ice_base_topography
+!         ! long_name = "ice base topography for the Antarctic and Greenland ice sheets / ice shelves (ice draft for ice shelves and floating glaciers; zero in absence of ice)"
+!         ! RTopo-2.0.1_30sec_surface_elevation.nc : surface_elevation
+!         ! long_name = "upper ice surface height for the Antarctic and Greenland ice sheets / ice shelves (bedrock topography for ice-free continent; zero for ocean)"
 
 
-        implicit none 
+!         implicit none 
 
-        character(len=*) :: domain, outfldr 
-        type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim, grad_lim 
-        character(len=512) :: filename 
-        character(len=1024) :: desc, ref 
-
-
+!         character(len=*) :: domain, outfldr 
+!         type(grid_class) :: grid 
+!         integer :: max_neighbors 
+!         double precision :: lat_lim, grad_lim 
+!         character(len=512) :: filename 
+!         character(len=1024) :: desc, ref 
 
 
-        return 
+!         ! Initialize output file 
+!         file_out = trim(outfldr)//trim(grid%name)//trim(file_out_suffix)
+!         call grid_write(mgrid%grid(q),file_out,xnm="xc",ynm="yc",create=.TRUE.)
+            
 
-    end subroutine rtopo_to_grid
+!         varnames = ["zs  ","zb  ","H   ","mask"]
+
+!         do k = 1, size(varnames)
+
+!             varname = varnames(k)
+!             write(*,*) k, trim(varname)
+
+!             ! Load test data
+!             call nc_read(file_input,varname,var)
+!             target_val = calc_grid_total(grid0%G%x,grid0%G%y,var,xlim=xlim,ylim=ylim)
+
+!             if (trim(varname) .ne. "mask") then
+!                 call map_field_conservative_map1(map%map,varname,var,var1)
+
+!                 current_val = calc_grid_total(grid%G%x,grid%G%y,var1,xlim=xlim,ylim=ylim)
+!                 err_percent = 100.d0 * (current_val-target_val) / target_val
+!                 write(*,"(a,3g12.4)") "mass comparison (hi, con, % diff): ", &
+!                         target_val, current_val, err_percent                  
+
+!             else 
+!                 var1 = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var, &
+!                                       xout=grid%G%x,yout=grid%G%y)
+
+!             end if 
+
+!             ! Write to file 
+!             call nc_write(file_out,varname,var1,dim1="xc",dim2="yc")
+ 
+!         end do 
+
+!         return 
+
+!     end subroutine rtopo_to_grid
 
 
 end module rtopo 

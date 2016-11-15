@@ -287,7 +287,7 @@ contains
 
 
 
-    function nearest_to_grid(grid,x,y,z,latlon,max_dist,lat_lim) result(zout)
+    subroutine nearest_to_grid(zout,grid,x,y,z,latlon,max_dist,lat_lim)
 
         implicit none 
 
@@ -296,36 +296,32 @@ contains
         logical, intent(IN), optional :: latlon
         real(4), intent(IN), optional :: max_dist  
         real(4), intent(IN), optional :: lat_lim  
-        real(4) :: zout(grid%G%nx,grid%G%ny)
+        real(4), intent(INOUT) :: zout(:,:)
 
         ! Local variables 
         logical :: is_latlon
-        real(4) :: lat_limit 
         integer :: i, j, inow, jnow 
         real(4) :: xout,  yout 
+
+        integer, allocatable :: ii(:,:), jj(:,:) 
 
         ! Check if this is a latlon grid 
         is_latlon = .TRUE.
         if (present(latlon)) is_latlon = .FALSE. 
 
-        lat_limit = 10.0 ! 10 degrees by default 
-        if (present(lat_lim)) lat_limit = lat_lim 
+        ! First find nearest indices 
+        call grid_allocate(grid,ii)
+        call grid_allocate(grid,jj)
+        call find_nearest_grid(ii,jj,x,y,real(grid%G%x),real(grid%G%y),is_latlon,lat_lim)
 
+        ! Loop over target grid and fill in available nearest neighbors
         zout = mv 
-
+ 
         do i = 1, grid%G%nx 
         do j = 1, grid%G%ny 
 
-            if (is_latlon) then 
-                xout = grid%lon(i,j)
-                yout = grid%lat(i,j) 
-            else 
-                xout = grid%x(i,j)
-                yout = grid%y(i,j) 
-            end if 
-
-            call find_nearest_grid(inow,jnow,x,y,xout,yout,is_latlon, &
-                                   ymask=abs(y-yout).le. lat_limit)
+            inow = ii(i,j)
+            jnow = jj(i,j) 
 
             ! Only update output array if valid neighbor was found
             if (inow .gt. 0 .and. jnow .gt. 0) then 
@@ -333,98 +329,96 @@ contains
             end if 
 
         end do
-
-            ! Output every 1% rows to check progress
-            if (mod(i,grid%G%nx/100)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
-                                    "  ",i, " / ",grid%G%nx,"   : ", zout(i,j) 
         end do 
-
 
         return 
 
 
-    end function nearest_to_grid
+    end subroutine nearest_to_grid
 
 
 
-    subroutine find_nearest_grid(i,j,x,y,xout,yout,latlon,xmask,ymask,max_dist)
+    subroutine find_nearest_grid(ii,jj,x,y,xout,yout,latlon,max_dist,lat_lim)
         ! Return the indices (i,j) of the x(nx), y(ny)
         ! grid point that is closest to the desired xout/yout values
         ! Distances measured in [m]
 
         implicit none 
 
-        integer, intent(OUT) :: i, j 
+        integer, intent(OUT) :: ii(:,:), jj(:,:) 
         real(4), intent(IN)  :: x(:), y(:)
-        real(4), intent(IN)  :: xout, yout 
+        real(4), intent(IN)  :: xout(:), yout(:) 
         logical, intent(IN) :: latlon 
-        logical, intent(IN), optional :: xmask(:), ymask(:) 
         real(4), intent(IN), optional :: max_dist 
+        real(4), intent(IN), optional :: lat_lim 
         
         ! Local variables 
-        logical, allocatable :: x_mask(:), y_mask(:)
-        real(4) :: max_distance 
-        integer :: i0, j0, npts  
+        real(4) :: max_distance
+        real(4) :: lat_limit 
+        integer :: i0, j0, i1, j1  
         real(4) :: dist, dist_min 
+        real(4) :: xout_now, yout_now 
 
         ! Planet parameters ("WGS84")
         real(8), parameter :: a = 6378137.0d0             ! Equatorial ellipsoid radius,   a in Snyder, WGS84
         real(8), parameter :: f = 1.0d0/298.257223563d0   ! Flattening of the ellipsoid
                 
 
-        ! Mask out indices that are not valid for this search
-        allocate(x_mask(size(x)))
-        x_mask = .TRUE. 
-        if (present(xmask)) x_mask = xmask 
+        lat_limit = 10.0 ! 10 degrees by default 
+        if (present(lat_lim)) lat_limit = lat_lim 
 
-        allocate(y_mask(size(y)))
-        y_mask = .TRUE. 
-        if (present(ymask)) y_mask = ymask 
-        
         ! Confirm maximum distance of interest 
         max_distance = 1e10
         if (present(max_dist)) max_distance = max_dist 
 
+        do i1 = 1, size(xout)
+            do j1 = 1, size(yout)
+                ! Loop over target grid and find all nn indices 
 
-        ! Loop over grid and find nearest neighbor indices 
-        i = -1
-        j = -1 
-        dist_min = 1e10 
+                ! Define current target point of interest
+                xout_now = xout(i1)
+                yout_now = yout(j1)
 
-        npts = size(x)*size(y) 
+                ! Initialize to missing indices 
+                ii(i1,j1) = -1
+                jj(i1,j1) = -1 
+                dist_min = 1e10 
 
-        do j0 = 1, size(y)
+                ! Loop over grid and find nearest neighbor indices 
+                do j0 = 1, size(y)
 
-            if (y_mask(j0)) then 
-                ! Only check if the y point is valid 
+                    if (abs(yout_now-y(j0)) .lt. lat_limit) then 
+                        ! Only check here, if the y-point is in range 
 
-                do i0 = 1, size(x)
+                        do i0 = 1, size(x)
 
-                    if (x_mask(i0)) then
-                        ! Only check if the x point is valid too
+                            if (latlon) then
+                                ! Use planetary (latlon) values
+                                dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
 
-                        if (latlon) then
-                            ! Use planetary (latlon) values
-                            dist = planet_distance(a,f,x(i0),y(j0),xout,yout)
+                            else
+                                ! Use cartesian values to determine distance
+                                dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
 
-                        else
-                            ! Use cartesian values to determine distance
-                            dist = cartesian_distance(x(i0),y(j0),xout,yout)                    
+                            end if 
 
-                        end if 
+                            if (dist .lt. dist_min .and. dist .lt. max_distance) then 
+                                ii(i1,j1) = i0 
+                                jj(i1,j1) = j0 
+                                dist_min = dist 
+                            end if 
 
-                        if (dist .lt. dist_min .and. dist .lt. max_distance) then 
-                            i = i0 
-                            j = j0 
-                            dist_min = dist 
-                        end if 
+                        end do 
 
                     end if 
 
                 end do 
 
-            end if 
+            end do 
 
+            ! Output every 1% rows to check progress
+            if (mod(i1,size(xout)/100)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
+                                    "  ",i1, " / ",size(xout),"   : ", dist_min 
         end do 
 
         return 
