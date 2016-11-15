@@ -307,7 +307,7 @@ contains
 
         ! Check if this is a latlon grid 
         is_latlon = .TRUE.
-        if (present(latlon)) is_latlon = .FALSE. 
+        if (present(latlon)) is_latlon = latlon
 
         ! First find nearest indices 
         call grid_allocate(grid,ii)
@@ -404,17 +404,12 @@ contains
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
 
-                        write(*,*) "Found some points in lat_limit: ", j0 
-
                         do i0 = 1, size(x)
 
                             if (latlon) then
-
                                 ! Use planetary (latlon) values
                                 dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
-                                write(*,*) "dist: ", i0, j0, x(i0), y(j0), xout_now, yout_now, dist 
-                                stop 
-                                
+
                             else
                                 ! Use cartesian values to determine distance
                                 dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
