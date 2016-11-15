@@ -417,7 +417,7 @@ contains
             end do 
 
             ! Output every 1% rows to check progress
-            if (mod(i1,size(xout)/100)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
+            if (mod(i1,ceiling(size(xout)/100.0))==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
                                     "  ",i1, " / ",size(xout),"   : ", dist_min 
         end do 
 
