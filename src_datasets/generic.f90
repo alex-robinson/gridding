@@ -334,8 +334,8 @@ contains
 
         end do
 
-            ! Output every 10% rows to check progress
-            if (mod(i,grid%G%nx/10)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
+            ! Output every 1% rows to check progress
+            if (mod(i,grid%G%nx/100)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
                                     "  ",i, " / ",grid%G%nx,"   : ", zout(i,j) 
         end do 
 
@@ -393,33 +393,38 @@ contains
 
         npts = size(x)*size(y) 
 
-        do i0 = 1, size(x)
         do j0 = 1, size(y)
 
-            if (x_mask(i0) .and. y_mask(j0)) then 
+            if (y_mask(j0)) then 
+                ! Only check if the y point is valid 
 
-                if (latlon) then
-                    ! Use planetary (latlon) values
-                    dist = planet_distance(a,f,x(i0),y(j0),xout,yout)
+                do i0 = 1, size(x)
 
-                else
-                    ! Use cartesian values to determine distance
-                    dist = cartesian_distance(x(i0),y(j0),xout,yout)                    
+                    if (x_mask(i0)) then
+                        ! Only check if the x point is valid too
 
-                end if 
+                        if (latlon) then
+                            ! Use planetary (latlon) values
+                            dist = planet_distance(a,f,x(i0),y(j0),xout,yout)
 
-                if (dist .lt. max_distance .and. dist .lt. dist_min) then 
-                    i = i0 
-                    j = j0 
-                    dist_min = dist 
-                end if 
+                        else
+                            ! Use cartesian values to determine distance
+                            dist = cartesian_distance(x(i0),y(j0),xout,yout)                    
+
+                        end if 
+
+                        if (dist .lt. dist_min .and. dist .lt. max_distance) then 
+                            i = i0 
+                            j = j0 
+                            dist_min = dist 
+                        end if 
+
+                    end if 
+
+                end do 
 
             end if 
 
-            ! Output every 1% rows to check progress
-            if (mod(i0*j0,npts/100)==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
-                                    "  ",i0*j0, " / ",npts,"   : ", dist_min
-        end do 
         end do 
 
         return 
