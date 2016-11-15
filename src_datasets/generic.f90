@@ -430,9 +430,8 @@ contains
 
             end do 
 
-            ! Output every 1% rows to check progress
-            if (mod(j1,ceiling(size(yout)/100.0))==0) write(*,"(a,i10,a3,i12,a5,g12.3)")  &
-                                    "  ",j1, " / ",size(yout),"   : ", dist_min 
+            ! Output every column to check progress
+            write(*,"(a,i10,a3,i12,a5,g12.3)") "  ",j1, " / ",size(yout),"   : ", dist_min 
         end do 
 
         return 
