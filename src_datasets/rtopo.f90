@@ -70,9 +70,14 @@ contains
         allocate(inp%lon(nx0),inp%lat(ny0))
         allocate(inp%var(nx0,ny0))
 
+        write(*,*) "nx0, ny0: ", nx0, ny0 
+
         ! Load lat/lon 
         call nc_read(filename,"lon",inp%lon)
         call nc_read(filename,"lat",inp%lat)
+        
+        write(*,*) "range(lon): ", minval(inp%lon), maxval(inp%lon)
+        write(*,*) "range(lat): ", minval(inp%lat), maxval(inp%lat)
         
         desc    = "RTOPO-2.0.1 present-day Earth topography data"
         ref     = "Timmermann et al.: A consistent data set of Antarctic &
