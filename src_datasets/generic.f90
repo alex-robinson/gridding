@@ -291,13 +291,13 @@ contains
 
         implicit none 
 
+        real(4), intent(INOUT) :: zout(:,:)
         type(grid_class), intent(IN) :: grid 
         real(4), intent(IN) :: x(:), y(:), z(:,:)
         logical, intent(IN), optional :: latlon
         real(4), intent(IN), optional :: max_dist  
         real(4), intent(IN), optional :: lat_lim  
-        real(4), intent(INOUT) :: zout(:,:)
-
+        
         ! Local variables 
         logical :: is_latlon
         integer :: i, j, inow, jnow 
@@ -312,7 +312,12 @@ contains
         ! First find nearest indices 
         call grid_allocate(grid,ii)
         call grid_allocate(grid,jj)
-        call find_nearest_grid(ii,jj,x,y,real(grid%G%x),real(grid%G%y),is_latlon,lat_lim)
+
+        if (is_latlon) then 
+            call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%G%lat),is_latlon,lat_lim)
+        else
+            call find_nearest_grid(ii,jj,x,y,real(grid%x),real(grid%y),is_latlon,lat_lim)
+        end if 
 
         ! Loop over target grid and fill in available nearest neighbors
         zout = mv 
@@ -347,7 +352,7 @@ contains
 
         integer, intent(OUT) :: ii(:,:), jj(:,:) 
         real(4), intent(IN)  :: x(:), y(:)
-        real(4), intent(IN)  :: xout(:), yout(:) 
+        real(4), intent(IN)  :: xout(:,:), yout(:,:) 
         logical, intent(IN) :: latlon 
         real(4), intent(IN), optional :: max_dist 
         real(4), intent(IN), optional :: lat_lim 
@@ -380,8 +385,8 @@ contains
                 ! Loop over target grid and find all nn indices 
 
                 ! Define current target point of interest
-                xout_now = xout(i1)
-                yout_now = yout(j1)
+                xout_now = xout(i1,j1)
+                yout_now = yout(i1,j1)
 
                 ! Reset the minimum distance
                 dist_min = 1e10 
@@ -391,7 +396,7 @@ contains
                     dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
                     write(*,*) "dist: ", x(i0), y(j0), xout_now, yout_now, dist  
                     stop 
-                    
+
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
 
