@@ -363,11 +363,14 @@ contains
         integer :: i0, j0, i1, j1  
         real(4) :: dist, dist_min 
         real(4) :: xout_now, yout_now 
+        integer :: nx1, ny1 
 
         ! Planet parameters ("WGS84")
         real(8), parameter :: a = 6378137.0d0             ! Equatorial ellipsoid radius,   a in Snyder, WGS84
         real(8), parameter :: f = 1.0d0/298.257223563d0   ! Flattening of the ellipsoid
                 
+        nx1 = size(xout,1)
+        ny1 = size(xout,2)
 
         lat_limit = 10.0 ! 10 degrees by default 
         if (present(lat_lim)) lat_limit = lat_lim 
@@ -380,8 +383,8 @@ contains
         ii = -1
         jj = -1 
 
-        do i1 = 1, size(xout)
-            do j1 = 1, size(yout)
+        do i1 = 1, nx1
+            do j1 = 1, ny1 
                 ! Loop over target grid and find all nn indices 
 
                 ! Define current target point of interest
