@@ -422,8 +422,6 @@ contains
 
                         end do 
 
-                        stop 
-
                     end if 
 
                 end do 
