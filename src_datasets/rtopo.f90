@@ -92,6 +92,19 @@ contains
         inp%i0 = 1
         inp%i1 = size(inp%lon)
 
+        ! # Longitude range
+        inp%i0 = size(inp%lon)
+        do k = 1, size(inp%lon)
+            if (inp%lon(k) .ge. minval(grid%lon)-1.d0) exit   
+        end do
+        inp%i0 = k 
+        inp%i1 = inp%i0 
+        do k = inp%i0, size(inp%lon)
+            if (inp%lon(k) .ge. maxval(grid%lon)+1.d0) exit   
+        end do
+        inp%i1 = k
+
+        ! # Latitude range
         inp%j0 = size(inp%lat)
         do k = 1, size(inp%lat)
             if (inp%lat(k) .ge. minval(grid%lat)-1.d0) exit   
