@@ -398,8 +398,11 @@ contains
                 ! Reset the minimum distance
                 dist_min = 1e10 
 
-                ! Loop over grid and find nearest neighbor indices 
-                do j0 = 1, size(y)
+                ! Find index of nearest latitude row
+                j0 = minloc(abs(yout_now-y))
+
+!                 ! Loop over grid and find nearest neighbor indices 
+!                 do j0 = 1, size(y)
                     
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
@@ -424,9 +427,10 @@ contains
 
                         end do 
 
+                        write(*,*) i1, j1, i0, j0, x(i0), y(j0), xout_now, yout_now, dist_min 
                     end if 
 
-                end do 
+!                 end do 
 
             end do 
 
