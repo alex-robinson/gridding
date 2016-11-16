@@ -419,7 +419,7 @@ contains
 
                             end if 
 
-                            write(*,"(2i4,2i6,4f.8.2,2g12.2)") i1, j1, i0, j0, x(i0), y(j0), xout_now, yout_now, dist, dist_min 
+                            write(*,"(2i4,2i6,4f8.2,2g12.2)") i1, j1, i0, j0, x(i0), y(j0), xout_now, yout_now, dist, dist_min 
                     
                             if (dist .lt. dist_min .and. dist .lt. max_distance) then 
                                 ii(i1,j1) = i0 
