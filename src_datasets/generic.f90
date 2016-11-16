@@ -419,6 +419,8 @@ contains
 
                             end if 
 
+                            write(*,"(4i5,6g12.2)") i1, j1, i0, j0, x(i0), y(j0), xout_now, yout_now, dist, dist_min 
+                    
                             if (dist .lt. dist_min .and. dist .lt. max_distance) then 
                                 ii(i1,j1) = i0 
                                 jj(i1,j1) = j0 
@@ -427,9 +429,8 @@ contains
 
                         end do 
 
-                        i0 = ii(i1,j1)
-                        j0 = jj(i1,j1)
-                        write(*,*) i1, j1, i0, j0, x(i0), y(j0), xout_now, yout_now, dist_min 
+                        stop 
+
                     end if 
 
 !                 end do 
