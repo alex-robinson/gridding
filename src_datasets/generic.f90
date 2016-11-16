@@ -399,7 +399,7 @@ contains
                 dist_min = 1e10 
 
                 ! Find index of nearest latitude row
-                j0 = minloc(abs(yout_now-y))
+                j0 = minloc(abs(yout_now-y),1)
 
 !                 ! Loop over grid and find nearest neighbor indices 
 !                 do j0 = 1, size(y)
