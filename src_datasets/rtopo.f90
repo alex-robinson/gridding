@@ -54,9 +54,11 @@ contains
         type inp_type 
             real(4), allocatable :: lon(:), lat(:)
             real(4), allocatable :: var(:,:)
+            integer :: i0, i1, j0, j1, ni, nj    ! Range of subset of data of interest
         end type 
 
         type(inp_type)     :: inp
+
         integer :: nx0, ny0 
 
         type neighbs_type 
@@ -65,6 +67,7 @@ contains
         type(neighbs_type) :: nbs 
 
         real(4), allocatable :: var(:,:) 
+        integer :: k 
 
         ! ### Define input information #####
         path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
@@ -74,8 +77,6 @@ contains
         nx0 = nc_size(filename_in,"londim")
         ny0 = nc_size(filename_in,"latdim")
         allocate(inp%lon(nx0),inp%lat(ny0))
-        allocate(inp%var(nx0,ny0))
-
         write(*,*) "nx0, ny0: ", nx0, ny0 
 
         ! Load lat/lon 
@@ -85,11 +86,38 @@ contains
         write(*,*) "range(lon): ", minval(inp%lon), maxval(inp%lon)
         write(*,*) "range(lat): ", minval(inp%lat), maxval(inp%lat)
         
+        ! Determine subset of interest
+
+        ! Take all longitudes for now 
+        inp%i0 = 1
+        inp%i1 = size(inp%lon)
+
+        inp%j0 = size(inp%lat)
+        do k = 1, size(inp%lat)
+            if (inp%lat(k) .ge. minval(grid%lat)-1.d0) exit   
+        end do
+        inp%j0 = k 
+        inp%j1 = inp%j0 
+        do k = inp%j0, size(inp%lat)
+            if (inp%lat(k) .ge. maxval(grid%lat)+1.d0) exit   
+        end do
+        inp%j1 = k
+
+        inp%ni = inp%i1-inp%i0+1
+        inp%nj = inp%j1-inp%j0+1 
+
+        ! Allocate input array to the size of the reduced matrix 
+        allocate(inp%var(inp%ni,inp%nj))
+        
+        write(*,*) "range(lon): ", minval(inp%lon(inp%i0:inp%i1)), maxval(inp%lon(inp%i0:inp%i1))
+        write(*,*) "range(lat): ", minval(inp%lat(inp%j0:inp%j1)), maxval(inp%lat(inp%j0:inp%j1))
+        write(*,*) "ni, nj:     ", inp%ni, inp%nj 
+
         desc    = "RTOPO-2.0.1 present-day Earth topography data"
         ref     = "Timmermann et al.: A consistent data set of Antarctic &
                   &ice sheet topography, cavity geometry, and global bathymetry, &
-                  &Earth Syst. Sci. Data, 2, 261-273, doi:10.5194/essd-2-261-2010, 2010.\n &
-                  &https://doi.pangaea.de/10.1594/PANGAEA.741917"
+                  &Earth Syst. Sci. Data, 2, 261-273, doi:10.5194/essd-2-261-2010, 2010. &
+                  &Data download: https://doi.pangaea.de/10.1594/PANGAEA.741917"
 
         ! ### Define output information #####
         
@@ -122,7 +150,8 @@ contains
 
         path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
         filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
-        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv))
+        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
+                     start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
 
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
