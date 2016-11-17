@@ -436,7 +436,7 @@ contains
             end do 
 
             ! Output every column to check progress
-            write(*,"(a,i10,a3,i12,a5,g12.3)") "  ",j1, " / ",size(yout,2),"   : ", dist_min 
+            write(*,"(a,i10,a3,i12,a5,g12.4)") "  ",j1, " / ", ny1,"   : ", dist_min 
         end do 
 
         return 
