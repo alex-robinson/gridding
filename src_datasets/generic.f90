@@ -328,13 +328,14 @@ contains
             inow = ii(i,j)
             jnow = jj(i,j) 
 
-            if (jnow .gt. grid%G%ny) then
-                write(*,*) "j0 index too big."
-                write(*,*) i, j, ii(i,j), jj(i,j)
-            end if 
+!             if (jnow .gt. grid%G%ny) then
+!                 write(*,*) "j0 index too big."
+!                 write(*,*) i, j, ii(i,j), jj(i,j)
+!             end if 
 
             ! Only update output array if valid neighbor was found
-            if (inow .gt. 0 .and. jnow .gt. 0) then 
+            if (inow .gt. 0 .and. jnow .gt. 0 .and. inow .le. grid%G%nx &
+                    .and. jnow .le. grid%G%ny) then 
                 zout(i,j) = z(inow,jnow)
             end if 
 
@@ -355,7 +356,7 @@ contains
 
         implicit none 
 
-        integer, intent(OUT) :: ii(:,:), jj(:,:) 
+        integer, intent(INOUT) :: ii(:,:), jj(:,:) 
         real(4), intent(IN)  :: x(:), y(:)
         real(4), intent(IN)  :: xout(:,:), yout(:,:) 
         logical, intent(IN) :: latlon 
