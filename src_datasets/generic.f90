@@ -328,6 +328,11 @@ contains
             inow = ii(i,j)
             jnow = jj(i,j) 
 
+            if (jnow .gt. size(y)) then
+                write(*,*) "j0 index too big."
+                write(*,*) i, j, ii(i,j), jj(i,j)
+            end if 
+
             ! Only update output array if valid neighbor was found
             if (inow .gt. 0 .and. jnow .gt. 0) then 
                 zout(i,j) = z(inow,jnow)
@@ -425,13 +430,6 @@ contains
                                 ii(i1,j1) = i0 
                                 jj(i1,j1) = j0 
                                 dist_min = dist
-
-                                if (jj(i1,j1) .gt. size(y)) then
-                                    write(*,*) "j0 index too big."
-                                    write(*,*) i1, j1, i0, j0, ii(i1,j1), jj(i1,j1), dist_min
-                                    stop 
-                                end if 
-
                             end if 
 
                         end do 
