@@ -328,7 +328,7 @@ contains
             inow = ii(i,j)
             jnow = jj(i,j) 
 
-            if (jnow .gt. size(y)) then
+            if (jnow .gt. grid%G%ny) then
                 write(*,*) "j0 index too big."
                 write(*,*) i, j, ii(i,j), jj(i,j)
             end if 
