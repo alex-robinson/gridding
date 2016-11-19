@@ -334,8 +334,9 @@ contains
 !             end if 
 
             ! Only update output array if valid neighbor was found
-            if (inow .gt. 0 .and. jnow .gt. 0 .and. inow .le. grid%G%nx &
-                    .and. jnow .le. grid%G%ny) then 
+!             if (inow .gt. 0 .and. jnow .gt. 0 .and. inow .le. grid%G%nx &
+!                     .and. jnow .le. grid%G%ny) then 
+            if (inow .gt. 0 .and. jnow .gt. 0) then 
                 zout(i,j) = z(inow,jnow)
             end if 
 
