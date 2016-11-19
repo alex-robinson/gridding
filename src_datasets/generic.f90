@@ -328,14 +328,7 @@ contains
             inow = ii(i,j)
             jnow = jj(i,j) 
 
-!             if (jnow .gt. grid%G%ny) then
-!                 write(*,*) "j0 index too big."
-!                 write(*,*) i, j, ii(i,j), jj(i,j)
-!             end if 
-
-            ! Only update output array if valid neighbor was found
-!             if (inow .gt. 0 .and. jnow .gt. 0 .and. inow .le. grid%G%nx &
-!                     .and. jnow .le. grid%G%ny) then 
+            ! Only update output array if valid neighbor was found 
             if (inow .gt. 0 .and. jnow .gt. 0) then 
                 zout(i,j) = z(inow,jnow)
             end if 
@@ -405,11 +398,11 @@ contains
                 ! Reset the minimum distance
                 dist_min = 1e10 
 
-                ! Find index of nearest latitude row
-                j0 = minloc(abs(yout_now-y),1)
+!                 ! Find index of nearest latitude row
+!                 j0 = minloc(abs(yout_now-y),1)
 
-!                 ! Loop over grid and find nearest neighbor indices 
-!                 do j0 = 1, size(y)
+                ! Loop over grid and find nearest neighbor indices 
+                do j0 = 1, size(y)
                     
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
@@ -426,8 +419,6 @@ contains
 
                             end if 
 
-!                             write(*,"(2i4,2i6,4f8.2,3g12.2)") i1, j1, i0, j0, x(i0), y(j0), xout_now, yout_now, dist, dist_min, max_distance 
-                    
                             if (dist .lt. dist_min .and. dist .lt. max_distance) then 
                                 ii(i1,j1) = i0 
                                 jj(i1,j1) = j0 
@@ -438,7 +429,7 @@ contains
 
                     end if 
 
-!                 end do 
+                end do 
 
             end do 
 
