@@ -436,8 +436,10 @@ contains
 
             end do 
 
-            ! Output every column to check progress
-            write(*,"(a,i10,a3,i12,a5,g12.4)") "  ",j1, " / ", ny1,"   : ", dist_min 
+            ! Output every 5th column to check progress
+            if (j1 .eq. 1 .or. mod(j1,5) .eq. 0 .or. j1 .eq. ny1) then 
+                write(*,"(a,i10,a3,i12,a5,g12.4)") "  ",j1, " / ", ny1,"   : ", dist_min
+            end if 
         end do 
 
         return 
