@@ -287,11 +287,12 @@ contains
 
 
 
-    subroutine nearest_to_grid(zout,grid,x,y,z,latlon,max_dist,lat_lim)
+    subroutine nearest_to_grid(zout,ii,jj,grid,x,y,z,latlon,max_dist,lat_lim)
 
         implicit none 
 
         real(4), intent(INOUT) :: zout(:,:)
+        integer, intent(INOUT), allocatable :: ii(:,:), jj(:,:) 
         type(grid_class), intent(IN) :: grid 
         real(4), intent(IN) :: x(:), y(:), z(:,:)
         logical, intent(IN), optional :: latlon
@@ -303,20 +304,23 @@ contains
         integer :: i, j, inow, jnow 
         real(4) :: xout,  yout 
 
-        integer, allocatable :: ii(:,:), jj(:,:) 
-
         ! Check if this is a latlon grid 
         is_latlon = .TRUE.
         if (present(latlon)) is_latlon = latlon
 
-        ! First find nearest indices 
-        call grid_allocate(grid,ii)
-        call grid_allocate(grid,jj)
+        if (.not. allocated(ii) .or. .not. allocated(jj)) then
+            ! Determine indices since they are not provided 
 
-        if (is_latlon) then 
-            call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%lat),is_latlon,max_dist,lat_lim)
-        else
-            call find_nearest_grid(ii,jj,x,y,real(grid%x),real(grid%y),is_latlon,max_dist,lat_lim)
+            ! First find nearest indices 
+            call grid_allocate(grid,ii)
+            call grid_allocate(grid,jj)
+
+            if (is_latlon) then 
+                call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%lat),is_latlon,max_dist,lat_lim)
+            else
+                call find_nearest_grid(ii,jj,x,y,real(grid%x),real(grid%y),is_latlon,max_dist,lat_lim)
+            end if 
+        
         end if 
 
         ! Loop over target grid and fill in available nearest neighbors
@@ -337,7 +341,6 @@ contains
         end do 
 
         return 
-
 
     end subroutine nearest_to_grid
 
