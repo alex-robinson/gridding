@@ -33,13 +33,13 @@ contains
         ! 
         ! RTopo-2.0.1_30sec_bedrock_topography.nc : bedrock_topography
         ! long_name = "ocean bathymetry; surface topography of continents; bedrock topography under grounded or floating ice"
-        ! RTopo-2.0.1_30sec_aux.nc : amask
-        ! long_name = "ice ocean rock mask"
-        ! RTopo-2.0.1_30sec_ice_base_topography.nc : ice_base_topography
-        ! long_name = "ice base topography for the Antarctic and Greenland ice sheets / ice shelves (ice draft for ice shelves and floating glaciers; zero in absence of ice)"
         ! RTopo-2.0.1_30sec_surface_elevation.nc : surface_elevation
         ! long_name = "upper ice surface height for the Antarctic and Greenland ice sheets / ice shelves (bedrock topography for ice-free continent; zero for ocean)"
-
+        ! RTopo-2.0.1_30sec_ice_base_topography.nc : ice_base_topography
+        ! long_name = "ice base topography for the Antarctic and Greenland ice sheets / ice shelves (ice draft for ice shelves and floating glaciers; zero in absence of ice)"
+        ! RTopo-2.0.1_30sec_aux.nc : amask
+        ! long_name = "ice ocean rock mask"
+        
 
         implicit none 
 
@@ -154,14 +154,16 @@ contains
 
         ! ### Process each variable, interpolate to nearest neighbor on grid #####
 
-        ! 1. Bedrock topography
+        ! Source path for all input files 
+        path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
+
+        ! 1. Bedrock topography ------------------------------------------------
         var_name     = "bedrock_topography"
         var_name_out = "z_bed"
         long_name    = "ocean bathymetry; surface topography of continents; &
                        &bedrock topography under grounded or floating ice"
         units        = "m" 
 
-        path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
         filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
         call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
                      start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
@@ -183,7 +185,90 @@ contains
         call nc_write_attr(filename,var_name_out,"long_name",long_name)
         call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
             
+        ! 2. Surface elevation ------------------------------------------------
+        var_name     = "surface_elevation"
+        var_name_out = "z_srf"
+        long_name    = "upper ice surface height for the Antarctic and Greenland ice sheets &
+                       &/ ice shelves (bedrock topography for ice-free continent; zero for ocean)"
+        units        = "m" 
 
+        filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_surface_elevation.nc"
+        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
+                     start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
+
+        write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
+
+        ! Interpolate to output grid 
+        call nearest_to_grid(zout=var,grid=grid,x=inp%lon(inp%i0:inp%i1), &
+                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
+                             max_dist=10e3,lat_lim=0.05)
+
+        write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
+        
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,real(var),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+        ! 3. Ice base topography ------------------------------------------------
+        var_name     = "ice_base_topography"
+        var_name_out = "z_ice_base"
+        long_name    = "ice base topography for the Antarctic and Greenland ice sheets &
+                       &/ ice shelves (ice draft for ice shelves and floating glaciers; &
+                       &zero in absence of ice)"
+        units        = "m" 
+
+        filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_ice_base_topography.nc"
+        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
+                     start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
+
+        write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
+
+        ! Interpolate to output grid 
+        call nearest_to_grid(zout=var,grid=grid,x=inp%lon(inp%i0:inp%i1), &
+                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
+                             max_dist=10e3,lat_lim=0.05)
+
+        write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
+        
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,real(var),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+        ! 4. amask ------------------------------------------------
+        var_name     = "amask"
+        var_name_out = "mask"
+        long_name    = "ice ocean rock mask"
+        units        = "--" 
+
+        filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_aux.nc"
+        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
+                     start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
+
+        write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
+
+        ! Interpolate to output grid 
+        call nearest_to_grid(zout=var,grid=grid,x=inp%lon(inp%i0:inp%i1), &
+                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
+                             max_dist=10e3,lat_lim=0.05)
+
+        write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
+        
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,real(var),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
         return 
 
     end subroutine rtopo_latlon_to_grid
