@@ -169,7 +169,8 @@ contains
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
-        call nearest_to_grid(zout=var,grid=grid,x=inp%lon,y=inp%lat,z=inp%var,latlon=.TRUE., &
+        call nearest_to_grid(zout=var,grid=grid,x=inp%lon(inp%i0:inp%i1), &
+                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
                              max_dist=10e3,lat_lim=0.1)
 
         write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)

@@ -313,20 +313,11 @@ contains
         call grid_allocate(grid,ii)
         call grid_allocate(grid,jj)
 
-        write(*,*) "size(ii): ", size(ii,1), size(ii,2)
-        write(*,*) "size(jj): ", size(jj,1), size(jj,2)
-        
         if (is_latlon) then 
             call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%lat),is_latlon,max_dist,lat_lim)
         else
             call find_nearest_grid(ii,jj,x,y,real(grid%x),real(grid%y),is_latlon,max_dist,lat_lim)
         end if 
-
-        write(*,*) "outside..."
-        write(*,*) "range(ii): ", minval(ii), maxval(ii)
-        write(*,*) "range(jj): ", minval(jj), maxval(jj)
-        
-        stop 
 
         ! Loop over target grid and fill in available nearest neighbors
         zout = mv 
@@ -454,9 +445,6 @@ contains
             write(*,"(a,i10,a3,i12,a5,g12.4)") "  ",j1, " / ", ny1,"   : ", dist_min 
         end do 
 
-        write(*,*) "range(ii): ", minval(ii), maxval(ii)
-        write(*,*) "range(jj): ", minval(jj), maxval(jj)
-        
         return 
 
     end subroutine find_nearest_grid
