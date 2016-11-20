@@ -10,7 +10,7 @@ module rtopo
 
     private 
     public :: rtopo_latlon_to_grid 
-!     public :: rtopo_to_grid 
+    public :: rtopo_to_grid 
 
 contains 
 
@@ -310,7 +310,7 @@ contains
         ! Define input grid 
         select case(trim(domain))
             case("Greenland")
-                call domain_definition(grid0,"GRL-1KM")
+                call domain_definition(grid0,"GRL-2KM")
             case("Antarctica")
                 call domain_definition(grid0,"ANT-1KM")
             case("North")
@@ -351,7 +351,7 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         allocate(varnames(4))
-        varnames = ["z_srf","z_bed","H_ice","mask "]
+        varnames = ["z_bed     ","z_srf     ","z_ice_base","mask      "]
 
         do k = 1, size(varnames)
 
@@ -362,18 +362,22 @@ contains
             call nc_read(filename_in,varname,var0)
             target_val = calc_grid_total(grid0%G%x,grid0%G%y,var,xlim=xlim,ylim=ylim)
 
-            if (trim(varname) .ne. "mask") then
+            if (trim(varname) .eq. "mask") then
+                ! Perform nearest neighbor interpolation
+
+                var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
+                                      xout=grid%G%x,yout=grid%G%y)
+
+            else 
+                ! Perform conservative interpolation 
+
                 call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv)
 
                 current_val = calc_grid_total(grid%G%x,grid%G%y,var,xlim=xlim,ylim=ylim)
                 err_percent = 100.d0 * (current_val-target_val) / target_val
                 write(*,"(a,3g12.4)") "mass comparison (hi, con, % diff): ", &
                         target_val, current_val, err_percent                  
-
-            else 
-                var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-                                      xout=grid%G%x,yout=grid%G%y)
-
+  
             end if 
 
             ! Write to file 
