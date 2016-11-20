@@ -10,6 +10,7 @@ module generic
     private 
     public :: generic_to_grid_nn
     public :: generic_to_grid_3D_nn
+    public :: find_nearest_grid
     public :: nearest_to_grid 
 
 contains 
@@ -285,67 +286,6 @@ contains
 
     end subroutine generic_to_grid_3D_nn
 
-
-
-    subroutine nearest_to_grid(zout,ii,jj,grid,x,y,z,latlon,max_dist,lat_lim)
-
-        implicit none 
-
-        real(4), intent(INOUT) :: zout(:,:)
-        integer, intent(INOUT), allocatable :: ii(:,:), jj(:,:) 
-        type(grid_class), intent(IN) :: grid 
-        real(4), intent(IN) :: x(:), y(:), z(:,:)
-        logical, intent(IN), optional :: latlon
-        real(4), intent(IN), optional :: max_dist  
-        real(4), intent(IN), optional :: lat_lim  
-        
-        ! Local variables 
-        logical :: is_latlon
-        integer :: i, j, inow, jnow 
-        real(4) :: xout,  yout 
-
-        ! Check if this is a latlon grid 
-        is_latlon = .TRUE.
-        if (present(latlon)) is_latlon = latlon
-
-        if (.not. allocated(ii) .or. .not. allocated(jj)) then
-            ! Determine indices since they are not provided 
-
-            ! First find nearest indices 
-            call grid_allocate(grid,ii)
-            call grid_allocate(grid,jj)
-
-            if (is_latlon) then 
-                call find_nearest_grid(ii,jj,x,y,real(grid%lon),real(grid%lat),is_latlon,max_dist,lat_lim)
-            else
-                call find_nearest_grid(ii,jj,x,y,real(grid%x),real(grid%y),is_latlon,max_dist,lat_lim)
-            end if 
-        
-        end if 
-
-        ! Loop over target grid and fill in available nearest neighbors
-        zout = mv 
- 
-        do i = 1, grid%G%nx 
-        do j = 1, grid%G%ny 
-
-            inow = ii(i,j)
-            jnow = jj(i,j) 
-
-            ! Only update output array if valid neighbor was found 
-            if (inow .gt. 0 .and. jnow .gt. 0) then 
-                zout(i,j) = z(inow,jnow)
-            end if 
-
-        end do
-        end do 
-
-        return 
-
-    end subroutine nearest_to_grid
-
-
-
     subroutine find_nearest_grid(ii,jj,x,y,xout,yout,latlon,max_dist,lat_lim)
         ! Return the indices (i,j) of the x(nx), y(ny)
         ! grid point that is closest to the desired xout/yout values
@@ -445,6 +385,39 @@ contains
         return 
 
     end subroutine find_nearest_grid
+
+    subroutine nearest_to_grid(zout,z,ii,jj)
+
+        implicit none 
+
+        real(4), intent(INOUT) :: zout(:,:)
+        real(4), intent(IN) :: z(:,:)
+        integer, intent(IN) :: ii(:,:), jj(:,:)  
+        
+        ! Local variables 
+        integer :: i, j, inow, jnow 
+        real(4) :: xout,  yout 
+
+        ! Loop over target grid and fill in available nearest neighbors
+        zout = mv 
+ 
+        do i = 1, size(zout,1) 
+        do j = 1, size(zout,2) 
+
+            inow = ii(i,j)
+            jnow = jj(i,j) 
+
+            ! Only update output array if valid neighbor was found 
+            if (inow .gt. 0 .and. jnow .gt. 0) then 
+                zout(i,j) = z(inow,jnow)
+            end if 
+
+        end do
+        end do 
+
+        return 
+
+    end subroutine nearest_to_grid
 
 
 !     subroutine var_to_grid(grid0,grid1,path_in,path_out,vdef,vtype,method,thin_fac)

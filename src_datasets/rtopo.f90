@@ -150,6 +150,18 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
+        ! ### Find indices of nearest neighbors #####
+
+        ! Allocate neighbor maps
+        call grid_allocate(grid,nbs%ii)
+        call grid_allocate(grid,nbs%jj)
+
+        ! Search for nearest neighbors
+        call find_nearest_grid(nbs%ii,nbs%jj,x=inp%lon(inp%i0:inp%i1),y=inp%lat(inp%j0:inp%j1), &
+                               xout=real(grid%lon),yout=real(grid%lat),latlon=.TRUE., &
+                               max_dist=2e3,lat_lim=0.05)
+            
+
         ! ### Process each variable, interpolate to nearest neighbor on grid #####
 
         ! Source path for all input files 
@@ -169,9 +181,7 @@ contains
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
-        call nearest_to_grid(zout=var,ii=nbs%ii,jj=nbs%jj,grid=grid,x=inp%lon(inp%i0:inp%i1), &
-                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
-                             max_dist=10e3,lat_lim=0.05)
+        call nearest_to_grid(zout=var,z=inp%var,ii=nbs%ii,jj=nbs%jj)
 
         write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
         
@@ -197,9 +207,7 @@ contains
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
-        call nearest_to_grid(zout=var,ii=nbs%ii,jj=nbs%jj,grid=grid,x=inp%lon(inp%i0:inp%i1), &
-                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
-                             max_dist=10e3,lat_lim=0.05)
+        call nearest_to_grid(zout=var,z=inp%var,ii=nbs%ii,jj=nbs%jj)
 
         write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
         
@@ -226,9 +234,7 @@ contains
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
-        call nearest_to_grid(zout=var,ii=nbs%ii,jj=nbs%jj,grid=grid,x=inp%lon(inp%i0:inp%i1), &
-                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
-                             max_dist=10e3,lat_lim=0.05)
+        call nearest_to_grid(zout=var,z=inp%var,ii=nbs%ii,jj=nbs%jj)
 
         write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
         
@@ -253,9 +259,7 @@ contains
         write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
 
         ! Interpolate to output grid 
-        call nearest_to_grid(zout=var,ii=nbs%ii,jj=nbs%jj,grid=grid,x=inp%lon(inp%i0:inp%i1), &
-                             y=inp%lat(inp%j0:inp%j1),z=inp%var,latlon=.TRUE., &
-                             max_dist=10e3,lat_lim=0.01)
+        call nearest_to_grid(zout=var,z=inp%var,ii=nbs%ii,jj=nbs%jj)
 
         write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
         
