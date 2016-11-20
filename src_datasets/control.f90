@@ -59,6 +59,11 @@ contains
                                lon180=.TRUE.,dx=5.d0,nx=361,dy=5.d0,ny=601, &
                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
             
+            case("GRL-2KM")
+                call grid_init(grid,name="GRL-2KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=2.d0,nx=901,dy=2.d0,ny=1501, &
+                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
             case("GRL-1KM")
                 call grid_init(grid,name="GRL-1KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=1.d0,nx=1801,dy=1.d0,ny=3001, &
