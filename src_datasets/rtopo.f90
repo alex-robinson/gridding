@@ -359,8 +359,10 @@ contains
             write(*,*) k, trim(varname)
 
             ! Load test data
-            call nc_read(filename_in,varname,var0)
-            target_val = calc_grid_total(grid0%G%x,grid0%G%y,var,xlim=xlim,ylim=ylim)
+            call nc_read(filename_in,varname,var0,missing_value=mv)
+            target_val = calc_grid_total(grid0%G%x,grid0%G%y,var0,xlim=xlim,ylim=ylim)
+
+            write(*,*) "range(var_in): ", minval(var0,mask=var0.ne.mv), maxval(var0,mask=var0.ne.mv)
 
             if (trim(varname) .eq. "mask") then
                 ! Perform nearest neighbor interpolation
@@ -379,6 +381,8 @@ contains
                         target_val, current_val, err_percent                  
   
             end if 
+
+            write(*,*) "range(var_out): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
 
             ! Write to file 
             call nc_write(filename,varname,var,dim1="xc",dim2="yc",missing_value=mv)
