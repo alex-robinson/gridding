@@ -329,7 +329,7 @@ contains
 
         ! Set up a filter for the x-distances, only sample every nth point first
         ! then zoom in to x-points with small distances 
-        dists_nx = max(2, floor((size(x)-1)/5.0))
+        dists_nx = max(2, floor((size(x)-1)/10.0))
         allocate(inds_x(dists_nx),dists_x(dists_nx))
 
         k = 0 
@@ -341,11 +341,13 @@ contains
 
         if (k .lt. dists_nx) then 
             write(*,*) "inds_x not filled yet."
-            write(*,*) dists_nx, k, i0, int((size(x)-1)/5.0), size(x)
+            write(*,*) dists_nx, k, i0, int((size(x)-1)/10.0), size(x)
             stop 
         end if 
 
-
+        ! Summary of low-res calc setup 
+        write(*,*) "Low res x: nx = ", dists_nx, " / ", size(x) 
+        write(*,*) "   range(inds): ", minval(inds_x), maxval(inds_x)
         
         ! Initialize to missing indices everywhere
         ii = -1
@@ -393,7 +395,7 @@ contains
                         do i0 = 1, size(x)
 
                             k = minloc(abs(inds_x-i0),1)
-                            if (dists_x(k) .lt. 3.0*max_distance) then 
+                            if (dists_x(k) .lt. 10.0*max_distance) then 
                                 ! Only check x-points with low-res distances in reasonable range
 
                                 if (latlon) then
