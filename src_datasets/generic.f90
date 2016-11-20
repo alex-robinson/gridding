@@ -303,11 +303,15 @@ contains
         ! Local variables 
         real(4) :: max_distance
         real(4) :: lat_limit 
-        integer :: i0, j0, i1, j1  
+        integer :: i0, j0, i1, j1, k   
         real(4) :: dist, dist_min 
         real(4) :: xout_now, yout_now 
         integer :: nx1, ny1 
         integer :: j00, j01 
+
+        integer :: dists_nx
+        integer, allocatable :: inds_x(:)
+        real(4), allocatable :: dists_x(:) 
 
         ! Planet parameters ("WGS84")
         real(8), parameter :: a = 6378137.0d0             ! Equatorial ellipsoid radius,   a in Snyder, WGS84
@@ -323,7 +327,26 @@ contains
         max_distance = 1e10
         if (present(max_dist)) max_distance = max_dist 
 
+        ! Set up a filter for the x-distances, only sample every nth point first
+        ! then zoom in to x-points with small distances 
+        dists_nx = max(2, floor((size(x)-1)/5.0))
+        allocate(inds_x(dists_nx),dists_x(dists_nx))
 
+        k = 0 
+        do i0 = 1, size(x), max(1,int(size(x)/dists_nx))
+            k = k+1
+            inds_x(k) = i0
+            if (k .eq. dists_nx) exit 
+        end do 
+
+        if (k .lt. dists_nx) then 
+            write(*,*) "inds_x not filled yet."
+            write(*,*) dists_nx, k, i0, int((size(x)-1)/5.0), size(x)
+            stop 
+        end if 
+
+
+        
         ! Initialize to missing indices everywhere
         ii = -1
         jj = -1 
@@ -350,22 +373,45 @@ contains
                     if (abs(yout_now-y(j0)) .lt. lat_limit) then 
                         ! Only check here, if the y-point is within range 
 
-                        do i0 = 1, size(x)
+                        ! First check filtered x-points 
+                        do i0 = 1, size(inds_x)
+                            k = inds_x(i0)
 
                             if (latlon) then
                                 ! Use planetary (latlon) values
-                                dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
+                                dists_x(i0) = planet_distance(a,f,x(k),y(j0),xout_now,yout_now)
 
                             else
                                 ! Use cartesian values to determine distance
-                                dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
+                                dists_x(i0) = cartesian_distance(x(k),y(j0),xout_now,yout_now)                    
 
                             end if 
 
-                            if (dist .lt. dist_min .and. dist .lt. max_distance) then 
-                                ii(i1,j1) = i0 
-                                jj(i1,j1) = j0 
-                                dist_min = dist
+                        end do 
+
+
+                        do i0 = 1, size(x)
+
+                            k = minloc(abs(inds_x-i0),1)
+                            if (dists_x(k) .lt. 3.0*max_distance) then 
+                                ! Only check x-points with low-res distances in reasonable range
+
+                                if (latlon) then
+                                    ! Use planetary (latlon) values
+                                    dist = planet_distance(a,f,x(i0),y(j0),xout_now,yout_now)
+
+                                else
+                                    ! Use cartesian values to determine distance
+                                    dist = cartesian_distance(x(i0),y(j0),xout_now,yout_now)                    
+
+                                end if 
+
+                                if (dist .lt. dist_min .and. dist .lt. max_distance) then 
+                                    ii(i1,j1) = i0 
+                                    jj(i1,j1) = j0 
+                                    dist_min = dist
+                                end if 
+
                             end if 
 
                         end do 
