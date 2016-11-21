@@ -387,9 +387,13 @@ contains
 
             write(*,*) "range(var_out): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
 
-            ! Write to file 
-            call nc_write(filename,varname,var,dim1="xc",dim2="yc",missing_value=mv)
-    
+            ! Write to file
+            if (trim(varname) .eq. "mask") then 
+                call nc_write(filename,varname,int(var),dim1="xc",dim2="yc",missing_value=int(mv))
+            else 
+                call nc_write(filename,varname,real(var),dim1="xc",dim2="yc",missing_value=real(mv))
+            end if 
+
             ! Write variable metadata
             call nc_read_attr(filename_in,varname,"units",units)
             call nc_write_attr(filename,  varname,"units",units)
@@ -409,7 +413,7 @@ contains
 
         var = z_srf - z_base 
         where(var.lt.0.d0) var = 0.d0 
-        
+
         ! Write to file 
         varname = "H_ice"
 
