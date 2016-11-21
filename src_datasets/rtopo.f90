@@ -335,7 +335,7 @@ contains
         call grid_allocate(grid,var) 
         
         ! Initialize the map 
-        call map_init(map,grid0,grid,max_neighbors=20,lat_lim=1.d0,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=100,lat_lim=1.d0,fldr="maps",load=.TRUE.)
         
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
