@@ -367,8 +367,9 @@ contains
             if (trim(varname) .eq. "mask") then
                 ! Perform nearest neighbor interpolation
 
-                var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-                                      xout=grid%G%x,yout=grid%G%y)
+!                 var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
+!                                       xout=grid%G%x,yout=grid%G%y)
+                call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv,no_interp=.TRUE.)
 
             else 
                 ! Perform conservative interpolation 
@@ -396,6 +397,8 @@ contains
             call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
             
         end do 
+
+        ! Add additional variables of interest 
 
         return 
 
