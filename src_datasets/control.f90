@@ -113,17 +113,17 @@ contains
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
             case("NH-20KM")
-                call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                call grid_init(grid,name="NH-20KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=20.d0,nx=449,dy=20.d0,ny=421, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
             case("NH-10KM")
-                call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                call grid_init(grid,name="NH-10KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=10.d0,nx=897,dy=10.d0,ny=841, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
             case("NH-5KM")
-                call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                call grid_init(grid,name="NH-5KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=5.d0,nx=1793,dy=5.d0,ny=1681, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
