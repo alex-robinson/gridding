@@ -305,6 +305,8 @@ contains
         real(8), allocatable :: var0(:,:), var(:,:)
         real(8) :: xlim(2), ylim(2) 
 
+        real(8), allocatable :: z_base(:,:), z_srf(:,:) 
+
         ! ### Input information #####
 
         ! Define input grid 
@@ -399,7 +401,26 @@ contains
         end do 
 
         ! Add additional variables of interest 
+        call grid_allocate(grid,z_base)
+        call grid_allocate(grid,z_srf)
+        
+        call nc_read(filename,"z_ice_base",z_base)
+        call nc_read(filename,"z_srf",z_srf)
 
+        var = z_srf - z_base 
+        where(var.lt.0.d0) var = 0.d0 
+        
+        ! Write to file 
+        varname = "H_ice"
+
+        call nc_write(filename,varname,var,dim1="xc",dim2="yc",missing_value=mv)
+
+        ! Write variable metadata
+        call nc_write_attr(filename,varname,"units","m")
+        call nc_write_attr(filename,varname,"long_name","Ice thickness")
+        call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
+            
+        
         return 
 
     end subroutine rtopo_to_grid
