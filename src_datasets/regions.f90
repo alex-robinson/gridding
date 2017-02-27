@@ -15,6 +15,7 @@ module regions
 
     private
     public :: get_region_map_north
+    public :: get_region_map_south
     public :: get_region_map_greenland 
     public :: write_regions
 contains 
@@ -68,7 +69,19 @@ contains
         logical :: in_reg(grid%G%nx,grid%G%ny)
         integer :: q 
 
+        ! Allocate the region_type to hold all regions of interest
+        allocate(regs(2))
+
+        ! === Define each region ===
+        call points_init(regs(1),grid0=grid,name="ant",filename="regions/polygon_ant.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(2),grid0=grid,name="ant",filename="regions/polygon_ant-inner.txt",latlon=.TRUE.,skip=1)
+
         mask = mask_index_south + 0.0   ! ocean 
+
+        do q = 1, size(regs)
+            in_reg = point_in_polygon(real(grid%x),real(grid%y),real(regs(q)%x),real(regs(q)%y))
+            where (in_reg) mask = mask_index_south + real(q)*0.1  
+        end do 
 
         return 
 

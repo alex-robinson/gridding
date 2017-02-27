@@ -10,18 +10,31 @@ program points_to_latlon
     character(len=512) :: filename_in, filename_out 
     integer :: q 
 
-    regions(1) = "ellesmere"
-    regions(2) = "grl-inner"
-    regions(3) = "grl"
-    regions(4) = "iceland"
-    regions(5) = "svalbard" 
+!     regions(1) = "ellesmere"
+!     regions(2) = "grl-inner"
+!     regions(3) = "grl"
+!     regions(4) = "iceland"
+!     regions(5) = "svalbard" 
 
-    do q = 1, size(regions)
-        filename_in  = "regions/Bamber2013/polygon_"//trim(regions(q))//"_Bamber2013.txt"
+!     do q = 1, size(regions)
+!         filename_in  = "regions/Bamber2013/polygon_"//trim(regions(q))//"_Bamber2013.txt"
+!         filename_out = "regions/polygon_"//trim(regions(q))//".txt"
+        
+!         call points_init(pts,name="pts-B13",mtype="polar_stereographic",units="meters", &
+!                              filename=filename_in,skip=1,lon180=.TRUE.,lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+        
+!         call write_ascii(filename_out,pts%lon,pts%lat,xnm="lon",ynm="lat")
+!     end do 
+
+    regions(1) = "ant"
+    regions(2) = "ant-inner"
+
+    do q = 1, 2
+        filename_in  = "regions/BEDMAP2/polygon_"//trim(regions(q))//"_BEDMAP2.txt"
         filename_out = "regions/polygon_"//trim(regions(q))//".txt"
         
-        call points_init(pts,name="pts-B13",mtype="polar_stereographic",units="meters", &
-                             filename=filename_in,skip=1,lon180=.TRUE.,lambda=-39.d0,phi=71.d0,alpha=19.0d0)
+        call points_init(pts,name="pts-BEDMAP2",mtype="polar_stereographic",units="km", &
+                             filename=filename_in,skip=1,lon180=.TRUE.,lambda=0.d0,phi=-71.d0,alpha=19.0d0)
         
         call write_ascii(filename_out,pts%lon,pts%lat,xnm="lon",ynm="lat")
     end do 
