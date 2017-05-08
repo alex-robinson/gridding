@@ -391,16 +391,11 @@ contains
 
                         end do 
 
+                        
+                        do i0 = 1, size(x)
 
-                        i0_mid = minloc(dists_x,1)
-                        i0_lo  = max(1,i0_mid-1)
-                        i0_hi  = min(size(x),i0_mid+1)
-
-!                         do i0 = 1, size(x)
-                        do i0 = i0_lo, i0_hi 
-
-!                             k = minloc(abs(inds_x-i0),1)
-!                             if (dists_x(k) .lt. 5.0*max_distance) then 
+                            k = minloc(abs(inds_x-i0),1)
+                            if (dists_x(k) .lt. 5.0*max_distance) then 
                                 ! Only check x-points with low-res distances in reasonable range
 
                                 if (latlon) then
@@ -419,7 +414,7 @@ contains
                                     dist_min = dist
                                 end if 
 
-!                             end if 
+                            end if 
 
                         end do 
 
