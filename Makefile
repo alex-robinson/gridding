@@ -253,6 +253,12 @@ points_to_latlon:
 	@echo "    points_to_latlon.x is ready."
 	@echo " "
 
+cores_to_grid:
+	$(FC) $(DFLAGS) $(FLAGS) -o cores_to_grid.x $^ cores_to_grid.f90 $(LFLAGS)
+	@echo " "
+	@echo "    cores_to_grid.x is ready."
+	@echo " "
+
 clean:
 	rm -f *.x $(objdir)/*.o $(objdir)/*.mod
 
