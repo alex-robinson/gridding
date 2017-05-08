@@ -158,11 +158,19 @@ contains
         call grid_allocate(grid,nbs%ii)
         call grid_allocate(grid,nbs%jj)
 
+        write(*,*) "Before find_nearest_grid..."
+        write(*,*) "size(ii): ", size(nbs%ii,1), size(nbs%ii,2)
+        write(*,*) "size(jj): ", size(nbs%jj,1), size(nbs%jj,2)
+        write(*,*) "length(lon): ", size(inp%lon(inp%i0:inp%i1),1)
+        write(*,*) "length(lat): ", size(inp%lat(inp%i0:inp%i1),1)
+        write(*,*) "Entering find_nearest_grid..."
+
         ! Search for nearest neighbors
         call find_nearest_grid(nbs%ii,nbs%jj,x=inp%lon(inp%i0:inp%i1),y=inp%lat(inp%j0:inp%j1), &
                                xout=real(grid%lon),yout=real(grid%lat),latlon=.TRUE., &
                                max_dist=2e3,lat_lim=0.05)
-            
+        
+        write(*,*) "Finished find_nearest_grid..."
 
         ! ### Process each variable, interpolate to nearest neighbor on grid #####
 
@@ -176,6 +184,9 @@ contains
                        &bedrock topography under grounded or floating ice"
         units        = "m" 
 
+        write(*,*) "size(inp%var): ", size(inp%var,1), size(inp%var,2)
+        write(*,*) "inp: ", inp%i0,inp%j0,inp%ni,inp%nj
+        
         filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
         call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
                      start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
