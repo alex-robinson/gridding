@@ -102,7 +102,7 @@ contains
         do k = inp%i0, size(inp%lon)
             if (inp%lon(k) .ge. maxval(grid%lon)+1.d0) exit   
         end do
-        inp%i1 = minval(k,size(inp%lon))
+        inp%i1 = min(k,size(inp%lon))
 
         ! # Latitude range
         inp%j0 = size(inp%lat)
@@ -115,7 +115,7 @@ contains
             if (inp%lat(k) .ge. maxval(grid%lat)+1.d0) exit   
         end do
         inp%j1 = k
-        inp%j1 = minval(k,size(inp%lat))
+        inp%j1 = min(k,size(inp%lat))
 
         inp%ni = inp%i1-inp%i0+1
         inp%nj = inp%j1-inp%j0+1 
@@ -175,7 +175,7 @@ contains
         long_name    = "ocean bathymetry; surface topography of continents; &
                        &bedrock topography under grounded or floating ice"
         units        = "m" 
-        
+
         filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_bedrock_topography.nc"
         call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
                      start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
