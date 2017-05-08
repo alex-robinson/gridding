@@ -392,9 +392,9 @@ contains
                         end do 
 
 
-                        i0_mid = minloc(dists_x)
-                        i0_lo  = max(1,i0_mid-1)
-                        i0_hi  = min(size(x),i0_mid+1)
+                        i0_mid = minloc(dists_x,1)
+                        i0_lo  = max(1,i0_mid-1,1)
+                        i0_hi  = min(size(x),i0_mid+1,1)
 
 !                         do i0 = 1, size(x)
                         do i0 = i0_lo, i0_hi 
@@ -419,7 +419,7 @@ contains
                                     dist_min = dist
                                 end if 
 
-                            end if 
+!                             end if 
 
                         end do 
 
