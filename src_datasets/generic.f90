@@ -308,7 +308,7 @@ contains
         real(4) :: xout_now, yout_now 
         integer :: nx1, ny1 
         integer :: j00, j01 
-
+        integer :: i0_lo, i0_mid, i0_hi 
         integer :: dists_nx
         integer, allocatable :: inds_x(:)
         real(4), allocatable :: dists_x(:) 
@@ -392,10 +392,15 @@ contains
                         end do 
 
 
-                        do i0 = 1, size(x)
+                        i0_mid = minloc(dists_x)
+                        i0_lo  = max(1,i0_mid-1)
+                        i0_hi  = min(size(x),i0_mid+1)
 
-                            k = minloc(abs(inds_x-i0),1)
-                            if (dists_x(k) .lt. 5.0*max_distance) then 
+!                         do i0 = 1, size(x)
+                        do i0 = i0_lo, i0_hi 
+
+!                             k = minloc(abs(inds_x-i0),1)
+!                             if (dists_x(k) .lt. 5.0*max_distance) then 
                                 ! Only check x-points with low-res distances in reasonable range
 
                                 if (latlon) then
