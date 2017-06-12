@@ -113,7 +113,7 @@ contains
             where (isnan(invar)) invar = mv 
 
             outvar = mv 
-            call map_field(map,"age_norm",invar,outvar,outmask,method="radius", &
+            call map_field(map,"age_norm",invar,outvar,outmask,method="nn", &
                            radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             where(outvar .ne. mv) outvar = outvar*1d-3
             
@@ -126,7 +126,7 @@ contains
             where (isnan(invar)) invar = mv 
 
             outvar = mv 
-            call map_field(map,"ice_age_err",invar,outvar,outmask,method="radius", &
+            call map_field(map,"ice_age_err",invar,outvar,outmask,method="nn", &
                            radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             where(outvar .ne. mv) outvar = outvar*1d-3
 
@@ -156,7 +156,7 @@ contains
             where (isnan(invar)) invar = mv 
             
             outvar = mv 
-            call map_field(map,"depth_iso",invar,outvar,outmask,method="radius", &
+            call map_field(map,"depth_iso",invar,outvar,outmask,method="nn", &
                            radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             
             call nc_write(filename,"depth_iso",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
@@ -168,7 +168,7 @@ contains
             where (isnan(invar)) invar = mv 
             
             outvar = mv 
-            call map_field(map,"depth_iso_err",invar,outvar,outmask,method="radius", &
+            call map_field(map,"depth_iso_err",invar,outvar,outmask,method="nn", &
                            radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             
             call nc_write(filename,"depth_iso_err",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
@@ -196,12 +196,12 @@ contains
                        radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
         where(outvar .eq. mv) outvar = 0.d0 
 
-        call nc_write(filename,"H",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"H_ice",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
         
         ! Write variable metadata
-        call nc_write_attr(filename,"depth_iso","units","m")
-        call nc_write_attr(filename,"depth_iso","long_name","Ice thickness")
-        call nc_write_attr(filename,"depth_iso","coordinates","lat2D lon2D")
+        call nc_write_attr(filename,"H_ice","units","m")
+        call nc_write_attr(filename,"H_ice","long_name","Ice thickness")
+        call nc_write_attr(filename,"H_ice","coordinates","lat2D lon2D")
         
         return 
 
