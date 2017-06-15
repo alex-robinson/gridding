@@ -368,12 +368,14 @@ contains
 
             write(*,*) "range(var_in): ", minval(var0,mask=var0.ne.mv), maxval(var0,mask=var0.ne.mv)
 
+            var = mv 
+            
             if (trim(varname) .eq. "mask") then
                 ! Perform nearest neighbor interpolation
 
-!                 var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-!                                       xout=grid%G%x,yout=grid%G%y)
-                call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv,no_interp=.TRUE.)
+                var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
+                                      xout=grid%G%x,yout=grid%G%y)
+!                 call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv,no_interp=.TRUE.)
 
             else 
                 ! Perform conservative interpolation 
