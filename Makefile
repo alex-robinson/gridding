@@ -32,8 +32,8 @@ else ifeq ($(env),eolo) ## env=eolo
 #    FC  = ifort
 #    INC_NC  = -I/home/fispalma22/work/librairies/netcdflib/include
 #    LIB_NC  = -L/home/fispalma22/work/librairies/netcdflib/lib -lnetcdf
-#    INC_COORD = -I/home/fispalma25/robinson/models/EURICE/coord/.obj
-#    LIB_COORD = /home/fispalma25/robinson/models/EURICE/coord/libcoordinates.a
+#    INC_COORD = -I/home/fispalma25/robinson/models/EURICE/coordinates/.obj
+#    LIB_COORD = /home/fispalma25/robinson/models/EURICE/coordinates/libcoordinates.a
 #    LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 #
 #    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC)
@@ -83,8 +83,8 @@ else ifeq ($(env),pik) ## env=pik
     INC_NC  = -I${NETCDF_FORTRANROOT}/include
     LIB_NC  = -L${NETCDF_FORTRANROOT}/lib -lnetcdff -L${NETCDF_CROOT}/lib -lnetcdf
     LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
-    INC_COORD = -I/p/projects/tumble/robinson/EURICE/coord/.obj
-	LIB_COORD = /p/projects/tumble/robinson/EURICE/coord/libcoordinates.a
+    INC_COORD = -I/p/projects/tumble/robinson/EURICE/coordinates/.obj
+	LIB_COORD = /p/projects/tumble/robinson/EURICE/coordinates/libcoordinates.a
 
     FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC) 
     LFLAGS   = $(LIB_COORD) $(LIB_NC)
@@ -102,6 +102,10 @@ else
 endif
 
 ## Individual libraries or modules ##
+
+$(objdir)/ncio.o: $(libdir)/ncio.f90
+	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
+
 $(objdir)/nml.o: $(libdir)/nml.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
@@ -178,7 +182,6 @@ $(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
 	$(FC) $(DFLAGS) $(FLAGS) -c -o $@ $<
 
 obj_datasets =     $(objdir)/control.o \
-				   $(objdir)/nml.o \
 				   $(objdir)/gridding_datasets.o \
 				   $(objdir)/generic.o \
 				   $(objdir)/regions.o \
@@ -204,32 +207,33 @@ obj_datasets =     $(objdir)/control.o \
 			       $(objdir)/topographies_grl.o
 
 obj_datasets_climber = $(objdir)/control.o \
-				   $(objdir)/nml.o \
 				   $(objdir)/gridding_datasets.o \
 			       $(objdir)/climber2.o \
 			       $(objdir)/climber3a.o
 
+gridder_libs = $(objdir)/ncio.o $(objdir)/nml.o
+
 ## Complete programs
 
-gridder: $(obj_datasets) 
+gridder: $(gridder_libs) $(obj_datasets) 
 	$(FC) $(DFLAGS) $(FLAGS) -o gridder.x $^ gridder.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gridder.x is ready."
 	@echo " "
 
-gridder_help: $(obj_datasets) 
+gridder_help: $(gridder_libs) $(obj_datasets) 
 	$(FC) $(DFLAGS) $(FLAGS) -o gridder_help.x $^ gridder_help.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gridder_help.x is ready."
 	@echo " "
 
-gridder_climber: $(obj_datasets_climber) 
+gridder_climber: $(gridder_libs) $(obj_datasets_climber) 
 	$(FC) $(DFLAGS) $(FLAGS) -o gridder_climber.x $^ gridder_climber.f90 $(LFLAGS)
 	@echo " "
 	@echo "    gridder_climber.x is ready."
 	@echo " "
 
-bedmap:
+bedmap: 
 	$(FC) $(DFLAGS) $(FLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
 	@echo " "
 	@echo "    bedmap2_netcdf.x is ready."
