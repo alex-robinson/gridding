@@ -42,7 +42,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "Bamber01-20KM"
+    grid_name = "GRL-10KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -54,7 +54,7 @@ program gridder
     call domain_definition(grid,grid_name) 
 
     ! Write a regional mask 
-!     call write_regions(outfldr,grid,domain)
+    call write_regions(outfldr,grid,domain)
 
     ! =========================================================
     !
