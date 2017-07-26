@@ -68,7 +68,7 @@ program gridder
 !     call rtopo_latlon_to_grid(outfldr,grid,domain)
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+!     call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
