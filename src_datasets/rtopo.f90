@@ -429,7 +429,7 @@ contains
         ! Write to file 
         varname = "H_ice"
 
-        call nc_write(filename,varname,var,dim1="xc",dim2="yc",missing_value=mv)
+        call nc_write(filename,varname,real(var),dim1="xc",dim2="yc",missing_value=real(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,varname,"units","m")
