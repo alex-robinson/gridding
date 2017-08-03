@@ -89,9 +89,9 @@ program gridder
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
+!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
 
     if (trim(domain) .eq. "Antarctica") then 
         ! == Antarctica only datasets ==
@@ -129,9 +129,9 @@ program gridder
         ! == Greenland only datasets ==
         write(*,*) "Processing Greenland..."
 
-        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
-        call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-        call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
+!         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
+!         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+!         call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
