@@ -17,9 +17,11 @@ ifeq ($(env),manto) ## env=manto
     INC_NC  = -I/home/jalvarez/work/librairies/netcdflib/include
     LIB_NC  = -L/home/jalvarez/work/librairies/netcdflib/lib -lnetcdf
     LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+    INC_COORD = -I/home/robinson/models/EURICE/coordinates/.obj
+    LIB_COORD = /home/robinson/models/EURICE/coordinates/libcoordinates.a
 
-    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_NC)
-    LFLAGS   = $(LIB_NC) $(LIB_MKL)
+    FLAGS    = -heap-arrays -module $(objdir) -L$(objdir) $(INC_COORD) $(INC_NC)
+    LFLAGS   = $(LIB_COORD) $(LIB_NC) $(LIB_MKL)
 
     DFLAGS   = -vec-report0 -O2 -fp-model precise -i_dynamic 
     ifeq ($(debug), 1)

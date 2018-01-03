@@ -534,7 +534,8 @@ contains
 
         ! Define the input filenames
 !         fldr_in         = "/data/sicopolis/data/North/Hughes/"
-        fldr_in         = "/Users/robinson/wrk/mypapers/paleo_indexForcing_ruben/wrk/"
+!        fldr_in         = "/Users/robinson/wrk/mypapers/paleo_indexForcing_ruben/wrk/"
+        fldr_in         = "/home/robinson/models/EURICE/gridding/data/"
         file_in         = trim(fldr_in)//"coord_hughes.txt"
 
         desc    = "Reconstructed Eurasian ice sheet extent during the last deglaciation"
