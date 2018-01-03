@@ -11,6 +11,8 @@ module topo_reconstructions
     public :: ICE5G_to_grid
     public :: LGMsimpson_to_grid 
     public :: huy3_to_grid
+    public :: dated1_to_grid
+
 
 contains 
 
@@ -493,6 +495,113 @@ contains
         return 
 
     end subroutine huy3_to_grid
+
+    subroutine dated1_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       DATED-1 GLACIAL MASK DATA
+        !       from Hughes et al. (2016)
+        !
+        ! =========================================================
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:)
+            double precision, allocatable :: var(:)
+        end type 
+
+        type(inp_type)     :: inp
+        integer            :: np 
+        type(points_class) :: points0
+        character(len=256) :: fldr_in, prefix, suffix 
+        character(len=512) :: file_in 
+        real(4)            :: times(40)
+        character(len=4)   :: times_str(40), year_str
+
+        type(map_class)  :: map 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+        integer :: i, j, q 
+        logical :: in_basin 
+
+        ! Define the input filenames
+!         fldr_in         = "/data/sicopolis/data/North/Hughes/"
+        fldr_in         = "/Users/robinson/wrk/mypapers/paleo_indexForcing_ruben/wrk/"
+        file_in         = trim(fldr_in)//"coord_hughes.txt"
+
+        desc    = "Reconstructed Eurasian ice sheet extent during the last deglaciation"
+        ref     = "Hughes, Anna L. C., Gyllencreutz, Richard, Lohne, Øystein S., Mangerud, Jan &
+                  &Svendsen, John Inge: The last Eurasian ice sheets – a chronological database &
+                  &and time-slice reconstruction, DATED-1, BOREAS, doi:10.1111/bor.12142, 2016."
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"// &
+                              trim(grid%name)//"_TOPO-LGM-H16.nc"
+
+        ! Define the input data 
+        np = 13127
+
+        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+
+        ! Define the input points
+        inp%lon = read_vector(file_in,n=np,col=1,skip=1)
+        inp%lat = read_vector(file_in,n=np,col=2,skip=1)
+
+        ! Define input points for mapping
+        call points_init(points0,grid,name="Hughes2016",x=inp%lon,y=inp%lat,latlon=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)     
+
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"time", x=21.0,units="ka BP",unlimited=.TRUE.)
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! Initially set all points to zero 
+        outvar = 0.0 
+
+        ! Loop over grid points and check point in polygon
+        do j = 1, grid%G%ny 
+        do i = 1, grid%G%nx 
+
+            in_basin = point_in_polygon(real(grid%x(i,j)), real(grid%y(i,j)), &
+                                        real(points0%x),   real(points0%y)) 
+            
+            ! If basin was found, save it
+            if (in_basin) outvar(i,j) = 1.0 
+
+        end do 
+        end do 
+
+        ! Write output variable to output file
+        call nc_write(filename,"mask",int(outvar),dim1="xc",dim2="yc",missing_value=int(mv), &
+                      start=[1,1],count=[grid%G%nx,grid%G%ny])
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"mask","units","1")
+        call nc_write_attr(filename,"mask","long_name", &
+                 "Mask of ice sheet at extent at the last deglaciation (21 ka BP)")
+        call nc_write_attr(filename,"mask","coordinates","lat2D lon2D")
+
+        return 
+
+    end subroutine dated1_to_grid
 
 end module topo_reconstructions 
 
