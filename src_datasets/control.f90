@@ -132,6 +132,11 @@ contains
                                lon180=.TRUE.,dx=1.d0,nx=8961,dy=1.d0,ny=8401, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
+            case("NH-40KM-old")
+                call grid_init(grid,name="NH-40KM-old",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
                 stop 
