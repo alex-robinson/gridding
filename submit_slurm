@@ -9,6 +9,7 @@
 #SBATCH --output=out.out
 #SBATCH --error=out.err
 #SBATCH --time=10:00:00
+#SBATCH --mem=50000 
 
 # Run the job
 ./gridder.x 
