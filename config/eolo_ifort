@@ -14,7 +14,7 @@ INC_LIS = -I${LISROOT}/include
 LIB_LIS = -L${LISROOT}/lib/ -llis
 
 FFLAGS_DEFAULT = -module $(objdir) -L$(objdir) $(INC_NC) $(INC_COORD)
-FFLAGS_OPENMP  = $(FFLAGS_DEFAULT) -qopenmp #-ipo -parallel -par-threshold90 -qopt-report #-mcmodel=medium
+FFLAGS_OPENMP  = $(FFLAGS_DEFAULT) -fopenmp #-ipo -parallel -par-threshold90 -qopt-report #-mcmodel=medium
 
 LFLAGS  = $(LIB_NC) $(LIB_COORD)
 

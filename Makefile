@@ -15,31 +15,29 @@ openmp ?= 1
 ## COMPILER CONFIGURATION ##
 # (should be loaded from config directory)
 
-FC = gfortran
+FC  = ifort
+INC_NC  = -I/home/fispalma22/work/librairies/netcdflib/include
+LIB_NC  = -L/home/fispalma22/work/librairies/netcdflib/lib -lnetcdf
 
-INC_NC  = -I/opt/local/include
-LIB_NC  = -L/opt/local/lib -lnetcdff -lnetcdf
-
-COORDROOT = /Users/robinson/models/EURICE/coordinates/libcoordinates
+COORDROOT = /home/fispalma25/apps/coordinates/libcoordinates
 INC_COORD = -I${COORDROOT}/include
 LIB_COORD = -L${COORDROOT}/include -lcoordinates
 
-MKLROOT = /opt/intel/mkl
-INC_MKL = -I${MKLROOT}/include
-# For sequential running (no tbb library)
-LIB_MKL =  -L${MKLROOT}/lib -Wl,-rpath,${MKLROOT}/lib -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread -lm -ldl
+INC_MKL = -I/opt/intel/mkl/include
+LIB_MKL = -L/opt/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 
-LISROOT = /Users/robinson/apps/lis/lis
+LISROOT = /home/fispalma25/apps/lis/lis
 INC_LIS = -I${LISROOT}/include 
 LIB_LIS = -L${LISROOT}/lib/ -llis
 
-FFLAGS_DEFAULT = -ffree-line-length-none -fbackslash -I$(objdir) -J$(objdir) $(INC_COORD)
-FFLAGS_OPENMP  = $(FFLAGS_DEFAULT) -fopenmp
+FFLAGS_DEFAULT = -module $(objdir) -L$(objdir) $(INC_NC) $(INC_COORD)
+FFLAGS_OPENMP  = $(FFLAGS_DEFAULT) -fopenmp #-ipo -parallel -par-threshold90 -qopt-report #-mcmodel=medium
 
-LFLAGS  = $(LIB_NC) $(LIB_COORD) 
-DFLAGS_NODEBUG = -O2
-DFLAGS_DEBUG   = -w -g -p -ggdb -ffpe-trap=invalid,zero,overflow,underflow -fbacktrace -fcheck=all
-DFLAGS_PROFILE = -O2 -pg
+LFLAGS  = $(LIB_NC) $(LIB_COORD)
+
+DFLAGS_NODEBUG = -vec-report0 -O2 -fp-model precise
+DFLAGS_DEBUG   = -C -traceback -ftrapuv -fpe0 -check all -vec-report0 -fp-model precise
+DFLAGS_PROFILE = -vec-report0 -O2 -fp-model precise -pg
 
 
 # Determine whether to use normal flags or debugging flags
