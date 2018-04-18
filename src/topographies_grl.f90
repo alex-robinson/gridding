@@ -119,7 +119,7 @@ contains
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp_rev(10218,18346))
         allocate(tmp(10218,18346))
-        
+
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
@@ -189,16 +189,31 @@ contains
         call grid_allocate(grid,H)
         call grid_allocate(grid,var_fill)
         
-        ! Bedrock from ETOPO-1 
-        ! Also load etopo bedrock, use it to replace high latitude regions 
+        ! Fill missing data with rtopo2 
+
+        ! rtopo2 bedrock
         call nc_read(filename0,"zb",var_fill)
         call nc_read(filename, "zb",zb,missing_value=mv)
         where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
-
-        ! Modify variables for consistency and gradient limit 
+        ! rtopo2 surface
+        call nc_read(filename0,"zs",var_fill)
+        call nc_read(filename, "zs",zs,missing_value=mv)
+        where(zs .eq. mv) zs = var_fill 
+        var_now = vars(2)
+        call nc_write(filename,var_now%nm_out,real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+    
+        ! rtopo2 ice thickness 
+        call nc_read(filename0,"H",var_fill)
+        call nc_read(filename, "H",H,missing_value=mv)
+        where(H .eq. mv) H = var_fill 
+        var_now = vars(3)
+        call nc_write(filename,var_now%nm_out,real(H),dim1="xc",dim2="yc",missing_value=real(mv))
+                
+        
+        ! Modify variables for consistency
 
         ! Re-load data
         call nc_read(filename,"zs",zs)
