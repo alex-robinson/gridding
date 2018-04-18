@@ -162,7 +162,7 @@ contains
         ! Search for nearest neighbors
         call find_nearest_grid(nbs%ii,nbs%jj,x=inp%lon(inp%i0:inp%i1),y=inp%lat(inp%j0:inp%j1), &
                                xout=real(grid%lon),yout=real(grid%lat),latlon=.TRUE., &
-                               max_dist=2e3,lat_lim=0.05)
+                               max_dist=1e3,lat_lim=0.02)
         
         ! ### Process each variable, interpolate to nearest neighbor on grid #####
 
