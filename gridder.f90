@@ -42,7 +42,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-20KM"
+    grid_name = "GRL-1KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -65,7 +65,7 @@ program gridder
     ! Global topography: Rtopo-2.0.1, two step process 
     ! 1. Interpolate rtopo fields to a high resolution regional grid 
     ! (only needed to be done once)
-!     call rtopo_latlon_to_grid(outfldr,grid,domain)
+    call rtopo_latlon_to_grid(outfldr,grid,domain)
 
     ! 2. Perform conservative interpolation to lower resolution 
 !     call rtopo_to_grid(outfldr,grid,domain)
@@ -135,7 +135,7 @@ program gridder
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !         call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-        call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=40,lat_lim=0.5d0,grad_lim=0.05d0)
+!         call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 !         call nasaBasins_to_grid(outfldr,grid,"Greenland")
