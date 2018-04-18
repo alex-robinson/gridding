@@ -15,7 +15,7 @@ module topographies_grl
 
 contains 
 
-        subroutine Morlighem17_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        subroutine Morlighem17_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -29,7 +29,10 @@ contains
         character(len=*) :: domain, outfldr 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: lat_lim  
+        double precision :: lat_lim
+        double precision :: grad_lim   
+        
+        ! Local variables 
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -44,14 +47,20 @@ contains
         integer, allocatable          :: outmask(:,:)
         integer :: q, k, m, i, l, n_var, j 
         integer :: thin_by
-        character(len=128) :: method  
+        character(len=128) :: method, grad_lim_str  
         integer :: status, ncid 
 
         double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zs(:,:), zb(:,:), H(:,:)
         character(len=512) :: filename0 
 
-
+        grad_lim_str = "" 
+        if (grad_lim .gt. 0.09d0) then 
+            write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
+        else if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
+        end if 
+        
         thin_by = 10 
 
 
@@ -90,7 +99,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-M17"//".nc"
+                              "_TOPO-M17"//trim(grad_lim_str)//".nc"
 
             ! Define filename holding RTOPO-2.0.1 data
             write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
@@ -220,6 +229,14 @@ contains
         call nc_read(filename,"z_bed",zb)
         call nc_read(filename,"H_ice",H)
         
+        ! Apply gradient limit as needed
+        if (grad_lim .gt. 0.d0) then 
+            ! Limit the gradient (m/m) to below threshold 
+            call limit_gradient(zs,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            call limit_gradient(zb,grid%G%dx*grid%xy_conv,grid%G%dy*grid%xy_conv,grad_lim=grad_lim,iter_max=50)
+            
+        end if 
+
         ! Eliminate problematic regions for this domain ========
         call clean_greenland(zs,zb,grid)
 
