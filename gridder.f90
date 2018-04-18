@@ -54,7 +54,7 @@ program gridder
     call domain_definition(grid,grid_name) 
 
     ! Write a regional mask 
-    call write_regions(outfldr,grid,domain)
+!     call write_regions(outfldr,grid,domain)
 
     ! =========================================================
     !
@@ -135,7 +135,7 @@ program gridder
 !         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !         call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-!         call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
+        call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=20,lat_lim=2.d0)
 !         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 !         call nasaBasins_to_grid(outfldr,grid,"Greenland")
