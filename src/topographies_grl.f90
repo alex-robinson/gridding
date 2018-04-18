@@ -117,9 +117,9 @@ contains
         call grid_allocate(grid0,invar)
 
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
-        allocate(tmp_rev(10018,17946))
-        allocate(tmp(10018,17946))
-
+        allocate(tmp_rev(10218,18346))
+        allocate(tmp(10218,18346))
+        
         ! Initialize mapping
         call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
