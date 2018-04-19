@@ -18,6 +18,12 @@ contains
         !
         !       GREENLAND VELOCITY DATA (Joughin et al, 2018)
         !
+        !       Data downloaded from here: http://dx.doi.org/10.5067/QUA5Q9SVMSJG
+        !       Original format: .tif 250m x 250m resolution
+        !       Aggregated to 2km x 2km by Ilaria Tabone in R using
+        !       the included script `scripts/joughin2018.r 
+        !       
+        !
         ! =========================================================
         implicit none
 
@@ -48,11 +54,10 @@ contains
         fldr_in         = "data/Greenland/Joughin2018_vel/"
         file_in         = trim(fldr_in)//"greenland_vel_mosaic250_vx_v1.txt"
 
-        desc    = "Satellite based reconstruction of Greenland surface velocity &
-                  &(source data processed from Searise product Greenland_5km_v1.1.nc)cHANGE!!!" 
-        ref     = "Joughin, I., Smith, B. E., Howat, I. M., Scambos, T. and Moon, T.: &
-                  &Greenland flow variability from ice-sheet-wide velocity mapping, &
-                  &56(197), 415–430, 2017. (CHANGE!!)"
+        desc    = "Satellite based reconstruction of Greenland surface velocity"
+        ref     = "Joughin, I., Smith, B. and Howat, I.: A complete map of Greenland &
+                  &ice velocity derived from satellite data collected over 20 years. &
+                  &Journal of Glaciology, 64(243), 1-11, doi:10.1017/jog.2017.73, 2018"
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"// &
