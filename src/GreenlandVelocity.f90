@@ -45,7 +45,7 @@ contains
 
         ! Define the input filenames
 !         fldr_in         = "/data/sicopolis/data/Greenland/"
-        fldr_in         = "data/Joughin2017_vel/"
+        fldr_in         = "data/Greenland/Joughin2017_vel/"
         file_in         = trim(fldr_in)//"greenland_vel_mosaic250_vx_v1.txt"
 
         desc    = "Satellite based reconstruction of Greenland surface velocity &
