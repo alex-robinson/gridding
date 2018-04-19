@@ -143,7 +143,7 @@ program gridder
             
 !         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
 !         call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
-        call grlvelj17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.1d0)
+        call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.1d0)
         
 !         path = "data/Davini_GreenlandAMOC/"
 !         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &

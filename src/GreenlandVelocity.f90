@@ -7,16 +7,16 @@ module GreenlandVelocity
     implicit none 
 
     private 
-    public :: grlvelj17_to_grid
+    public :: grlvelj18_to_grid
     public :: grlvelj10_to_grid
     
 contains 
 
-    subroutine grlvelj17_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine grlvelj18_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
-        !       GREENLAND VELOCITY DATA (Joughin et al, 2017)
+        !       GREENLAND VELOCITY DATA (Joughin et al, 2018)
         !
         ! =========================================================
         implicit none
@@ -45,7 +45,7 @@ contains
 
         ! Define the input filenames
 !         fldr_in         = "/data/sicopolis/data/Greenland/"
-        fldr_in         = "data/Greenland/Joughin2017_vel/"
+        fldr_in         = "data/Greenland/Joughin2018_vel/"
         file_in         = trim(fldr_in)//"greenland_vel_mosaic250_vx_v1.txt"
 
         desc    = "Satellite based reconstruction of Greenland surface velocity &
@@ -56,7 +56,7 @@ contains
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"// &
-                              trim(grid%name)//"_VEL-J17.nc"
+                              trim(grid%name)//"_VEL-J18.nc"
 
         ! Define the input data 
         !nx = 301
@@ -71,7 +71,7 @@ contains
         inp%lon = read_vector(file_in,n=np,col=3,skip=0)
         inp%lat = read_vector(file_in,n=np,col=4,skip=0)        
  
-        call points_init(points0,name="Joughin2017-5km",mtype="latlon",units="degrees", &
+        call points_init(points0,name="Joughin2018-5km",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat)
 
 
@@ -137,7 +137,7 @@ contains
 
         return
 
-    end subroutine grlvelj17_to_grid
+    end subroutine grlvelj18_to_grid
 
     subroutine grlvelj10_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
