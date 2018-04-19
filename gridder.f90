@@ -42,7 +42,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-1KM"
+    grid_name = "GRL-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -65,7 +65,7 @@ program gridder
     ! Global topography: Rtopo-2.0.1, two step process 
     ! 1. Interpolate rtopo fields to a high resolution regional grid 
     ! (only needed to be done once)
-    call rtopo_latlon_to_grid(outfldr,grid,domain)
+!     call rtopo_latlon_to_grid(outfldr,grid,domain)
 
     ! 2. Perform conservative interpolation to lower resolution 
 !     call rtopo_to_grid(outfldr,grid,domain)
@@ -142,8 +142,9 @@ program gridder
 !         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
             
 !         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
-!         call grlvel_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
-
+!         call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
+        call grlvelj17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.1d0)
+        
 !         path = "data/Davini_GreenlandAMOC/"
 !         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
 !                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)

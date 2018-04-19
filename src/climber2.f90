@@ -224,8 +224,7 @@ contains
 !         write(*,*) "climber2_smooth nloop = ", nloop
 
         do i = 1, nloop 
-            tmp2D = var2D
-            call filter_gaussian(input=tmp2D,output=var2D,sigma=sigma_max,dx=dx,mask=mask)
+            call filter_gaussian(var=var2D,sigma=sigma_max,dx=dx,mask=mask)
         end do 
 
         return 

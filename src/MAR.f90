@@ -247,9 +247,8 @@ contains
                     call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
                                   missing_value=nint(mv))
                 else 
-                    tmp = outvar 
-                    call fill_weighted(tmp,missing_value=mv)
-                    call filter_gaussian(tmp,outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                    call fill_weighted(outvar,missing_value=mv)
+                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
                                   missing_value=real(mv))
                 end if 
@@ -287,10 +286,9 @@ contains
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",radius=50.d0, &
-                                       fill=.TRUE.,missing_value=mv)
-                        tmp = outvar 
-                        call fill_weighted(tmp,missing_value=mv)
-                        call filter_gaussian(tmp,outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                                       fill=.TRUE.,missing_value=mv) 
+                        call fill_weighted(outvar,missing_value=mv)
+                        call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     
