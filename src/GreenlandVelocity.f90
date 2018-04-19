@@ -61,7 +61,8 @@ contains
         ! Define the input data 
         !nx = 301
         !ny = 561
-        np = 6032 !(5km x 5 km) nrow for each column of the .txt file
+!         np = 6032 !(5km x 5 km) nrow for each column of the .txt file
+        np = 1026480  ! (2km x 2km) 
 
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
@@ -71,7 +72,7 @@ contains
         inp%lon = read_vector(file_in,n=np,col=3,skip=0)
         inp%lat = read_vector(file_in,n=np,col=4,skip=0)        
  
-        call points_init(points0,name="Joughin2018-5km",mtype="latlon",units="degrees", &
+        call points_init(points0,name="Joughin2018-2km",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat)
 
 
@@ -96,7 +97,8 @@ contains
         !call nc_read(file_in,"surfvelx",inp%var,start=[1,1,1],count=[nx,ny,1],missing_value=mv)
         inp%var = read_vector(file_in,n=np,col=1,skip=0)   ! vx
         where(inp%var .eq. 0.0) inp%var = mv
-        call map_field(map,"vx",inp%var,outvar,outmask,"radius",fill=.TRUE.,missing_value=mv,radius=grid%G%dx)
+        outvar = mv 
+        call map_field(map,"vx",inp%var,outvar,outmask,"radius",fill=.FALSE.,missing_value=mv,radius=grid%G%dx)
         call nc_write(filename,"Ux_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata
@@ -109,7 +111,8 @@ contains
         !call nc_read(file_in,"surfvely",inp%var,start=[1,1,1],count=[nx,ny,1],missing_value=mv)
         inp%var = read_vector(file_in,n=np,col=2,skip=0)   ! vy
         where(inp%var .eq. 0.0) inp%var = mv
-        call map_field(map,"vx",inp%var,outvar,outmask,"radius",fill=.TRUE.,missing_value=mv,radius=grid%G%dx)
+        outvar = mv 
+        call map_field(map,"vx",inp%var,outvar,outmask,"radius",fill=.FALSE.,missing_value=mv,radius=grid%G%dx)
         call nc_write(filename,"Uy_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata
