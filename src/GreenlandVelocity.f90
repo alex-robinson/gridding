@@ -52,7 +52,7 @@ contains
         ! Define the input filenames
 !         fldr_in         = "/data/sicopolis/data/Greenland/"
         fldr_in         = "data/Greenland/Joughin2018_vel/"
-        file_in         = trim(fldr_in)//"greenland_vel_mosaic250_vx_v1.txt"
+        file_in         = trim(fldr_in)//"greenland_vel_mosaic250_v1_5km.txt"
 
         desc    = "Satellite based reconstruction of Greenland surface velocity"
         ref     = "Joughin, I., Smith, B. and Howat, I.: A complete map of Greenland &
@@ -66,8 +66,8 @@ contains
         ! Define the input data 
         !nx = 301
         !ny = 561
-!         np = 6032 !(5km x 5 km) nrow for each column of the .txt file
-        np = 1026480  ! (2km x 2km) 
+        np = 164346 !(5km x 5 km) nrow for each column of the .txt file
+!         np = 1026480  ! (2km x 2km) 
 
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
@@ -77,7 +77,7 @@ contains
         inp%lon = read_vector(file_in,n=np,col=3,skip=0)
         inp%lat = read_vector(file_in,n=np,col=4,skip=0)        
  
-        call points_init(points0,name="Joughin2018-2km",mtype="latlon",units="degrees", &
+        call points_init(points0,name="Joughin2018-5km",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat)
 
 
