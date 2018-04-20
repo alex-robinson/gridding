@@ -353,6 +353,7 @@ contains
         ii = -1
         jj = -1 
 
+        !$omp parallel do private(i1,j1,xout_now,yout_now,dist_min,i0,j0,k,dists_x,dist)
         do j1 = 1, ny1
 
             do i1 = 1, nx1
@@ -429,7 +430,8 @@ contains
                 write(*,"(a,i10,a3,i12,a5,g12.4)") "  ",j1, " / ", ny1,"   : ", dist_min
             end if 
         end do 
-
+        !$omp end parallel do
+        
         return 
 
     end subroutine find_nearest_grid
