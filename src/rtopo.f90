@@ -6,6 +6,8 @@ module rtopo
     use generic 
     use control 
 
+    use gaussian_filter 
+
     implicit none 
 
     private 
@@ -314,7 +316,7 @@ contains
         ! Define input grid 
         select case(trim(domain))
             case("Greenland")
-                call domain_definition(grid0,"GRL-2KM")
+                call domain_definition(grid0,"GRL-1KM")
             case("Antarctica")
                 call domain_definition(grid0,"ANT-1KM")
             case("North")
@@ -339,7 +341,7 @@ contains
         call grid_allocate(grid,var) 
         
         ! Initialize the map 
-        call map_init(map,grid0,grid,max_neighbors=200,lat_lim=2d0,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=50,lat_lim=0.5d0,fldr="maps",load=.TRUE.)
         
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
@@ -383,13 +385,18 @@ contains
             else 
                 ! Perform conservative interpolation 
 
-                if (same_projection(grid0%proj,grid%proj)) then 
-                    call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv)
-                else
-                    var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-                                        xout=grid%G%x,yout=grid%G%y)
-                end if 
+!                 if (same_projection(grid0%proj,grid%proj)) then 
+!                     call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv)
+!                 else
+!                     var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
+!                                         xout=grid%G%x,yout=grid%G%y)
+!                 end if 
                 
+
+                call filter_gaussian(var=var0,sigma=grid%G%dx/1.d0,dx=grid0%G%dx)
+                var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
+                                     xout=grid%G%x,yout=grid%G%y)
+
                 current_val = calc_grid_total(grid%G%x,grid%G%y,var,xlim=xlim,ylim=ylim)
                 err_percent = 100.d0 * (current_val-target_val) / target_val
                 write(*,"(a,3g12.4)") "mass comparison (hi, con, % diff): ", &

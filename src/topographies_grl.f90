@@ -4,6 +4,8 @@ module topographies_grl
     use coord
     use ncio 
     
+    use gaussian_filter 
+
     use regions 
 
     implicit none 
@@ -53,6 +55,7 @@ contains
         double precision, allocatable :: var_fill(:,:)
         double precision, allocatable :: zs(:,:), zb(:,:), H(:,:)
         character(len=512) :: filename0 
+        double precision :: sigma 
 
         grad_lim_str = "" 
         if (grad_lim .gt. 0.09d0) then 
@@ -124,7 +127,7 @@ contains
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
-
+        
         ! Allocate tmp array to hold full data (that will be trimmed to smaller size)
         allocate(tmp_rev(10218,18346))
         allocate(tmp(10218,18346))
@@ -150,7 +153,7 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
 
-            method = "radius"
+            method = "nn"
             if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
 
@@ -168,6 +171,17 @@ contains
                 where( invar .eq. mv ) invar = 0.d0 
             end if
             
+            ! Perform Gaussian smoothing at high resolution 
+            if (trim(var_now%nm_out) .eq. "H_ice" .or. &
+                trim(var_now%nm_out) .eq. "z_srf" .or. &
+                trim(var_now%nm_out) .eq. "z_bed") then 
+                
+                sigma = grid%G%dx / 2.0 
+
+                call filter_gaussian(var=invar,sigma=sigma,dx=grid0%G%dx)
+
+            end if 
+
             outvar = mv 
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx, &
