@@ -106,6 +106,10 @@ contains
                 call grid_init(grid,name="ANT-5KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=5.d0,nx=1249,dy=5.d0,ny=1169,lambda=0.d0,phi=-71.d0)
 
+            case("ANT-2KM")
+                call grid_init(grid,name="ANT-2KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,dx=2.d0,nx=3121,dy=2.d0,ny=2921,lambda=0.d0,phi=-71.d0)
+            
             case("ANT-1KM")
                 call grid_init(grid,name="ANT-1KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=1.d0,nx=6241,dy=1.d0,ny=5841,lambda=0.d0,phi=-71.d0)
