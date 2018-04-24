@@ -318,9 +318,9 @@ contains
             case("Greenland")
                 call domain_definition(grid0,"GRL-1KM")
             case("Antarctica")
-                call domain_definition(grid0,"ANT-1KM")
+                call domain_definition(grid0,"ANT-5KM")
             case("North")
-                call domain_definition(grid0,"NH-1KM")
+                call domain_definition(grid0,"NH-5KM")
             case DEFAULT 
                 write(*,*) "rtopo_to_grid:: error: domain not recognized: "//trim(domain)
                 stop
@@ -393,7 +393,7 @@ contains
 !                 end if 
                 
 
-                call filter_gaussian(var=var0,sigma=grid%G%dx/1.d0,dx=grid0%G%dx)
+                call filter_gaussian(var=var0,sigma=grid%G%dx/2.d0,dx=grid0%G%dx)
                 var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
                                      xout=grid%G%x,yout=grid%G%y)
 
