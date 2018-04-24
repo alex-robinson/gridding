@@ -136,6 +136,11 @@ contains
                                lon180=.TRUE.,dx=5.d0,nx=1793,dy=5.d0,ny=1681, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
 
+            case("NH-2KM")
+                call grid_init(grid,name="NH-2KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=2.d0,nx=4481,dy=2.d0,ny=4201, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
             case("NH-1KM")
                 call grid_init(grid,name="NH-1KM",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=1.d0,nx=8961,dy=1.d0,ny=8401, &
