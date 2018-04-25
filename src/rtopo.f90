@@ -336,12 +336,18 @@ contains
         filename_in = trim(path)//"/"//trim(grid0%name)//"/"// &
                         trim(grid0%name)//"_TOPO-RTOPO-2.0.1.nc"
 
+        desc    = "RTOPO-2.0.1 present-day Earth topography data"
+        ref     = "Timmermann et al.: A consistent data set of Antarctic &
+                  &ice sheet topography, cavity geometry, and global bathymetry, &
+                  &Earth Syst. Sci. Data, 2, 261-273, doi:10.5194/essd-2-261-2010, 2010. &
+                  &Data download: https://doi.pangaea.de/10.1594/PANGAEA.741917"
+
         ! ### Output information ##### 
 
         call grid_allocate(grid,var) 
         
         ! Initialize the map 
-        call map_init(map,grid0,grid,max_neighbors=50,lat_lim=0.5d0,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=5,lat_lim=0.5d0,fldr="maps",load=.TRUE.)
         
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
@@ -372,37 +378,19 @@ contains
 
             var = mv 
 
-            if (trim(varname) .eq. "mask") then
-                ! Perform nearest neighbor interpolation
-
-                if (same_projection(grid0%proj,grid%proj)) then 
-                    call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv,no_interp=.TRUE.)
-                else
-                    var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-                                        xout=grid%G%x,yout=grid%G%y)
-                end if 
-                
-            else 
-                ! Perform conservative interpolation 
-
-!                 if (same_projection(grid0%proj,grid%proj)) then 
-!                     call map_field_conservative_map1(map%map,varname,var0,var,missing_value=mv)
-!                 else
-!                     var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-!                                         xout=grid%G%x,yout=grid%G%y)
-!                 end if 
-                
-
+            if (trim(varname) .ne. "mask") then 
+                ! Smooth data on hires grid
                 call filter_gaussian(var=var0,sigma=grid%G%dx/2.d0,dx=grid0%G%dx)
-                var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
-                                     xout=grid%G%x,yout=grid%G%y)
+            end if
 
-                current_val = calc_grid_total(grid%G%x,grid%G%y,var,xlim=xlim,ylim=ylim)
-                err_percent = 100.d0 * (current_val-target_val) / target_val
-                write(*,"(a,3g12.4)") "mass comparison (hi, con, % diff): ", &
-                        target_val, current_val, err_percent                  
-  
-            end if 
+            ! Perform nearest neighbor interpolation to get lores output 
+            var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
+                                 xout=grid%G%x,yout=grid%G%y)
+
+            current_val = calc_grid_total(grid%G%x,grid%G%y,var,xlim=xlim,ylim=ylim)
+            err_percent = 100.d0 * (current_val-target_val) / target_val
+            write(*,"(a,3g12.4)") "mass comparison (hi, con, % diff): ", &
+                    target_val, current_val, err_percent                  
 
             write(*,*) "range(var_out): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
 
