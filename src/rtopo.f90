@@ -464,6 +464,10 @@ contains
             mask = 0.0  
         end where 
 
+        ! Rewrite surface elevation to file after modification 
+        varname = "z_srf"
+        call nc_write(filename,varname,real(z_srf),dim1="xc",dim2="yc",missing_value=real(mv))
+
         ! Write new variable to file: Ice thickness 
         varname = "H_ice"
         call nc_write(filename,varname,real(H_ice),dim1="xc",dim2="yc",missing_value=real(mv))
