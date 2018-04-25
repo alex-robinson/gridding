@@ -130,10 +130,12 @@ contains
         write(*,*) "ni, nj:     ", inp%ni, inp%nj 
 
         desc    = "RTOPO-2.0.1 present-day Earth topography data"
-        ref     = "Timmermann et al.: A consistent data set of Antarctic &
-                  &ice sheet topography, cavity geometry, and global bathymetry, &
-                  &Earth Syst. Sci. Data, 2, 261-273, doi:10.5194/essd-2-261-2010, 2010. &
-                  &Data download: https://doi.pangaea.de/10.1594/PANGAEA.741917"
+        ref     = "Schaffer, J., Timmermann, R., Arndt, J. E., Kristensen, S. S., Mayer, C., &
+                  &Morlighem, M., and Steinhage, D.: A global, high-resolution data set of &
+                  &ice sheet topography, cavity geometry, and ocean bathymetry, &
+                  &Earth Syst. Sci. Data, 8, 543-557, &
+                  *https://doi.org/10.5194/essd-8-543-2016, 2016. &
+                  &Data download: https://doi.pangaea.de/10.1594/PANGAEA.856844"
 
         ! ### Define output information #####
         
@@ -309,7 +311,7 @@ contains
         real(8), allocatable :: var0(:,:), var(:,:)
         real(8) :: xlim(2), ylim(2) 
 
-        real(8), allocatable :: z_base(:,:), z_srf(:,:) 
+        real(8), allocatable :: z_base(:,:), z_srf(:,:), z_bed(:,:), H_ice(:,:)   
 
         ! ### Input information #####
 
@@ -337,10 +339,12 @@ contains
                         trim(grid0%name)//"_TOPO-RTOPO-2.0.1.nc"
 
         desc    = "RTOPO-2.0.1 present-day Earth topography data"
-        ref     = "Timmermann et al.: A consistent data set of Antarctic &
-                  &ice sheet topography, cavity geometry, and global bathymetry, &
-                  &Earth Syst. Sci. Data, 2, 261-273, doi:10.5194/essd-2-261-2010, 2010. &
-                  &Data download: https://doi.pangaea.de/10.1594/PANGAEA.741917"
+        ref     = "Schaffer, J., Timmermann, R., Arndt, J. E., Kristensen, S. S., Mayer, C., &
+                  &Morlighem, M., and Steinhage, D.: A global, high-resolution data set of &
+                  &ice sheet topography, cavity geometry, and ocean bathymetry, &
+                  &Earth Syst. Sci. Data, 8, 543-557, &
+                  *https://doi.org/10.5194/essd-8-543-2016, 2016. &
+                  &Data download: https://doi.pangaea.de/10.1594/PANGAEA.856844"
 
         ! ### Output information ##### 
 
@@ -362,8 +366,8 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        allocate(varnames(4))
-        varnames = ["z_bed     ","z_srf     ","z_ice_base","mask      "]
+        allocate(varnames(3))
+        varnames = ["z_bed     ","z_srf     ","z_ice_base"]
 
         do k = 1, size(varnames)
 
@@ -376,14 +380,11 @@ contains
 
             write(*,*) "range(var_in): ", minval(var0,mask=var0.ne.mv), maxval(var0,mask=var0.ne.mv)
 
-            var = mv 
-
-            if (trim(varname) .ne. "mask") then 
-                ! Smooth data on hires grid
-                call filter_gaussian(var=var0,sigma=grid%G%dx/2.d0,dx=grid0%G%dx)
-            end if
+            ! Smooth data on hires grid
+            call filter_gaussian(var=var0,sigma=grid%G%dx/2.d0,dx=grid0%G%dx)
 
             ! Perform nearest neighbor interpolation to get lores output 
+            var = mv 
             var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
                                  xout=grid%G%x,yout=grid%G%y)
 
@@ -414,23 +415,50 @@ contains
         ! Add additional variables of interest 
         call grid_allocate(grid,z_base)
         call grid_allocate(grid,z_srf)
+        call grid_allocate(grid,H_ice)
+        call grid_allocate(grid,z_bed)
         
         call nc_read(filename,"z_ice_base",z_base)
         call nc_read(filename,"z_srf",z_srf)
+        call nc_read(filename,"z_bed",z_bed)
 
-        var = z_srf - z_base 
-        where(var.lt.0.d0) var = 0.d0 
+        H_ice = z_srf - z_base 
+        where(H_ice.lt.0.d0) H_ice = 0.d0 
 
-        ! Write to file 
+        ! Write new variable to file 
         varname = "H_ice"
 
-        call nc_write(filename,varname,real(var),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,varname,real(H_ice),dim1="xc",dim2="yc",missing_value=real(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,varname,"units","m")
         call nc_write_attr(filename,varname,"long_name","Ice thickness")
         call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
             
+        ! Write new variable to file 
+        varname = "mask"
+         
+        where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-z_bed)-H_ice) .lt. 1e0) 
+            ! Ice thickness touches bedrock to within 1m, then it is grounded ice 
+            var = 2.0
+        else where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0) 
+            ! Floating ice 
+            var = 3.0 
+        else where (z_srf .gt. 0.0) 
+            ! Ice-free land 
+            var = 1.0
+        elsewhere
+            ! Ice-free ocean 
+            var = 0.0  
+        end where 
+
+        call nc_write(filename,varname,int(var),dim1="xc",dim2="yc",missing_value=int(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,varname,"units","")
+        call nc_write_attr(filename,varname, &
+                "long_name","Mask (0:ocean, 1:land, 2:grounded ice, 3:floating ice)")
+        call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
         
         return 
 
