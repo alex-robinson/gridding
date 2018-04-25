@@ -429,10 +429,9 @@ contains
 
             
         ! Calculate ice thickness everywhere 
-        where (z_srf / (1.0-rho_ice/rho_sw) .lt. z_srf-z_bed) 
+        where (z_srf / (1.0-rho_ice/rho_sw) .le. z_srf-z_bed) 
             ! Floating ice is diagnosed 
             H_ice = z_srf / (1.0-rho_ice/rho_sw)
-        
         elsewhere
             ! Grounded ice is diagnosed 
             H_ice = z_srf-z_bed 
@@ -442,6 +441,12 @@ contains
         where (H_ice .lt. 1.0) 
             H_ice = 0.0 
             z_srf = max(0.0,z_bed)
+        end where 
+
+        ! Now delete floating points with small ice thickness 
+        where (H_ice .lt. 100.0 .and. abs((z_srf-H_ice)-z_bed) .ge. 1e0)
+            H_ice = 0.0 
+            z_srf = 0.0 
         end where 
 
         ! Now generate the consistent mask 
