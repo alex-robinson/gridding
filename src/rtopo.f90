@@ -312,7 +312,11 @@ contains
         real(8) :: xlim(2), ylim(2) 
 
         real(8), allocatable :: z_base(:,:), z_srf(:,:), z_bed(:,:), H_ice(:,:)   
+        integer, allocatable :: mask(:,:) 
 
+        real(8), parameter :: rho_ice =  910.0 
+        real(8), parameter :: rho_sw  = 1028.0 
+        
         ! ### Input information #####
 
         ! Define input grid 
@@ -413,46 +417,61 @@ contains
         end do 
 
         ! Add additional variables of interest 
-        call grid_allocate(grid,z_base)
         call grid_allocate(grid,z_srf)
-        call grid_allocate(grid,H_ice)
         call grid_allocate(grid,z_bed)
-        
+        call grid_allocate(grid,z_base)
+        call grid_allocate(grid,H_ice)
+        call grid_allocate(grid,mask)
+
         call nc_read(filename,"z_ice_base",z_base)
         call nc_read(filename,"z_srf",z_srf)
         call nc_read(filename,"z_bed",z_bed)
 
-        H_ice = z_srf - z_base 
-        where(H_ice.lt.0.d0) H_ice = 0.d0 
+            
+        ! Calculate ice thickness everywhere 
+        where (z_srf / (1.0-rho_ice/rho_sw) .lt. z_srf-z_bed) 
+            ! Floating ice is diagnosed 
+            H_ice = z_srf / (1.0-rho_ice/rho_sw)
+        
+        elsewhere
+            ! Grounded ice is diagnosed 
+            H_ice = z_srf-z_bed 
+        end where 
 
-        ! Write new variable to file 
+        ! Now delete points with small ice thickness 
+        where (H_ice .lt. 1.0) 
+            H_ice = 0.0 
+            z_srf = max(0.0,z_bed)
+        end where 
+
+        ! Now generate the consistent mask 
+        where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-H_ice)-z_bed) .lt. 1e0) 
+            ! Ice thickness touches bedrock to within 1m, then it is grounded ice 
+            mask = 2.0
+        else where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0) 
+            ! Floating ice 
+            mask = 3.0 
+        else where (z_srf .gt. 0.0) 
+            ! Ice-free land 
+            mask = 1.0
+        elsewhere
+            ! Ice-free ocean 
+            mask = 0.0  
+        end where 
+
+        ! Write new variable to file: Ice thickness 
         varname = "H_ice"
-
         call nc_write(filename,varname,real(H_ice),dim1="xc",dim2="yc",missing_value=real(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,varname,"units","m")
         call nc_write_attr(filename,varname,"long_name","Ice thickness")
         call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
-            
-        ! Write new variable to file 
-        varname = "mask"
-         
-        where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-z_bed)-H_ice) .lt. 1e0) 
-            ! Ice thickness touches bedrock to within 1m, then it is grounded ice 
-            var = 2.0
-        else where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0) 
-            ! Floating ice 
-            var = 3.0 
-        else where (z_srf .gt. 0.0) 
-            ! Ice-free land 
-            var = 1.0
-        elsewhere
-            ! Ice-free ocean 
-            var = 0.0  
-        end where 
+        
 
-        call nc_write(filename,varname,int(var),dim1="xc",dim2="yc",missing_value=int(mv))
+        ! Write new variable to file: ice mask  
+        varname = "mask"
+        call nc_write(filename,varname,mask,dim1="xc",dim2="yc",missing_value=int(mv))
 
         ! Write variable metadata
         call nc_write_attr(filename,varname,"units","")
