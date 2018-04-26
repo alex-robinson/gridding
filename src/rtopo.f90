@@ -412,12 +412,18 @@ contains
             call nc_write(filename,varname,real(var),dim1="xc",dim2="yc",missing_value=real(mv))
 
             ! Write variable metadata
-            call nc_read_attr(filename_in,varname,"units",units)
-            call nc_write_attr(filename,  varname,"units",units)
-            call nc_read_attr(filename_in,varname,"long_name",long_name)
-            call nc_write_attr(filename,  varname,"long_name",long_name)
-            
-            call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
+            if (trim(varname) .ne. "H_ice") then
+                call nc_read_attr(filename_in,varname,"units",units)
+                call nc_write_attr(filename,  varname,"units",units)
+                call nc_read_attr(filename_in,varname,"long_name",long_name)
+                call nc_write_attr(filename,  varname,"long_name",long_name)
+                call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
+            else 
+                ! Write variable metadata
+                call nc_write_attr(filename,varname,"units","m")
+                call nc_write_attr(filename,varname,"long_name","Ice thickness")
+                call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
+            end if 
             
         end do 
 
@@ -472,12 +478,7 @@ contains
         varname = "H_ice"
         call nc_write(filename,varname,real(H_ice),dim1="xc",dim2="yc",missing_value=real(mv))
 
-        ! Write variable metadata
-        call nc_write_attr(filename,varname,"units","m")
-        call nc_write_attr(filename,varname,"long_name","Ice thickness")
-        call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
         
-
         ! Write new variable to file: ice mask  
         varname = "mask"
         call nc_write(filename,varname,mask,dim1="xc",dim2="yc",missing_value=int(mv))
