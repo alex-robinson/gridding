@@ -433,26 +433,21 @@ contains
         call nc_read(filename,"z_bed",z_bed)
         call nc_read(filename,"H_ice",H_ice)
         
-!         ! Calculate ice thickness everywhere 
-!         where (z_srf / (1.0-rho_ice/rho_sw) .le. z_srf-z_bed) 
-!             ! Floating ice is diagnosed 
-!             H_ice = z_srf / (1.0-rho_ice/rho_sw)
-!         elsewhere
-!             ! Grounded ice is diagnosed 
-!             H_ice = z_srf-z_bed 
-!         end where 
+        ! Delete grounded points with small ice thickness 
+        ! Set threshold for "floating" to 100m difference with bed, in order to avoid 
+        ! artifacts 
+        where (H_ice .lt. 20.0 .and. abs((z_srf-H_ice)-z_bed) .lt. 100e0)
+            H_ice = 0.0 
+            z_srf = max(z_bed,0.0)
+        end where 
 
-!         ! Now delete points with small ice thickness 
-!         where (H_ice .lt. 1.0) 
-!             H_ice = 0.0 
-!             z_srf = max(0.0,z_bed)
-!         end where 
-
-!         ! Now delete floating points with small ice thickness 
-!         where (H_ice .lt. 100.0 .and. abs((z_srf-H_ice)-z_bed) .ge. 1e0)
-!             H_ice = 0.0 
-!             z_srf = 0.0 
-!         end where 
+        ! Delete floating points with small ice thickness 
+        ! Set threshold for "floating" to 100m difference with bed, in order to avoid 
+        ! artifacts 
+        where (H_ice .lt. 100.0 .and. abs((z_srf-H_ice)-z_bed) .ge. 100e0)
+            H_ice = 0.0 
+            z_srf = 0.0 
+        end where 
 
         ! Now generate the consistent mask 
         where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-H_ice)-z_bed) .lt. 1e0) 
