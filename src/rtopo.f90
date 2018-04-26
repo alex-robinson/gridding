@@ -308,7 +308,7 @@ contains
         real(8) :: current_val, target_val, err_percent
 
         type(grid_class) :: grid0 
-        real(8), allocatable :: var0(:,:), var(:,:)
+        real(8), allocatable :: var0(:,:), var0b(:,:), var(:,:)
         real(8) :: xlim(2), ylim(2) 
 
         real(8), allocatable :: z_base(:,:), z_srf(:,:), z_bed(:,:), H_ice(:,:)   
@@ -337,7 +337,8 @@ contains
         ylim = [minval(grid0%G%y), maxval(grid0%G%y)]
 
         call grid_allocate(grid0,var0) 
-
+        call grid_allocate(grid0,var0b) 
+        
         path = "output/"//trim(domain)
         filename_in = trim(path)//"/"//trim(grid0%name)//"/"// &
                         trim(grid0%name)//"_TOPO-RTOPO-2.0.1.nc"
@@ -371,7 +372,7 @@ contains
         call nc_write_attr(filename,"Reference",ref)
 
         allocate(varnames(3))
-        varnames = ["z_bed     ","z_srf     ","z_ice_base"]
+        varnames = ["z_bed     ","z_srf     ","z_ice_base","H_ice     "]
 
         do k = 1, size(varnames)
 
@@ -379,7 +380,15 @@ contains
             write(*,*) k, trim(varname)
 
             ! Load test data
-            call nc_read(filename_in,varname,var0,missing_value=mv)
+            if (trim(varname) .ne. "H_ice") then 
+                call nc_read(filename_in,varname,var0,missing_value=mv)
+            else 
+                call nc_read(filename_in,"z_srf",var0,missing_value=mv)
+                call nc_read(filename_in,"z_ice_base",var0b,missing_value=mv)
+                var0 = max(var0 - var0b,0.0)
+                where(var0b .eq. 0.0) var0 = 0.0  
+            end if 
+
             target_val = calc_grid_total(grid0%G%x,grid0%G%y,var0,xlim=xlim,ylim=ylim)
 
             write(*,*) "range(var_in): ", minval(var0,mask=var0.ne.mv), maxval(var0,mask=var0.ne.mv)
@@ -400,11 +409,7 @@ contains
             write(*,*) "range(var_out): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
 
             ! Write to file
-            if (trim(varname) .eq. "mask") then 
-                call nc_write(filename,varname,int(var),dim1="xc",dim2="yc",missing_value=int(mv))
-            else 
-                call nc_write(filename,varname,real(var),dim1="xc",dim2="yc",missing_value=real(mv))
-            end if 
+            call nc_write(filename,varname,real(var),dim1="xc",dim2="yc",missing_value=real(mv))
 
             ! Write variable metadata
             call nc_read_attr(filename_in,varname,"units",units)
@@ -416,7 +421,7 @@ contains
             
         end do 
 
-        ! Add additional variables of interest 
+        ! Calculate additional variables of interest 
         call grid_allocate(grid,z_srf)
         call grid_allocate(grid,z_bed)
         call grid_allocate(grid,z_base)
@@ -426,28 +431,28 @@ contains
         call nc_read(filename,"z_ice_base",z_base)
         call nc_read(filename,"z_srf",z_srf)
         call nc_read(filename,"z_bed",z_bed)
+        call nc_read(filename,"H_ice",H_ice)
+        
+!         ! Calculate ice thickness everywhere 
+!         where (z_srf / (1.0-rho_ice/rho_sw) .le. z_srf-z_bed) 
+!             ! Floating ice is diagnosed 
+!             H_ice = z_srf / (1.0-rho_ice/rho_sw)
+!         elsewhere
+!             ! Grounded ice is diagnosed 
+!             H_ice = z_srf-z_bed 
+!         end where 
 
-            
-        ! Calculate ice thickness everywhere 
-        where (z_srf / (1.0-rho_ice/rho_sw) .le. z_srf-z_bed) 
-            ! Floating ice is diagnosed 
-            H_ice = z_srf / (1.0-rho_ice/rho_sw)
-        elsewhere
-            ! Grounded ice is diagnosed 
-            H_ice = z_srf-z_bed 
-        end where 
+!         ! Now delete points with small ice thickness 
+!         where (H_ice .lt. 1.0) 
+!             H_ice = 0.0 
+!             z_srf = max(0.0,z_bed)
+!         end where 
 
-        ! Now delete points with small ice thickness 
-        where (H_ice .lt. 1.0) 
-            H_ice = 0.0 
-            z_srf = max(0.0,z_bed)
-        end where 
-
-        ! Now delete floating points with small ice thickness 
-        where (H_ice .lt. 100.0 .and. abs((z_srf-H_ice)-z_bed) .ge. 1e0)
-            H_ice = 0.0 
-            z_srf = 0.0 
-        end where 
+!         ! Now delete floating points with small ice thickness 
+!         where (H_ice .lt. 100.0 .and. abs((z_srf-H_ice)-z_bed) .ge. 1e0)
+!             H_ice = 0.0 
+!             z_srf = 0.0 
+!         end where 
 
         ! Now generate the consistent mask 
         where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-H_ice)-z_bed) .lt. 1e0) 
