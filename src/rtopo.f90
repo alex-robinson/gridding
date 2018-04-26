@@ -456,7 +456,7 @@ contains
         end where 
 
         ! Now generate the consistent mask 
-        where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-H_ice)-z_bed) .lt. 1e0) 
+        where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0 .and. abs((z_srf-H_ice)-z_bed) .lt. 10e0) 
             ! Ice thickness touches bedrock to within 1m, then it is grounded ice 
             mask = 2.0
         else where (z_srf .gt. 0.0 .and. H_ice .gt. 0.0) 
