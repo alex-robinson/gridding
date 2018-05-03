@@ -39,8 +39,7 @@ contains
         type(points_class) :: pMAR
         character(len=512) :: fldr0 
         character(len=512) :: file_invariant, file_surface, file_prefix(2)
-        type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
-        double precision, allocatable :: invar(:,:)
+        type(var_defs), allocatable :: invariant(:), surf(:)
         integer, allocatable :: invar_int(:,:) 
         integer :: plev(9) 
 
@@ -197,9 +196,9 @@ contains
             do i = 1, size(invariant)
 
                 var_now = invariant(i)
-                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv)
+                call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv)
                 outvar = missing_value
-                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=sigma, &
+                call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                fill=var_now%fill,missing_value=mv)
                 !call fill_nearest(outvar,missing_value=mv)
                 !call fill_weighted(outvar,missing_value=mv)
@@ -214,6 +213,8 @@ contains
                 
             end do 
 
+            stop 
+            
             ! ## SURFACE FIELDS ##
             do i = 1, n_var
 
@@ -235,11 +236,11 @@ contains
                                  start=[1,1,m],count=[nx,ny,1])
                         
                         ! Bug fix with input values - make sure missing values are missing
-                        where (invar .lt. -9000.d0) invar = missing_value 
+                        where (inp%var .lt. -9000.d0) inp%var = missing_value 
 
-                        where (invar .ne. missing_value) invar = invar*var_now%conv 
+                        where (inp%var .ne. missing_value) inp%var = inp%var*var_now%conv 
                         outvar = missing_value 
-                        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=sigma, &
+                        call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                        fill=var_now%fill,missing_value=mv) 
                         !call fill_weighted(outvar,missing_value=mv)
                         !call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
