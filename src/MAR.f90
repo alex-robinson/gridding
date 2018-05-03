@@ -8,6 +8,7 @@ module MAR
     implicit none 
 
     private 
+    public :: MARv39_to_grid
     public :: MARv35_to_grid
 !     public :: MARv33_to_grid
 !     public :: MARv32_to_grid
@@ -35,13 +36,21 @@ contains
         character(len=512)  :: filename 
         character(len=1024) :: desc, ref 
 
-        type(grid_class)   :: gMAR
+        type(points_class) :: pMAR
         character(len=512) :: fldr0 
         character(len=512) :: file_invariant, file_surface, file_prefix(2)
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:) 
         double precision, allocatable :: invar(:,:)
         integer, allocatable :: invar_int(:,:) 
         integer :: plev(9) 
+
+        type inp_type 
+            real(8), allocatable :: lon(:), lat(:)
+            real(8), allocatable :: var(:)
+        end type 
+
+        type(inp_type)     :: inp
+        integer :: nx, ny, npts 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -56,11 +65,6 @@ contains
         
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
-            
-            ! Define MAR raw grid and input variable field
-            call grid_init(gMAR,name="MAR-15KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                           x0=-780.d0,dx=30.d0,nx=51,y0=-1230.d0,dy=30.d0,ny=93, &
-                           lambda=-40.d0,phi=71.d0,alpha=7.5d0)
 
             ! Define the input filenames
             fldr0 = "/data/sicopolis/data/MARv3.9/Greenland/ERA_1958-2017_15km/"
@@ -68,6 +72,24 @@ contains
             file_surface   = trim(fldr0)
             file_prefix(1) = "MARv3.9-monthly-ERA-40-"
             file_prefix(2) = "MARv3.9-monthly-ERA-Interim-"
+
+            ! Determine size of input points, allocate input points object 
+            nx = nc_size(file_invariant,"x")
+            ny = nc_size(file_invariant,"y")
+            npts = nx*ny 
+            allocate(inp%lon(npts))
+            allocate(inp%lat(npts))
+            allocate(inp%var(npts))
+
+            ! Read in points 
+            call nc_read(file_invariant,"LON",inp%lon)
+            call nc_read(file_invariant,"LAT",inp%lat)
+            
+            ! Define MAR raw grid and input variable field
+            call points_init(pMAR,name="MAR-15KM-GIMP5KM",mtype="latlon",units="degrees", &
+                             lon180=.TRUE.,x=inp%lon,y=inp%lat)
+
+            stop 
 
             desc    = "Greenland regional climate simulated by MARv3.9"
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.9/Greenland"
@@ -78,7 +100,7 @@ contains
             
             year0       = 1958 
             year_switch = 1979   ! Switch scenarios (ERA-40 to ERA-INTERIM)
-            nyr         = 2013-year0+1
+            nyr         = 2017-year0+1
 
             ! For climatology
             if (present(clim_range)) then  
@@ -96,71 +118,52 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(3))
-        call def_var_info(invariant(1),trim(file_invariant),"SH", "zs",  units="m",fill=.TRUE., &
+        allocate(invariant(2))
+        call def_var_info(invariant(1),trim(file_invariant),"SRF_GIMP","z_srf",units="m",fill=.TRUE., &
             long_name="Surface elevation")
-        call def_var_info(invariant(2),trim(file_invariant),"SRF","mask",units="(0 - 4)", &
+        call def_var_info(invariant(2),trim(file_invariant),"MSK_GIMP","mask",units="(0 - 4)", &
             long_name="Land ice mask",method="nn",fill=.TRUE.)
-        call def_var_info(invariant(3),trim(file_invariant),"MSK","msk", units="%", &
-            long_name="Cell ice coverage",fill=.TRUE.)
         
-        allocate(surf(28))
-        call def_var_info(surf( 1),trim(file_surface),"SHSN0", "SH0", units="m", &
-            long_name="Snow height (layer 0)")  
-        call def_var_info(surf( 2),trim(file_surface),"SHSN2", "SH2", units="m", &
-            long_name="Snow height (layer 2)")  
-        call def_var_info(surf( 3),trim(file_surface),"SHSN3", "SH3", units="m", &
-            long_name="Snow height (layer 3)")
-        call def_var_info(surf( 4),trim(file_surface),"SMB", "smb", units="mm d**-1", &
-            long_name="Surface mass balance") 
-        call def_var_info(surf( 5),trim(file_surface),"SU",  "su",  units="mm d**-1", &
-            long_name="Sublimation") 
-        call def_var_info(surf( 6),trim(file_surface),"ME",  "me",  units="mm d**-1", &
-            long_name="Total melt",fill=.TRUE.) 
-        call def_var_info(surf( 7),trim(file_surface),"RZ",  "rz",  units="mm d**-1", &
-            long_name="Total refreezing",fill=.TRUE.) 
-        call def_var_info(surf( 8),trim(file_surface),"SF",  "sf",  units="mm d**-1", &
-            long_name="Snowfall",fill=.TRUE.) 
-        call def_var_info(surf( 9),trim(file_surface),"RF",  "rf",  units="mm d**-1", &
-            long_name="Rainfall",fill=.TRUE.) 
-        call def_var_info(surf(10),trim(file_surface),"RU",  "ru",  units="mm d**-1", &
-            long_name="Runoff") 
-        call def_var_info(surf(11),trim(file_surface),"UU",  "u",   units="m s**-1", &
-            long_name="Surface wind, u-component",fill=.TRUE.)
-        call def_var_info(surf(12),trim(file_surface),"VV",  "v",   units="m s**-1", &
-            long_name="Surface wind, v-component",fill=.TRUE.)
-        call def_var_info(surf(13),trim(file_surface),"TT",  "t3m", units="degrees Celcius", &
-            long_name="Near-surface temperature (3-m)",fill=.TRUE.)
-        call def_var_info(surf(17),trim(file_surface),"TTMIN","t3m_min", units="degrees Celcius", &
-            long_name="Min near-surface temperature (3-m)",fill=.TRUE.)
-        call def_var_info(surf(18),trim(file_surface),"TTMAX","t3m_max", units="degrees Celcius", &
-            long_name="Max near-surface temperature (3-m)",fill=.TRUE.)
-        call def_var_info(surf(14),trim(file_surface),"QQ",  "q",   units="g kg**-1", &
-            long_name="Near-surface specific humidity",fill=.TRUE.)
-        call def_var_info(surf(15),trim(file_surface),"SP",  "sp",  units="hPa", &
-            long_name="Surface pressure",fill=.TRUE.)
-        call def_var_info(surf(16),trim(file_surface),"RH",  "rh",  units="%", &
-            long_name="Relative humidity",fill=.TRUE.)
-        call def_var_info(surf(19),trim(file_surface),"UV",  "uv",  units="m s**-1", &
-            long_name="Surface wind, magnitude",fill=.TRUE.)
-        call def_var_info(surf(20),trim(file_surface),"SWD", "swd", units="W m**-2", &
+        allocate(surf(19))
+        
+        call def_var_info(surf(1),trim(file_surface),"SWD", "swd", units="W m**-2", &
             long_name="Near-surface radiation, shortwave down",fill=.TRUE.)
-        call def_var_info(surf(21),trim(file_surface),"LWD", "lwd", units="W m**-2", &
+        call def_var_info(surf(2),trim(file_surface),"LWD", "lwd", units="W m**-2", &
             long_name="Near-surface radiation, longwave down",fill=.TRUE.)
-        call def_var_info(surf(22),trim(file_surface),"LWU", "lwu", units="W m**-2", &
-            long_name="Near-surface radiation, longwave up",fill=.TRUE.)
-        call def_var_info(surf(23),trim(file_surface),"SHF", "shf", units="W m**-2", &
+        call def_var_info(surf(3),trim(file_surface),"SHF", "shf", units="W m**-2", &
             long_name="Sensible heat flux",fill=.TRUE.)
-        call def_var_info(surf(24),trim(file_surface),"LHF", "lhf", units="W m**-2", &
+        call def_var_info(surf(4),trim(file_surface),"LHF", "lhf", units="W m**-2", &
             long_name="Latent heat flux",fill=.TRUE.)
-        call def_var_info(surf(25),trim(file_surface),"AL",  "al",  units="(0 - 1)", &
-            long_name="Surface albedo")
-        call def_var_info(surf(26),trim(file_surface),"CC",  "cc",  units="(0 - 1)", &
+        call def_var_info(surf(5),trim(file_surface),"SP",  "sp",  units="hPa", &
+            long_name="Surface pressure",fill=.TRUE.)
+        call def_var_info(surf(6),trim(file_surface),"UU",  "u",   units="m s**-1", &
+            long_name="Surface wind, u-component",fill=.TRUE.)
+        call def_var_info(surf(7),trim(file_surface),"VV",  "v",   units="m s**-1", &
+            long_name="Surface wind, v-component",fill=.TRUE.)
+        call def_var_info(surf(8),trim(file_surface),"QQ",  "q",   units="g kg**-1", &
+            long_name="Near-surface specific humidity",fill=.TRUE.)
+        call def_var_info(surf(9),trim(file_surface),"CC",  "cc",  units="(0 - 1)", &
             long_name="Cloud cover fraction",fill=.TRUE.)
-        call def_var_info(surf(27),trim(file_surface),"ST",  "ts",  units="degrees Celcius", &
+        call def_var_info(surf(10),trim(file_surface),"SF",  "sf",  units="mm m**-1", &
+            long_name="Snowfall",fill=.TRUE.) 
+        call def_var_info(surf(11),trim(file_surface),"RF",  "rf",  units="mm m**-1", &
+            long_name="Rainfall",fill=.TRUE.) 
+        call def_var_info(surf(12),trim(file_surface),"AL2",  "al",  units="(0 - 1)", &
+            long_name="Surface albedo (sub-pixel 2)")
+        call def_var_info(surf(13),trim(file_surface),"TTcorr",  "t3m", units="degrees Celcius", &
+            long_name="Near-surface temperature (3-m)",fill=.TRUE.)
+        call def_var_info(surf(14),trim(file_surface),"STcorr",  "ts",  units="degrees Celcius", &
             long_name="Surface temperature")
-        call def_var_info(surf(28),trim(file_surface),"PDD", "pdd", units="degrees Celcius", &
-            long_name="Positive degree days")
+        call def_var_info(surf(15),trim(file_surface),"SMB2corr", "smb", units="mm m**-1", &
+            long_name="Surface mass balance") 
+        call def_var_info(surf(16),trim(file_surface),"MEcorr",  "me",  units="mm m**-1", &
+            long_name="Total melt",fill=.TRUE.) 
+        call def_var_info(surf(17),trim(file_surface),"SHcorr",  "sh", units="m", &
+            long_name="Snow height change through month",fill=.TRUE.)
+        call def_var_info(surf(18),trim(file_surface),"RU2corr",  "ru",  units="mm m**-1", &
+            long_name="Runoff") 
+        call def_var_info(surf(19),trim(file_surface),"SU",  "su",  units="mm m**-1", &
+            long_name="Sublimation") 
         
         nm       = 12
         n_var    = size(surf)
@@ -170,12 +173,8 @@ contains
 
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
-            ! Allocate the input grid variable
-            call grid_allocate(gMAR,invar)
-            call grid_allocate(gMAR,invar_int)
-
             ! Initialize mapping
-            call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+            call map_init(map,pMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
             ! Initialize output variable arrays
             call grid_allocate(grid,outvar)
@@ -238,8 +237,8 @@ contains
                     
                     do m = 1, nm 
                     
-                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv, &
-                                 start=[1,1,m],count=[gMAR%G%nx,gMAR%G%ny,1])
+                        call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=mv, &
+                                 start=[1,1,m],count=[nx,ny,1])
                         
                         ! Bug fix with input values - make sure missing values are missing
                         where (invar .lt. -9000.d0) invar = missing_value 
