@@ -60,7 +60,7 @@ contains
         integer :: yearf, k0, nk 
         character(len=512) :: filename_clim 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
-        double precision :: sigma 
+        double precision :: sigma, conv_mon_day   
         
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
@@ -124,6 +124,8 @@ contains
         
         allocate(surf(19))
         
+        conv_mon_day = 30.d0    ! 30 days in a month 
+
         call def_var_info(surf(1),trim(file_surface),"SWD", "swd", units="W m**-2", &
             long_name="Near-surface radiation, shortwave down",method="nn",fill=.FALSE.)
         call def_var_info(surf(2),trim(file_surface),"LWD", "lwd", units="W m**-2", &
@@ -142,25 +144,25 @@ contains
             long_name="Near-surface specific humidity",method="nn",fill=.FALSE.)
         call def_var_info(surf(9),trim(file_surface),"CC",  "cc",  units="(0 - 1)", &
             long_name="Cloud cover fraction",method="nn",fill=.FALSE.)
-        call def_var_info(surf(10),trim(file_surface),"SF",  "sf",  units="mm m**-1", &
+        call def_var_info(surf(10),trim(file_surface),"SF",  "sf",  units="mm d**-1",conv=conv_mon_day, &
             long_name="Snowfall",method="nn",fill=.FALSE.) 
-        call def_var_info(surf(11),trim(file_surface),"RF",  "rf",  units="mm m**-1", &
+        call def_var_info(surf(11),trim(file_surface),"RF",  "rf",  units="mm d**-1",conv=conv_mon_day, &
             long_name="Rainfall",method="nn",fill=.FALSE.) 
-        call def_var_info(surf(12),trim(file_surface),"AL2",  "al",  units="(0 - 1)", &
-            long_name="Surface albedo (sub-pixel 2)",method="nn",fill=.FALSE.)
+        call def_var_info(surf(12),trim(file_surface),"AL",  "al",  units="(0 - 1)", &
+            long_name="Surface albedo",method="nn",fill=.FALSE.)
         call def_var_info(surf(13),trim(file_surface),"TTcorr",  "t3m", units="degrees Celcius", &
             long_name="Near-surface temperature (3-m)",method="nn",fill=.FALSE.)
         call def_var_info(surf(14),trim(file_surface),"STcorr",  "ts",  units="degrees Celcius", &
             long_name="Surface temperature",method="nn",fill=.FALSE.)
-        call def_var_info(surf(15),trim(file_surface),"SMB2corr", "smb", units="mm m**-1", &
+        call def_var_info(surf(15),trim(file_surface),"SMBcorr", "smb", units="mm d**-1",conv=conv_mon_day, &
             long_name="Surface mass balance",method="nn",fill=.FALSE.) 
-        call def_var_info(surf(16),trim(file_surface),"MEcorr",  "me",  units="mm m**-1", &
+        call def_var_info(surf(16),trim(file_surface),"MEcorr",  "me",  units="mm d**-1",conv=conv_mon_day, &
             long_name="Total melt",method="nn",fill=.FALSE.) 
         call def_var_info(surf(17),trim(file_surface),"SHcorr",  "sh", units="m", &
             long_name="Snow height change through month",method="nn",fill=.FALSE.)
-        call def_var_info(surf(18),trim(file_surface),"RU2corr",  "ru",  units="mm m**-1", &
+        call def_var_info(surf(18),trim(file_surface),"RUcorr",  "ru",  units="mm d**-1",conv=conv_mon_day, &
             long_name="Runoff",method="nn",fill=.FALSE.) 
-        call def_var_info(surf(19),trim(file_surface),"SU",  "su",  units="mm m**-1", &
+        call def_var_info(surf(19),trim(file_surface),"SU",  "su",  units="mm d**-1",conv=conv_mon_day, &
             long_name="Sublimation",method="nn",fill=.FALSE.) 
         
         nm       = 12
@@ -197,6 +199,8 @@ contains
 
                 var_now = invariant(i)
                 call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv,start=[1,1],count=[nx,ny])
+                write(*,*) trim(var_now%nm_in), minval(inp%var), maxval(inp%var)
+                
                 outvar = missing_value
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                fill=var_now%fill,missing_value=mv)
