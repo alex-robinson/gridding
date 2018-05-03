@@ -78,8 +78,6 @@ contains
             ny = nc_size(file_invariant,"y")
             npts = nx*ny 
 
-            write(*,*) "pMAR: nx, ny, npts: ", nx, ny, npts 
-
             allocate(inp%lon(npts))
             allocate(inp%lat(npts))
             allocate(inp%var(npts))
@@ -91,8 +89,6 @@ contains
             ! Define MAR raw grid and input variable field
             call points_init(pMAR,name="MAR-15KM-GIMP5KM",mtype="latlon",units="degrees", &
                              lon180=.TRUE.,x=inp%lon,y=inp%lat)
-
-            stop 
 
             desc    = "Greenland regional climate simulated by MARv3.9"
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.9/Greenland"
@@ -122,57 +118,57 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(2))
-        call def_var_info(invariant(1),trim(file_invariant),"SRF_GIMP","z_srf",units="m",fill=.TRUE., &
-            long_name="Surface elevation")
+        call def_var_info(invariant(1),trim(file_invariant),"SRF_GIMP","z_srf",units="m", &
+            long_name="Surface elevation",method="nn",fill=.FALSE.)
         call def_var_info(invariant(2),trim(file_invariant),"MSK_GIMP","mask",units="(0 - 4)", &
-            long_name="Land ice mask",method="nn",fill=.TRUE.)
+            long_name="Land ice mask",method="nn",fill=.FALSE.)
         
         allocate(surf(19))
         
         call def_var_info(surf(1),trim(file_surface),"SWD", "swd", units="W m**-2", &
-            long_name="Near-surface radiation, shortwave down",fill=.TRUE.)
+            long_name="Near-surface radiation, shortwave down",method="nn",fill=.FALSE.)
         call def_var_info(surf(2),trim(file_surface),"LWD", "lwd", units="W m**-2", &
-            long_name="Near-surface radiation, longwave down",fill=.TRUE.)
+            long_name="Near-surface radiation, longwave down",method="nn",fill=.FALSE.)
         call def_var_info(surf(3),trim(file_surface),"SHF", "shf", units="W m**-2", &
-            long_name="Sensible heat flux",fill=.TRUE.)
+            long_name="Sensible heat flux",method="nn",fill=.FALSE.)
         call def_var_info(surf(4),trim(file_surface),"LHF", "lhf", units="W m**-2", &
-            long_name="Latent heat flux",fill=.TRUE.)
+            long_name="Latent heat flux",method="nn",fill=.FALSE.)
         call def_var_info(surf(5),trim(file_surface),"SP",  "sp",  units="hPa", &
-            long_name="Surface pressure",fill=.TRUE.)
+            long_name="Surface pressure",method="nn",fill=.FALSE.)
         call def_var_info(surf(6),trim(file_surface),"UU",  "u",   units="m s**-1", &
-            long_name="Surface wind, u-component",fill=.TRUE.)
+            long_name="Surface wind, u-component",method="nn",fill=.FALSE.)
         call def_var_info(surf(7),trim(file_surface),"VV",  "v",   units="m s**-1", &
-            long_name="Surface wind, v-component",fill=.TRUE.)
+            long_name="Surface wind, v-component",method="nn",fill=.FALSE.)
         call def_var_info(surf(8),trim(file_surface),"QQ",  "q",   units="g kg**-1", &
-            long_name="Near-surface specific humidity",fill=.TRUE.)
+            long_name="Near-surface specific humidity",method="nn",fill=.FALSE.)
         call def_var_info(surf(9),trim(file_surface),"CC",  "cc",  units="(0 - 1)", &
-            long_name="Cloud cover fraction",fill=.TRUE.)
+            long_name="Cloud cover fraction",method="nn",fill=.FALSE.)
         call def_var_info(surf(10),trim(file_surface),"SF",  "sf",  units="mm m**-1", &
-            long_name="Snowfall",fill=.TRUE.) 
+            long_name="Snowfall",method="nn",fill=.FALSE.) 
         call def_var_info(surf(11),trim(file_surface),"RF",  "rf",  units="mm m**-1", &
-            long_name="Rainfall",fill=.TRUE.) 
+            long_name="Rainfall",method="nn",fill=.FALSE.) 
         call def_var_info(surf(12),trim(file_surface),"AL2",  "al",  units="(0 - 1)", &
-            long_name="Surface albedo (sub-pixel 2)")
+            long_name="Surface albedo (sub-pixel 2)",method="nn",fill=.FALSE.)
         call def_var_info(surf(13),trim(file_surface),"TTcorr",  "t3m", units="degrees Celcius", &
-            long_name="Near-surface temperature (3-m)",fill=.TRUE.)
+            long_name="Near-surface temperature (3-m)",method="nn",fill=.FALSE.)
         call def_var_info(surf(14),trim(file_surface),"STcorr",  "ts",  units="degrees Celcius", &
-            long_name="Surface temperature")
+            long_name="Surface temperature",method="nn",fill=.FALSE.)
         call def_var_info(surf(15),trim(file_surface),"SMB2corr", "smb", units="mm m**-1", &
-            long_name="Surface mass balance") 
+            long_name="Surface mass balance",method="nn",fill=.FALSE.) 
         call def_var_info(surf(16),trim(file_surface),"MEcorr",  "me",  units="mm m**-1", &
-            long_name="Total melt",fill=.TRUE.) 
+            long_name="Total melt",method="nn",fill=.FALSE.) 
         call def_var_info(surf(17),trim(file_surface),"SHcorr",  "sh", units="m", &
-            long_name="Snow height change through month",fill=.TRUE.)
+            long_name="Snow height change through month",method="nn",fill=.FALSE.)
         call def_var_info(surf(18),trim(file_surface),"RU2corr",  "ru",  units="mm m**-1", &
-            long_name="Runoff") 
+            long_name="Runoff",method="nn",fill=.FALSE.) 
         call def_var_info(surf(19),trim(file_surface),"SU",  "su",  units="mm m**-1", &
-            long_name="Sublimation") 
+            long_name="Sublimation",method="nn",fill=.FALSE.) 
         
         nm       = 12
         n_var    = size(surf)
 
         ! Determine smoothing for missing points that are filled in 
-        sigma = grid%G%dx*2.d0 
+        sigma = grid%G%dx*1.d0 
 
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
@@ -203,24 +199,19 @@ contains
                 var_now = invariant(i)
                 call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv)
                 outvar = missing_value
-                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=50.d0, &
-                               fill=.TRUE.,missing_value=mv)
-                if (trim(var_now%method) .eq. "nn") then 
-                    call fill_nearest(outvar,missing_value=mv)
-                    call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
-                                  missing_value=nint(mv))
-                else 
-                    call fill_weighted(outvar,missing_value=mv)
-                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
-                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
-                                  missing_value=real(mv))
-                end if 
+                call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=sigma, &
+                               fill=var_now%fill,missing_value=mv)
+                !call fill_nearest(outvar,missing_value=mv)
+                !call fill_weighted(outvar,missing_value=mv)
+                !call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
+                              missing_value=real(mv))
 
                 ! Write variable metadata
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
-            
+                
             end do 
 
             ! ## SURFACE FIELDS ##
@@ -248,10 +239,10 @@ contains
 
                         where (invar .ne. missing_value) invar = invar*var_now%conv 
                         outvar = missing_value 
-                        call map_field(map,var_now%nm_in,invar,outvar,outmask,"shepard",radius=50.d0, &
-                                       fill=.TRUE.,missing_value=mv) 
-                        call fill_weighted(outvar,missing_value=mv)
-                        call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                        call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=sigma, &
+                                       fill=var_now%fill,missing_value=mv) 
+                        !call fill_weighted(outvar,missing_value=mv)
+                        !call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     
