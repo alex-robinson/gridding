@@ -50,6 +50,7 @@ contains
 
         type(inp_type)     :: inp
         integer :: nx, ny, npts 
+        double precision, allocatable :: invar(:,:) 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -61,7 +62,8 @@ contains
         character(len=512) :: filename_clim 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
         double precision :: sigma, conv_mon_day   
-        
+        double precision :: sigma0, dx0 
+
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
 
@@ -80,6 +82,11 @@ contains
             allocate(inp%lon(npts))
             allocate(inp%lat(npts))
             allocate(inp%var(npts))
+            allocate(invar(nx,ny))
+
+            ! Determine smoothing radius for input grid points (5 km input grid)
+            sigma0 = grid%G%dx / 2.d0 
+            dx0    = 5.d0 
 
             ! Read in points 
             call nc_read(file_invariant,"LON",inp%lon,start=[1,1],count=[nx,ny])
@@ -124,7 +131,7 @@ contains
         
         allocate(surf(19))
         
-        conv_mon_day = 30.d0    ! 30 days in a month 
+        conv_mon_day = 1.d0/30.d0    ! 30 days in a month 
 
         call def_var_info(surf(1),trim(file_surface),"SWD", "swd", units="W m**-2", &
             long_name="Near-surface radiation, shortwave down",method="nn",fill=.FALSE.)
@@ -179,7 +186,6 @@ contains
             ! Initialize output variable arrays
             call grid_allocate(grid,outvar)
             call grid_allocate(grid,outmask)    
-            call grid_allocate(grid,outvar_int)
             call grid_allocate(grid,tmp)
 
             ! Initialize the output file
@@ -198,7 +204,16 @@ contains
             do i = 1, size(invariant)
 
                 var_now = invariant(i)
-                call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv,start=[1,1],count=[nx,ny])
+                call nc_read(var_now%filename,var_now%nm_in,invar,missing_value=mv,start=[1,1],count=[nx,ny])
+                
+                if (trim(var_now%nm_out) .eq. "z_srf") then 
+                    ! Perform high resolution smoothing 
+                    call filter_gaussian(var=invar,sigma=sigma0,dx=dx0,mask=invar.ne.mv)
+                end if 
+
+                ! Store grid in points vector 
+                inp%var = reshape(invar,[npts])
+
                 outvar = missing_value
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                fill=.TRUE.,missing_value=mv)
@@ -214,7 +229,7 @@ contains
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
                 
             end do 
-            
+
             ! ## SURFACE FIELDS ##
             do i = 1, n_var
 
@@ -232,13 +247,20 @@ contains
                     
                     do m = 1, nm 
                     
-                        call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=mv, &
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv, &
                                  start=[1,1,m],count=[nx,ny,1])
                         
                         ! Bug fix with input values - make sure missing values are missing
-                        where (inp%var .lt. -9000.d0) inp%var = missing_value 
+                        ! Then perform units conversion as needed
+                        where (invar .lt. -9000.d0) invar = mv 
+                        where (invar .ne. mv)       invar = invar*var_now%conv
 
-                        where (inp%var .ne. missing_value) inp%var = inp%var*var_now%conv 
+                        ! Perform high resolution smoothing 
+                        call filter_gaussian(var=invar,sigma=sigma0,dx=dx0,mask=invar.ne.mv) 
+
+                        ! Store grid in points vector 
+                        inp%var = reshape(invar,[npts])
+ 
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                        fill=var_now%fill,missing_value=mv) 
