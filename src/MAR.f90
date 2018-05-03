@@ -199,14 +199,12 @@ contains
 
                 var_now = invariant(i)
                 call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv,start=[1,1],count=[nx,ny])
-                write(*,*) trim(var_now%nm_in), minval(inp%var), maxval(inp%var)
-
                 outvar = missing_value
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                fill=.TRUE.,missing_value=mv)
                 !call fill_nearest(outvar,missing_value=mv)
-                !call fill_weighted(outvar,missing_value=mv)
-                !call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                call fill_weighted(outvar,missing_value=mv)
+                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
                               missing_value=real(mv))
 
@@ -246,7 +244,7 @@ contains
                         outvar = missing_value 
                         call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                        fill=var_now%fill,missing_value=mv) 
-                        !call fill_weighted(outvar,missing_value=mv)
+                        call fill_weighted(outvar,missing_value=mv)
                         !call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
