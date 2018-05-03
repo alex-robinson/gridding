@@ -77,6 +77,9 @@ contains
             nx = nc_size(file_invariant,"x")
             ny = nc_size(file_invariant,"y")
             npts = nx*ny 
+
+            write(*,*) "pMAR: nx, ny, npts: ", nx, ny, npts 
+            
             allocate(inp%lon(npts))
             allocate(inp%lat(npts))
             allocate(inp%var(npts))
