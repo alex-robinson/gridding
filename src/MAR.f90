@@ -68,7 +68,7 @@ contains
 
             ! Define the input filenames
             fldr0 = "/data/sicopolis/data/MARv3.9/Greenland/ERA_1958-2017_15km/"
-            file_invariant = trim(fldr0)//"MARv3.5-ERA-30km-monthly-2013.nc"
+            file_invariant = trim(fldr0)//"MARv3.9-monthly-ERA-Interim-2017.nc"
             file_surface   = trim(fldr0)
             file_prefix(1) = "MARv3.9-monthly-ERA-40-"
             file_prefix(2) = "MARv3.9-monthly-ERA-Interim-"
