@@ -196,7 +196,7 @@ contains
             do i = 1, size(invariant)
 
                 var_now = invariant(i)
-                call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv)
+                call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=mv,start=[1,1],count=[nx,ny])
                 outvar = missing_value
                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=sigma, &
                                fill=var_now%fill,missing_value=mv)
@@ -214,7 +214,7 @@ contains
             end do 
 
             stop 
-            
+
             ! ## SURFACE FIELDS ##
             do i = 1, n_var
 
