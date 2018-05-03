@@ -79,14 +79,14 @@ contains
             npts = nx*ny 
 
             write(*,*) "pMAR: nx, ny, npts: ", nx, ny, npts 
-            
+
             allocate(inp%lon(npts))
             allocate(inp%lat(npts))
             allocate(inp%var(npts))
 
             ! Read in points 
-            call nc_read(file_invariant,"LON",inp%lon)
-            call nc_read(file_invariant,"LAT",inp%lat)
+            call nc_read(file_invariant,"LON",inp%lon,start=[1,1],count=[nx,ny])
+            call nc_read(file_invariant,"LAT",inp%lat,start=[1,1],count=[nx,ny])
             
             ! Define MAR raw grid and input variable field
             call points_init(pMAR,name="MAR-15KM-GIMP5KM",mtype="latlon",units="degrees", &
