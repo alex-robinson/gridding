@@ -337,8 +337,8 @@ contains
                     units_out = trim(var_now%units_out)
                 end if 
 
-                call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
-                              units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+                              units=units_out,start=[1,1],count=[grid%G%nx,grid%G%ny])
 
                 ! Write variable metadata
                 call nc_write_attr(filename_clim_ann,var_now%nm_out,"units",units_out)
