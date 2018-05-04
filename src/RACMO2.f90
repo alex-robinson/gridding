@@ -55,6 +55,7 @@ contains
         integer, allocatable          :: outmask(:,:)
 
         character(len=512) :: filename_clim, filename_clim_ann 
+        character(len=512) :: units_out 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l, year0, n_var 
@@ -335,7 +336,7 @@ contains
                 else 
                     units_out = trim(var_now%units_out)
                 end if 
-                
+
                 call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
                               units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
 
