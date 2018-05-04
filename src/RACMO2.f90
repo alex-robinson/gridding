@@ -4,13 +4,292 @@ module RACMO2
     use coord
     use ncio 
     
+    use gaussian_filter 
+    
     implicit none 
 
     private 
-    public :: RACMO2rot_to_grid
+    public :: RACMO23grl_to_grid 
     public :: RACMO23_to_grid 
-
+    public :: RACMO2rot_to_grid
+    
 contains 
+
+    subroutine RACMO23grl_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       RACMO2.3/GRL (RCM) DATA - RACMO2.3 11km data obtained from
+        !       Michiel van den Broeke
+        !       https://www.projects.science.uu.nl/iceclimate/models/greenland.php
+        !
+        ! =========================================================
+
+        implicit none 
+
+        character(len=*)  :: domain, outfldr 
+        type(grid_class)  :: grid 
+        integer, optional :: max_neighbors 
+        double precision, optional :: lat_lim 
+        integer, optional :: clim_range(2)
+
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        character(len=512) :: fldr_input, file_topo, file_prefix, file_suffix 
+        type(var_defs), allocatable :: vars0(:), vars(:)
+        integer :: nx, ny, np  
+
+        type inp_type 
+            double precision, allocatable :: lon(:), lat(:), var(:)
+            double precision :: lapse = 6.5d0 
+        end type 
+
+        type(inp_type)     :: inp
+        type(points_class) :: pts0 
+
+        type(map_class)  :: map
+        type(var_defs) :: var_now 
+        double precision, allocatable :: invar(:,:)
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        character(len=512) :: filename_clim 
+        double precision, allocatable :: var3D(:,:,:), var2D(:,:)
+
+        integer :: nyr, nm, q, k, year, m, i, l, year0, n_var 
+        integer :: yearf, k0, nk 
+        double precision :: sigma0, dx0, conv_day
+
+        ! Define input grid
+        if (trim(domain) .eq. "Greenland") then 
+            
+            ! Define the input filenames
+            fldr_input     = "/p/projects/megarun/greenrise/datasets/racmo2.3/11km/"
+            file_topo      = trim(fldr_input)//"smb.1958-2015.BN_1958_2013.MM.nc"
+            file_prefix    = "smb.1958-2015.BN_1958_2013.MM.nc"
+            file_suffix    = ""
+
+            desc    = "Greenland regional climate simulated by RACMO2.3 (GRIS11/3 dataset)"
+            ref     = "Noël, B. et al., 2015. Evaluation of the updated regional climate model RACMO2.3: &
+                      &summer snowfall impact on the Greenland Ice Sheet. The Cryosphere, 9, 1831-1844, &
+                      &doi:10.5194/tc-9-1831-2015."
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_RACMO23-ERA-INTERIM_monthly_195801-201312.nc"
+
+            year0       = 1958
+            nyr         = 2013-1958+1
+
+            ! For climatology
+            if (present(clim_range)) then  
+                k0 = clim_range(1) - year0+1
+                nk = clim_range(2) - clim_range(1) + 1 
+
+                write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
+                    "_RACMO23-ERA-INTERIM_monthly_",clim_range(1),"-",clim_range(2),".nc"
+            end if 
+
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+        end if 
+
+        ! Define RACMO2 input grids/points ===========
+        
+        nx = nc_size(file_topo,"lon")
+        ny = nc_size(file_topo,"lat")
+        np = nx*ny 
+
+        if (allocated(inp%lon)) deallocate(inp%lon)
+        if (allocated(inp%lat)) deallocate(inp%lat)
+        if (allocated(inp%var)) deallocate(inp%var)
+        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+        allocate(invar(nx,ny))
+        call nc_read(file_topo,"LON",inp%lon,start=[1,1],count=[nx,ny])
+        call nc_read(file_topo,"lAT",inp%lat,start=[1,1],count=[nx,ny])
+        call points_init(pts0,name="GRIS11",mtype="latlon",units="degrees",lon180=.TRUE., &
+                         x=inp%lon,y=inp%lat)
+
+        ! Define the variables to be mapped
+
+!         ! ## INVARIANT (2D) FIELDS ## 
+!         allocate(vars0(3))
+!         call def_var_info(vars0(1),trim(file_topo), &
+!                           "Height","zs",units="m",long_name="Surface elevation")
+!         call def_var_info(vars0(2),trim(file_topo), &
+!                           "mask2d", "mask",  units="-",long_name="Ice mask",method="nn")
+!         call def_var_info(vars0(3),trim(file_topo), &
+!                 "maskgrounded2d","mask_grounded",units="-",long_name="Grounded ice mask",method="nn")
+
+
+        ! ## SURFACE (3D) FIELDS ##
+
+        sigma0   = grid%G%dx/2.d0  ! Gaussian smoothing radius for high resolution grid
+        dx0      = 11.d0           ! Resolution of high resolution grid  
+        conv_day = 1.d0/30.d0      ! 30 days in a month   sec_day = 86400.d0
+
+        if (allocated(vars)) deallocate(vars)
+        allocate(vars(6))
+        call def_var_info(vars(1),trim(fldr_input)//trim(file_prefix),"precip","pr", &
+                          units="kg m**-2 d**-1",long_name="Precipitation",conv=conv_day,method="nn")
+        call def_var_info(vars(2),trim(fldr_input)//trim(file_prefix),"runoff","ru", &
+                          units="kg m**-2 d**-1",long_name="Runoff",conv=conv_day,method="nn")
+        call def_var_info(vars(3),trim(fldr_input)//trim(file_prefix),"refreeze","rz", &
+                          units="kg m**-2 d**-1",long_name="Refreezing",conv=conv_day,method="nn")
+        call def_var_info(vars(4),trim(fldr_input)//trim(file_prefix),"snowfall","sf", &
+                          units="kg m**-2 d**-1",long_name="Snowfall",conv=conv_day,method="nn")
+        call def_var_info(vars(5),trim(fldr_input)//trim(file_prefix),"snowmelt","me", &
+                          units="kg m**-2 d**-1",long_name="Snow melt",conv=conv_day,method="nn")
+        call def_var_info(vars(6),trim(fldr_input)//trim(file_prefix),"smb","smb", &
+                          units="kg m**-2 d**-1",long_name="Surface mass balance",conv=conv_day,method="nn")
+        
+        nm       = 12
+        n_var    = size(vars)
+
+        if (present(max_neighbors) .and. present(lat_lim)) then 
+
+            ! Initialize mapping
+            call map_init(map,pts0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+            ! Initialize output variable arrays
+            call grid_allocate(grid,outvar)
+            call grid_allocate(grid,outmask)
+
+            ! Initialize the output file
+            call nc_create(filename)
+            call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
+            call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
+!             ! ## INVARIANT (2D) FIELDS ##
+!             do i = 1, size(vars0)
+
+!                 var_now = vars0(i)
+!                 call nc_read(var_now%filename,var_now%nm_in,inp%var,missing_value=missing_value, &
+!                              start=[1,1],count=[nx,ny])
+!                 outvar = missing_value
+!                 call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=50.d0, &
+!                                fill=.TRUE.,missing_value=missing_value)
+!                 if (var_now%fill) call fill_mean(outvar,missing_value=missing_value,fill_value=0.d0)
+!                 if (trim(var_now%method) .eq. "nn") then 
+!                     call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc", &
+!                                   missing_value=nint(missing_value))
+!                 else 
+!                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
+!                                   missing_value=real(missing_value))
+!                 end if 
+
+!                 ! Write variable metadata
+!                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+!                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+!             end do 
+
+            ! ## SURFACE (3D) FIELDS ##
+            do i = 1, size(vars)
+                var_now = vars(i)     
+                write(*,*) "=== ",trim(var_now%nm_out)," ==="
+     
+                do k = 1, nyr 
+!                     write(*,*) year0-1+k
+                    do m = 1, nm 
+                        q = (k-1)*12 + m 
+
+                        call nc_read(trim(var_now%filename),var_now%nm_in,invar,&
+                                 start=[1,1,q],count=[nx,ny,1],missing_value=mv)
+                        
+                        where (invar .ne. mv) invar = invar*var_now%conv 
+                        
+                        ! Perform high resolution smoothing 
+                        call filter_gaussian(var=invar,sigma=sigma0,dx=dx0,mask=invar.ne.mv) 
+
+                        ! Store in points vector 
+                        inp%var = reshape(invar,[np])
+
+                        outvar = mv 
+                        call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=grid%G%dx*2.d0, &
+                                       fill=var_now%fill,missing_value=mv)
+                        call nc_write(filename,var_now%nm_out,real(outvar),units=var_now%units_out, &
+                                      dim1="xc",dim2="yc",dim3="month",dim4="time", &
+                                      start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
+            
+                    end do 
+                end do
+
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+            end do 
+
+        end if 
+
+        if (present(clim_range)) then 
+
+            ! Create climatology too (month by month)
+
+            call grid_allocate(grid,var2D)
+            allocate(var3D(grid%G%nx,grid%G%ny,nk))    
+            
+            ! Initialize the output file
+            call nc_create(filename_clim)
+            call nc_write_dim(filename_clim,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename_clim,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename_clim,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call grid_write(grid,filename_clim,xnm="xc",ynm="yc",create=.FALSE.)
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
+!             ! ## INVARIANT (2D) FIELDS ##
+!             do i = 1, size(vars0)
+!                 var_now = vars0(i) 
+!                 call nc_read(filename,var_now%nm_out,var2D)
+!                 call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+!                               units=var_now%units_out)
+
+!                 ! Write variable metadata
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+!             end do 
+
+            ! ## SURFACE (3D) FIELDS ##
+            do i = 1, size(vars)
+                var_now = vars(i)
+
+                do m = 1, nm  
+                    call nc_read(filename,var_now%nm_out,var3D,start=[1,1,m,k0],count=[grid%G%nx,grid%G%ny,1,nk])
+                    var2D = time_average(var3D)
+                    call nc_write(filename_clim,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                                  units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+                end do 
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+            end do 
+
+        end if 
+
+        return 
+
+    end subroutine RACMO23grl_to_grid
 
     subroutine RACMO23_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
