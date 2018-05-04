@@ -610,7 +610,7 @@ contains
         n_var    = size(surf)
 
         ! Determine smoothing for missing points that are filled in 
-        sigma = grid%G%dx*2.d0 
+        sigma = grid%G%dx*1.d0 
 
         if (present(max_neighbors) .and. present(lat_lim)) then 
 
@@ -649,7 +649,7 @@ contains
                     call fill_nearest(outvar,missing_value=mv)
                 else 
                     call fill_weighted(outvar,missing_value=mv)
-                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
                 end if 
                 
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc", &
@@ -692,7 +692,7 @@ contains
                         call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method,radius=grid%G%dx*2.d0, &
                                        fill=var_now%fill,missing_value=mv) 
                         call fill_weighted(outvar,missing_value=mv)
-                        call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                        call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
                         call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month",dim4="time", &
                                       start=[1,1,m,k],count=[grid%G%nx,grid%G%ny,1,1])
                     
