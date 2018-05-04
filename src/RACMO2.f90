@@ -5,7 +5,7 @@ module RACMO2
     use ncio 
     
     use gaussian_filter 
-    
+
     implicit none 
 
     private 
@@ -109,7 +109,7 @@ contains
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
         allocate(invar(nx,ny))
         call nc_read(file_topo,"LON",inp%lon,start=[1,1],count=[nx,ny])
-        call nc_read(file_topo,"lAT",inp%lat,start=[1,1],count=[nx,ny])
+        call nc_read(file_topo,"LAT",inp%lat,start=[1,1],count=[nx,ny])
         call points_init(pts0,name="GRIS11",mtype="latlon",units="degrees",lon180=.TRUE., &
                          x=inp%lon,y=inp%lat)
 
