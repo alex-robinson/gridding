@@ -54,12 +54,12 @@ contains
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
 
-        character(len=512) :: filename_clim 
+        character(len=512) :: filename_clim, filename_clim_ann 
         double precision, allocatable :: var3D(:,:,:), var2D(:,:)
 
         integer :: nyr, nm, q, k, year, m, i, l, year0, n_var 
         integer :: yearf, k0, nk 
-        double precision :: sigma0, dx0, conv_day
+        double precision :: sigma0, dx0, conv_day, conv_ann 
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
@@ -89,6 +89,8 @@ contains
 
                 write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
                     "_RACMO23-ERA-INTERIM_monthly_",clim_range(1),"-",clim_range(2),".nc"
+                write(filename_clim_ann,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(grid%name)// &
+                    "_RACMO23-ERA-INTERIM_ann_",clim_range(1),"-",clim_range(2),".nc"
             end if 
 
         else
@@ -240,6 +242,7 @@ contains
             ! Create climatology too (month by month)
 
             call grid_allocate(grid,var2D)
+            if (allocated(var3D)) deallocate(var3D)
             allocate(var3D(grid%G%nx,grid%G%ny,nk))    
             
             ! Initialize the output file
@@ -282,6 +285,64 @@ contains
                 call nc_write_attr(filename_clim,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename_clim,var_now%nm_out,"long_name",var_now%long_name)
                 call nc_write_attr(filename_clim,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+            end do 
+
+        end if 
+
+        if (present(clim_range)) then 
+
+            ! Create climatology too (annual mean)
+
+            call grid_allocate(grid,var2D)
+            if (allocated(var3D)) deallocate(var3D)
+            allocate(var3D(grid%G%nx,grid%G%ny,12))    
+            
+            ! Initialize the output file
+            call nc_create(filename_clim_ann)
+            call nc_write_dim(filename_clim_ann,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename_clim_ann,"yc",   x=grid%G%y,units="kilometers")
+            call grid_write(grid,filename_clim_ann,xnm="xc",ynm="yc",create=.FALSE.)
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
+!             ! ## INVARIANT (2D) FIELDS ##
+!             do i = 1, size(vars0)
+!                 var_now = vars0(i) 
+!                 call nc_read(filename,var_now%nm_out,var2D)
+!                 call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
+!                               units=var_now%units_out)
+
+!                 ! Write variable metadata
+!                 call nc_write_attr(filename_clim_ann,var_now%nm_out,"units",var_now%units_out)
+!                 call nc_write_attr(filename_clim_ann,var_now%nm_out,"long_name",var_now%long_name)
+!                 call nc_write_attr(filename_clim_ann,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+!             end do 
+
+            ! ## SURFACE (3D) FIELDS ##
+            do i = 1, size(vars)
+                var_now = vars(i)
+  
+                call nc_read(filename,var_now%nm_out,var3D,start=[1,1,1],count=[grid%G%nx,grid%G%ny,12])
+                var2D = time_average(var3D)
+                ! Convert units [mm/d] => [mm/a]
+                if (trim(var_now%units_out) .eq. "kg m**-2 d**-1") then 
+                    var2D = var2D*365.d0 
+                    units_out = "kg m**-2 a**-1"
+                else 
+                    units_out = trim(var_now%units_out)
+                end if 
+                
+                call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc",dim3="month", &
+                              units=var_now%units_out,start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
+
+                ! Write variable metadata
+                call nc_write_attr(filename_clim_ann,var_now%nm_out,"units",units_out)
+                call nc_write_attr(filename_clim_ann,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename_clim_ann,var_now%nm_out,"coordinates","lat2D lon2D")
             
             end do 
 

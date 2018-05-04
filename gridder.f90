@@ -139,7 +139,7 @@ program gridder
 !         call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !         call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
-        call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
+!         call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
         call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
 
 !         call nasaBasins_to_grid(outfldr,grid,"Greenland")
