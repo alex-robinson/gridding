@@ -306,13 +306,13 @@ contains
             call grid_write(grid,filename_clim_ann,xnm="xc",ynm="yc",create=.FALSE.)
             
             ! Write meta data 
-            call nc_write_attr(filename,"Description",desc)
-            call nc_write_attr(filename,"Reference",ref)
+            call nc_write_attr(filename_clim_ann,"Description",desc)
+            call nc_write_attr(filename_clim_ann,"Reference",ref)
 
 !             ! ## INVARIANT (2D) FIELDS ##
 !             do i = 1, size(vars0)
 !                 var_now = vars0(i) 
-!                 call nc_read(filename,var_now%nm_out,var2D)
+!                 call nc_read(filename_clim,var_now%nm_out,var2D)
 !                 call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
 !                               units=var_now%units_out)
 
@@ -327,7 +327,7 @@ contains
             do i = 1, size(vars)
                 var_now = vars(i)
   
-                call nc_read(filename,var_now%nm_out,var3D,start=[1,1,1],count=[grid%G%nx,grid%G%ny,12])
+                call nc_read(filename_clim,var_now%nm_out,var3D,start=[1,1,1],count=[grid%G%nx,grid%G%ny,12])
                 var2D = time_average(var3D)
                 ! Convert units [mm/d] => [mm/a]
                 if (trim(var_now%units_out) .eq. "kg m**-2 d**-1") then 
