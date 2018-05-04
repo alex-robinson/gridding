@@ -357,7 +357,7 @@ contains
             ! ## INVARIANT (2D) FIELDS ##
             do i = 1, size(invariant)
                 var_now = invariant(i) 
-                call nc_read(filename_clim_ann,var_now%nm_out,var2D)
+                call nc_read(filename_clim,var_now%nm_out,var2D)
                 call nc_write(filename_clim_ann,var_now%nm_out,real(var2D),dim1="xc",dim2="yc", &
                               units=var_now%units_out)
 
