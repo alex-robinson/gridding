@@ -42,7 +42,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-20KM"
+    grid_name = "GRL-10KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -54,7 +54,7 @@ program gridder
     call domain_definition(grid,grid_name) 
 
     ! Write a regional mask 
-!     call write_regions(outfldr,grid,domain)
+    call write_regions(outfldr,grid,domain)
 
     ! =========================================================
     !
@@ -68,7 +68,7 @@ program gridder
 !     call rtopo_latlon_to_grid(outfldr,grid,domain)
 
     ! 2. Perform conservative interpolation to lower resolution 
-!     call rtopo_to_grid(outfldr,grid,domain)
+    call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
@@ -137,8 +137,8 @@ program gridder
 !         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
 !         call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
 
-        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
-        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
+!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 !         call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !         call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
