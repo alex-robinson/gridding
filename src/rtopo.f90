@@ -322,7 +322,8 @@ contains
         ! Define input grid 
         select case(trim(domain))
             case("Greenland")
-                call domain_definition(grid0,"GRL-1KM")
+                call domain_definition(grid0,"ESPG-3413-1KM")
+!                 call domain_definition(grid0,"GRL-1KM")
             case("Antarctica")
                 call domain_definition(grid0,"ANT-5KM")
             case("North")
