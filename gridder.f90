@@ -68,7 +68,7 @@ program gridder
     !call rtopo_latlon_to_grid(outfldr,grid,domain)
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+!     call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
@@ -150,7 +150,7 @@ program gridder
             
 !         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
 !         call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
-!         call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
+        call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
         
 !         path = "data/Davini_GreenlandAMOC/"
 !         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
