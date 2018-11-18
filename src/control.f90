@@ -185,8 +185,8 @@ contains
 
             case("EIS-40KM")
                 call grid_init(grid,name="EIS-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=71,dy=40.d0,ny=101, &
-                               lambda=15.d0,phi=67.d0,alpha=20.0d0)
+                               lon180=.TRUE.,dx=40.d0,nx=71,dy=40.d0,ny=121, &
+                               lambda=15.d0,phi=70.d0,alpha=20.0d0)
 
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
