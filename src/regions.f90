@@ -151,7 +151,8 @@ contains
 
             case DEFAULT 
                 write(*,*) "regions:: error: domain not recognized: "//trim(domain)
-                stop 
+                write(*,*) "Setting all values of regions to zero."
+                mask = 0.0  
 
         end select
 
