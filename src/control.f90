@@ -190,8 +190,8 @@ contains
             
             call grid_init(grid,name="EIS-ESPG-3413-40KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
-                              x0=2000.d0,dx=40.0d0,nx=81,y0=-3500.d0,dy=40.0d0,ny=121, &
-                              lambda=-45.d0,phi=70.d0,alpha=20.0d0)
+                              x0=2000.d0,dx=40.0d0,nx=91,y0=-3400.d0,dy=40.0d0,ny=101, &
+                              lambda=-45.d0,phi=70.d0,alpha=14.4d0)
             
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
