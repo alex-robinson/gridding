@@ -184,10 +184,15 @@ contains
             ! EURASIA DOMAINS ======================= 
 
             case("EIS-40KM")
-                call grid_init(grid,name="EIS-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=81,dy=40.d0,ny=121, &
-                               lambda=15.d0,phi=74.d0,alpha=14.0d0)
-
+!                 call grid_init(grid,name="EIS-40KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=40.d0,nx=81,dy=40.d0,ny=121, &
+!                                lambda=15.d0,phi=74.d0,alpha=14.0d0)
+            
+            call grid_init(grid,name="EIS-ESPG-3413-40KM",mtype="polar_stereographic", &
+                              units="kilometers",lon180=.TRUE., &
+                              x0=2000.d0,dx=40.0d0,nx=81,y0=-3500.d0,dy=40.0d0,ny=121, &
+                              lambda=-45.d0,phi=70.d0,alpha=20.0d0)
+            
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
                 stop 
