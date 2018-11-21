@@ -64,13 +64,32 @@ contains
             ! EURASIA DOMAINS ======================= 
 
             case("EIS-40KM")
-
                 call grid_init(grid,name="EIS-40KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=380.d0,dx=40.0d0,nx=89,y0=-5000.d0,dy=40.0d0,ny=161, &
                         lambda=-45.d0,phi=70.d0)
             
+            case("EIS-20KM")
+                call grid_init(grid,name="EIS-20KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=380.d0,dx=20.0d0,nx=177,y0=-5000.d0,dy=20.0d0,ny=321, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("EIS-10KM")
+                call grid_init(grid,name="EIS-10KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=380.d0,dx=10.0d0,nx=353,y0=-5000.d0,dy=10.0d0,ny=641, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("EIS-5KM")
+                call grid_init(grid,name="EIS-5KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=380.d0,dx=5.0d0,nx=705,y0=-5000.d0,dy=5.0d0,ny=1281, &
+                        lambda=-45.d0,phi=70.d0)
+                
             ! GREENLAND DOMAINS =======================
 
+            case("GRL-40KM")
+                call grid_init(grid,name="GRL-40KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=40.0d0,nx=43,y0=-3450.d0,dy=40.0d0,ny=73, &
+                        lambda=-45.d0,phi=70.d0)
+            
             case("GRL-20KM")
                 call grid_init(grid,name="GRL-20KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-720.d0,dx=20.0d0,nx=85,y0=-3450.d0,dy=20.0d0,ny=145, &
