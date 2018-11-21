@@ -34,75 +34,35 @@ contains
 
             ! GREENLAND DOMAINS =======================
 
-            case("ESPG-3413-20KM")
-                call grid_init(grid,name="ESPG-3413-20KM",mtype="polar_stereographic", &
+            case("GRL-20KM")
+                call grid_init(grid,name="ESPG-3413-GRL-20KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
                               x0=-720.d0,dx=20.0d0,nx=85,y0=-3450.d0,dy=20.0d0,ny=145, &
                               lambda=-45.d0,phi=70.d0,alpha=20.0d0)
             
-            case("ESPG-3413-10KM")
-                call grid_init(grid,name="ESPG-3413-10KM",mtype="polar_stereographic", &
+            case("GRL-10KM")
+                call grid_init(grid,name="ESPG-3413-GRL-10KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
                               x0=-720.d0,dx=10.0d0,nx=169,y0=-3450.d0,dy=10.0d0,ny=289, &
                               lambda=-45.d0,phi=70.d0,alpha=20.0d0)
             
-            case("ESPG-3413-5KM")
-                call grid_init(grid,name="ESPG-3413-5KM",mtype="polar_stereographic", &
+            case("GRL-5KM")
+                call grid_init(grid,name="ESPG-3413-GRL-5KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
                               x0=-720.d0,dx=5.0d0,nx=337,y0=-3450.d0,dy=5.0d0,ny=577, &
                               lambda=-45.d0,phi=70.d0,alpha=20.0d0)
             
-            case("ESPG-3413-2KM")
-                call grid_init(grid,name="ESPG-3413-2KM",mtype="polar_stereographic", &
+            case("GRL-2KM")
+                call grid_init(grid,name="ESPG-3413-GRL-2KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
                               x0=-720.d0,dx=2.0d0,nx=841,y0=-3450.d0,dy=2.0d0,ny=1441, &
                               lambda=-45.d0,phi=70.d0,alpha=20.0d0)
             
-            case("ESPG-3413-1KM")
-                call grid_init(grid,name="ESPG-3413-1KM",mtype="polar_stereographic", &
+            case("GRL-1KM")
+                call grid_init(grid,name="ESPG-3413-GRL-1KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
                               x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
                               lambda=-45.d0,phi=70.d0,alpha=20.0d0)
-
-            case("GRL-120KM")
-                call grid_init(grid,name="GRL-120KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=120.d0,nx=16,dy=120.d0,ny=26, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-
-            case("GRL-40KM")
-                call grid_init(grid,name="GRL-40KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=40.d0,nx=46,dy=40.d0,ny=76, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-
-            case("GRL-20KM")
-                call grid_init(grid,name="GRL-20KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=20.d0,nx=91,dy=20.d0,ny=151, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-
-            case("GRL-10KM")
-                call grid_init(grid,name="GRL-10KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=10.d0,nx=181,dy=10.d0,ny=301, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-
-            case("GRL-5KM")
-                call grid_init(grid,name="GRL-5KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=5.d0,nx=361,dy=5.d0,ny=601, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-            
-            case("GRL-2KM")
-                call grid_init(grid,name="GRL-2KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=2.d0,nx=901,dy=2.d0,ny=1501, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-
-            case("GRL-1KM")
-                call grid_init(grid,name="GRL-1KM",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=1.d0,nx=1801,dy=1.d0,ny=3001, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
-
-            case("GRL-500M")
-                call grid_init(grid,name="GRL-500M",mtype="stereographic",units="kilometers", &
-                               lon180=.TRUE.,dx=0.5d0,nx=3601,dy=0.5d0,ny=6001, &
-                               lambda=-40.d0,phi=72.d0,alpha=8.4d0)
 
             case("Bamber01-20KM")
                 call grid_init(grid,name="Bamber01-20KM",mtype="polar_stereographic",units="kilometers", &
@@ -147,58 +107,19 @@ contains
             ! NORTH DOMAINS ======================= 
 
             case("NH-40KM")
-                call grid_init(grid,name="NH-ESPG-3413-40KM",mtype="polar_stereographic", &
+                call grid_init(grid,name="NH-40KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
-                              x0=-4000.d0,dx=40.0d0,nx=225,y0=-5000.d0,dy=40.0d0,ny=211, &
-                              lambda=-45.d0,phi=70.d0,alpha=20.0d0)
+                              x0=-4600.d0,dx=40.0d0,nx=226,y0=-5400.d0,dy=40.0d0,ny=221, &
+                              lambda=-45.d0,phi=70.d0,alpha=33.1d0)
             
-            ! Old projection, before going back to polar_stereographic for grid homogeneity among NH domains...
-!             case("NH-40KM")
-!                 call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-20KM")
-!                 call grid_init(grid,name="NH-20KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=20.d0,nx=449,dy=20.d0,ny=421, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-10KM")
-!                 call grid_init(grid,name="NH-10KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=10.d0,nx=897,dy=10.d0,ny=841, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-5KM")
-!                 call grid_init(grid,name="NH-5KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=5.d0,nx=1793,dy=5.d0,ny=1681, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-2KM")
-!                 call grid_init(grid,name="NH-2KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=2.d0,nx=4481,dy=2.d0,ny=4201, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-1KM")
-!                 call grid_init(grid,name="NH-1KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=1.d0,nx=8961,dy=1.d0,ny=8401, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-40KM-old")
-!                 call grid_init(grid,name="NH-40KM-old",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
-!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
             ! EURASIA DOMAINS ======================= 
 
             case("EIS-40KM")
-!                 call grid_init(grid,name="EIS-40KM",mtype="stereographic",units="kilometers", &
-!                                lon180=.TRUE.,dx=40.d0,nx=81,dy=40.d0,ny=121, &
-!                                lambda=15.d0,phi=74.d0,alpha=14.0d0)
-            
-            call grid_init(grid,name="EIS-ESPG-3413-40KM",mtype="polar_stereographic", &
+
+                call grid_init(grid,name="ESPG-3413-EIS-40KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
                               x0=2000.d0,dx=40.0d0,nx=91,y0=-3400.d0,dy=40.0d0,ny=101, &
-                              lambda=-45.d0,phi=70.d0,alpha=14.4d0)
+                              lambda=-45.d0,phi=70.d0,alpha=20.0d0)
             
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
@@ -293,3 +214,83 @@ contains
     end subroutine timer_print
 
 end module control 
+
+
+
+! ================ OLD PROJECTIONS ================ 
+
+!             case("GRL-120KM")
+!                 call grid_init(grid,name="GRL-120KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=120.d0,nx=16,dy=120.d0,ny=26, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+!             case("GRL-40KM")
+!                 call grid_init(grid,name="GRL-40KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=40.d0,nx=46,dy=40.d0,ny=76, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+!             case("GRL-20KM")
+!                 call grid_init(grid,name="GRL-20KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=20.d0,nx=91,dy=20.d0,ny=151, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+!             case("GRL-10KM")
+!                 call grid_init(grid,name="GRL-10KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=10.d0,nx=181,dy=10.d0,ny=301, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+!             case("GRL-5KM")
+!                 call grid_init(grid,name="GRL-5KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=5.d0,nx=361,dy=5.d0,ny=601, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+            
+!             case("GRL-2KM")
+!                 call grid_init(grid,name="GRL-2KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=2.d0,nx=901,dy=2.d0,ny=1501, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+!             case("GRL-1KM")
+!                 call grid_init(grid,name="GRL-1KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=1.d0,nx=1801,dy=1.d0,ny=3001, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+!             case("GRL-500M")
+!                 call grid_init(grid,name="GRL-500M",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=0.5d0,nx=3601,dy=0.5d0,ny=6001, &
+!                                lambda=-40.d0,phi=72.d0,alpha=8.4d0)
+
+            ! Old projection, before going back to polar_stereographic for grid homogeneity among NH domains...
+!             case("NH-40KM")
+!                 call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+!             case("NH-20KM")
+!                 call grid_init(grid,name="NH-20KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=20.d0,nx=449,dy=20.d0,ny=421, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+!             case("NH-10KM")
+!                 call grid_init(grid,name="NH-10KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=10.d0,nx=897,dy=10.d0,ny=841, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+!             case("NH-5KM")
+!                 call grid_init(grid,name="NH-5KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=5.d0,nx=1793,dy=5.d0,ny=1681, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+!             case("NH-2KM")
+!                 call grid_init(grid,name="NH-2KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=2.d0,nx=4481,dy=2.d0,ny=4201, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+!             case("NH-1KM")
+!                 call grid_init(grid,name="NH-1KM",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=1.d0,nx=8961,dy=1.d0,ny=8401, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+!             case("NH-40KM-old")
+!                 call grid_init(grid,name="NH-40KM-old",mtype="stereographic",units="kilometers", &
+!                                lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
+!                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
