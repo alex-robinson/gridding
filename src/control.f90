@@ -32,6 +32,48 @@ contains
 
         select case(trim(grid_name))
 
+            ! Note - all North projections now use the ESPG-3413
+            ! polar stereographic projection with (lambda=-45.d0,phi=70.d0)
+            ! Smaller Northern domains like Eurasia and Greenland use
+            ! the same projection for consistency. 
+            ! ESPG-3413 (lambda=-45.d0,phi=70.d0) is used for Greenland in 
+            ! model intercomparison exercises, eg ISMIP6. 
+
+            ! NORTH DOMAINS ======================= 
+
+            case("NH-40KM")
+                call grid_init(grid,name="NH-40KM",mtype="polar_stereographic", &
+                              units="kilometers",lon180=.TRUE., &
+                              x0=-4900.d0,dx=40.0d0,nx=221,y0=-5400.d0,dy=40.0d0,ny=221, &
+                              lambda=-45.d0,phi=70.d0)
+            
+            case("NH-20KM")
+                call grid_init(grid,name="NH-20KM",mtype="polar_stereographic", &
+                              units="kilometers",lon180=.TRUE., &
+                              x0=-4900.d0,dx=20.0d0,nx=441,y0=-5400.d0,dy=20.0d0,ny=441, &
+                              lambda=-45.d0,phi=70.d0)
+            
+            case("NH-10KM")
+                call grid_init(grid,name="NH-10KM",mtype="polar_stereographic", &
+                              units="kilometers",lon180=.TRUE., &
+                              x0=-4900.d0,dx=10.0d0,nx=881,y0=-5400.d0,dy=10.0d0,ny=881, &
+                              lambda=-45.d0,phi=70.d0)
+            
+            case("NH-5KM")
+                call grid_init(grid,name="NH-5KM",mtype="polar_stereographic", &
+                              units="kilometers",lon180=.TRUE., &
+                              x0=-4900.d0,dx=5.0d0,nx=1761,y0=-5400.d0,dy=5.0d0,ny=1761, &
+                              lambda=-45.d0,phi=70.d0)
+            
+            ! EURASIA DOMAINS ======================= 
+
+            case("EIS-40KM")
+
+                call grid_init(grid,name="EIS-40KM",mtype="polar_stereographic", &
+                              units="kilometers",lon180=.TRUE., &
+                              x0=380.d0,dx=40.0d0,nx=89,y0=-5000.d0,dy=40.0d0,ny=161, &
+                              lambda=-45.d0,phi=70.d0)
+            
             ! GREENLAND DOMAINS =======================
 
             case("GRL-20KM")
@@ -104,23 +146,6 @@ contains
                 call grid_init(grid,name="ANT-1KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=1.d0,nx=6241,dy=1.d0,ny=5841,lambda=0.d0,phi=-71.d0)
 
-            ! NORTH DOMAINS ======================= 
-
-            case("NH-40KM")
-                call grid_init(grid,name="NH-40KM",mtype="polar_stereographic", &
-                              units="kilometers",lon180=.TRUE., &
-                              x0=-4900.d0,dx=40.0d0,nx=221,y0=-5400.d0,dy=40.0d0,ny=221, &
-                              lambda=-45.d0,phi=70.d0,alpha=34.0d0)
-            
-            ! EURASIA DOMAINS ======================= 
-
-            case("EIS-40KM")
-
-                call grid_init(grid,name="ESPG-3413-EIS-40KM",mtype="polar_stereographic", &
-                              units="kilometers",lon180=.TRUE., &
-                              x0=2000.d0,dx=40.0d0,nx=91,y0=-3400.d0,dy=40.0d0,ny=101, &
-                              lambda=-45.d0,phi=70.d0,alpha=20.0d0)
-            
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
                 stop 
