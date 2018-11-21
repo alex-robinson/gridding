@@ -109,8 +109,8 @@ contains
             case("NH-40KM")
                 call grid_init(grid,name="NH-40KM",mtype="polar_stereographic", &
                               units="kilometers",lon180=.TRUE., &
-                              x0=-4600.d0,dx=40.0d0,nx=226,y0=-5400.d0,dy=40.0d0,ny=221, &
-                              lambda=-45.d0,phi=70.d0,alpha=33.1d0)
+                              x0=-4900.d0,dx=40.0d0,nx=221,y0=-5400.d0,dy=40.0d0,ny=221, &
+                              lambda=-45.d0,phi=70.d0,alpha=34.0d0)
             
             ! EURASIA DOMAINS ======================= 
 
