@@ -41,8 +41,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Eurasia"
-    grid_name = "EIS-40KM"
+    domain    = "North"
+    grid_name = "NH-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -54,7 +54,7 @@ program gridder
     call domain_definition(grid,grid_name) 
 
     ! Write a regional mask 
-!     call write_regions(outfldr,grid,domain)
+    call write_regions(outfldr,grid,domain)
 
     ! =========================================================
     !
@@ -93,7 +93,7 @@ program gridder
     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
         
-    call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
+!     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
 
     if (trim(domain) .eq. "Antarctica") then 
         ! == Antarctica only datasets ==
