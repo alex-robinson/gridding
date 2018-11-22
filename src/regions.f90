@@ -28,7 +28,7 @@ contains
 
         type(grid_class), intent(IN) :: grid 
         real(4) :: mask(grid%G%nx,grid%G%ny)
-        
+
         type(points_class), allocatable :: regs(:)
         type(points_class) :: pts 
         logical :: in_reg(grid%G%nx,grid%G%ny)
@@ -48,10 +48,10 @@ contains
         call points_init(regs(3),grid0=grid,name="reg3",filename="regions/new/polygon_grl.txt",latlon=.TRUE.,skip=1)
         
         ! == Sub-regions ==
-        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/new/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/new/polygon_britain.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/new/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/new/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/new/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/new/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/new/polygon_britain.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/new/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(8),grid0=grid,name="reg8",filename="regions/new/polygon_iceland.txt",latlon=.TRUE.,skip=1)
         
         ! == Continental regions ==
@@ -62,9 +62,9 @@ contains
         ! == Sub-regions ==
         reg_vals(4) = 1.1
         reg_vals(5) = 2.1
-        reg_vals(6) = 3.1
-        reg_vals(7) = 2.2
-        reg_vals(8) = 2.3
+        reg_vals(6) = 2.2
+        reg_vals(7) = 2.3
+        reg_vals(8) = 3.1
         
         mask = mask_index_north + 0.0   ! ocean 
 
