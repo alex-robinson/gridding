@@ -43,17 +43,17 @@ contains
         ! === Define each region ===
 
         ! == Continental regions ==
-        call points_init(regs(1),grid0=grid,name="reg1",filename="regions/new/polygon_laurentide.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(2),grid0=grid,name="reg2",filename="regions/new/polygon_eis.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(3),grid0=grid,name="reg3",filename="regions/new/polygon_grl.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/new/polygon_asia.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(1),grid0=grid,name="reg1",filename="regions/polygons/polygon_laurentide.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(2),grid0=grid,name="reg2",filename="regions/polygons/polygon_eis.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(3),grid0=grid,name="reg3",filename="regions/polygons/polygon_grl.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/polygons/polygon_asia.txt",latlon=.TRUE.,skip=1)
         
         ! == Sub-regions ==
-        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/new/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/new/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/new/polygon_britain.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(8),grid0=grid,name="reg8",filename="regions/new/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(9),grid0=grid,name="reg9",filename="regions/new/polygon_iceland.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/polygons/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/polygons/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/polygons/polygon_britain.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(8),grid0=grid,name="reg8",filename="regions/polygons/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(9),grid0=grid,name="reg9",filename="regions/polygons/polygon_iceland.txt",latlon=.TRUE.,skip=1)
         
         ! == Continental regions ==
         reg_vals(1) = 1.0
@@ -97,8 +97,8 @@ contains
         allocate(regs(2))
 
         ! === Define each region ===
-        call points_init(regs(1),grid0=grid,name="ant",filename="regions/polygon_ant.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(2),grid0=grid,name="ant",filename="regions/polygon_ant-inner.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(1),grid0=grid,name="ant",filename="regions/polygons/polygon_ant.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(2),grid0=grid,name="ant",filename="regions/polygons/polygon_ant-inner.txt",latlon=.TRUE.,skip=1)
 
         mask = mask_index_south + 0.0   ! ocean 
 
