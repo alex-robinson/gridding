@@ -131,24 +131,24 @@ program gridder
         ! == Greenland only datasets ==
         write(*,*) "Processing Greenland..."
 
-!         call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
-!         call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-!         call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
-!         call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-!         call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
+        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
+        call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+        call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
+        call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
+        call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
 
-!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
-!         call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
-!         call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
-!         call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
+        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+        call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
+        call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
-!         call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
-!         call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
+        call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
+        call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
 
-!         call nasaBasins_to_grid(outfldr,grid,"Greenland")
-!         call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        call nasaBasins_to_grid(outfldr,grid,"Greenland")
+        call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
             
-!         call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
 !         call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
         call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
         
