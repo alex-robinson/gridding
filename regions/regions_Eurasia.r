@@ -104,6 +104,10 @@ if (FALSE) {
 
     coords = locator(type="l")
     poly1  = get_latlon(coords,topo)
+    my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_asia.txt"),scientific=TRUE,digits=4)
+
+    coords = locator(type="l")
+    poly1  = get_latlon(coords,topo)
     my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_grl.txt"),scientific=TRUE,digits=4)
 
     ### Sub-domains ###

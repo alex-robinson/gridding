@@ -36,7 +36,7 @@ contains
         integer :: q, n_regions 
         
         ! Allocate the region_type to hold all regions of interest
-        n_regions = 8 
+        n_regions = 9 
         allocate(regs(n_regions))
         allocate(reg_vals(n_regions))
 
@@ -46,25 +46,27 @@ contains
         call points_init(regs(1),grid0=grid,name="reg1",filename="regions/new/polygon_laurentide.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(2),grid0=grid,name="reg2",filename="regions/new/polygon_eis.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(3),grid0=grid,name="reg3",filename="regions/new/polygon_grl.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/new/polygon_aisa.txt",latlon=.TRUE.,skip=1)
         
         ! == Sub-regions ==
-        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/new/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/new/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/new/polygon_britain.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/new/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(8),grid0=grid,name="reg8",filename="regions/new/polygon_iceland.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/new/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/new/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/new/polygon_britain.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(8),grid0=grid,name="reg8",filename="regions/new/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(9),grid0=grid,name="reg9",filename="regions/new/polygon_iceland.txt",latlon=.TRUE.,skip=1)
         
         ! == Continental regions ==
         reg_vals(1) = 1.0
         reg_vals(2) = 2.0
         reg_vals(3) = 3.0
+        reg_vals(4) = 4.0
 
         ! == Sub-regions ==
-        reg_vals(4) = 1.1
-        reg_vals(5) = 2.1
-        reg_vals(6) = 2.2
-        reg_vals(7) = 2.3
-        reg_vals(8) = 3.1
+        reg_vals(5) = 1.1
+        reg_vals(6) = 2.1
+        reg_vals(7) = 2.2
+        reg_vals(8) = 2.3
+        reg_vals(9) = 3.1
         
         mask = mask_index_north + 0.0   ! ocean 
 
