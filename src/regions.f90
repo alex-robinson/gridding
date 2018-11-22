@@ -35,7 +35,7 @@ contains
         integer :: q 
 
         ! Allocate the region_type to hold all regions of interest
-        allocate(regs(5))
+        allocate(regs(6))
 
         ! === Define each region ===
         call points_init(regs(1),grid0=grid,name="grl",filename="regions/polygon_grl.txt",latlon=.TRUE.,skip=1)
@@ -43,6 +43,8 @@ contains
         call points_init(regs(3),grid0=grid,name="grl",filename="regions/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(4),grid0=grid,name="grl",filename="regions/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(5),grid0=grid,name="grl",filename="regions/polygon_iceland.txt",latlon=.TRUE.,skip=1)
+        
+        call points_init(regs(6),grid0=grid,name="grl",filename="regions/new/polygon_eis.txt",latlon=.TRUE.,skip=1)
         
         mask = mask_index_north + 0.0   ! ocean 
 
