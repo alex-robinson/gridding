@@ -43,16 +43,16 @@ contains
         ! === Define each region ===
 
         ! == Continental regions ==
-        call points_init(regs(1),grid0=grid,name="reg1",filename="regions/polygon_laurentide.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(2),grid0=grid,name="reg2",filename="regions/polygon_eis.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(3),grid0=grid,name="reg3",filename="regions/polygon_grl.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(1),grid0=grid,name="reg1",filename="regions/new/polygon_laurentide.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(2),grid0=grid,name="reg2",filename="regions/new/polygon_eis.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(3),grid0=grid,name="reg3",filename="regions/new/polygon_grl.txt",latlon=.TRUE.,skip=1)
         
         ! == Sub-regions ==
-        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/polygon_iceland.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/polygon_britain.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(8),grid0=grid,name="reg8",filename="regions/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(4),grid0=grid,name="reg4",filename="regions/new/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(5),grid0=grid,name="reg5",filename="regions/new/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(6),grid0=grid,name="reg6",filename="regions/new/polygon_iceland.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(7),grid0=grid,name="reg7",filename="regions/new/polygon_britain.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(8),grid0=grid,name="reg8",filename="regions/new/polygon_barents-kara.txt",latlon=.TRUE.,skip=1)
         
         ! == Continental regions ==
         reg_vals(1) = 1.0
@@ -162,14 +162,14 @@ contains
         
         select case(trim(domain)) 
 
-            case("North") 
+            case("North","Eurasia","Greenland") 
                 mask = get_region_map_north(grid)
 
             case("Antarctica") 
                 mask = get_region_map_south(grid)
                 
-            case("Greenland")
-                mask = get_region_map_greenland(grid)
+!             case("Greenland")
+!                 mask = get_region_map_greenland(grid)
 
             case DEFAULT 
                 write(*,*) "regions:: error: domain not recognized: "//trim(domain)
