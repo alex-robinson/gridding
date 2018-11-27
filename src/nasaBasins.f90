@@ -8,6 +8,7 @@ module nasaBasins
 
     private 
     public :: nasaBasins_to_grid
+    public :: nasaBasins_to_grid_North ! Filler routine to output file
     
 contains 
 
@@ -202,5 +203,81 @@ contains
         return 
 
     end subroutine nasaBasins_to_grid 
+
+    subroutine nasaBasins_to_grid_North(outfldr,grid,domain)
+
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid  
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type(points_class) :: pTOPO
+        character(len=256) :: file_invariant, tmp 
+
+        type basin_type 
+            double precision, allocatable :: lon(:), lat(:), basin(:)
+        end type 
+
+        type(basin_type) :: inb
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable :: outmask(:,:)
+
+        integer :: nh, nl, np, i, j, k  
+
+        double precision, allocatable :: basins(:) 
+        integer, allocatable :: inds(:)
+        integer :: nb, q 
+        logical :: in_basin 
+        double precision, parameter :: tol = 1d-5 
+
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                          "_BASINS-nasa.nc"
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)     
+        call grid_allocate(grid,outmask)     
+        
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! ## MAP FIELDS ##
+        ! Map polygons onto new grid points 
+
+        ! Initially set all output values to missing
+        outvar = 1.0 
+
+        ! Write a mask of the original basin extent (no ocean points)
+        outmask = 0 
+        where (outvar .ne. missing_value) outmask = 1 
+        call nc_write(filename,"basin_mask",outmask,dim1="xc",dim2="yc", &
+                      units="1",missing_value=int(missing_value))
+        call nc_write_attr(filename,"basin_mask","long_name","Mask of original basin extent")
+!         call nc_write_attr(filename,"basin_mask","grid_mapping",trim(grid%mtype))
+        call nc_write_attr(filename,"basin_mask","coordinates","lat2D lon2D")
+            
+        ! Fill in basins over ocean too
+        call fill_nearest(outvar,missing_value)
+
+        ! Now whole number basins (aggregate basins)
+        outvar = floor(outvar)
+        call nc_write(filename,"basin",nint(outvar),dim1="xc",dim2="yc", &
+                      units="1",missing_value=int(missing_value))
+        call nc_write_attr(filename,"basin","long_name","Basins")
+!         call nc_write_attr(filename,"basin","grid_mapping",trim(grid%mtype))
+        call nc_write_attr(filename,"basin","coordinates","lat2D lon2D")
+                    
+        return 
+
+    end subroutine nasaBasins_to_grid_North 
 
 end module nasaBasins
