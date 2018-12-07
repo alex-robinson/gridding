@@ -8,12 +8,11 @@ module vavrus2018
     implicit none 
 
     private 
-    public :: vavrus2018_atm_to_grid
-    public :: vavrus2018_ocn_to_grid
+    public :: vavrus2018_to_grid
 
 contains 
 
-    subroutine vavrus2018_atm_to_grid(outfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
+    subroutine vavrus2018_to_grid(outfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -30,25 +29,29 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: lon(:), lat(:), var(:,:), z_srf(:,:), var1D(:) 
+            double precision, allocatable :: lon(:), lat(:), depth(:)
+            double precision, allocatable :: var(:,:), z_srf(:,:)
+            double precision, allocatable :: mask1D(:), var1D(:) 
             double precision :: lapse_ann    = 8.0d-3 
             double precision :: lapse_summer = 6.5d-3
         end type 
 
         type(inp_type)     :: inp
+        type(points_class) :: pts0 
         type(grid_class)   :: grid0
         character(len=256) :: grid0_nm 
         character(len=256) :: file_in
         type(var_defs)     :: var_info
-        integer :: nx, ny, np 
+        integer :: nx, ny, np, nz  
 
-        type(map_class)  :: map
+        type(map_class)  :: map, map1
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: out_zsrf(:,:)
 
         integer :: q, k, m, i, l, n_var 
+        integer, allocatable :: dims(:) 
 
         double precision, parameter :: sec_year = 365.0*24.0*3600.0
 
@@ -65,10 +68,18 @@ contains
         call grid_allocate(grid,outmask)     
         call grid_allocate(grid,out_zsrf)     
         
+        ! Get the vertical dimension of depth in the ocean for output file dimension
+        file_in = trim(path_in)//"/"//"TEMP.1371-1420_ave.nc" 
+        nz = nc_size(file_in,"z_t")
+        allocate(inp%depth(nz))
+        call nc_read(file_in,"z_t",inp%depth)
+        inp%depth = inp%depth*1e-2     ! [cm] => [m] 
+
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x, units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y, units="kilometers")
+        call nc_write_dim(filename,"depth",x=inp%depth,units="meters")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -242,11 +253,107 @@ contains
         call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
         call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
         
-        stop 
+
+        ! ======================================================================
+        ! Note: 
+        ! Ocean grid must be treated as a set of points, since it is not a
+        ! normal lon/lat grid. Mapping must be separate from above.  
+        ! ======================================================================
+
+
+        ! ======================================================================
+        ! 1. Ocean temperatures, annual 
+
+        ! Define the variable to be mapped 
+        call def_var_info(var_info,trim(file_in),"TEMP","to_ann",units="K",conv=1d0, &
+                          long_name="Ocean temperature, annual",method="nng")
+
+        ! Define input filename
+        file_in = trim(path_in)//"/"//"TEMP.1371-1420_ave.nc"
+
+        ! Load domain information 
+        call nc_dims(file_in,"TLONG",dims=dims)
+        nx   = dims(1)
+        ny   = dims(2) 
+        grid0_nm = "vavrus2018_ocn"
+        np = nx*ny 
+
+        ! Deallocate arrays to redo mapping
+        deallocate(inp%lon)
+        deallocate(inp%lat)
+        deallocate(inp%var)
+        deallocate(inp%z_srf)
+
+        ! Allocate input variable vectors of points
+        allocate(inp%lon(np),inp%lat(np))
+        allocate(inp%mask1D(np))
+        allocate(inp%var1D(np))
+
+        ! Read domain variables 
+        call nc_read(file_in,"TLONG",inp%lon,start=[1,1],count=[nx,ny])
+        call nc_read(file_in,"TLAT", inp%lat,start=[1,1],count=[nx,ny])
         
+        ! Define input grid based on input axes
+        call points_init(pts0,name=grid0_nm,mtype="latlon",units="degrees",lon180=.TRUE.,x=inp%lon,y=inp%lat)
+
+        ! Initialize mapping
+        call map_init(map1,pts0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        
+        ! Loop over each level vertically and interpolate variable,
+        ! as well as a mask to show where original values where valid 
+
+        do k = 1, nz 
+
+            ! Load variable
+            call nc_read(file_in,var_info%nm_in,inp%var1D,missing_value=mv,start=[1,1,k],count=[nx,ny,1])
+            where(abs(inp%var1D) .gt. 1e10) inp%var1D = mv 
+            write(*,*) "input : ", trim(var_info%nm_out), k, minval(inp%var1D,mask=inp%var1D.ne.mv), &
+                                                                maxval(inp%var1D,mask=inp%var1D.ne.mv)
+
+            ! Adjust units
+            where(inp%var1D .ne. mv) inp%var1D = inp%var1D * var_info%conv 
+            where(inp%var1D .ne. mv) inp%var1D = inp%var1D + 273.15   ! [C] => [K] 
+
+            ! Map var to new grid
+            call map_field(map1,var_info%nm_out,inp%var1D,outvar,outmask,var_info%method, &
+                           fill=.TRUE.,missing_value=mv,sigma=sigma)
+
+            ! Clean up infinite values or all missing layers
+            ! (eg, for deep bathymetry levels for GRL domain)
+            where(outvar .ne. outvar .or. abs(outvar) .gt. 1e10 .or. &
+                  count(outvar.eq.mv) .eq. grid%npts) outvar = 1.d0
+
+            call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="depth", &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+
+            ! Write variable metadata
+            call nc_write_attr(filename,var_info%nm_out,"units",var_info%units_out)
+            call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
+            call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
+            
+            ! === Also generate an ocean mask =======
+
+            inp%mask1D = 1.0 
+            where(inp%var1D .eq. mv) inp%var1D = 0.0 
+
+            ! Map mask to new grid
+            call map_field(map1,"mask_ocn",inp%mask1D,outvar,outmask,"nn", &
+                              fill=.TRUE.,missing_value=mv,sigma=sigma)
+            call nc_write(filename,"mask_ocn",nint(outvar),dim1="xc",dim2="yc",dim3="depth", &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+               
+            ! Write variable metadata
+            call nc_write_attr(filename,"mask_ocn","units","1")
+            call nc_write_attr(filename,"mask_ocn","long_name","Ocean mask (land=0)")
+            call nc_write_attr(filename,"mask_ocn","coordinates","lat2D lon2D")
+
+        end do 
+
+
         return 
 
-    end subroutine vavrus2018_atm_to_grid
+    end subroutine vavrus2018_to_grid
 
     subroutine vavrus2018_ocn_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file

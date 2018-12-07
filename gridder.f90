@@ -97,7 +97,7 @@ program gridder
         
 !     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
-    call vavrus2018_atm_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
+    call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
                                 sigma=40.d0,max_neighbors=10,lat_lim=5.d0)
 
     if (trim(domain) .eq. "Antarctica") then 
