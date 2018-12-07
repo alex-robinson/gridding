@@ -126,7 +126,8 @@ contains
         call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
         call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
         
-        ! Also generate a land mask
+        ! === Also generate a land mask =======
+
         where(inp%var .gt. 1.d0) inp%var = 1.d0 
         where(inp%var .lt. 1.d0) inp%var = 0.d0 
         
@@ -141,7 +142,8 @@ contains
         call nc_write_attr(filename,"mask_land","coordinates","lat2D lon2D")
 
 
-        ! == PRECIP (on same grid as topo) ==
+        ! ======================================================================
+        ! 2. Precipitation (on same grid as topo)
 
         ! Define the variables to be mapped 
         call def_var_info(var_info,trim(file_in),"PRECT","pr",units="m/a",conv=sec_year, &
@@ -167,6 +169,59 @@ contains
         call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
         call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
         
+        ! ======================================================================
+        ! 3. Temperature, annual (on same grid as topo)
+
+        ! Define the variables to be mapped 
+        call def_var_info(var_info,trim(file_in),"TREFHT","tas_ann",units="K",conv=1d0, &
+                          long_name="Near-surface temperature, annual",method="nng")
+
+        ! Define input filename
+        file_in = trim(path_in)//"/"//"TREFHT.1371-1420_ave.nc"
+
+        ! Load variable
+        call nc_read(file_in,var_info%nm_in,inp%var,missing_value=mv) 
+        write(*,*) "input : ", trim(var_info%nm_out), minval(inp%var), maxval(inp%var)
+
+        ! Adjust units 
+        inp%var = inp%var * var_info%conv 
+
+        ! Map var to new grid
+        call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
+                       fill=.TRUE.,missing_value=mv,sigma=sigma)
+        call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_info%nm_out,"units",var_info%units_out)
+        call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
+        call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
+        
+        ! ======================================================================
+        ! 4. Temperature, JJA (on same grid as topo)
+
+        ! Define the variables to be mapped 
+        call def_var_info(var_info,trim(file_in),"TREFHT","tas_jja",units="K",conv=1d0, &
+                          long_name="Near-surface temperature, JJA",method="nng")
+
+        ! Define input filename
+        file_in = trim(path_in)//"/"//"TREFHT_jja.1371-1420_ave.nc"
+
+        ! Load variable
+        call nc_read(file_in,var_info%nm_in,inp%var,missing_value=mv) 
+        write(*,*) "input : ", trim(var_info%nm_out), minval(inp%var), maxval(inp%var)
+
+        ! Adjust units 
+        inp%var = inp%var * var_info%conv 
+
+        ! Map var to new grid
+        call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
+                       fill=.TRUE.,missing_value=mv,sigma=sigma)
+        call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_info%nm_out,"units",var_info%units_out)
+        call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
+        call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
         
         stop 
 
