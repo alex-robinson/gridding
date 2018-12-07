@@ -78,6 +78,9 @@ $(objdir)/topo_reconstructions.o: $(srcdir)/topo_reconstructions.f90
 $(objdir)/topographies_grl.o: $(srcdir)/topographies_grl.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/vavrus2018.o: $(srcdir)/vavrus2018.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
 obj_datasets =     $(objdir)/control.o \
 									 $(objdir)/gridding_datasets.o \
 									 $(objdir)/generic.o \
@@ -101,7 +104,8 @@ obj_datasets =     $(objdir)/control.o \
 									 $(objdir)/sediments.o \
 									 $(objdir)/stratigraphy.o \
 									 $(objdir)/topo_reconstructions.o \
-									 $(objdir)/topographies_grl.o
+									 $(objdir)/topographies_grl.o \
+									 $(objdir)/vavrus2018.o
 
 obj_datasets_climber = $(objdir)/control.o \
 									 $(objdir)/gridding_datasets.o \

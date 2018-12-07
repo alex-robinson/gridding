@@ -26,6 +26,7 @@ program gridder
     use stratigraphy
     use topo_reconstructions 
     use topographies_grl 
+    use vavrus2018 
 
     implicit none
 
@@ -95,6 +96,9 @@ program gridder
 !     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
         
 !     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
+    
+    call vavrus2018_atm_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
+                                sigma=20.d0,max_neighbors=10,lat_lim=5.d0)
 
     if (trim(domain) .eq. "Antarctica") then 
         ! == Antarctica only datasets ==
