@@ -30,7 +30,7 @@ contains
         character(len=1024) :: desc, ref 
 
         type inp_type 
-            double precision, allocatable :: lon(:), lat(:), var(:,:), var1D(:) 
+            double precision, allocatable :: lon(:), lat(:), var(:,:), z_srf(:,:), var1D(:) 
             double precision :: lapse_ann    = 8.0d-3 
             double precision :: lapse_summer = 6.5d-3
         end type 
@@ -46,6 +46,7 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
+        double precision, allocatable :: out_zsrf(:,:)
 
         integer :: q, k, m, i, l, n_var 
 
@@ -62,6 +63,7 @@ contains
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)     
+        call grid_allocate(grid,out_zsrf)     
         
         ! Initialize the output file
         call nc_create(filename)
@@ -97,6 +99,7 @@ contains
 
         ! Allocate input variable arrays
         allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny))
+        allocate(inp%z_srf(nx,ny))
 
         ! Read domain variables 
         call nc_read(file_in,"lon",inp%lon)
@@ -126,6 +129,10 @@ contains
         call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
         call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
         
+        ! Also store elevation for later use with temperatures
+        inp%z_srf = inp%var 
+        out_zsrf  = outvar
+
         ! === Also generate a land mask =======
 
         where(inp%var .gt. 1.d0) inp%var = 1.d0 
@@ -186,12 +193,18 @@ contains
         ! Adjust units 
         inp%var = inp%var * var_info%conv 
 
+        ! Scale to sea-level for interpolation
+        inp%var = inp%var + inp%lapse_ann*inp%z_srf 
+
         ! Map var to new grid
         call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
                        fill=.TRUE.,missing_value=mv,sigma=sigma)
-        call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
+        
+        ! Scale back to output elevation after interpolation 
+        outvar = outvar - inp%lapse_ann*out_zsrf
 
-        ! Write variable metadata
+        ! Write variable and metadata
+        call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
         call nc_write_attr(filename,var_info%nm_out,"units",var_info%units_out)
         call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
         call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
@@ -213,50 +226,24 @@ contains
         ! Adjust units 
         inp%var = inp%var * var_info%conv 
 
+        ! Scale to sea-level for interpolation
+        inp%var = inp%var + inp%lapse_summer*inp%z_srf 
+
         ! Map var to new grid
         call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
                        fill=.TRUE.,missing_value=mv,sigma=sigma)
-        call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
+        
+        ! Scale back to output elevation after interpolation 
+        outvar = outvar - inp%lapse_summer*out_zsrf
 
-        ! Write variable metadata
+        ! Write variable and metadata
+        call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
         call nc_write_attr(filename,var_info%nm_out,"units",var_info%units_out)
         call nc_write_attr(filename,var_info%nm_out,"long_name",var_info%long_name)
         call nc_write_attr(filename,var_info%nm_out,"coordinates","lat2D lon2D")
         
         stop 
-
-        ! ## Map climatological gridded variables ##
         
-        var_now = var_info 
-
-            ! Read in current variable
-            call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=missing_value)
-            where(abs(inp%var) .ge. 1d10) inp%var = missing_value 
-
-!             ! Scale to sea-level temperature for interpolation
-!             if (trim(var_now%nm_out) .eq. "t2m_sum") &
-!                 inp%var = inp%var + inp%lapse_summer*inp%zs 
-!             if (trim(var_now%nm_out) .eq. "t2m_ann") &
-!                 inp%var = inp%var + inp%lapse_ann*inp%zs 
-
-            ! Map variable to new grid
-            call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=missing_value,sigma=sigma)
-            
-!             ! Re-scale to near-surface temp for writing to file
-!             if (trim(var_now%nm_out) .eq. "t2m_sum") &
-!                 outvar = outvar - inp%lapse_summer*outzs 
-!             if (trim(var_now%nm_out) .eq. "t2m_ann") &
-!                 outvar = outvar - inp%lapse_ann*outzs 
-
-            ! Write output variable to output file
-            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
-
-            ! Write variable metadata
-            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D") 
-
         return 
 
     end subroutine vavrus2018_atm_to_grid
