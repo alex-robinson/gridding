@@ -42,10 +42,13 @@ contains
             ! NORTH DOMAINS ======================= 
 
             case("NH-40KM")
-                call grid_init(grid,name="NH-40KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-4900.d0,dx=40.0d0,nx=221,y0=-5400.d0,dy=40.0d0,ny=221, &
-                        lambda=-45.d0,phi=70.d0)
-            
+!                 call grid_init(grid,name="NH-40KM",mtype="polar_stereographic",units="kilometers", &
+!                         lon180=.TRUE.,x0=-4900.d0,dx=40.0d0,nx=221,y0=-5400.d0,dy=40.0d0,ny=221, &
+!                         lambda=-45.d0,phi=70.d0)
+                call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+                
             case("NH-20KM")
                 call grid_init(grid,name="NH-20KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-4900.d0,dx=20.0d0,nx=441,y0=-5400.d0,dy=20.0d0,ny=441, &
