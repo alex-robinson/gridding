@@ -98,79 +98,87 @@ program gridder
 !     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
-                                sigma=40.d0,max_neighbors=10,lat_lim=5.d0)
+                                sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
 
-    if (trim(domain) .eq. "Antarctica") then 
-        ! == Antarctica only datasets ==
-        write(*,*) "Processing Antarctica..."
+
+    ! Next, process domain-specific datasets
+
+    select case(trim(domain))
+
+        case("North")
+            ! == North only datasets ==
+            write(*,*) "Processing North..."
+
+!             call nasaBasins_to_grid_North(outfldr,grid,"North")
         
-!         call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
-!         call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
-!         call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-!         call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-!         call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
-!         call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-!         call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                         fill=.TRUE.,sigma=100.d0)
+        case("Antarctica")
 
-!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
-!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
-!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
-!         call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
-
-!         call RACMO23_to_grid( outfldr, grid, "ANT27",max_neighbors=20,lat_lim=0.5d0)
-!         call RACMO23_to_grid( outfldr, grid, "ANT27",clim_range=[1981,2010])
-
-        ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
-        !      data while they should all have 240 months (1980-1999)
-        !      This dataset is not used for now...
-        !call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",max_neighbors=20,lat_lim=0.5d0)
-        !call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",clim_range=[1980,1999])
+            ! == Antarctica only datasets ==
+            write(*,*) "Processing Antarctica..."
         
-        ! Testing old grisli fields 
-!         call g40_topo_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
+!             call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
+!             call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
+!             call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!             call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!             call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+!             call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+!             call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
+!                                             fill=.TRUE.,sigma=100.d0)
 
-    end if 
+!             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
+!             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
+!             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
+!             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
 
-    if (trim(domain) .eq. "Greenland") then 
-        ! == Greenland only datasets ==
-        write(*,*) "Processing Greenland..."
+!             call RACMO23_to_grid( outfldr, grid, "ANT27",max_neighbors=20,lat_lim=0.5d0)
+!             call RACMO23_to_grid( outfldr, grid, "ANT27",clim_range=[1981,2010])
 
-        call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
-        call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-        call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
-        call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-        call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
+            ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
+            !      data while they should all have 240 months (1980-1999)
+            !      This dataset is not used for now...
+            !call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",max_neighbors=20,lat_lim=0.5d0)
+            !call RACMO2rot_to_grid( outfldr, grid, "Antarctica-c20",clim_range=[1980,1999])
 
-        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
-        call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
-        call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
-        call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+            ! Testing old grisli fields 
+!             call g40_topo_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
 
-        call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
-        call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
-
-        call nasaBasins_to_grid(outfldr,grid,"Greenland")
-        call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+        case("Greenland") 
             
-        call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
-!         call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
-        call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
+            ! == Greenland only datasets ==
+            write(*,*) "Processing Greenland..."
+
+            call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
+            call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+            call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
+            call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
+            call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
+
+            call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
+            call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+            call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
+            call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
+
+            call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
+            call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
+
+            call nasaBasins_to_grid(outfldr,grid,"Greenland")
+            call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+                
+            call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+!             call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
+            call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
         
-!         path = "data/Davini_GreenlandAMOC/"
-!         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
-!                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
-!         call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
-!                                 path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+!             path = "data/Davini_GreenlandAMOC/"
+!             call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
+!                                     path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
+!             call davini2015_to_grid(outfldr,"Davini2015",grid,domain="bedrock", &
+!                                     path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
     
-    end if 
 
-    if (trim(domain) .eq. "North") then 
+        case DEFAULT 
+            ! Pass - do nothing 
 
-        call nasaBasins_to_grid_North(outfldr,grid,"North")
-        
-    end if 
-
+    end select
 
     write(*,*)
     write(*,*) "Regridding program finished."

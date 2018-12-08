@@ -12,7 +12,7 @@ module vavrus2018
 
 contains 
 
-    subroutine vavrus2018_to_grid(outfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
+    subroutine vavrus2018_to_grid(outfldr,grid,domain,path_in,sigma_atm,sigma_ocn,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -24,7 +24,7 @@ contains
         character(len=*) :: domain, outfldr, path_in 
         type(grid_class) :: grid 
         integer :: max_neighbors 
-        double precision :: sigma, lat_lim 
+        double precision :: sigma_atm, sigma_ocn, lat_lim 
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
 
@@ -51,6 +51,7 @@ contains
         double precision, allocatable :: out_zsrf(:,:)
 
         integer :: q, k, m, i, l, n_var 
+        double precision :: sigma 
         integer, allocatable :: dims(:) 
 
         double precision, parameter :: sec_year = 365.0*24.0*3600.0
@@ -132,7 +133,7 @@ contains
 
         ! Map var to new grid
         call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
-                       fill=.TRUE.,missing_value=mv,sigma=sigma)
+                       fill=.TRUE.,missing_value=mv,sigma=sigma_atm)
         call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
 
         ! Write variable metadata
@@ -151,7 +152,7 @@ contains
         
         ! Map mask to new grid
         call map_field(map,"mask_land",inp%var,outvar,outmask,"nn", &
-                          fill=.TRUE.,missing_value=mv,sigma=sigma)
+                          fill=.TRUE.,missing_value=mv,sigma=sigma_atm)
         call nc_write(filename,"mask_land",nint(outvar),dim1="xc",dim2="yc")
            
         ! Write variable metadata
@@ -179,7 +180,7 @@ contains
         
         ! Map var to new grid
         call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
-                       fill=.TRUE.,missing_value=mv,sigma=sigma)
+                       fill=.TRUE.,missing_value=mv,sigma=sigma_atm)
         call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc")
 
         ! Write variable metadata
@@ -209,7 +210,7 @@ contains
 
         ! Map var to new grid
         call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
-                       fill=.TRUE.,missing_value=mv,sigma=sigma)
+                       fill=.TRUE.,missing_value=mv,sigma=sigma_atm)
         
         ! Scale back to output elevation after interpolation 
         outvar = outvar - inp%lapse_ann*out_zsrf
@@ -242,7 +243,7 @@ contains
 
         ! Map var to new grid
         call map_field(map,var_info%nm_out,inp%var,outvar,outmask,var_info%method, &
-                       fill=.TRUE.,missing_value=mv,sigma=sigma)
+                       fill=.TRUE.,missing_value=mv,sigma=sigma_atm)
         
         ! Scale back to output elevation after interpolation 
         outvar = outvar - inp%lapse_summer*out_zsrf
@@ -265,17 +266,18 @@ contains
         ! 1. Ocean temperatures, annual 
 
         ! Define the variable to be mapped 
-        call def_var_info(var_info,trim(file_in),"TEMP","to_ann",units="K",conv=1d0, &
+        call def_var_info(var_info,trim(file_in),"TEMP","to",units="degrees Celcius",conv=1d0, &
                           long_name="Ocean temperature, annual",method="nng")
 
         ! Define input filename
         file_in = trim(path_in)//"/"//"TEMP.1371-1420_ave.nc"
 
         ! Load domain information 
+        grid0_nm = "vavrus2018_ocn"
+        
         call nc_dims(file_in,"TLONG",dims=dims)
         nx   = dims(1)
         ny   = dims(2) 
-        grid0_nm = "vavrus2018_ocn"
         np = nx*ny 
 
         ! Deallocate arrays to redo mapping
@@ -307,25 +309,22 @@ contains
 
             ! Load variable
             call nc_read(file_in,var_info%nm_in,inp%var1D,missing_value=mv,start=[1,1,k],count=[nx,ny,1])
-            where(abs(inp%var1D) .gt. 1e10) inp%var1D = mv 
-            write(*,*) "input : ", trim(var_info%nm_out), k, minval(inp%var1D,mask=inp%var1D.ne.mv), &
-                                                                maxval(inp%var1D,mask=inp%var1D.ne.mv)
 
             ! Adjust units
             where(inp%var1D .ne. mv) inp%var1D = inp%var1D * var_info%conv 
-            where(inp%var1D .ne. mv) inp%var1D = inp%var1D + 273.15   ! [C] => [K] 
 
+            write(*,*) "input: ", trim(var_info%nm_out), k, &
+                    minval(inp%var1D,mask=inp%var1D.ne.mv),maxval(inp%var1D,mask=inp%var1D.ne.mv)
+            
             ! Map var to new grid
+            outvar    = mv 
+            outmask   = mv  
             call map_field(map1,var_info%nm_out,inp%var1D,outvar,outmask,var_info%method, &
-                           fill=.TRUE.,missing_value=mv,sigma=sigma)
+                           fill=.TRUE.,missing_value=mv,sigma=sigma_ocn)
 
-            ! Clean up infinite values or all missing layers
-            ! (eg, for deep bathymetry levels for GRL domain)
-            where(outvar .ne. outvar .or. abs(outvar) .gt. 1e10 .or. &
-                  count(outvar.eq.mv) .eq. grid%npts) outvar = 1.d0
-
+            ! Write variable to file
             call nc_write(filename,var_info%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="depth", &
-                            start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
+                          missing_value=real(mv),start=[1,1,k],count=[grid%G%nx,grid%G%ny,1])
 
             ! Write variable metadata
             call nc_write_attr(filename,var_info%nm_out,"units",var_info%units_out)
@@ -334,8 +333,11 @@ contains
             
             ! === Also generate an ocean mask =======
 
-            inp%mask1D = 1.0 
-            where(inp%var1D .eq. mv) inp%var1D = 0.0 
+            where(inp%var1D .eq. mv) 
+                inp%mask1D = 0.0
+            elsewhere
+                inp%mask1D = 1.0
+            end where 
 
             ! Map mask to new grid
             call map_field(map1,"mask_ocn",inp%mask1D,outvar,outmask,"nn", &
