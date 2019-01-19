@@ -11,12 +11,10 @@ module regions
 
     real(4), parameter :: mask_index_north = 1.0  ! North
     real(4), parameter :: mask_index_south = 2.0  ! Antarctica
-    real(4), parameter :: mask_index_grl   = 3.0  ! Greenland
-
+    
     private
     public :: get_region_map_north
     public :: get_region_map_south
-    public :: get_region_map_greenland 
     public :: write_regions
 contains 
 
@@ -91,59 +89,40 @@ contains
         type(points_class), allocatable :: regs(:)
         type(points_class) :: pts 
         logical :: in_reg(grid%G%nx,grid%G%ny)
-        integer :: q 
-
+        real(4), allocatable :: reg_vals(:) 
+        integer :: q, n_regions 
+        
         ! Allocate the region_type to hold all regions of interest
-        allocate(regs(2))
+        n_regions = 1 
+        allocate(regs(n_regions))
+        allocate(reg_vals(n_regions))
 
         ! === Define each region ===
-        call points_init(regs(1),grid0=grid,name="ant",filename="regions/polygons/polygon_ant.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(2),grid0=grid,name="ant",filename="regions/polygons/polygon_ant-inner.txt",latlon=.TRUE.,skip=1)
 
+        ! == Continental regions ==
+        call points_init(regs(1),grid0=grid,name="reg1",filename="regions/polygons/polygon_antarctica.txt",latlon=.TRUE.,skip=1)
+
+        ! == Sub-regions ==  ! ajr, to do!!
+        !call points_init(regs(2),grid0=grid,name="reg5",filename="regions/polygons/polygon_wais.txt",latlon=.TRUE.,skip=1)
+        !call points_init(regs(3),grid0=grid,name="reg6",filename="regions/polygons/polygon_eais.txt",latlon=.TRUE.,skip=1)
+
+        ! == Continental regions ==
+        reg_vals(1) = 1.0
+
+        ! == Sub-regions == ! ajr, to do!!
+        !reg_vals(2) = 1.1
+        !reg_vals(3) = 1.2
+        
         mask = mask_index_south + 0.0   ! ocean 
 
-        do q = 1, size(regs)
+        do q = 1, n_regions
             in_reg = point_in_polygon(real(grid%x),real(grid%y),real(regs(q)%x),real(regs(q)%y))
-            where (in_reg) mask = mask_index_south + real(q)*0.1  
+            where (in_reg) mask = mask_index_south + reg_vals(q)*0.1  
         end do 
 
         return 
 
     end function get_region_map_south
-
-    function get_region_map_greenland(grid) result(mask)
-        ! For a given grid (input), output a mask of the regions
-        ! that overlap with it
-
-        implicit none
-
-        type(grid_class), intent(IN) :: grid 
-        real(4) :: mask(grid%G%nx,grid%G%ny)
-
-        type(points_class), allocatable :: regs(:)
-        type(points_class) :: pts 
-        logical :: in_reg(grid%G%nx,grid%G%ny)
-        integer :: q 
-
-        ! Allocate the region_type to hold all regions of interest
-        allocate(regs(5))
-
-        ! === Define each region ===
-        call points_init(regs(1),grid0=grid,name="grl",filename="regions/polygon_grl.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(2),grid0=grid,name="grl",filename="regions/polygon_grl-inner.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(3),grid0=grid,name="grl",filename="regions/polygon_ellesmere.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(4),grid0=grid,name="grl",filename="regions/polygon_svalbard.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(5),grid0=grid,name="grl",filename="regions/polygon_iceland.txt",latlon=.TRUE.,skip=1)
-        
-        mask = mask_index_grl + 0.0   ! ocean 
-        do q = 1, size(regs)
-            in_reg = point_in_polygon(real(grid%x),real(grid%y),real(regs(q)%x),real(regs(q)%y))
-            where (in_reg) mask = mask_index_grl + real(q)*0.1  
-        end do 
-
-        return 
-
-    end function get_region_map_greenland
 
     subroutine write_regions(outfldr,grid,domain)
 

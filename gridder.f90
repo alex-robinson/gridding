@@ -42,8 +42,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "North"
-    grid_name = "NH-40KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-40KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -55,7 +55,7 @@ program gridder
     call domain_definition(grid,grid_name) 
 
     ! Write a regional mask 
-!     call write_regions(outfldr,grid,domain)
+    call write_regions(outfldr,grid,domain)
 
     ! =========================================================
     !
@@ -97,8 +97,8 @@ program gridder
         
 !     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
-    call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
-                                sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
+!     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
+!                                 sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
 
 
     ! Next, process domain-specific datasets
