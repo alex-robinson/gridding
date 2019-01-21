@@ -11,7 +11,7 @@ module regions
 
     real(4), parameter :: mask_index_north = 1.0  ! North
     real(4), parameter :: mask_index_south = 2.0  ! Antarctica
-    
+
     private
     public :: get_region_map_north
     public :: get_region_map_south
@@ -93,7 +93,7 @@ contains
         integer :: q, n_regions 
         
         ! Allocate the region_type to hold all regions of interest
-        n_regions = 1 
+        n_regions = 2 
         allocate(regs(n_regions))
         allocate(reg_vals(n_regions))
 
@@ -102,16 +102,22 @@ contains
         ! == Continental regions ==
         call points_init(regs(1),grid0=grid,name="reg1",filename="regions/polygons/polygon_antarctica.txt",latlon=.TRUE.,skip=1)
 
-        ! == Sub-regions ==  ! ajr, to do!!
+        ! == Sub-regions ==
+        call points_init(regs(2),grid0=grid,name="reg5",filename="regions/polygons/polygon_wais.txt",latlon=.TRUE.,skip=1)
+        
+        ! ajr, to do!!
         !call points_init(regs(2),grid0=grid,name="reg5",filename="regions/polygons/polygon_wais.txt",latlon=.TRUE.,skip=1)
         !call points_init(regs(3),grid0=grid,name="reg6",filename="regions/polygons/polygon_eais.txt",latlon=.TRUE.,skip=1)
 
         ! == Continental regions ==
         reg_vals(1) = 1.0
 
-        ! == Sub-regions == ! ajr, to do!!
-        !reg_vals(2) = 1.1
+        ! == Sub-regions ==
+        reg_vals(2) = 1.1
+
+        ! ajr, to do!!
         !reg_vals(3) = 1.2
+        !reg_vals(4) = 1.3
         
         mask = mask_index_south + 0.0   ! ocean 
 
