@@ -103,7 +103,7 @@ contains
         call points_init(regs(1),grid0=grid,name="reg1",filename="regions/polygons/polygon_antarctica.txt",latlon=.TRUE.,skip=1)
 
         ! == Sub-regions ==
-        call points_init(regs(2),grid0=grid,name="reg5",filename="regions/polygons/polygon_wais.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(2),grid0=grid,name="reg5",filename="regions/polygons/polygon_antarctica_inner.txt",latlon=.TRUE.,skip=1)
         
         ! ajr, to do!!
         !call points_init(regs(2),grid0=grid,name="reg5",filename="regions/polygons/polygon_wais.txt",latlon=.TRUE.,skip=1)
