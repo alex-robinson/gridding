@@ -87,12 +87,12 @@ if (FALSE) {
     poly1  = get_latlon(coords,topo)
     my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_antarctica.txt"),scientific=TRUE,digits=4)
 
+    ### Sub-domains ###
+
     coords = locator(type="l")
     poly1  = get_latlon(coords,topo)
     my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_antarctica_inner.txt"),scientific=TRUE,digits=4)
-
-    ### Sub-domains ###
-
+    
     coords = locator(type="l")
     poly1  = get_latlon(coords,topo)
     my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_wais.txt"),scientific=TRUE,digits=4)
