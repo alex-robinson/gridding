@@ -42,8 +42,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-40KM"
+    domain    = "Greenland"
+    grid_name = "GRL-80KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -70,7 +70,7 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-!     call rtopo_to_grid(outfldr,grid,domain)
+    call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
@@ -91,15 +91,15 @@ program gridder
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
-        
+    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
+    stop 
+    
 !     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
 !     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
 !                                 sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
-
 
     ! Next, process domain-specific datasets
 
