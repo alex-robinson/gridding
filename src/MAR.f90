@@ -107,7 +107,7 @@ contains
 
             write(*,*) "Domain not recognized: ",trim(domain)
             stop
-             
+
         end if 
 
         allocate(surf(5))
