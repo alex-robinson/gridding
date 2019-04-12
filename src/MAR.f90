@@ -106,7 +106,8 @@ contains
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
-            stop 
+            stop
+             
         end if 
 
         allocate(surf(5))
@@ -128,60 +129,61 @@ contains
         ! Determine smoothing for missing points that are filled in 
         sigma = grid%G%dx*1.d0 
 
-        if (present(max_neighbors) .and. present(lat_lim)) then 
+        ! Initialize mapping
+        call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-            ! Initialize mapping
-            call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+        call grid_allocate(grid,tmp)
 
-            ! Initialize output variable arrays
-            call grid_allocate(grid,outvar)
-            call grid_allocate(grid,outmask)    
-            call grid_allocate(grid,tmp)
-
-            ! Initialize the output file
-            call nc_create(filename)
-            call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-            call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
-            call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
-            call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
-            call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
-            
-            ! Write meta data 
-            call nc_write_attr(filename,"Description",desc)
-            call nc_write_attr(filename,"Reference",ref)
-
-            ! ## SURFACE FIELDS ##
-            do i = 1, n_var
-
-                var_now = surf(i)  
-
-                call nc_read(trim(var_now%filename),var_now%nm_in,info0%var2D,missing_value=mv)
-                
-                ! Perform high resolution smoothing
-                if (.not. trim(var_now%nm_in) .eq. "MSK") then  
-                    call filter_gaussian(var=info0%var2D,sigma=sigma0,dx=dx0,mask=info0%var2D.ne.mv) 
-                end if 
-
-                outvar = missing_value 
-                call map_field(map,var_now%nm_in,info0%var2D,outvar,outmask,var_now%method,radius=sigma, &
-                               fill=var_now%fill,missing_value=mv) 
-                
-                if (.not. trim(var_now%nm_in) .eq. "MSK") then
-                    call fill_weighted(outvar,missing_value=mv)
-                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
-                end if 
-
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
-                    
-                ! Write variable metadata
-                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
-            
-            end do 
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+        call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
-        end if 
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
 
+        ! ## SURFACE FIELDS ##
+        do i = 1, n_var
+
+            var_now = surf(i)  
+
+            call nc_read(trim(var_now%filename),var_now%nm_in,info0%var2D,missing_value=mv)
+            
+            ! Perform high resolution smoothing
+            if (.not. trim(var_now%nm_in) .eq. "MSK") then  
+                call filter_gaussian(var=info0%var2D,sigma=sigma0,dx=dx0,mask=info0%var2D.ne.mv) 
+            end if 
+
+            outvar = missing_value 
+            call map_field(map,var_now%nm_in,info0%var2D,outvar,outmask,var_now%method,radius=sigma, &
+                           fill=var_now%fill,missing_value=mv) 
+            
+            if (.not. trim(var_now%nm_in) .eq. "MSK") then
+                call fill_weighted(outvar,missing_value=mv)
+                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+            end if 
+
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+            
+            write(*,*) trim(var_now%nm_in),  minval(info0%var2D,mask=info0%var2D .ne. mv), &
+                                             maxval(info0%var2D,mask=info0%var2D .ne. mv)
+            write(*,*) trim(var_now%nm_out), minval(outvar,mask=outvar .ne. mv), &
+                                             maxval(outvar,mask=outvar .ne. mv)
+            
+            ! Write variable metadata
+            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+        
+        end do 
+        
         return 
 
     end subroutine MARv39ismip6_to_grid
