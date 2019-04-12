@@ -8,12 +8,184 @@ module MAR
     implicit none 
 
     private 
+    public :: MARv39ismip6_to_grid
     public :: MARv39_to_grid
     public :: MARv35_to_grid
 !     public :: MARv33_to_grid
 !     public :: MARv32_to_grid
 
 contains 
+
+    subroutine MARv39ismip6_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       MAR (RCM) DATA - MARv3.9 downloaded from the ftp site:
+        !       ftp://ftp.climato.be/fettweis/MARv3.9/ISMIP6/
+        !       * Input data on 1KM grid using the ISMIP6 projection *
+        !
+        ! =========================================================
+
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer, optional :: max_neighbors 
+        double precision, optional :: lat_lim 
+        integer, optional :: clim_range(2)
+
+        character(len=512)  :: filename 
+        character(len=1024) :: desc, ref 
+
+        type(grid_class) :: gMAR
+        character(len=512) :: fldr0 
+        character(len=512) :: file_surface
+        type(var_defs), allocatable :: surf(:)
+        
+        type info0_type
+            integer :: nx, ny, npts  
+            real(8), allocatable :: xc(:), yc(:) 
+            real(8), allocatable :: lon(:), lat(:) 
+            real(8), allocatable :: var(:)
+            real(8), allocatable :: var2D(:,:)
+        end type 
+
+        type(info0_type) :: info0 
+
+
+        type(map_class)  :: map 
+        type(var_defs) :: var_now 
+        double precision, allocatable :: outvar(:,:), tmp(:,:)
+        integer, allocatable          :: outmask(:,:), outvar_int(:,:)
+
+        integer :: nyr, nm, q, k, year, m, i, l, year0, year_switch, n_prefix, n_var 
+        integer :: yearf, k0, nk 
+        character(len=512) :: filename_clim, filename_clim_ann 
+        character(len=512) :: units_out 
+        double precision, allocatable :: var3D(:,:,:), var2D(:,:)
+        double precision :: sigma, conv_mon_day   
+        double precision :: sigma0, dx0 
+
+        ! Define input grid
+        if (trim(domain) .eq. "Greenland-ERA") then 
+
+            ! Define the input filenames
+            fldr0 = "/data/sicopolis/data/MARv3.9/ISMIP6/GrIS/ERA_1958-2017/"
+            file_surface = trim(fldr0)//"MARv3.9-ERA-Interim-1980-1999.nc"
+
+            ! Determine size of input points, allocate input points object 
+            info0%nx = nc_size(file_surface,"X")
+            info0%ny = nc_size(file_surface,"Y")
+            info0%npts = info0%nx*info0%ny 
+
+            ! Allocate input info
+            allocate(info0%xc(info0%nx))
+            allocate(info0%yc(info0%ny))
+            allocate(info0%var2D(info0%nx,info0%ny))
+            
+            ! Determine smoothing radius for input grid points (1 km input grid)
+            sigma0 = grid%G%dx / 2.d0 
+            dx0    = 1.d0 
+
+            ! Read in points 
+            call nc_read(file_surface,"X",info0%xc)
+            call nc_read(file_surface,"Y",info0%yc)
+            
+            ! Define MAR raw grid and input variable field
+            call grid_init(grid,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
+                        lambda=-45.d0,phi=70.d0)
+
+            desc    = "Greenland regional climate simulated by MARv3.9, downscaled for ISMIP6"
+            ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.9/ISMIP6/GrIS"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_MARv3.9-ERA-INT_ann_1980-1999.nc"
+            
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+        end if 
+
+        allocate(surf(5))
+        
+        call def_var_info(surf(1),trim(file_surface),"MSK", "mask", units="1", &
+            long_name="Land/ice mask",method="nn",fill=.FALSE.)
+        call def_var_info(surf(2),trim(file_surface),"SRF", "z_srf", units="m", &
+            long_name="Surface elevation",method="nn",fill=.FALSE.)
+        
+        call def_var_info(surf(3),trim(file_surface),"ST", "T_srf", units="degC", &
+            long_name="Surface temperature",method="nn",fill=.FALSE.)
+        call def_var_info(surf(4),trim(file_surface),"SMB", "smb", units="mm a**-1", &
+            long_name="Surface mass balance",method="nn",fill=.FALSE.)
+        call def_var_info(surf(5),trim(file_surface),"RU", "runoff", units="mm a**-1", &
+            long_name="Runoff",method="nn",fill=.FALSE.)
+
+        n_var    = size(surf)
+
+        ! Determine smoothing for missing points that are filled in 
+        sigma = grid%G%dx*1.d0 
+
+        if (present(max_neighbors) .and. present(lat_lim)) then 
+
+            ! Initialize mapping
+            call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+            ! Initialize output variable arrays
+            call grid_allocate(grid,outvar)
+            call grid_allocate(grid,outmask)    
+            call grid_allocate(grid,tmp)
+
+            ! Initialize the output file
+            call nc_create(filename)
+            call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+            call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+            call nc_write_dim(filename,"month",x=[1,2,3,4,5,6,7,8,9,10,11,12],units="month")
+            call nc_write_dim(filename,"time", x=year0,dx=1,nx=nyr,units="years",calendar="360_day")
+            call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+            
+            ! Write meta data 
+            call nc_write_attr(filename,"Description",desc)
+            call nc_write_attr(filename,"Reference",ref)
+
+            ! ## SURFACE FIELDS ##
+            do i = 1, n_var
+
+                var_now = surf(i)  
+
+                call nc_read(trim(var_now%filename),var_now%nm_in,info0%var2D,missing_value=mv)
+                
+                ! Perform high resolution smoothing
+                if (.not. trim(var_now%nm_in) .eq. "MSK") then  
+                    call filter_gaussian(var=info0%var2D,sigma=sigma0,dx=dx0,mask=info0%var2D.ne.mv) 
+                end if 
+
+                outvar = missing_value 
+                call map_field(map,var_now%nm_in,info0%var2D,outvar,outmask,var_now%method,radius=sigma, &
+                               fill=var_now%fill,missing_value=mv) 
+                
+                if (.not. trim(var_now%nm_in) .eq. "MSK") then
+                    call fill_weighted(outvar,missing_value=mv)
+                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+                end if 
+
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+                    
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
+            
+            end do 
+        
+        end if 
+
+        return 
+
+    end subroutine MARv39ismip6_to_grid
+
 
     subroutine MARv39_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
