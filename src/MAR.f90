@@ -92,7 +92,7 @@ contains
             call nc_read(file_surface,"Y",info0%yc)
             
             ! Define MAR raw grid and input variable field
-            call grid_init(grid,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
+            call grid_init(gMAR,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
                         lambda=-45.d0,phi=70.d0)
 
