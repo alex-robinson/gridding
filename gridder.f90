@@ -70,22 +70,22 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+!     call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
     
-    call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
-    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
+!     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
+!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
