@@ -43,7 +43,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-20KM"
+    grid_name = "GRL-16KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -70,33 +70,32 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-!     call rtopo_to_grid(outfldr,grid,domain)
+    call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
     
-!     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
-!     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
+    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
+    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-!     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
-!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
-!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
+    call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
+    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
-!     stop 
+    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
     
-!     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
+    call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
 !     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
 !                                 sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
@@ -147,11 +146,11 @@ program gridder
             ! == Greenland only datasets ==
             write(*,*) "Processing Greenland..."
 
-!             call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
-!             call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-!             call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
-!             call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-!             call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
+            call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
+            call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+            call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
+            call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
+            call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
 
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
@@ -159,16 +158,16 @@ program gridder
 !             call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
             call MARv39ismip6_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
-            
+
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
 
-!             call nasaBasins_to_grid(outfldr,grid,"Greenland")
-!             call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+            call nasaBasins_to_grid(outfldr,grid,"Greenland")
+            call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
                 
-!             call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+            call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
 !             call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
-!             call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
+            call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
         
 !             path = "data/Davini_GreenlandAMOC/"
 !             call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &

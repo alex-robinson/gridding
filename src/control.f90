@@ -106,9 +106,19 @@ contains
                         lon180=.TRUE.,x0=-720.d0,dx=20.0d0,nx=85,y0=-3450.d0,dy=20.0d0,ny=145, &
                         lambda=-45.d0,phi=70.d0)
             
+            case("GRL-16KM")
+                call grid_init(grid,name="GRL-16KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=16.0d0,nx=106,y0=-3450.d0,dy=16.0d0,ny=181, &
+                        lambda=-45.d0,phi=70.d0)
+            
             case("GRL-10KM")
                 call grid_init(grid,name="GRL-10KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-720.d0,dx=10.0d0,nx=169,y0=-3450.d0,dy=10.0d0,ny=289, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("GRL-8KM")
+                call grid_init(grid,name="GRL-8KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=8.0d0,nx=211,y0=-3450.d0,dy=8.0d0,ny=361, &
                         lambda=-45.d0,phi=70.d0)
             
             case("GRL-5KM")
