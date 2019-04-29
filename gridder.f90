@@ -95,7 +95,7 @@ program gridder
     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
     
-    call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
+!     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
 !     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
 !                                 sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
