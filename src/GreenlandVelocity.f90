@@ -49,6 +49,9 @@ contains
         integer, allocatable          :: outmask(:,:)
         double precision, allocatable :: ux(:,:), uy(:,:)
 
+        character(len=512) :: filename_H_ice 
+        double precision, allocatable :: H_ice(:,:)
+
         ! Define the input filenames
 !         fldr_in         = "/data/sicopolis/data/Greenland/"
         fldr_in         = "data/Greenland/Joughin2018_vel/"
@@ -62,6 +65,9 @@ contains
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"// &
                               trim(grid%name)//"_VEL-J18.nc"
+
+        write(filename_H_ice,"(a)") trim(outfldr)//"/"// &
+                              trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
 
         ! Define the input data 
         !nx = 301
@@ -87,6 +93,12 @@ contains
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)
+        call grid_allocate(grid,H_ice)
+
+
+        ! First load H_ice field for filtering where velocity should be zero 
+        ! (assumes topography is already available on output domain)
+        call nc_read(filename_H_ice,"H_ice",H_ice)
 
         ! Initialize the output file
         call nc_create(filename)
@@ -104,13 +116,14 @@ contains
         where(inp%var .eq. 0.0) inp%var = mv
         outvar = mv 
         call map_field(map,"vx",inp%var,outvar,outmask,"radius",fill=.FALSE.,missing_value=mv,radius=grid%G%dx)
-        call nc_write(filename,"Ux_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
+        where(H_ice .eq. 0.0) outvar = mv 
+        call nc_write(filename,"ux_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata
-        call nc_write_attr(filename,"Ux_srf","units","m/a")
-        call nc_write_attr(filename,"Ux_srf","long_name", &
+        call nc_write_attr(filename,"ux_srf","units","m/a")
+        call nc_write_attr(filename,"ux_srf","long_name", &
                     "Surface velocity, x-component")
-        call nc_write_attr(filename,"Ux_srf","coordinates","lat2D lon2D")
+        call nc_write_attr(filename,"ux_srf","coordinates","lat2D lon2D")
 
         ! Read in current variable, map it, and write it
         !call nc_read(file_in,"surfvely",inp%var,start=[1,1,1],count=[nx,ny,1],missing_value=mv)
@@ -118,30 +131,31 @@ contains
         where(inp%var .eq. 0.0) inp%var = mv
         outvar = mv 
         call map_field(map,"vx",inp%var,outvar,outmask,"radius",fill=.FALSE.,missing_value=mv,radius=grid%G%dx)
-        call nc_write(filename,"Uy_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
+        where(H_ice .eq. 0.0) outvar = mv 
+        call nc_write(filename,"uy_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata
-        call nc_write_attr(filename,"Uy_srf","units","m/a")
-        call nc_write_attr(filename,"Uy_srf","long_name", &
+        call nc_write_attr(filename,"uy_srf","units","m/a")
+        call nc_write_attr(filename,"uy_srf","long_name", &
                     "Surface velocity, y-component")
-        call nc_write_attr(filename,"Uy_srf","coordinates","lat2D lon2D")
+        call nc_write_attr(filename,"uy_srf","coordinates","lat2D lon2D")
 
         call grid_allocate(grid,ux)
         call grid_allocate(grid,uy)
 
-        call nc_read(filename,"Ux_srf",ux)
-        call nc_read(filename,"Uy_srf",uy)
+        call nc_read(filename,"ux_srf",ux)
+        call nc_read(filename,"uy_srf",uy)
 
         outvar = mv
         where(ux .ne. mv .and. uy .ne. mv) outvar = sqrt(ux**2 + uy**2)
 
-        call nc_write(filename,"Umag_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
+        call nc_write(filename,"uxy_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
 
         ! Write variable metadata
-        call nc_write_attr(filename,"Umag_srf","units","m/a")
-        call nc_write_attr(filename,"Umag_srf","long_name", &
+        call nc_write_attr(filename,"uxy_srf","units","m/a")
+        call nc_write_attr(filename,"uxy_srf","long_name", &
                     "Surface velocity, magnitude")
-        call nc_write_attr(filename,"Umag_srf","coordinates","lat2D lon2D")
+        call nc_write_attr(filename,"uxy_srf","coordinates","lat2D lon2D")
 
         return
 
