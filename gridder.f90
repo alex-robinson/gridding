@@ -43,7 +43,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-16KM"
+    grid_name = "GRL-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -150,7 +150,7 @@ program gridder
 !             call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
 !             call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !             call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-!             call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
+            call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=0.5d0,grad_lim=0d0)
 
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
