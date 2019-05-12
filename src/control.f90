@@ -176,6 +176,13 @@ contains
                 call grid_init(grid,name="ANT-1KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=1.d0,nx=6241,dy=1.d0,ny=5841,lambda=0.d0,phi=-71.d0)
 
+            ! ISIMIP6 grid definitions 
+
+            case("ANT-32KM")
+                call grid_init(grid,name="ANT-32KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=32.d0,nx=191,y0=-3040.d0,dy=32.d0,ny=191, &
+                       lambda=0.d0,phi=-71.d0)
+
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
                 stop 

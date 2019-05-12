@@ -42,8 +42,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-16KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-32KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -56,9 +56,7 @@ program gridder
 
     ! Write a regional mask 
     call write_regions(outfldr,grid,domain)
-
-    stop 
-
+    
     ! =========================================================
     !
     ! DATASET TO GRID CALCULATIONS
@@ -72,7 +70,7 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-!     call rtopo_to_grid(outfldr,grid,domain)
+    call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
