@@ -70,32 +70,32 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+!     call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
     
-!     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
-    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
+    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-!     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
-!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
-!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
+    call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
+    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
+    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
     
-!     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
+    call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
 !     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
 !                                 sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
@@ -115,22 +115,22 @@ program gridder
             ! == Antarctica only datasets ==
             write(*,*) "Processing Antarctica..."
         
-            call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
-!             call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
-            call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!             call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
+            call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
+!             call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !             call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
-            call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
-            call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-            call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-                                            fill=.TRUE.,sigma=100.d0)
+!             call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+!             call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+!             call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
+!                                             fill=.TRUE.,sigma=100.d0)
 
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
 
-            call RACMO23_to_grid( outfldr, grid, "ANT27",max_neighbors=20,lat_lim=0.5d0)
-            call RACMO23_to_grid( outfldr, grid, "ANT27",clim_range=[1981,2010])
+!             call RACMO23_to_grid( outfldr, grid, "ANT27",max_neighbors=20,lat_lim=0.5d0)
+!             call RACMO23_to_grid( outfldr, grid, "ANT27",clim_range=[1981,2010])
 
             ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
             !      data while they should all have 240 months (1980-1999)
