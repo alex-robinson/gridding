@@ -281,12 +281,12 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(3))
-        call def_var_info(invariant(1),file_invariant,  "u","u",units="m*a-1", &
-                          long_name="Surface velocity, u-component")
-        call def_var_info(invariant(2),file_invariant,  "v","v",units="m*a-1", &
-                          long_name="Surface velocity, v-component")
-        call def_var_info(invariant(3),file_invariant,"uv","uv",units="m*a-1", &
-                          long_name="Surface velocity, magnitude")
+        call def_var_info(invariant(1),file_invariant,  "u","ux_srf",units="m*a-1", &
+                          long_name="Surface velocity, u-component",method="nng")
+        call def_var_info(invariant(2),file_invariant,  "v","uy_srf",units="m*a-1", &
+                          long_name="Surface velocity, v-component",method="nng")
+        call def_var_info(invariant(3),file_invariant,"uv","uxy_srf",units="m*a-1", &
+                          long_name="Surface velocity, magnitude",method="nng")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
@@ -316,7 +316,7 @@ contains
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
             var_now = invariant(i) 
-            if (trim(var_now%nm_out) .eq. "uv") then 
+            if (trim(var_now%nm_out) .eq. "uxy_srf") then 
                 call nc_read(var_now%filename,"u",tmp1,missing_value=missing_value)
                 call thin(invar,tmp1,by=10,missing_value=mv)
 !                 call thin_ave(invar,tmp1,by=10,missing_value=mv)
@@ -333,8 +333,8 @@ contains
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if 
 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=20.d0, &
-                          fill=.TRUE.,missing_value=missing_value)
+            call map_field(map,var_now%nm_in,invar,outvar,outmask,var_now%method,radius=grid%G%dx, &
+                          fill=.FALSE.,missing_value=missing_value)
             call fill_mean(outvar,missing_value=missing_value)
             if (var_now%method .eq. "nn") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc")

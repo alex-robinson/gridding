@@ -75,7 +75,7 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
     
-    call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+!     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
 !     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
@@ -83,19 +83,19 @@ program gridder
 !     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
+!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-    call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
-    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
-    call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
+!     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
+!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
+!     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
+!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
     
-    call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
+!     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
 !     call vavrus2018_to_grid(outfldr,grid,"Global",path_in="data/Vavrus2018-MIS19", &
 !                                 sigma_atm=40.d0,sigma_ocn=20.d0,max_neighbors=10,lat_lim=5.d0)
@@ -117,7 +117,7 @@ program gridder
         
 !             call An15litho_to_grid(outfldr, grid,"Antarctica", max_neighbors=5, lat_lim=1.0d0)
 !             call bedmap2_to_grid(outfldr,   grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0,grad_lim=0.05d0)
-!             call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+            call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !             call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !             call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
 !             call nasaBasins_to_grid(outfldr,grid,"Antarctica")
