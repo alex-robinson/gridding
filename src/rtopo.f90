@@ -322,13 +322,13 @@ contains
         ! Define input grid 
         select case(trim(domain))
             case("North")
-                call domain_definition(grid0,"NH-5KM")
+                call domain_definition(grid0,"NH-4KM")
             case("Eurasia")
-                call domain_definition(grid0,"EIS-5KM")
+                call domain_definition(grid0,"EIS-4KM")
             case("Greenland")
                 call domain_definition(grid0,"GRL-1KM")
             case("Antarctica")
-                call domain_definition(grid0,"ANT-5KM")
+                call domain_definition(grid0,"ANT-4KM")
             case DEFAULT 
                 write(*,*) "rtopo_to_grid:: error: domain not recognized: "//trim(domain)
                 stop
