@@ -23,8 +23,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Eurasia"
-    grid_name = "EIS-16KM"
+    domain    = "North"
+    grid_name = "NH-32KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
