@@ -88,8 +88,8 @@ contains
             dx0    = 1.d0 
 
             ! Read in points 
-            call nc_read(file_surface,"X",info0%xc)
-            call nc_read(file_surface,"Y",info0%yc)
+            call nc_read(file_surface,"x",info0%xc)
+            call nc_read(file_surface,"y",info0%yc)
             
             ! Define MAR raw grid and input variable field
 !             call grid_init(gMAR,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
@@ -162,7 +162,7 @@ contains
 
             ! Eliminate missing values 
             where(abs(info0%var2D) .gt. 1e10) info0%var2D = mv 
-            
+
 if (.FALSE.) then  
             ! Perform high resolution smoothing
             if (.not. trim(var_now%nm_in) .eq. "MSK") then  
