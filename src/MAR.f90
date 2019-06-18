@@ -111,7 +111,7 @@ contains
         n_var    = size(surf)
 
         ! Determine smoothing for missing points that are filled in 
-        sigma = grid%G%dx*1.d0 
+        sigma = grid%G%dx*2.d0 
 
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -156,7 +156,7 @@ if (.FALSE.) then
                            fill=var_now%fill,missing_value=mv) 
 
 else 
-            
+
             if (trim(var_now%nm_in) .eq. "MSK") then
                 call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
                                                 missing_value=mv,no_interp=.TRUE.)
