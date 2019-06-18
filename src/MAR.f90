@@ -71,7 +71,7 @@ contains
 
             ! Define the input filenames
             fldr0 = "/data/sicopolis/data/MARv3.9/ISMIP6/GrIS/ERA_1958-2017/"
-            file_surface = trim(fldr0)//"MARv3.9-ERA-Interim-1980-1999.nc"
+            file_surface = trim(fldr0)//"ISMIP6-GRL-5KM_MARv3.9-ERA-Interim-1980-1999.nc"
 
             ! Determine size of input points, allocate input points object 
             info0%nx = nc_size(file_surface,"X")
@@ -92,11 +92,15 @@ contains
             call nc_read(file_surface,"Y",info0%yc)
             
             ! Define MAR raw grid and input variable field
-            call grid_init(gMAR,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
+!             call grid_init(gMAR,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
+!                         lon180=.TRUE.,x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
+!                         lambda=-45.d0,phi=70.d0)
+            call grid_init(gMAR,name="MAR-ISMIP6-5KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=5.0d0,nx=337,y0=-3450.d0,dy=5.0d0,ny=577, &
                         lambda=-45.d0,phi=70.d0)
 
-            desc    = "Greenland regional climate simulated by MARv3.9, downscaled for ISMIP6"
+            desc    = "Greenland regional climate simulated by MARv3.9, downscaled for ISMIP6, &
+                      &then conservatively aggregated to 5KM grid using cdo."
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.9/ISMIP6/GrIS"
 
             ! Define the output filename 
@@ -156,6 +160,9 @@ contains
 
             call nc_read(trim(var_now%filename),var_now%nm_in,info0%var2D,missing_value=mv)
 
+            ! Eliminate missing values 
+            where(abs(info0%var2D) .gt. 1e10) info0%var2D = mv 
+            
 if (.FALSE.) then  
             ! Perform high resolution smoothing
             if (.not. trim(var_now%nm_in) .eq. "MSK") then  
