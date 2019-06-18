@@ -111,7 +111,7 @@ contains
         n_var    = size(surf)
 
         ! Determine smoothing for missing points that are filled in 
-        sigma = grid%G%dx*2.d0 
+        sigma = grid%G%dx*3.d0 
 
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
