@@ -160,6 +160,8 @@ if (.FALSE.) then
 
 else 
             
+            outvar = missing_value
+            
             if (trim(var_now%nm_in) .eq. "MSK") then
                 call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
                                                 missing_value=mv,no_interp=.TRUE.)
