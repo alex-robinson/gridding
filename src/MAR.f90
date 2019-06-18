@@ -115,14 +115,14 @@ contains
         call def_var_info(surf(1),trim(file_surface),"MSK", "mask", units="1", &
             long_name="Land/ice mask",method="nn",fill=.FALSE.)
         call def_var_info(surf(2),trim(file_surface),"SRF", "z_srf", units="m", &
-            long_name="Surface elevation",method="nn",fill=.FALSE.)
+            long_name="Surface elevation",method="con",fill=.FALSE.)
         
         call def_var_info(surf(3),trim(file_surface),"ST", "T_srf", units="degC", &
-            long_name="Surface temperature",method="nn",fill=.FALSE.)
+            long_name="Surface temperature",method="con",fill=.FALSE.)
         call def_var_info(surf(4),trim(file_surface),"SMB", "smb", units="mm a**-1", &
-            long_name="Surface mass balance",method="nn",fill=.FALSE.)
+            long_name="Surface mass balance",method="con",fill=.FALSE.)
         call def_var_info(surf(5),trim(file_surface),"RU", "runoff", units="mm a**-1", &
-            long_name="Runoff",method="nn",fill=.FALSE.)
+            long_name="Runoff",method="con",fill=.FALSE.)
 
         n_var    = size(surf)
 
@@ -155,7 +155,8 @@ contains
             var_now = surf(i)  
 
             call nc_read(trim(var_now%filename),var_now%nm_in,info0%var2D,missing_value=mv)
-            
+
+if (.FALSE.) then  
             ! Perform high resolution smoothing
             if (.not. trim(var_now%nm_in) .eq. "MSK") then  
                 call filter_gaussian(var=info0%var2D,sigma=sigma0,dx=dx0,mask=info0%var2D.ne.mv) 
@@ -164,11 +165,23 @@ contains
             outvar = missing_value 
             call map_field(map,var_now%nm_in,info0%var2D,outvar,outmask,var_now%method,radius=sigma, &
                            fill=var_now%fill,missing_value=mv) 
-            
+
             if (.not. trim(var_now%nm_in) .eq. "MSK") then
                 call fill_weighted(outvar,missing_value=mv)
                 call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
             end if 
+
+else 
+            
+            if (trim(var_now%nm_in) .eq. "MSK") then
+                call map_field_conservative_map1(map%map,var_now%nm_in,info0%var2D,outvar,fill=var_now%fill, &
+                                                missing_value=mv,no_interp=.TRUE.)
+            else
+                call map_field_conservative_map1(map%map,var_now%nm_in,info0%var2D,outvar,fill=var_now%fill, &
+                                            missing_value=mv)
+            end if 
+
+end if 
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
