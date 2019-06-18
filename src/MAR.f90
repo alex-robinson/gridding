@@ -143,24 +143,19 @@ contains
             ! Eliminate missing values 
             where(abs(var2D) .gt. 1e10) var2D = mv 
 
+            ! Initialize output variable to missing data 
+            outvar = mv 
+            
 if (.FALSE.) then  
             ! Perform high resolution smoothing
             if (.not. trim(var_now%nm_in) .eq. "MSK") then  
                 call filter_gaussian(var=var2D,sigma=sigma0,dx=dx0,mask=var2D.ne.mv) 
             end if 
 
-            outvar = missing_value 
             call map_field(map,var_now%nm_in,var2D,outvar,outmask,var_now%method,radius=sigma, &
                            fill=var_now%fill,missing_value=mv) 
 
-            if (.not. trim(var_now%nm_in) .eq. "MSK") then
-                call fill_weighted(outvar,missing_value=mv)
-                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
-            end if 
-
 else 
-            
-            outvar = missing_value
             
             if (trim(var_now%nm_in) .eq. "MSK") then
                 call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
@@ -171,6 +166,11 @@ else
             end if 
 
 end if 
+
+            if (.not. trim(var_now%nm_in) .eq. "MSK") then
+                call fill_weighted(outvar,missing_value=mv)
+                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)
+            end if 
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
