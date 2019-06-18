@@ -42,16 +42,7 @@ contains
         character(len=512) :: file_surface
         type(var_defs), allocatable :: surf(:)
         
-        type info0_type
-            integer :: nx, ny, npts  
-            real(8), allocatable :: xc(:), yc(:) 
-            real(8), allocatable :: lon(:), lat(:) 
-            real(8), allocatable :: var(:)
-            real(8), allocatable :: var2D(:,:)
-        end type 
-
-        type(info0_type) :: info0 
-
+        real(8), allocatable :: var2D(:,:)
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -62,7 +53,7 @@ contains
         integer :: yearf, k0, nk 
         character(len=512) :: filename_clim, filename_clim_ann 
         character(len=512) :: units_out 
-        double precision, allocatable :: var3D(:,:,:), var2D(:,:)
+        double precision, allocatable :: var3D(:,:,:)
         double precision :: sigma, conv_mon_day   
         double precision :: sigma0, dx0 
 
@@ -73,24 +64,10 @@ contains
             fldr0 = "/data/sicopolis/data/MARv3.9/ISMIP6/GrIS/ERA_1958-2017/"
             file_surface = trim(fldr0)//"ISMIP6-GRL-5KM_MARv3.9-ERA-Interim-1980-1999.nc"
 
-            ! Determine size of input points, allocate input points object 
-            info0%nx = nc_size(file_surface,"x")
-            info0%ny = nc_size(file_surface,"y")
-            info0%npts = info0%nx*info0%ny 
-
-            ! Allocate input info
-            allocate(info0%xc(info0%nx))
-            allocate(info0%yc(info0%ny))
-            allocate(info0%var2D(info0%nx,info0%ny))
-            
             ! Determine smoothing radius for input grid points (1 km input grid)
             sigma0 = grid%G%dx / 2.d0 
             dx0    = 1.d0 
 
-            ! Read in points 
-            call nc_read(file_surface,"x",info0%xc)
-            call nc_read(file_surface,"y",info0%yc)
-            
             ! Define MAR raw grid and input variable field
 !             call grid_init(gMAR,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
 !                         lon180=.TRUE.,x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
@@ -114,6 +91,9 @@ contains
 
         end if 
 
+        ! Allocate input variable array
+        allocate(var2D(gMAR%G%nx,gMAR%G%ny))
+            
         allocate(surf(5))
         
         call def_var_info(surf(1),trim(file_surface),"MSK", "mask", units="1", &
@@ -158,19 +138,19 @@ contains
 
             var_now = surf(i)  
 
-            call nc_read(trim(var_now%filename),var_now%nm_in,info0%var2D,missing_value=mv)
+            call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
 
             ! Eliminate missing values 
-            where(abs(info0%var2D) .gt. 1e10) info0%var2D = mv 
+            where(abs(var2D) .gt. 1e10) var2D = mv 
 
 if (.FALSE.) then  
             ! Perform high resolution smoothing
             if (.not. trim(var_now%nm_in) .eq. "MSK") then  
-                call filter_gaussian(var=info0%var2D,sigma=sigma0,dx=dx0,mask=info0%var2D.ne.mv) 
+                call filter_gaussian(var=var2D,sigma=sigma0,dx=dx0,mask=var2D.ne.mv) 
             end if 
 
             outvar = missing_value 
-            call map_field(map,var_now%nm_in,info0%var2D,outvar,outmask,var_now%method,radius=sigma, &
+            call map_field(map,var_now%nm_in,var2D,outvar,outmask,var_now%method,radius=sigma, &
                            fill=var_now%fill,missing_value=mv) 
 
             if (.not. trim(var_now%nm_in) .eq. "MSK") then
@@ -181,10 +161,10 @@ if (.FALSE.) then
 else 
             
             if (trim(var_now%nm_in) .eq. "MSK") then
-                call map_field_conservative_map1(map%map,var_now%nm_in,info0%var2D,outvar,fill=var_now%fill, &
+                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
                                                 missing_value=mv,no_interp=.TRUE.)
             else
-                call map_field_conservative_map1(map%map,var_now%nm_in,info0%var2D,outvar,fill=var_now%fill, &
+                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
                                             missing_value=mv)
             end if 
 
@@ -192,8 +172,8 @@ end if
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
-            write(*,*) trim(var_now%nm_in),  minval(info0%var2D,mask=info0%var2D .ne. mv), &
-                                             maxval(info0%var2D,mask=info0%var2D .ne. mv)
+            write(*,*) trim(var_now%nm_in),  minval(var2D,mask=var2D .ne. mv), &
+                                             maxval(var2D,mask=var2D .ne. mv)
             write(*,*) trim(var_now%nm_out), minval(outvar,mask=outvar .ne. mv), &
                                              maxval(outvar,mask=outvar .ne. mv)
             
