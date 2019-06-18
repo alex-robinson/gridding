@@ -74,8 +74,8 @@ contains
             file_surface = trim(fldr0)//"ISMIP6-GRL-5KM_MARv3.9-ERA-Interim-1980-1999.nc"
 
             ! Determine size of input points, allocate input points object 
-            info0%nx = nc_size(file_surface,"X")
-            info0%ny = nc_size(file_surface,"Y")
+            info0%nx = nc_size(file_surface,"x")
+            info0%ny = nc_size(file_surface,"y")
             info0%npts = info0%nx*info0%ny 
 
             ! Allocate input info
