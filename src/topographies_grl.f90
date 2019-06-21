@@ -174,15 +174,15 @@ contains
             ! ajr: note: filling in causes issues with border points of z_bed, etc.,
             ! even though it shouldn't apply there.
             ! disable for now...
-            if (trim(method) .eq. "mean") then
-                sigma = grid%G%dx
-                outmask = 0
-                where(outvar.eq.mv) outmask = 1 
-                call fill_weighted(outvar,missing_value=mv)
-                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
-            else 
-                call fill_nearest(outvar,missing_value=mv)
-            end if 
+!             if (trim(method) .eq. "mean") then
+!                 sigma = grid%G%dx
+!                 outmask = 0
+!                 where(outvar.eq.mv) outmask = 1 
+!                 call fill_weighted(outvar,missing_value=mv)
+!                 call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
+!             else 
+!                 call fill_nearest(outvar,missing_value=mv)
+!             end if 
                 
             write(*,"(a,3f10.2)") trim(var_now%nm_out)//": ", maxval(outvar), maxval(invar), maxval(tmp)
             
