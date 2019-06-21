@@ -163,15 +163,19 @@ contains
             method = "mean"
             if (trim(var_now%nm_out) .eq. "mask")        method = "count" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "count" 
-
+            if (trim(var_now%nm_out) .eq. "z_bed_err")   method = "count" 
+            
             outvar = mv 
 
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method=method,missing_value=mv)
 
-            ! Note: do not fill in missing values here, since we will populate them with
-            ! rtopo2 data afterwards (see further below) 
-            
+            ! Note: do not fill in missing values here, except for masks, since they 
+            ! will be populated with  rtopo2 data afterwards (see further below) 
+            if (trim(method) .eq. "count") then 
+                call fill_nearest(outvar,missing_value=mv)
+            end if 
+
             write(*,"(a,3f10.2)") trim(var_now%nm_out)//": ", maxval(outvar), maxval(invar), maxval(tmp)
 
             if (trim(method) .eq. "count") then 
