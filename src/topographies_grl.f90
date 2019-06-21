@@ -17,7 +17,7 @@ module topographies_grl
 
 contains 
 
-        subroutine Morlighem17_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim)
+        subroutine Morlighem17_to_grid(outfldr,grid,domain,max_neighbors,lat_lim,grad_lim,thin_by)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -33,7 +33,8 @@ contains
         integer :: max_neighbors 
         double precision :: lat_lim
         double precision :: grad_lim   
-        
+        integer, intent(IN) :: thin_by 
+
         ! Local variables 
         character(len=512) :: filename 
         character(len=1024) :: desc, ref 
@@ -48,7 +49,6 @@ contains
         double precision, allocatable :: outvar(:,:), tmp(:,:), tmp_rev(:,:)
         integer, allocatable          :: outmask(:,:)
         integer :: q, k, m, i, l, n_var, j 
-        integer :: thin_by
         character(len=128) :: method, grad_lim_str  
         integer :: status, ncid 
 
@@ -64,14 +64,16 @@ contains
             write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
         end if 
         
-        thin_by = 10 
-
-
         ! Define input grid
         if (trim(domain) .eq. "Greenland") then 
             
             ! Define grid and input variable field
             select case(thin_by)
+                case(15)  ! 150m => 2.25km 
+                    call grid_init(grid0,name="ESPG-3413-2.25KM",mtype="polar_stereographic", &
+                            units="kilometers",lon180=.TRUE., &
+                            x0=-652.925d0,dx=2.25d0,nx=682,y0=-3384.425d0,dy=2.25d0,ny=1224, &
+                            lambda=-45.d0,phi=70.d0)
                 case(10)  ! 150m => 1.5km 
                     call grid_init(grid0,name="ESPG-3413-1.5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
@@ -85,7 +87,7 @@ contains
                             lambda=-45.d0,phi=70.d0)
                     
             end select 
-            
+
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/BedMachineGreenland-2017-09-20.nc"
             desc    = "BedMachine v3 (2017-09-20): Greenland dataset based on mass conservation"
@@ -147,24 +149,22 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
 
-            method = "nn"
-            if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
-            if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
-
             call nc_read(trim(var_now%filename),var_now%nm_in,tmp_rev,missing_value=mv)
             do j = 1, size(tmp_rev,2)
                 tmp(:,j) = tmp_rev(:,size(tmp_rev,2)-j+1)
             end do 
-            if (var_now%method .eq. "nn") then 
-                call thin(invar,tmp,by=thin_by,missing_value=mv)
-            else 
-                call thin(invar,tmp,by=thin_by,missing_value=mv)
-!                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv)  ! Diffuses z_srf too much!!
-            end if 
+            call thin(invar,tmp,by=thin_by,missing_value=mv)
+
             if (trim(var_now%nm_out) .eq. "H_ice" .or. trim(var_now%nm_out) .eq. "z_srf") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
-            
+
+if (.FALSE.) then 
+
+            method = "nn"
+            if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
+            if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
+
             ! Perform Gaussian smoothing at high resolution 
             if (trim(var_now%nm_out) .eq. "H_ice" .or. &
                 trim(var_now%nm_out) .eq. "z_srf" .or. &
@@ -180,7 +180,19 @@ contains
             call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
                            radius=grid%G%dx, &
                            sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
-            
+
+else 
+            ! Perform conservative interpolation 
+
+            method = "mean"
+            if (trim(var_now%nm_out) .eq. "mask")        method = "count" 
+            if (trim(var_now%nm_out) .eq. "mask_source") method = "count" 
+
+            call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
+                                                            method=method,missing_value=mv)
+
+end if 
+
             if (trim(var_now%nm_out) .eq. "z_srf") then
                 write(*,"(a,3f10.2)") "maxval(z_srf): ", maxval(outvar), maxval(invar), maxval(tmp)
             end if 
