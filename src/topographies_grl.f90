@@ -193,6 +193,7 @@ else
 
 
             if (trim(method) .eq. "mean") then
+                sigma = grid%G%dx
                 outmask = 0
                 where(outvar.eq.mv) outmask = 1 
                 call fill_weighted(outvar,missing_value=mv)
