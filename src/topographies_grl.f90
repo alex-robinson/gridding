@@ -159,31 +159,7 @@ contains
                 where( invar .eq. mv ) invar = 0.d0 
             end if
 
-if (.FALSE.) then 
-
-            method = "nn"
-            if (trim(var_now%nm_out) .eq. "mask")        method = "nn" 
-            if (trim(var_now%nm_out) .eq. "mask_source") method = "nn" 
-
-            ! Perform Gaussian smoothing at high resolution 
-            if (trim(var_now%nm_out) .eq. "H_ice" .or. &
-                trim(var_now%nm_out) .eq. "z_srf" .or. &
-                trim(var_now%nm_out) .eq. "z_bed") then 
-                
-                sigma = grid%G%dx / 2.0 
-
-                call filter_gaussian(var=invar,sigma=sigma,dx=grid0%G%dx)
-
-            end if 
-
-            outvar = mv 
-            call map_field(map,var_now%nm_in,invar,outvar,outmask,method, &
-                           radius=grid%G%dx, &
-                           sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
-
-else 
             ! Perform conservative interpolation 
-
             method = "mean"
             if (trim(var_now%nm_out) .eq. "mask")        method = "count" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "count" 
@@ -192,6 +168,9 @@ else
                                                             method=method,missing_value=mv)
 
 
+            ! ajr: note: filling in causes issues with border points of z_bed, etc.,
+            ! even though it shouldn't apply there.
+            ! disable for now...
 !             if (trim(method) .eq. "mean") then
 !                 sigma = grid%G%dx
 !                 outmask = 0
@@ -201,14 +180,12 @@ else
 !             else 
 !                 call fill_nearest(outvar,missing_value=mv)
 !             end if 
-            
-end if 
-            
+                
             if (trim(var_now%nm_out) .eq. "z_srf") then
                 write(*,"(a,3f10.2)") "maxval(z_srf): ", maxval(outvar), maxval(invar), maxval(tmp)
             end if 
 
-            if (var_now%method .eq. "nn") then 
+            if (trim(method) .eq. "count") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
                 call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
@@ -219,6 +196,25 @@ end if
             call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
+            ! For bedrock elevation, additionally calculate the standard deviation of the field 
+            if (.TRUE. .and. trim(var_now%nm_out) .eq. "z_bed") then 
+
+                ! invar  == high resolution field 
+                ! outvar == destination field 
+
+                call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
+                                                            method="stdev",missing_value=mv)
+
+                call nc_write(filename,"z_bed_sd",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+                
+                ! Write variable metadata
+                call nc_write_attr(filename,"z_bed_sd","units",var_now%units_out)
+                call nc_write_attr(filename,"z_bed_sd","long_name",var_now%long_name)
+                call nc_write_attr(filename,"z_bed_sd","coordinates","lat2D lon2D")
+            
+            end if 
+
+
         end do 
 
 
