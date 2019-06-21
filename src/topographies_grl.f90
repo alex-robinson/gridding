@@ -169,23 +169,11 @@ contains
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method=method,missing_value=mv)
 
-            write(*,"(a,3f10.2)") trim(var_now%nm_out)//": ", maxval(outvar), maxval(invar), maxval(tmp)
+            ! Note: do not fill in missing values here, since we will populate them with
+            ! rtopo2 data afterwards (see further below) 
             
-            ! ajr: note: filling in causes issues with border points of z_bed, etc.,
-            ! even though it shouldn't apply there.
-            ! disable for now...
-!             if (trim(method) .eq. "mean") then
-!                 sigma = grid%G%dx
-!                 outmask = 0
-!                 where(outvar.eq.mv) outmask = 1 
-!                 call fill_weighted(outvar,missing_value=mv)
-!                 call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
-!             else 
-!                 call fill_nearest(outvar,missing_value=mv)
-!             end if 
-                
             write(*,"(a,3f10.2)") trim(var_now%nm_out)//": ", maxval(outvar), maxval(invar), maxval(tmp)
-            
+
             if (trim(method) .eq. "count") then 
                 call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
             else
