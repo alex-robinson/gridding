@@ -171,9 +171,10 @@ else
 end if 
             
             if (.not. trim(var_now%nm_in) .eq. "MSK") then
-                outmask = outvar.eq.mv
+                outmask = 0
+                where(outvar.eq.mv) outmask = 1 
                 call fill_weighted(outvar,missing_value=mv)
-                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask)
+                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
             end if 
 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
