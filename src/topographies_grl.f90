@@ -164,6 +164,8 @@ contains
             if (trim(var_now%nm_out) .eq. "mask")        method = "count" 
             if (trim(var_now%nm_out) .eq. "mask_source") method = "count" 
 
+            outvar = mv 
+
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method=method,missing_value=mv)
 
@@ -202,8 +204,16 @@ contains
                 ! invar  == high resolution field 
                 ! outvar == destination field 
 
+                outvar = mv 
+                
                 call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method="stdev",missing_value=mv)
+
+                sigma = grid%G%dx
+                outmask = 0
+                where(outvar.eq.mv) outmask = 1 
+                call fill_weighted(outvar,missing_value=mv)
+                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
 
                 call nc_write(filename,"z_bed_sd",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
                 
