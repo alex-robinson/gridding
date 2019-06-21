@@ -155,9 +155,9 @@ contains
             end do 
             call thin(invar,tmp,by=thin_by,missing_value=mv)
 
-            if (trim(var_now%nm_out) .eq. "H_ice" .or. trim(var_now%nm_out) .eq. "z_srf") then 
-                where( invar .eq. mv ) invar = 0.d0 
-            end if
+!             if (trim(var_now%nm_out) .eq. "H_ice" .or. trim(var_now%nm_out) .eq. "z_srf") then 
+!                 where( invar .eq. mv ) invar = 0.d0 
+!             end if
 
             ! Perform conservative interpolation 
             method = "mean"
