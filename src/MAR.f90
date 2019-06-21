@@ -71,6 +71,9 @@ contains
             sigma0 = grid%G%dx / 2.d0 
             dx0    = 1.d0 
 
+            ! Determine smoothing radius for grid points that are filled in with neighbors
+            sigma = grid%G%dx*2.d0 
+
             ! Define MAR raw grid and input variable field
 !             call grid_init(gMAR,name="MAR-ISMIP6-1KM",mtype="polar_stereographic",units="kilometers", &
 !                         lon180=.TRUE.,x0=-720.d0,dx=1.0d0,nx=1681,y0=-3450.d0,dy=1.0d0,ny=2881, &
@@ -112,9 +115,6 @@ contains
             long_name="Runoff",method="con",fill=.FALSE.)
 
         n_var    = size(surf)
-
-        ! Determine smoothing for missing points that are filled in 
-        sigma = grid%G%dx*1.d0 
 
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
