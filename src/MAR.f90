@@ -64,6 +64,8 @@ contains
             fldr0 = "/data/sicopolis/data/MARv3.9/ISMIP6/GrIS/ERA_1958-2017/"
             file_surface = trim(fldr0)//"ISMIP6-GRL-5KM_MARv3.9-ERA-Interim-1980-1999.nc"
 
+            year0 = 1980 
+            
             ! Determine smoothing radius for input grid points (1 km input grid)
             sigma0 = grid%G%dx / 2.d0 
             dx0    = 1.d0 
