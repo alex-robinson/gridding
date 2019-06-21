@@ -65,6 +65,7 @@ contains
             file_surface = trim(fldr0)//"ISMIP6-GRL-5KM_MARv3.9-ERA-Interim-1980-1999.nc"
 
             year0 = 1980 
+            nyr   = 1 
             
             ! Determine smoothing radius for input grid points (1 km input grid)
             sigma0 = grid%G%dx / 2.d0 
