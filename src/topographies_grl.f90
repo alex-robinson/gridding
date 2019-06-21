@@ -191,8 +191,18 @@ else
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method=method,missing_value=mv)
 
-end if 
 
+            if (trim(method) .eq. "mean") then
+                outmask = 0
+                where(outvar.eq.mv) outmask = 1 
+                call fill_weighted(outvar,missing_value=mv)
+                call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
+            else 
+                call fill_nearest(outvar,missing_value=mv)
+            end if 
+            
+end if 
+            
             if (trim(var_now%nm_out) .eq. "z_srf") then
                 write(*,"(a,3f10.2)") "maxval(z_srf): ", maxval(outvar), maxval(invar), maxval(tmp)
             end if 

@@ -176,7 +176,7 @@ end if
                 call fill_weighted(outvar,missing_value=mv)
                 call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
             end if 
-
+            
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
             write(*,*) trim(var_now%nm_in),  minval(var2D,mask=var2D .ne. mv), &
