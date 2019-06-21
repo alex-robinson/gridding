@@ -158,15 +158,15 @@ if (.FALSE.) then
 else 
 
             if (trim(var_now%nm_in) .eq. "MSK") then
-                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
-                                                missing_value=mv,no_interp=.TRUE.)
+                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar, &
+                                                            method="count",missing_value=mv)
             else
-                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar,fill=var_now%fill, &
-                                            missing_value=mv)
+                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar, &
+                                                            method="mean",missing_value=mv)
             end if 
 
 end if 
-
+            
             if (.not. trim(var_now%nm_in) .eq. "MSK") then
                 call fill_weighted(outvar,missing_value=mv)
                 call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.eq.mv)

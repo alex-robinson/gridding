@@ -76,22 +76,16 @@ contains
                     call grid_init(grid0,name="ESPG-3413-1.5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-652.925d0,dx=1.5d0,nx=1022,y0=-3384.425d0,dy=1.5d0,ny=1835, &
-                            lambda=-45.d0,phi=70.d0,alpha=20.0d0)
+                            lambda=-45.d0,phi=70.d0)
 
                 case DEFAULT
                     call grid_init(grid0,name="ESPG-3413-150M",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-652.925d0,dx=0.150d0,nx=10218,y0=-3384.425d0,dy=0.150d0,ny=18346, &
-                            lambda=-45.d0,phi=70.d0,alpha=20.0d0)
+                            lambda=-45.d0,phi=70.d0)
                     
             end select 
-
-!             ! Default grid at 150 m resolution
-!             call grid_init(grid0,name="ESPG-3413-150M",mtype="polar_stereographic", &
-!                             units="kilometers",lon180=.TRUE., &
-!                             x0=-637.925d0,dx=0.15d0,nx=10018,y0=-3349.425d0,dy=0.15d0,ny=17946, &
-!                             lambda=-45.d0,phi=70.d0,alpha=20.0d0)
-
+            
             ! Define the input filenames
             file_in = "/data/sicopolis/data/Greenland/BedMachineGreenland-2017-09-20.nc"
             desc    = "BedMachine v3 (2017-09-20): Greenland dataset based on mass conservation"
