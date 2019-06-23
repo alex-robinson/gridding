@@ -328,7 +328,7 @@ contains
                 invar = dsqrt(invar**2 + invarb**2)
             else
                 call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-                call thin(invarb,tmp1,by=10,missing_value=mv)
+                call thin(invar,tmp1,by=10,missing_value=mv)
 !                 call thin_ave(invar,tmp1,by=10,missing_value=mv)
                 where( invar .eq. missing_value ) invar = 0.d0 
             end if 
