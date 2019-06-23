@@ -21,6 +21,9 @@ $(objdir)/generic.o: $(srcdir)/generic.f90
 $(objdir)/AN1CRUST.o: $(srcdir)/AN1CRUST.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/AntarcticaVelocity.o: $(srcdir)/AntarcticaVelocity.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
 $(objdir)/bedmap2.o: $(srcdir)/bedmap2.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
@@ -86,6 +89,7 @@ obj_datasets =     $(objdir)/control.o \
 									 $(objdir)/generic.o \
 									 $(objdir)/regions.o \
 									 $(objdir)/AN1CRUST.o \
+                   $(objdir)/AntarcticaVelocity.o \
 									 $(objdir)/bedmap2.o \
 									 $(objdir)/CERES.o \
 									 $(objdir)/climber2.o \
