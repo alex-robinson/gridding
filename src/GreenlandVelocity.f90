@@ -51,7 +51,7 @@ contains
 
         character(len=512) :: filename_H_ice 
         double precision, allocatable :: H_ice(:,:)
-
+        
         ! Define the input filenames
 !         fldr_in         = "/data/sicopolis/data/Greenland/"
         fldr_in         = "data/Greenland/Joughin2018_vel/"

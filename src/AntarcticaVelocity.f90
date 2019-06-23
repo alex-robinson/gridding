@@ -38,9 +38,13 @@ contains
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp1(:,:), tmp2(:,:), tmp3(:,:)
         integer, allocatable          :: outmask(:,:)
+        double precision, allocatable :: ux(:,:), uy(:,:) 
         double precision, allocatable :: zb(:,:), zs(:,:), H(:,:)
         integer :: nyr, nm, q, k, year, m, i, j, l, year0, year_switch, n_prefix, n_var 
 
+        character(len=512) :: filename_H_ice 
+        double precision, allocatable :: H_ice(:,:)
+        
         ! Define input grid
         if (trim(domain) .eq. "Antarctica") then 
             
@@ -60,6 +64,9 @@ contains
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_VEL-R11_2.nc"
+
+            write(filename_H_ice,"(a)") trim(outfldr)//"/"// &
+                              trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
 
         else
 
@@ -90,7 +97,14 @@ contains
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
+        call grid_allocate(grid,H_ice)
         
+
+        ! First load H_ice field for filtering where velocity should be zero 
+        ! (assumes topography is already available on output domain)
+        call nc_read(filename_H_ice,"H_ice",H_ice)
+
+
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
@@ -118,6 +132,7 @@ contains
 
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method="mean",missing_value=mv)
+            where(H_ice .eq. 0.0) outvar = mv 
 !             call fill_mean(outvar,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
@@ -128,6 +143,25 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
         end do 
+
+        ! === Now velocity magnitude ===
+
+        call grid_allocate(grid,ux)
+        call grid_allocate(grid,uy)
+
+        call nc_read(filename,"ux_srf",ux)
+        call nc_read(filename,"uy_srf",uy)
+
+        outvar = mv
+        where(ux .ne. mv .and. uy .ne. mv) outvar = sqrt(ux**2 + uy**2)
+
+        call nc_write(filename,"uxy_srf",outvar,dim1="xc",dim2="yc",missing_value=mv)
+
+        ! Write variable metadata
+        call nc_write_attr(filename,"uxy_srf","units","m/a")
+        call nc_write_attr(filename,"uxy_srf","long_name", &
+                    "Surface velocity, magnitude")
+        call nc_write_attr(filename,"uxy_srf","coordinates","lat2D lon2D")
 
         return 
 
