@@ -126,6 +126,12 @@ contains
                 end do 
                 call thin(invar,tmp1,by=10,missing_value=mv)
                 !where( invar .eq. missing_value ) invar = 0.d0 
+
+                write(*,*) trim(var_now%nm_out)
+                write(*,*) "tmp1:  ", minval(tmp1,mask=tmp1.ne.mv),   maxval(tmp1,mask=tmp1.ne.mv)
+                write(*,*) "tmp2:  ", minval(tmp2,mask=tmp2.ne.mv),   maxval(tmp2,mask=tmp2.ne.mv)
+                write(*,*) "invar: ", minval(invar,mask=invar.ne.mv), maxval(invar,mask=tmp1.ne.mv)
+                
             end if 
 
             outvar = mv 
