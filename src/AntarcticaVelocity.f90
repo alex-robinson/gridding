@@ -76,9 +76,9 @@ contains
 
         ! Define the variables to be mapped 
         allocate(invariant(3))
-        call def_var_info(invariant(1),file_invariant,  "U","ux_srf",units="m*a-1", &
+        call def_var_info(invariant(1),file_invariant,  "VX","ux_srf",units="m*a-1", &
                           long_name="Surface velocity, u-component",method="radius")
-        call def_var_info(invariant(2),file_invariant,  "V","uy_srf",units="m*a-1", &
+        call def_var_info(invariant(2),file_invariant,  "VY","uy_srf",units="m*a-1", &
                           long_name="Surface velocity, v-component",method="radius")
         call def_var_info(invariant(3),file_invariant,"uv","uxy_srf",units="m*a-1", &
                           long_name="Surface velocity, magnitude",method="radius")
