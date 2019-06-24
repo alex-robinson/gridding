@@ -358,7 +358,7 @@ contains
         call grid_allocate(grid,var) 
         
         ! Initialize the map 
-        call map_init(map,grid0,grid,max_neighbors=5,lat_lim=0.5d0,fldr="maps",load=.TRUE.)
+        call map_init(map,grid0,grid,max_neighbors=20,lat_lim=0.5d0,fldr="maps",load=.TRUE.)
         
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
@@ -395,6 +395,7 @@ contains
 
             write(*,*) "range(var_in): ", minval(var0,mask=var0.ne.mv), maxval(var0,mask=var0.ne.mv)
 
+if (.FALSE.) then 
             ! Smooth data on hires grid
             call filter_gaussian(var=var0,sigma=grid%G%dx/2.d0,dx=grid0%G%dx)
 
@@ -402,6 +403,12 @@ contains
             var = mv 
             var = interp_nearest(x=grid0%G%x,y=grid0%G%y,z=var0, &
                                  xout=grid%G%x,yout=grid%G%y)
+else 
+            ! Perform conservative interpolation 
+            var = mv 
+            call map_field_conservative_map1(map%map,varname,var0,var,method="mean",missing_value=mv)
+
+end if 
 
             current_val = calc_grid_total(grid%G%x,grid%G%y,var,xlim=xlim,ylim=ylim)
             err_percent = 100.d0 * (current_val-target_val) / target_val
@@ -480,7 +487,6 @@ contains
         varname = "H_ice"
         call nc_write(filename,varname,real(H_ice),dim1="xc",dim2="yc",missing_value=real(mv))
 
-        
         ! Write new variable to file: ice mask  
         varname = "mask"
         call nc_write(filename,varname,mask,dim1="xc",dim2="yc",missing_value=int(mv))

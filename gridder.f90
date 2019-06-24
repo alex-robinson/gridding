@@ -71,7 +71,7 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-!     call rtopo_to_grid(outfldr,grid,domain)
+    call rtopo_to_grid(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
@@ -125,7 +125,7 @@ program gridder
 !             call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
 !                                             fill=.TRUE.,sigma=100.d0)
             
-            call antevelr11_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+!             call antevelr11_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
