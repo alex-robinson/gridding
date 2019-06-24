@@ -125,14 +125,14 @@ contains
                     tmp1(:,j) = tmp2(:,size(tmp2,2)-j+1)
                 end do 
                 call thin(invar,tmp1,by=10,missing_value=mv)
-                where( invar .eq. missing_value ) invar = 0.d0 
+                !where( invar .eq. missing_value ) invar = 0.d0 
             end if 
 
             outvar = mv 
 
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
                                                             method="mean",missing_value=mv)
-            where(H_ice .eq. 0.0) outvar = mv 
+!             where(H_ice .eq. 0.0) outvar = mv 
 !             call fill_mean(outvar,missing_value=missing_value)
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
