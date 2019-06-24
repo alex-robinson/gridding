@@ -118,20 +118,21 @@ contains
         do i = 1, size(invariant)
             
             var_now = invariant(i) 
- 
+    
+            ! Read in variable, flip y-direction, thin it to match defined input grid
             call nc_read(var_now%filename,var_now%nm_in,tmp2,missing_value=missing_value)
             do j = 1, size(tmp2,2)
                 tmp1(:,j) = tmp2(:,size(tmp2,2)-j+1)
             end do 
             call thin(invar,tmp1,by=10,missing_value=mv)
-            !where( invar .eq. missing_value ) invar = 0.d0 
 
+            ! Apply conservative mapping
             outvar = mv 
+            call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar,method="mean",missing_value=mv)
 
-            call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar, &
-                                                            method="mean",missing_value=mv)
-!             where(H_ice .eq. 0.0) outvar = mv 
-!             call fill_mean(outvar,missing_value=missing_value)
+            ! Fill in missing values, then limit field to where H_ice exists
+            call fill_mean(outvar,missing_value=missing_value)
+            where(H_ice .eq. 0.0) outvar = 0.0 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
             ! Write variable metadata
