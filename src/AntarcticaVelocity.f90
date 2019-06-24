@@ -50,7 +50,7 @@ contains
             
             ! Define input variable grid
             call grid_init(grid0,name="ANTVEL-4.5KM",mtype="polar_stereographic",units="kilometers",lon180=.TRUE., &
-                   x0=-2800.d0,dx=10.d0,nx=1246,y0=-2800.d0,dy=10.d0,ny=1246, &
+                   x0=-2800.d0,dx=4.5d0,nx=1246,y0=-2800.d0,dy=4.5d0,ny=1246, &
                    lambda=0.d0,phi=-71.d0)
 
             ! Define the input filenames
@@ -125,12 +125,6 @@ contains
             end do 
             call thin(invar,tmp1,by=10,missing_value=mv)
             !where( invar .eq. missing_value ) invar = 0.d0 
-
-            write(*,*) trim(var_now%nm_out)
-            write(*,*) "tmp1:  ", minval(tmp1,mask=tmp1.ne.mv),   maxval(tmp1,mask=tmp1.ne.mv)
-            write(*,*) "tmp2:  ", minval(tmp2,mask=tmp2.ne.mv),   maxval(tmp2,mask=tmp2.ne.mv)
-            write(*,*) "invar: ", minval(invar,mask=invar.ne.mv), maxval(invar,mask=tmp1.ne.mv)
-                
 
             outvar = mv 
 
