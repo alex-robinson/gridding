@@ -55,7 +55,7 @@ contains
 
             ! Define the input filenames
             infldr         = "data/Antarctica/"
-            file_invariant = trim(infldr)//"antarctica_ice_velocity_450m_v2.nc"
+            file_invariant = trim(infldr)//"antarctica_ice_velocity_450m_v2_clean.nc"
             desc    = "MEaSURES Antarctica Ice Velocity, version 2, https://nsidc.org/data/nsidc-0484"
             ref     = "Rignot, E., Mouginot, J. and Scheuchl, B.: &
                       &Ice Flow of the Antarctic Ice Sheet, Science, &
@@ -63,7 +63,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_VEL-R11_2.nc"
+                              "_VEL-R11-2.nc"
 
             write(filename_H_ice,"(a)") trim(outfldr)//"/"// &
                               trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
