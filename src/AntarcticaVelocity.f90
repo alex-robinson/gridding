@@ -75,13 +75,11 @@ contains
         end if 
 
         ! Define the variables to be mapped 
-        allocate(invariant(3))
+        allocate(invariant(2))
         call def_var_info(invariant(1),file_invariant,  "VX","ux_srf",units="m*a-1", &
-                          long_name="Surface velocity, u-component",method="radius")
+                          long_name="Surface velocity, u-component",method="mean")
         call def_var_info(invariant(2),file_invariant,  "VY","uy_srf",units="m*a-1", &
-                          long_name="Surface velocity, v-component",method="radius")
-        call def_var_info(invariant(3),file_invariant,"uv","uxy_srf",units="m*a-1", &
-                          long_name="Surface velocity, magnitude",method="radius")
+                          long_name="Surface velocity, v-component",method="mean")
 
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
@@ -118,21 +116,21 @@ contains
 
         ! ## INVARIANT FIELDS ##
         do i = 1, size(invariant)
+            
             var_now = invariant(i) 
-            if (trim(var_now%nm_out) .ne. "uxy_srf") then 
-                call nc_read(var_now%filename,var_now%nm_in,tmp1,missing_value=missing_value)
-                do j = 1, size(tmp2,2)
-                    tmp1(:,j) = tmp2(:,size(tmp2,2)-j+1)
-                end do 
-                call thin(invar,tmp1,by=10,missing_value=mv)
-                !where( invar .eq. missing_value ) invar = 0.d0 
+ 
+            call nc_read(var_now%filename,var_now%nm_in,tmp2,missing_value=missing_value)
+            do j = 1, size(tmp2,2)
+                tmp1(:,j) = tmp2(:,size(tmp2,2)-j+1)
+            end do 
+            call thin(invar,tmp1,by=10,missing_value=mv)
+            !where( invar .eq. missing_value ) invar = 0.d0 
 
-                write(*,*) trim(var_now%nm_out)
-                write(*,*) "tmp1:  ", minval(tmp1,mask=tmp1.ne.mv),   maxval(tmp1,mask=tmp1.ne.mv)
-                write(*,*) "tmp2:  ", minval(tmp2,mask=tmp2.ne.mv),   maxval(tmp2,mask=tmp2.ne.mv)
-                write(*,*) "invar: ", minval(invar,mask=invar.ne.mv), maxval(invar,mask=tmp1.ne.mv)
+            write(*,*) trim(var_now%nm_out)
+            write(*,*) "tmp1:  ", minval(tmp1,mask=tmp1.ne.mv),   maxval(tmp1,mask=tmp1.ne.mv)
+            write(*,*) "tmp2:  ", minval(tmp2,mask=tmp2.ne.mv),   maxval(tmp2,mask=tmp2.ne.mv)
+            write(*,*) "invar: ", minval(invar,mask=invar.ne.mv), maxval(invar,mask=tmp1.ne.mv)
                 
-            end if 
 
             outvar = mv 
 
