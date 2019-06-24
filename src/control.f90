@@ -194,33 +194,33 @@ contains
 
             ! ANTARCTICA DOMAINS ======================= 
 
-            case("ANT-80KM")
-                call grid_init(grid,name="ANT-80KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=80.d0,nx=79,dy=80.d0,ny=74,lambda=0.d0,phi=-71.d0)
+!             case("ANT-80KM")
+!                 call grid_init(grid,name="ANT-80KM",mtype="polar_stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=80.d0,nx=79,dy=80.d0,ny=74,lambda=0.d0,phi=-71.d0)
 
             case("ANT-40KM")
                 call grid_init(grid,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,dx=40.d0,nx=157,dy=40.d0,ny=147,lambda=0.d0,phi=-71.d0)
 
-            case("ANT-20KM")
-                call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=20.d0,nx=313,dy=20.d0,ny=293,lambda=0.d0,phi=-71.d0)
+!             case("ANT-20KM")
+!                 call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=20.d0,nx=313,dy=20.d0,ny=293,lambda=0.d0,phi=-71.d0)
 
-            case("ANT-10KM")
-                call grid_init(grid,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=10.d0,nx=625,dy=10.d0,ny=585,lambda=0.d0,phi=-71.d0)
+!             case("ANT-10KM")
+!                 call grid_init(grid,name="ANT-10KM",mtype="polar_stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=10.d0,nx=625,dy=10.d0,ny=585,lambda=0.d0,phi=-71.d0)
 
-            case("ANT-5KM")
-                call grid_init(grid,name="ANT-5KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=5.d0,nx=1249,dy=5.d0,ny=1169,lambda=0.d0,phi=-71.d0)
+!             case("ANT-5KM")
+!                 call grid_init(grid,name="ANT-5KM",mtype="polar_stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=5.d0,nx=1249,dy=5.d0,ny=1169,lambda=0.d0,phi=-71.d0)
 
-            case("ANT-2KM")
-                call grid_init(grid,name="ANT-2KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=2.d0,nx=3121,dy=2.d0,ny=2921,lambda=0.d0,phi=-71.d0)
+!             case("ANT-2KM")
+!                 call grid_init(grid,name="ANT-2KM",mtype="polar_stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=2.d0,nx=3121,dy=2.d0,ny=2921,lambda=0.d0,phi=-71.d0)
             
-            case("ANT-1KM")
-                call grid_init(grid,name="ANT-1KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=1.d0,nx=6241,dy=1.d0,ny=5841,lambda=0.d0,phi=-71.d0)
+!             case("ANT-1KM")
+!                 call grid_init(grid,name="ANT-1KM",mtype="polar_stereographic",units="kilometers", &
+!                        lon180=.TRUE.,dx=1.d0,nx=6241,dy=1.d0,ny=5841,lambda=0.d0,phi=-71.d0)
 
             ! ISIMIP6 grid definitions 
 
@@ -228,6 +228,27 @@ contains
                 call grid_init(grid,name="ANT-32KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,x0=-3040.d0,dx=32.d0,nx=191,y0=-3040.d0,dy=32.d0,ny=191, &
                        lambda=0.d0,phi=-71.d0)
+
+            case("ANT-16KM")
+                call grid_init(grid,name="ANT-16KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=16.d0,nx=381,y0=-3040.d0,dy=16.d0,ny=381, &
+                       lambda=0.d0,phi=-71.d0)
+
+            case("ANT-8KM")
+                call grid_init(grid,name="ANT-8KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=8.d0,nx=761,y0=-3040.d0,dy=8.d0,ny=761, &
+                       lambda=0.d0,phi=-71.d0)
+            
+            case("ANT-4KM")
+                call grid_init(grid,name="ANT-4KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=4.d0,nx=1521,y0=-3040.d0,dy=4.d0,ny=1521, &
+                       lambda=0.d0,phi=-71.d0)
+            
+            case("ANT-2KM")
+                call grid_init(grid,name="ANT-2KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=2.d0,nx=3041,y0=-3040.d0,dy=2.d0,ny=3041, &
+                       lambda=0.d0,phi=-71.d0)
+                        
 
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
