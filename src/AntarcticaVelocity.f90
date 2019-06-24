@@ -130,8 +130,9 @@ contains
             outvar = mv 
             call map_field_conservative_map1(map%map,var_now%nm_in,invar,outvar,method="mean",missing_value=mv)
 
-            ! Fill in missing values, then limit field to where H_ice exists
-            call fill_mean(outvar,missing_value=missing_value)
+            ! Fill in missing values for thick ice points (to avoid island), 
+            ! then limit field to where H_ice exists
+            call fill_mean(outvar,missing_value=missing_value,mask=H_ice .gt. 500.0)
             where(H_ice .eq. 0.0) outvar = 0.0 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
             
