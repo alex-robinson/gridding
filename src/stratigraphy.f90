@@ -73,6 +73,10 @@ contains
             stop 
         end if 
 
+        ! Write the original grid (for Andreas Born)
+!         call grid_write(grid,"macgregor2015_grid.nc",xnm="xc",ynm="yc",create=.TRUE.)
+!         stop 
+
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
 
