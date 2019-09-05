@@ -192,6 +192,12 @@ contains
                         lon180=.TRUE.,x0=-800.d0,dx=10.d0,nx=151,y0=-3400.d0,dy=10.d0,ny=281, &
                         lambda=-39.d0,phi=90.d0)
 
+
+            case("GRL-2KM-EXT")
+                call grid_init(grid,name="GRL-2KM-EXT",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-820.d0,dx=2.0d0,nx=941,y0=-4000.d0,dy=2.0d0,ny=1716, &
+                        lambda=-45.d0,phi=70.d0)
+            
             ! ANTARCTICA DOMAINS ======================= 
 
 !             case("ANT-80KM")
