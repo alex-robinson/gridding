@@ -66,6 +66,12 @@ gridder_climber: $(gridder_libs) $(obj_datasets_climber)
 	@echo "    gridder_climber.x is ready."
 	@echo " "
 
+projector: $(gridder_libs) $(objdir)/control.o
+	$(FC) $(DFLAGS) $(FFLAGS) -o projector.x $^ projector.f90 $(LFLAGS)
+	@echo " "
+	@echo "    projector.x is ready."
+	@echo " "
+
 bedmap: 
 	$(FC) $(DFLAGS) $(FFLAGS) -o bedmap2_netcdf.x $^ bedmap2_netcdf.f90 $(LFLAGS)
 	@echo " "
