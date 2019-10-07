@@ -45,8 +45,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-32KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-32KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -75,6 +75,8 @@ program gridder
     ! 2. Perform conservative interpolation to lower resolution 
     call rtopo_to_grid(outfldr,grid,domain)
 
+    stop 
+    
     ! == Global datasets - applicable to all domains ==
 
     

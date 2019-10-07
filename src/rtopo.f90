@@ -313,6 +313,7 @@ contains
 
         real(8), allocatable :: z_base(:,:), z_srf(:,:), z_bed(:,:), H_ice(:,:)   
         integer, allocatable :: mask(:,:) 
+        real(8) :: sigma 
 
         real(8), parameter :: rho_ice =  910.0 
         real(8), parameter :: rho_sw  = 1028.0 
@@ -497,6 +498,29 @@ end if
                 "long_name","Mask (0:ocean, 1:land, 2:grounded ice, 3:floating ice)")
         call nc_write_attr(filename,varname,"coordinates","lat2D lon2D")
         
+        ! For bedrock elevation, additionally calculate the standard deviation of the field 
+        ! var0 == high resolution field 
+        ! var  == destination field 
+
+        call nc_read(filename_in,"z_bed",var0,missing_value=mv)
+
+        var = mv 
+
+        call map_field_conservative_map1(map%map,"z_bed",var0,var,method="stdev",missing_value=mv)
+
+        sigma = grid%G%dx
+        mask = 0
+        where(var.eq.mv) mask = 1 
+        call fill_weighted(var,missing_value=mv)
+        call filter_gaussian(var=var,sigma=sigma,dx=grid%G%dx,mask=mask.eq.1)
+
+        call nc_write(filename,"z_bed_sd",real(var),dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,"z_bed_sd","units","m")
+        call nc_write_attr(filename,"z_bed_sd","long_name","Bedrock standard deviation")
+        call nc_write_attr(filename,"z_bed_sd","coordinates","lat2D lon2D")
+
         return 
 
     end subroutine rtopo_to_grid
