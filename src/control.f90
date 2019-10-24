@@ -130,6 +130,33 @@ contains
                         lon180=.TRUE.,x0=380.d0,dx=4.0d0,nx=881,y0=-5000.d0,dy=4.0d0,ny=1601, &
                         lambda=-45.d0,phi=70.d0)
             
+            ! LAURENTIDE DOMAINS ======================
+
+            case("LIS-32KM")
+                call grid_init(grid,name="LIS-32KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-5400.d0,dx=32.0d0,nx=165,y0=-5300.d0,dy=32.0d0,ny=245, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("LIS-20KM")
+                call grid_init(grid,name="LIS-20KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-5400.d0,dx=20.0d0,nx=263,y0=-5300.d0,dy=20.0d0,ny=389, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("LIS-16KM")
+                call grid_init(grid,name="LIS-16KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-5400.d0,dx=16.0d0,nx=329,y0=-5300.d0,dy=16.0d0,ny=489, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("LIS-8KM")
+                call grid_init(grid,name="LIS-8KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-5400.d0,dx=8.0d0,nx=657,y0=-5300.d0,dy=8.0d0,ny=977, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("LIS-4KM")
+                call grid_init(grid,name="LIS-4KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-5400.d0,dx=4.0d0,nx=1313,y0=-5300.d0,dy=4.0d0,ny=1953, &
+                        lambda=-45.d0,phi=70.d0)
+            
             ! GREENLAND DOMAINS =======================
 
 !             case("GRL-80KM")

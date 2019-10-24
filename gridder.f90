@@ -45,8 +45,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-32KM"
+    domain    = "Laurentide"
+    grid_name = "LIS-4KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -69,14 +69,14 @@ program gridder
     ! Global topography: Rtopo-2.0.1, two step process 
     ! 1. Interpolate rtopo fields to a high resolution regional grid 
     ! (only needed to be done once)
-!     call rtopo_latlon_to_grid(outfldr,grid,domain)
-!     stop 
+    call rtopo_latlon_to_grid(outfldr,grid,domain)
+    stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+!     call rtopo_to_grid(outfldr,grid,domain)
 
-    stop 
-    
+!     stop 
+
     ! == Global datasets - applicable to all domains ==
 
     
