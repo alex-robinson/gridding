@@ -134,27 +134,27 @@ contains
 
             case("LIS-32KM")
                 call grid_init(grid,name="LIS-32KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-5400.d0,dx=32.0d0,nx=165,y0=-5300.d0,dy=32.0d0,ny=245, &
+                        lon180=.TRUE.,x0=-4900.d0,dx=32.0d0,nx=153,y0=-5400.d0,dy=32.0d0,ny=219, &
                         lambda=-45.d0,phi=70.d0)
             
             case("LIS-20KM")
                 call grid_init(grid,name="LIS-20KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-5400.d0,dx=20.0d0,nx=263,y0=-5300.d0,dy=20.0d0,ny=389, &
+                        lon180=.TRUE.,x0=-4900.d0,dx=20.0d0,nx=243,y0=-5400.d0,dy=20.0d0,ny=349, &
                         lambda=-45.d0,phi=70.d0)
             
             case("LIS-16KM")
                 call grid_init(grid,name="LIS-16KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-5400.d0,dx=16.0d0,nx=329,y0=-5300.d0,dy=16.0d0,ny=489, &
+                        lon180=.TRUE.,x0=-4900.d0,dx=16.0d0,nx=305,y0=-5400.d0,dy=16.0d0,ny=437, &
                         lambda=-45.d0,phi=70.d0)
             
             case("LIS-8KM")
                 call grid_init(grid,name="LIS-8KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-5400.d0,dx=8.0d0,nx=657,y0=-5300.d0,dy=8.0d0,ny=977, &
+                        lon180=.TRUE.,x0=-4900.d0,dx=8.0d0,nx=609,y0=-5400.d0,dy=8.0d0,ny=873, &
                         lambda=-45.d0,phi=70.d0)
             
             case("LIS-4KM")
                 call grid_init(grid,name="LIS-4KM",mtype="polar_stereographic",units="kilometers", &
-                        lon180=.TRUE.,x0=-5400.d0,dx=4.0d0,nx=1313,y0=-5300.d0,dy=4.0d0,ny=1953, &
+                        lon180=.TRUE.,x0=-4900.d0,dx=4.0d0,nx=1217,y0=-5400.d0,dy=4.0d0,ny=1745, &
                         lambda=-45.d0,phi=70.d0)
             
             ! GREENLAND DOMAINS =======================
