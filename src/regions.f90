@@ -149,7 +149,7 @@ contains
         
         select case(trim(domain)) 
 
-            case("North","Eurasia","Greenland") 
+            case("North","Laurentide","Eurasia","Greenland") 
                 mask = get_region_map_north(grid)
 
             case("Antarctica") 
