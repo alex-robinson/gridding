@@ -324,6 +324,8 @@ contains
         select case(trim(domain))
             case("North")
                 call domain_definition(grid0,"NH-4KM")
+            case("Laurentide")
+                call domain_definition(grid0,"LIS-4KM")
             case("Eurasia")
                 call domain_definition(grid0,"EIS-4KM")
             case("Greenland")
