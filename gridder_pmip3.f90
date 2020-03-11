@@ -21,8 +21,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Antarctica"
-    grid_name = "ANT-32KM"
+    domain    = "Greenland"
+    grid_name = "GRL-32KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -43,6 +43,9 @@ program gridder
 
     path = "data/PMIP3/"
     sigma = 250.d0 
+
+    write(subfldr,"(a15,i3,a2)") "PMIP3_sig", int(sigma), "km"
+    outfldr = trim(outfldr)//"/"//trim(subfldr)
 
     call system("mkdir -p "//trim(outfldr))
 
