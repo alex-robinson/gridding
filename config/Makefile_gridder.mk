@@ -60,6 +60,9 @@ $(objdir)/MAR.o: $(srcdir)/MAR.f90
 $(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/pmip3.o: $(srcdir)/pmip3.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
 $(objdir)/RACMO2.o: $(srcdir)/RACMO2.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
@@ -115,5 +118,9 @@ obj_datasets_climber = $(objdir)/control.o \
 									 $(objdir)/gridding_datasets.o \
 									 $(objdir)/climber2.o \
 									 $(objdir)/climber3a.o
+
+obj_datasets_pmip3 = $(objdir)/control.o \
+									 $(objdir)/gridding_datasets.o \
+									 $(objdir)/pmip3.o
 
 gridder_libs = $(objdir)/ncio.o $(objdir)/nml.o

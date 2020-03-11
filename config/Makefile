@@ -66,6 +66,12 @@ gridder_climber: $(gridder_libs) $(obj_datasets_climber)
 	@echo "    gridder_climber.x is ready."
 	@echo " "
 
+gridder_pmip3: $(gridder_libs) $(obj_datasets_pmip3) 
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_pmip3.x $^ gridder_pmip3.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_pmip3.x is ready."
+	@echo " "
+
 projector: $(gridder_libs) $(objdir)/control.o
 	$(FC) $(DFLAGS) $(FFLAGS) -o projector.x $^ projector.f90 $(LFLAGS)
 	@echo " "
