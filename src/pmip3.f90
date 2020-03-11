@@ -2518,8 +2518,8 @@ contains
         character(len=256) :: pmip3_grid
 
         ! Define the input filenames
-        fldr_in          = trim(path_in)
-        file_in          = trim(fldr_in)//"pmip3_21k.nc"
+        fldr_in          = trim(path_in)//"/extensions/"
+        file_in          = trim(fldr_in)//"pmip3_21k_v0.nc"
 
         desc    = "MRI_CGCM3 PMIP3 PD ATM"
         ref     = "source folder: "//trim(fldr_in)
@@ -2628,7 +2628,7 @@ contains
         character(len=256) :: pmip3_grid
 
         ! Define the input filenames
-        fldr_in          = trim(path_in)
+        fldr_in          = trim(path_in)//"/extensions/"
         file_in          = trim(fldr_in)//"pmip3_21k_extensions_ant.nc"
 
         desc    = "LGM extensions"
