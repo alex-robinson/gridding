@@ -21,7 +21,7 @@ export OMP_STACKSIZE=64M
 
 
 # Run the job
-./gridder.x 
+./gridder_pmip3.x 
 
 
 

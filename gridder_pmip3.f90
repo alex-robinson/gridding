@@ -45,8 +45,9 @@ program gridder
     sigma = 250.d0 
 
     write(subfldr,"(a15,i3,a2)") "PMIP3_sig", int(sigma), "km"
+    subfldr = trim(adjustl(subfldr))
     outfldr = trim(outfldr)//"/"//trim(subfldr)
-
+    
     call system("mkdir -p "//trim(outfldr))
 
    call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
