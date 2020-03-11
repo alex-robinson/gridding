@@ -49,6 +49,11 @@ program gridder
 
     call system("mkdir -p "//trim(outfldr))
 
+    call LGM_dzs_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+    call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+
    call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
    call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
@@ -93,11 +98,6 @@ program gridder
 !                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !    call MRI_CGCM3_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call LGM_dzs_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-    call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
-                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-
 
     
 
