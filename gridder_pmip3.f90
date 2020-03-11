@@ -59,46 +59,46 @@ program gridder
                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
     call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call CNRM_CM5_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call CNRM_CM5_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call COSMOS_ASO_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call COSMOS_ASO_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call FGOALS_g2_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call FGOALS_g2_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_150_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_150_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_151_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_151_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call IPSL_CM5A_LR_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call IPSL_CM5A_LR_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MIROC_ESM_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MIROC_ESM_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p1_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p1_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p2_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p2_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MRI_CGCM3_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MRI_CGCM3_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call CNRM_CM5_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call CNRM_CM5_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call COSMOS_ASO_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call COSMOS_ASO_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call FGOALS_g2_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call FGOALS_g2_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call GISS_E2_R_150_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call GISS_E2_R_150_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call GISS_E2_R_151_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call GISS_E2_R_151_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call IPSL_CM5A_LR_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call IPSL_CM5A_LR_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MIROC_ESM_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MIROC_ESM_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MPI_ESM_P_p1_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MPI_ESM_P_p1_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MPI_ESM_P_p2_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MPI_ESM_P_p2_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MRI_CGCM3_PD_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+   call MRI_CGCM3_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 
     
 
