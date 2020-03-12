@@ -2559,6 +2559,9 @@ contains
         ! Load the present-day surface elevation field (do it now, to make sure it's available)
         call nc_read(file_in_topo,"z_srf",pd_zs)
         
+        ! Smooth it out to match target smoothness via sigma 
+        call filter_gaussian(var=pd_zs,sigma=sigma,dx=grid%G%dx)
+
         if (is_pd) then 
             ! Simply writing present-day surface elevation to file 
 
