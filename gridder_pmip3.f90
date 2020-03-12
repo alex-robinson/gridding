@@ -10,7 +10,7 @@ program gridder
 
     type(grid_class)   :: grid
     character(len=256) :: domain, grid_name, outfldr 
-    character(len=256) :: path, subfldr  
+    character(len=256) :: path, subfldr, sigma_str  
     real(8) :: sigma
 
     write(*,*) 
@@ -42,9 +42,12 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
     path = "data/PMIP3/"
-    sigma = 250.d0 
+    sigma = 50.0d0 
+    
+    write(sigma_str,*) int(sigma)
+    sigma_str = trim(adjustl(sigma_str))
 
-    write(subfldr,"(a15,i3,a2)") "PMIP3_sig", int(sigma), "km"
+    write(subfldr,"(a15,a,a2)") "PMIP3_sig", trim(sigma_str), "km"
     subfldr = trim(adjustl(subfldr))
     outfldr = trim(outfldr)//"/"//trim(subfldr)
     
