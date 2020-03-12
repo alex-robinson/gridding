@@ -2537,7 +2537,7 @@ contains
         file_in          = trim(fldr_in)//"pmip3_21k_v0.nc"
 
         ! Filename of already-processed present-day topography to combine with dzs here 
-        file_in_topo     = trim(outfldr)//"/"//trim(grid%name)//"_RTOPO-2.0.1.nc"
+        file_in_topo     = trim(outfldr)//"/../"//trim(grid%name)//"_RTOPO-2.0.1.nc"
 
         nx = nc_size(file_in,"lon")
         ny = nc_size(file_in,"lat")
