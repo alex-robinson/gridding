@@ -2667,7 +2667,7 @@ contains
             ! dz_srf =========
 
             ! Read in current variable
-            call nc_read(trim(file_in),"orogdiff",inp%var,missing_value=mv)
+            call nc_read(trim(file_in),"orog_diff",inp%var,missing_value=mv)
             
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
