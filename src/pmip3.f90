@@ -56,8 +56,8 @@ contains
         implicit none 
 
         type(pmip_info_type), intent(INOUT) :: info 
-        character(len=256),   intent(IN)    :: pmip_case 
-        character(len=256),   intent(IN)    :: domain 
+        character(len=*),     intent(IN)    :: pmip_case 
+        character(len=*),     intent(IN)    :: domain 
 
         ! Local variables 
         logical :: is_south 
