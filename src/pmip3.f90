@@ -9,15 +9,18 @@ module pmip3
 
     type pmip_info_type
 
+        character(len=256) :: model 
+        character(len=256) :: experiment 
+        character(len=256) :: pmip_case 
+        character(len=256) :: file_in_suffix
+        character(len=256) :: desc
+        character(len=256) :: grid_name 
+        logical            :: is_pd 
+        
         character(len=256) :: nm_tas_ann
         character(len=256) :: nm_tas_sum
         character(len=256) :: nm_pr_ann
-        character(len=256) :: file_suffix
-        character(len=256) :: desc
-        character(len=256) :: grid_name 
-
-        logical            :: is_pd 
-        
+            
     end type 
 
     private
@@ -51,12 +54,13 @@ module pmip3
 
 contains
 
-    subroutine pmip3_info(info,pmip_case,domain)
+    subroutine pmip3_info(info,model,experiment,domain)
 
         implicit none 
 
         type(pmip_info_type), intent(INOUT) :: info 
-        character(len=*),     intent(IN)    :: pmip_case 
+        character(len=*),     intent(IN)    :: model 
+        character(len=*),     intent(IN)    :: experiment 
         character(len=*),     intent(IN)    :: domain 
 
         ! Local variables 
@@ -67,6 +71,20 @@ contains
 
         ! === Default values for all cases =====
 
+        info%model       = trim(model)
+        info%experiment  = trim(experiment)
+
+        info%pmip_case      = trim(model)//"-"//trim(experiment)
+        info%file_in_suffix = trim(model)//"/"//trim(model)//"_"//trim(experiment)//".nc"
+        info%desc           = "PMIP3 "//trim(model)//" - "//trim(experiment)
+        info%grid_name      = trim(model)//"-grid"
+
+        if (trim(experiment) .eq. "piControl") then 
+            info%is_pd = .TRUE. 
+        else
+            info%is_pd = .FALSE. 
+        end if 
+
         info%nm_tas_ann = "tas_spatialmean_ann" 
         info%nm_pr_ann  = "pr_spatialmean_ann" 
 
@@ -76,37 +94,13 @@ contains
             info%nm_tas_sum = "tas_spatialmean_jja" 
         end if 
 
-        ! === Model-experiment specific values =====
-
-        select case(trim(pmip_case))
-
-            case("CCSM4-piControl") 
-
-                info%file_suffix = "CCSM4/CCSM4_piControl.nc"
-                info%desc        = "CCSM4 PMIP3 ATM - piControl"
-                info%grid_name   = "CCSM4-grid"
-                info%is_pd       = .TRUE. 
-
-            case("CCSM4-LGM") 
-
-                info%file_suffix = "CCSM4/CCSM4_lgm.nc"
-                info%desc        = "CCSM4 PMIP3 ATM - LGM"
-                info%grid_name   = "CCSM4-grid"
-                info%is_pd       = .FALSE. 
-
-            case DEFAULT 
-
-                write(*,*) "pmip3_info:: Error: case not recognized: "//trim(pmip_case)
-                stop 
-
-        end select 
-
+        
         return 
 
     end subroutine pmip3_info 
 
 
-    subroutine PMIP3_to_grid(outfldr,grid,domain,pmip_case,path_in,sigma,max_neighbors,lat_lim)
+    subroutine PMIP3_to_grid(outfldr,grid,domain,model,experiment,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -118,7 +112,8 @@ contains
         character(len=*), intent(IN) :: outfldr 
         type(grid_class), intent(IN) :: grid
         character(len=*), intent(IN) :: domain
-        character(len=*), intent(IN) :: pmip_case
+        character(len=*), intent(IN) :: model
+        character(len=*), intent(IN) :: experiment
         character(len=*), intent(IN) :: path_in
         double precision, intent(IN) :: sigma
         integer,          intent(IN) :: max_neighbors
@@ -149,17 +144,17 @@ contains
         integer :: q, k, m, i, l, n_var
 
         ! Get PMIP info 
-        call pmip3_info(info,pmip_case,domain)
+        call pmip3_info(info,model,experiment,domain)
 
         ! Define the input filenames
         fldr_in          = trim(path_in)
-        file_in          = trim(fldr_in)//trim(info%file_suffix)
+        file_in          = trim(fldr_in)//trim(info%file_in_suffix)
 
         desc    = trim(info%desc)
         ref     = "source folder: "//trim(fldr_in)
 
         ! Define the output filename 
-        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_"//trim(pmip_case)//".nc"
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_"//trim(info%pmip_case)//".nc"
 
         nx = nc_size(file_in,"lon")
         ny = nc_size(file_in,"lat")
