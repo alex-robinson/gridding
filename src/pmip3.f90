@@ -143,6 +143,10 @@ contains
 
         end do
 
+        ! Add topography 
+        call pmip3_add_zs_to_grid(filename,outfldr,grid,domain,path_in,sigma, &
+                                                max_neighbors,lat_lim,is_pd=.FALSE.)
+
         return 
 
     end subroutine CCSM4_LGM_to_grid
@@ -253,6 +257,10 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
 
         end do
+
+        ! Add topography 
+        call pmip3_add_zs_to_grid(filename,outfldr,grid,domain,path_in,sigma, &
+                                                max_neighbors,lat_lim,is_pd=.TRUE.)
 
         return 
 
@@ -2477,6 +2485,179 @@ contains
         return 
 
     end subroutine MRI_CGCM3_PD_to_grid
+
+    subroutine pmip3_add_zs_to_grid(filename,outfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim,is_pd)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       LGM dzs wrt PD is given for PMIP3 (Abe-Ouchi 2015)
+        !       If present day, z_srf = rtopo
+        !       If LGM,         z_srf = rtopo+dzs_pmip3
+        !
+        ! =========================================================
+        implicit none
+        
+        character(len=*), intent(IN) :: filename
+        character(len=*), intent(IN) :: outfldr
+        type(grid_class), intent(IN) :: grid
+        character(len=*), intent(IN) :: domain, path_in
+        integer,          intent(IN) :: max_neighbors
+        double precision, intent(IN) :: sigma, lat_lim
+        logical,          intent(IN) :: is_pd           ! Is this file present day? 
+
+        ! Local variables 
+
+        type inp_type
+            double precision, allocatable :: lon(:), lat(:), var(:,:)
+            double precision, allocatable :: zs(:,:)
+            double precision :: lapse_ann    = 8.0d-3
+            double precision :: lapse_summer = 6.5d-3
+        end type
+
+        type(inp_type)     :: inp
+        type(grid_class)   :: grid0
+        character(len=256) :: fldr_in, file_in_topo, file_in, nm_topo
+        type(var_defs), allocatable :: vars(:)
+        integer :: nx, ny, np
+
+        type(map_class)  :: map
+        type(var_defs) :: var_now
+        double precision, allocatable :: outvar(:,:), outvar1(:,:)
+        integer, allocatable          :: outmask(:,:)
+
+        double precision, allocatable :: pd_zs(:,:)
+
+        integer :: q, k, m, i, l, n_var
+
+        ! For intermediate interpolation 
+        character(len=256) :: pmip3_grid
+
+        ! Define the input filenames
+        fldr_in          = trim(path_in)//"/extensions/"
+        file_in          = trim(fldr_in)//"pmip3_21k_v0.nc"
+
+        ! Filename of already-processed present-day topography to combine with dzs here 
+        file_in_topo     = trim(outfldr)//"/"//trim(grid%name)//"_RTOPO-2.0.1.nc"
+
+        nx = nc_size(file_in,"lon")
+        ny = nc_size(file_in,"lat")
+
+        allocate(inp%lon(nx),inp%lat(ny),inp%var(nx,ny))
+
+        call nc_read(file_in,"lon",inp%lon)
+        call nc_read(file_in,"lat",inp%lat)
+
+        call grid_init(grid0,name="pmip3_dzs_grid",mtype="latlon",units="degrees", &
+                         lon180=.TRUE.,x=inp%lon,y=inp%lat) 
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outvar1)
+        call grid_allocate(grid,outmask)
+        call grid_allocate(grid,pd_zs)
+
+        ! Load the present-day surface elevation field (do it now, to make sure it's available)
+        call nc_read(file_in_topo,"z_srf",pd_zs)
+        
+        if (is_pd) then 
+            ! Simply writing present-day surface elevation to file 
+
+            ! Write output variable to output file
+            call nc_write(filename,"z_srf",real(pd_zs),dim1="xc",dim2="yc")
+
+            ! Write variable metadata
+            call nc_write_attr(filename,"z_srf","units","m")
+            call nc_write_attr(filename,"z_srf","long_name","Surface elevation")
+            call nc_write_attr(filename,"z_srf","coordinates","lat2D lon2D")
+
+            ! Load PD mask
+            call nc_read(file_in_topo,"mask",outmask)
+
+            ! Write output variable to output file
+            call nc_write(filename,"mask",outmask,dim1="xc",dim2="yc")
+
+            ! Write variable metadata
+            call nc_write_attr(filename,"mask","units","")
+            call nc_write_attr(filename,"mask","long_name","Mask (0:ocean, 1:land, 2:grounded ice, 3:floating ice)")
+            call nc_write_attr(filename,"mask","coordinates","lat2D lon2D")
+
+        else 
+
+            ! Initialize mapping
+            call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+            ! dz_srf =========
+
+            ! Read in current variable
+            call nc_read(trim(file_in),"orogdiff",inp%var,missing_value=mv)
+            
+            where((abs(inp%var) .ge. 1d10)) inp%var = mv
+
+            ! Map variable to new grid
+            call map_field(map,"dz_srf",inp%var,outvar,outmask,method="nng", &
+                          fill=.TRUE.,missing_value=mv,sigma=sigma)
+
+            ! Write output variable to output file
+            call nc_write(filename,"dz_srf",real(outvar),dim1="xc",dim2="yc")
+
+            ! Write variable metadata
+            call nc_write_attr(filename,"dz_srf","units","m")
+            call nc_write_attr(filename,"dz_srf","long_name","Surface elevation difference")
+            call nc_write_attr(filename,"dz_srf","coordinates","lat2D lon2D")
+
+            ! Next, add present-day surface elevation to field to get z_srf 
+            outvar = outvar + pd_zs 
+
+            ! Write output variable to output file
+            call nc_write(filename,"z_srf",real(outvar),dim1="xc",dim2="yc")
+
+            ! Write variable metadata
+            call nc_write_attr(filename,"z_srf","units","m")
+            call nc_write_attr(filename,"z_srf","long_name","Surface elevation")
+            call nc_write_attr(filename,"z_srf","coordinates","lat2D lon2D")
+
+            ! mask =========
+
+            ! Read in current variable - land mask
+            call nc_read(trim(file_in),"mask3",inp%var,missing_value=mv)
+            
+            where((abs(inp%var) .ge. 1d10)) inp%var = mv
+
+            ! Map variable to new grid
+            call map_field(map,"mask3",inp%var,outvar,outmask,method="nn", &
+                          fill=.TRUE.,missing_value=mv,sigma=sigma)
+
+
+            ! Read in current variable - ice mask 
+            call nc_read(trim(file_in),"mask1",inp%var,missing_value=mv)
+            
+            where((abs(inp%var) .ge. 1d10)) inp%var = mv
+
+            ! Map variable to new grid
+            call map_field(map,"mask1",inp%var,outvar1,outmask,method="nn", &
+                          fill=.TRUE.,missing_value=mv,sigma=sigma)
+            
+            ! Define final ice-land-mask 
+            outmask = 0 
+            where(outvar .gt. 0.5)  outmask = 1     ! Land 
+            where(outvar1 .gt. 0.5) outmask = 2     ! Land-ice 
+            where(outvar1 .gt. 0.5 .and. outvar .le. 0.5) outmask = 3  ! Floating ice 
+
+            ! Write output variable to output file
+            call nc_write(filename,"mask",outmask,dim1="xc",dim2="yc")
+
+            ! Write variable metadata
+            call nc_write_attr(filename,"mask","units","")
+            call nc_write_attr(filename,"mask","long_name","Mask (0:ocean, 1:land, 2:grounded ice, 3:floating ice)")
+            call nc_write_attr(filename,"mask","coordinates","lat2D lon2D")
+
+        
+        end if 
+
+
+        return 
+
+    end subroutine pmip3_add_zs_to_grid
 
     subroutine LGM_dzs_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file

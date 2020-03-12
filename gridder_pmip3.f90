@@ -53,15 +53,15 @@ program gridder
     
     call system("mkdir -p "//trim(outfldr))
 
-    call LGM_dzs_to_grid(outfldr,subfldr,grid,domain="lgm", &
-                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+!     call LGM_dzs_to_grid(outfldr,subfldr,grid,domain="lgm", &
+!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !     call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                                path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 
-!     call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!     call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+    call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+    call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
+                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !    call CNRM_CM5_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !    call CNRM_CM5_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
