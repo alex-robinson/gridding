@@ -57,11 +57,15 @@ program gridder
 !                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !     call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                                path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-
-    call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
+    
+    call PMIP3_to_grid(outfldr,grid,domain,pmip_case="CCSM4-PiControl", &
                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-    call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
+    call PMIP3_to_grid(outfldr,grid,domain,pmip_case="CCSM4-LGM", &
                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+!     call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
+!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+!     call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
+!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !    call CNRM_CM5_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 !    call CNRM_CM5_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &

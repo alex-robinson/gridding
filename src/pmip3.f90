@@ -7,9 +7,24 @@ module pmip3
     
     implicit none 
 
+    type pmip_info_type
+
+        character(len=256) :: nm_tas_ann
+        character(len=256) :: nm_tas_sum
+        character(len=256) :: nm_pr_ann
+        character(len=256) :: file_suffix
+        character(len=256) :: desc
+        character(len=256) :: grid_name 
+
+        logical            :: is_pd 
+        
+    end type 
+
     private
-    public :: CCSM4_PD_to_grid
-    public :: CCSM4_LGM_to_grid
+    public :: PMIP3_to_grid
+
+!     public :: CCSM4_PD_to_grid
+!     public :: CCSM4_LGM_to_grid
     public :: CNRM_CM5_PD_to_grid
     public :: CNRM_CM5_LGM_to_grid 
     public :: COSMOS_ASO_PD_to_grid
@@ -36,7 +51,62 @@ module pmip3
 
 contains
 
-    subroutine CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
+    subroutine pmip3_info(info,pmip_case,domain)
+
+        implicit none 
+
+        type(pmip_info_type), intent(INOUT) :: info 
+        character(len=256),   intent(IN)    :: pmip_case 
+        character(len=256),   intent(IN)    :: domain 
+
+        ! Local variables 
+        logical :: is_south 
+
+        is_south = .FALSE. 
+        if (trim(domain) .eq. "Antarctica") is_south = .TRUE. 
+
+        ! === Default values for all cases =====
+
+        info%nm_tas_ann = "tas_spatialmean_ann" 
+        info%nm_pr_ann  = "pr_spatialmean_ann" 
+
+        if (is_south) then 
+            info%nm_tas_sum = "tas_spatialmean_djf" 
+        else 
+            info%nm_tas_sum = "tas_spatialmean_jja" 
+        end if 
+
+        ! === Model-experiment specific values =====
+
+        select case(trim(pmip_case))
+
+            case("CCSM4-piControl") 
+
+                info%file_suffix = "CCSM4/CCSM4_piControl.nc"
+                info%desc        = "CCSM4 PMIP3 ATM - piControl"
+                info%grid_name   = "CCSM4-grid"
+                info%is_pd       = .TRUE. 
+
+            case("CCSM4-LGM") 
+
+                info%file_suffix = "CCSM4/CCSM4_lgm.nc"
+                info%desc        = "CCSM4 PMIP3 ATM - LGM"
+                info%grid_name   = "CCSM4-grid"
+                info%is_pd       = .FALSE. 
+
+            case DEFAULT 
+
+                write(*,*) "pmip3_info:: Error: case not recognized: "//trim(pmip_case)
+                stop 
+
+        end select 
+
+        return 
+
+    end subroutine pmip3_info 
+
+
+    subroutine PMIP3_to_grid(outfldr,grid,domain,pmip_case,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -45,18 +115,24 @@ contains
         ! =========================================================
         implicit none
         
-        character(len=*) :: domain, outfldr, subfldr, path_in
-        type(grid_class) :: grid
-        integer :: max_neighbors
-        double precision :: sigma, lat_lim
+        character(len=*), intent(IN) :: outfldr 
+        type(grid_class), intent(IN) :: grid
+        character(len=*), intent(IN) :: domain
+        character(len=*), intent(IN) :: pmip_case
+        character(len=*), intent(IN) :: path_in
+        double precision, intent(IN) :: sigma
+        integer,          intent(IN) :: max_neighbors
+        double precision, intent(IN) :: lat_lim
+
+        ! Local variables 
+        
+        type(pmip_info_type) :: info
+
         character(len=512) :: filename
         character(len=1024) :: desc, ref
-
+        
         type inp_type
             double precision, allocatable :: lon(:), lat(:), var(:,:)
-            double precision, allocatable :: zs(:,:)
-            double precision :: lapse_ann    = 8.0d-3
-            double precision :: lapse_summer = 6.5d-3
         end type
 
         type(inp_type)     :: inp
@@ -72,18 +148,18 @@ contains
 
         integer :: q, k, m, i, l, n_var
 
-        ! For intermediate interpolation 
-        character(len=256) :: pmip3_grid
+        ! Get PMIP info 
+        call pmip3_info(info,pmip_case,domain)
 
         ! Define the input filenames
         fldr_in          = trim(path_in)
-        file_in          = trim(fldr_in)//"CCSM4/CCSM4_lgm.nc"
+        file_in          = trim(fldr_in)//trim(info%file_suffix)
 
-        desc    = "CCSM4 PMIP3 LGM ATM"
+        desc    = trim(info%desc)
         ref     = "source folder: "//trim(fldr_in)
 
         ! Define the output filename 
-        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_CCSM4-LGM.nc"
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_"//trim(pmip_case)//".nc"
 
         nx = nc_size(file_in,"lon")
         ny = nc_size(file_in,"lat")
@@ -93,14 +169,13 @@ contains
         call nc_read(file_in,"lon",inp%lon)
         call nc_read(file_in,"lat",inp%lat)
 
-        call grid_init(grid0,name="CCSM4-grid",mtype="latlon",units="degrees", &
+        call grid_init(grid0,name=trim(info%grid_name),mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat ) 
 
-        ! jablasco
         allocate(vars(3))
-        call def_var_info(vars(1),trim(file_in),"tas_spatialmean_ann","t2m_ann",units="C",long_name="Near-surface temperature (2-m), annual mean",method="nng")
-        call def_var_info(vars(2),trim(file_in),"tas_spatialmean_djf","t2m_sum",units="C",long_name="Near-surface temperature (2-m), summer mean",method="nng")
-        call def_var_info(vars(3),trim(file_in),"pr_spatialmean_ann","pr_ann",units="mm*d**-1",long_name="Precipitation, annual mean",method="nng") 
+        call def_var_info(vars(1),trim(file_in),trim(info%nm_tas_ann),"t2m_ann",units="C",long_name="Near-surface temperature (2-m), annual mean",method="nng")
+        call def_var_info(vars(2),trim(file_in),trim(info%nm_tas_sum),"t2m_sum",units="C",long_name="Near-surface temperature (2-m), summer mean",method="nng")
+        call def_var_info(vars(3),trim(file_in),trim(info%nm_pr_ann), "pr_ann",units="mm*d**-1",long_name="Precipitation, annual mean",method="nng") 
  
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -145,11 +220,11 @@ contains
 
         ! Add topography 
         call pmip3_add_zs_to_grid(filename,outfldr,grid,domain,path_in,sigma, &
-                                                max_neighbors,lat_lim,is_pd=.FALSE.)
+                                                max_neighbors,lat_lim,is_pd=info%is_pd)
 
         return 
 
-    end subroutine CCSM4_LGM_to_grid
+    end subroutine PMIP3_to_grid
 
     subroutine CCSM4_PD_to_grid(outfldr,subfldr,grid,domain,path_in,sigma,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
