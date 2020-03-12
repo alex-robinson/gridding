@@ -13,6 +13,10 @@ program gridder
     character(len=256) :: path, subfldr, sigma_str  
     real(8) :: sigma
 
+    character(len=256), allocatable :: models(:) 
+    character(len=256) :: model 
+    integer :: n, nmodels 
+
     write(*,*) 
 
     ! =========================================================
@@ -58,56 +62,31 @@ program gridder
 !     call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                                path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
     
-    call PMIP3_to_grid(outfldr,grid,domain,model="CCSM4",experiment="piControl", &
-                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-    call PMIP3_to_grid(outfldr,grid,domain,model="CCSM4",experiment="lgm", &
-                              path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!     call CCSM4_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!     call CCSM4_LGM_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call CNRM_CM5_PD_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call CNRM_CM5_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call COSMOS_ASO_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call COSMOS_ASO_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call FGOALS_g2_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call FGOALS_g2_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_150_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_150_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_151_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call GISS_E2_R_151_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call IPSL_CM5A_LR_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call IPSL_CM5A_LR_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MIROC_ESM_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MIROC_ESM_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p1_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p1_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p2_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MPI_ESM_P_p2_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MRI_CGCM3_PD_to_grid(outfldr,subfldr,grid,domain="present", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!    call MRI_CGCM3_LGM_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+    nmodels = 11 
 
+    allocate(models(nmodels))
+    models(1)  = "CCSM4" 
+    models(2)  = "CNRM_CM5"
+    models(3)  = "COSMOS_ASO"
+    models(4)  = "FGOALS_g2"
+    models(5)  = "GISS_E2_R_150"
+    models(6)  = "GISS_E2_R_151"
+    models(7)  = "IPSL_CM5A_LR"
+    models(8)  = "MIROC_ESM"
+    models(9)  = "MPI_ESM_P_p1"
+    models(10) = "MPI_ESM_P_p2"
+    models(11) = "MRI_CGCM3"
     
+    do n = 1, nmodels 
+        
+        model = models(n) 
+
+        call PMIP3_to_grid(outfldr,grid,domain,model=trim(model),experiment="piControl", &
+                                  path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+        call PMIP3_to_grid(outfldr,grid,domain,model=trim(model),experiment="lgm", &
+                                  path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+
+    end do 
 
     write(*,*)
     write(*,*) "Regridding program finished."
