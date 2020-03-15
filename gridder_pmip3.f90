@@ -45,7 +45,7 @@ program gridder
 
     ! == Global datasets - applicable to all domains ==
 
-    path = "data/PMIP3/"
+    path = "data/PMIP3/all_PMIP_cvdp_data/data/"
     sigma = 50.0d0 
     
     write(sigma_str,*) int(sigma)
@@ -62,28 +62,26 @@ program gridder
 !     call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
 !                                path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
     
-    nmodels = 11 
+    nmodels = 8 
 
     allocate(models(nmodels))
     models(1)  = "CCSM4" 
-    models(2)  = "CNRM_CM5"
-    models(3)  = "COSMOS_ASO"
-    models(4)  = "FGOALS_g2"
-    models(5)  = "GISS_E2_R_150"
-    models(6)  = "GISS_E2_R_151"
-    models(7)  = "IPSL_CM5A_LR"
-    models(8)  = "MIROC_ESM"
-    models(9)  = "MPI_ESM_P_p1"
-    models(10) = "MPI_ESM_P_p2"
-    models(11) = "MRI_CGCM3"
+    models(2)  = "CNRM-CM5"
+    models(3)  = "FGOALS-g2"
+    models(4)  = "GISS-E2-R"
+    models(5)  = "IPSL_CM5A_LR"
+    models(6)  = "MIROC-ESM"
+    models(7)  = "MPI-ESM-P"
+    models(8)  = "MRI-CGCM3"
     
+
     do n = 1, nmodels 
         
         model = models(n) 
 
-        call PMIP3_to_grid(outfldr,grid,domain,model=trim(model),experiment="piControl", &
+        call pmip3_to_grid(outfldr,grid,domain,model=trim(model),experiment="piControl", &
                                   path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-        call PMIP3_to_grid(outfldr,grid,domain,model=trim(model),experiment="lgm", &
+        call pmip3_to_grid(outfldr,grid,domain,model=trim(model),experiment="lgm", &
                                   path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 
     end do 
@@ -93,4 +91,20 @@ program gridder
     write(*,*)
 
 end program gridder
+
+
+! From Javi's data processing:
+!     nmodels = 11 
+
+!     allocate(models(nmodels))
+!     models(1)  = "CCSM4" 
+!     models(2)  = "CNRM-CM5"
+!     models(3)  = "COSMOS_ASO"
+!     models(4)  = "FGOALS_g2"
+!     models(5)  = "GISS_E2_R_150"
+!     models(6)  = "GISS_E2_R_151"
+!     models(7)  = "IPSL_CM5A_LR"
+!     models(8)  = "MIROC_ESM"
+!     models(9)  = "MPI_ESM_P"
+!     models(11) = "MRI_CGCM3"
 
