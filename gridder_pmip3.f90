@@ -81,6 +81,8 @@ program gridder
 
         call pmip3_to_grid(outfldr,grid,domain,model=trim(model),experiment="piControl", &
                                   path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
+        call pmip3_to_grid(outfldr,grid,domain,model=trim(model),experiment="midHolocene", &
+                                  path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
         call pmip3_to_grid(outfldr,grid,domain,model=trim(model),experiment="lgm", &
                                   path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
 
