@@ -62,7 +62,7 @@ contains
         ! Assume present-day topography 
             info%is_pd = .TRUE. 
         end if
-        
+
         info%nm_tas_ann = "tas_spatialmean_ann" 
         info%nm_pr_ann  = "pr_spatialmean_ann" 
 
@@ -139,6 +139,10 @@ contains
         end select 
 
         info%file_in_suffix = trim(str) 
+
+
+        ! Write summary 
+        write(*,*) "PMIP3-info: ", trim(info%pmip_case), info%is_pd, trim(info%file_in_suffix)
 
         return 
 
