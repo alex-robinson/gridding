@@ -69,7 +69,7 @@ program gridder
     models(2)  = "CNRM-CM5"
     models(3)  = "FGOALS-g2"
     models(4)  = "GISS-E2-R"
-    models(5)  = "IPSL_CM5A_LR"
+    models(5)  = "IPSL-CM5A-LR"
     models(6)  = "MIROC-ESM"
     models(7)  = "MPI-ESM-P"
     models(8)  = "MRI-CGCM3"
