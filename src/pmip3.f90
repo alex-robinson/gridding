@@ -55,12 +55,14 @@ contains
         info%desc           = "PMIP3 "//trim(model)//" - "//trim(experiment)
         info%grid_name      = trim(model)//"-grid"
 
-        if (trim(experiment) .eq. "piControl") then 
-            info%is_pd = .TRUE. 
-        else
+        if (trim(experiment) .eq. "lgm") then 
+            ! Assume LGM topography 
             info%is_pd = .FALSE. 
-        end if 
-
+        else
+        ! Assume present-day topography 
+            info%is_pd = .TRUE. 
+        end if
+        
         info%nm_tas_ann = "tas_spatialmean_ann" 
         info%nm_pr_ann  = "pr_spatialmean_ann" 
 
@@ -133,7 +135,7 @@ contains
 
                 write(*,*) "pmip3_info:: Error: case not recognized: "//trim(info%pmip_case)
                 stop 
-            
+
         end select 
 
         info%file_in_suffix = trim(str) 
