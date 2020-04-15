@@ -267,6 +267,11 @@ contains
                        lon180=.TRUE.,x0=-3040.d0,dx=32.d0,nx=191,y0=-3040.d0,dy=32.d0,ny=191, &
                        lambda=0.d0,phi=-71.d0)
 
+            case("ANT-20KM")
+                call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=20.d0,nx=305,y0=-3040.d0,dy=20.d0,ny=305, &
+                       lambda=0.d0,phi=-71.d0)
+                        
             case("ANT-16KM")
                 call grid_init(grid,name="ANT-16KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,x0=-3040.d0,dx=16.d0,nx=381,y0=-3040.d0,dy=16.d0,ny=381, &
