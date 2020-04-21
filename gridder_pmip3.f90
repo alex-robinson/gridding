@@ -25,7 +25,7 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "North"
+    domain    = "Laurentide"
     grid_name = "LIS-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
