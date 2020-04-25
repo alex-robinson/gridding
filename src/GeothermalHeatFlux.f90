@@ -7,11 +7,197 @@ module GeothermalHeatFlux
     implicit none 
 
     private 
+    public :: ghfMartos_to_grid
     public :: ghfMaule_to_grid
     public :: ghfDavies_to_grid
     public :: ghfShapiro_to_grid
 
 contains 
+
+    subroutine ghfMartos_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       GEOTHERMAL HEAT FLUX DATA - Martos et al., 2017 (Antarctica), 2018 (Greenland)
+        !       https://doi.pangaea.de/10.1594/PANGAEA.882503
+        !       https://doi.pangaea.de/10.1594/PANGAEA.892973
+        !
+        ! =========================================================
+        
+        implicit none 
+
+        character(len=*) :: domain, outfldr 
+        type(grid_class) :: grid 
+        integer :: max_neighbors 
+        double precision :: lat_lim 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type inpts_type 
+            double precision, allocatable :: lon(:), lat(:), var(:)
+        end type 
+
+        type(inpts_type)     :: inp
+        type(points_class)   :: pts_in
+
+        character(len=56)    :: pname 
+        character(len=512)   :: fldr_data 
+        character(len=512)   :: files(4), varnames(4), units(4), long_names(4)
+        character(len=512)   :: file_now, vnm_now, units_now, long_name_now
+
+        type(map_class)  :: map 
+        type(var_defs)   :: var_now 
+        double precision, allocatable :: outvar(:,:)
+        integer, allocatable          :: outmask(:,:)
+        integer :: i, q, np 
+
+        ! Define input points from global data on lon/lat coordinates 
+
+        varnames(1) = "ghf"
+        varnames(2) = "ghf_err"
+        varnames(3) = "depth_curie"
+        varnames(4) = "depth_curie_err"
+        
+        units(1)    = "mW m**-2"
+        units(2)    = "mW m**-2"
+        units(3)    = "km"
+        units(4)    = "km"
+        
+        long_names(1) = "Geothermal heat flux"
+        long_names(2) = "Geothermal heat flux uncertainty"
+        long_names(3) = "Curie depth"
+        long_names(4) = "Curie depth uncertainty"
+        
+        if (trim(domain) .eq. "Greenland") then 
+
+            fldr_data = "/data/sicopolis/data/GeothermalHeatFlux/Martos2018/"
+
+            files(1) = trim(fldr_data)//"Martos2018_Greenland_ghf.txt"
+            files(2) = trim(fldr_data)//"Martos2018_Greenland_ghf_err.txt"
+            files(3) = trim(fldr_data)//"Martos2018_Greenland_depth_curie.txt"
+            files(4) = trim(fldr_data)//"Martos2018_Greenland_depth_curie_err.txt"
+            
+            ! Name of set of points 
+            pname = "Martos2018-GRL"
+
+            ! Number of data points 
+            np = 10716
+
+            desc    = "Geothermal heat flux"
+            ref     = "Martos, Yasmina M; Jordan, Tom A; Catalan, Manuel; Jordan, Thomas M; &
+                      &Bamber, Jonathan L; Vaughan, David G (2018): Geothermal heat flux &
+                      &reveals the Iceland hotspot track underneath Greenland. Geophysical &
+                      & Research Letters, 45(16), 8214-8222, https://doi.org/10.1029/2018GL078289 &
+                      &\n https://doi.pangaea.de/10.1594/PANGAEA.892973"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_GHF-M18.nc"
+
+        else if (trim(domain) .eq. "Antarctica") then
+
+            fldr_data = "/data/sicopolis/data/GeothermalHeatFlux/Martos2017/"
+
+            files(1) = trim(fldr_data)//"Martos2017_Antarctica_ghf.txt"
+            files(2) = trim(fldr_data)//"Martos2017_Antarctica_ghf_err.txt"
+            files(3) = trim(fldr_data)//"Martos2017_Antarctica_depth_curie.txt"
+            files(4) = trim(fldr_data)//"Martos2017_Antarctica_depth_curie_err.txt"
+            
+            ! Name of set of points 
+            pname = "Martos2017-ANT"
+            
+            ! Number of data points 
+            np = 59329
+            
+            desc    = "Geothermal heat flux"
+            ref     = "Martos, Yasmina M; Catalan, Manuel; Jordan, Tom A; Golynsky, Alexander V; &
+                      &Golynsky, Dmitry A; Eagles, Graeme; Vaughan, David G (2017): Heat flux &
+                      &distribution of Antarctica unveiled. Geophysical Research Letters, &
+                      &44(22), 11417-11426, https://doi.org/10.1002/2017GL075609 &
+                      &\n https://doi.org/10.1594/PANGAEA.882503"
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_GHF-M17.nc"
+
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+
+        end if 
+
+        ! Allocate input data points 
+        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+
+        ! Load data from first file to get lon/lat coordinates of points 
+        ! File format: lon, lat, ghf 
+        open(2,file=trim(files(1)),status="old")
+        do i = 1, np 
+            read(2,*) inp%lon(i), inp%lat(i), inp%var(i) 
+        end do 
+        close(2)
+
+        write(*,*) "lon: ",minval(inp%lon),maxval(inp%lon)
+        write(*,*) "lat: ",minval(inp%lat),maxval(inp%lat)
+        write(*,*) "var: ",minval(inp%var),maxval(inp%var)
+
+        ! Define input points for mapping
+        call points_init(pts_in,name=trim(pname),mtype="latlon",units="degrees",x=inp%lon,y=inp%lat,lon180=.TRUE.)
+        
+        ! Initialize mapping
+        call map_init(map,pts_in,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+        
+        ! Initialize the output file
+        call nc_create(filename)
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
+        
+        ! Write meta data 
+        call nc_write_attr(filename,"Description",desc)
+        call nc_write_attr(filename,"Reference",ref)
+
+        ! Loop over variables and map each one to our grid 
+        do q = 1, size(files) 
+
+            file_now      = files(q)
+            vnm_now       = varnames(q)
+            units_now     = units(q) 
+            long_name_now = long_names(q) 
+
+            ! Read in current data 
+            ! File format: lon, lat, var 
+            open(2,file=trim(file_now),status="old")
+            do i = 1, np 
+                read(2,*) inp%lon(i), inp%lat(i), inp%var(i) 
+            end do 
+            close(2)
+
+            ! ## MAP FIELD ##
+            call map_field(map,vnm_now,inp%var,outvar,outmask,"nng",fill=.TRUE.,sigma=10.d0,missing_value=mv)
+
+            write(*,*) "Range invar:  ",minval(inp%var,inp%var.ne.mv), maxval(inp%var,inp%var.ne.mv)
+            write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv), maxval(outvar,outvar.ne.mv)
+            
+            ! Fill any missing values
+            call fill_weighted(outvar,missing_value=missing_value)
+        
+            ! Write field to output file 
+            call nc_write(filename,vnm_now,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+
+            ! Write variable metadata
+            call nc_write_attr(filename,vnm_now,"units",trim(units_now))
+            call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
+            call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+            
+        end do 
+
+        return 
+
+    end subroutine ghfMartos_to_grid
 
     subroutine ghfMaule_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
         ! Convert the variables to the desired grid format and write to file
