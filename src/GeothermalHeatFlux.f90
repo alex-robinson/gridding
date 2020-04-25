@@ -81,7 +81,7 @@ contains
             pname = "Martos2018-GRL"
 
             ! Number of data points 
-            np = 10716
+            np = 10715
 
             desc    = "Geothermal heat flux"
             ref     = "Martos, Yasmina M; Jordan, Tom A; Catalan, Manuel; Jordan, Thomas M; &
@@ -106,7 +106,7 @@ contains
             pname = "Martos2017-ANT"
             
             ! Number of data points 
-            np = 59329
+            np = 59328
             
             desc    = "Geothermal heat flux"
             ref     = "Martos, Yasmina M; Catalan, Manuel; Jordan, Tom A; Golynsky, Alexander V; &
