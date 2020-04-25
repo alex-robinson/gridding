@@ -40,7 +40,7 @@ contains
         type(inpts_type)     :: inp
         type(points_class)   :: pts_in
 
-        character(len=56)    :: pname 
+        character(len=56)    :: pname, tmpstr(3)  
         character(len=512)   :: fldr_data 
         character(len=512)   :: files(4), varnames(4), units(4), long_names(4)
         character(len=512)   :: file_now, vnm_now, units_now, long_name_now
@@ -129,8 +129,9 @@ contains
         allocate(inp%lon(np),inp%lat(np),inp%var(np))
 
         ! Load data from first file to get lon/lat coordinates of points 
-        ! File format: lon, lat, ghf 
+        ! File format: lon, lat, ghf with header
         open(2,file=trim(files(1)),status="old")
+        read(2,*) tmpstr(1), tmpstr(2), tmpstr(3) 
         do i = 1, np 
             read(2,*) inp%lon(i), inp%lat(i), inp%var(i) 
         end do 
@@ -171,6 +172,7 @@ contains
             ! Read in current data 
             ! File format: lon, lat, var 
             open(2,file=trim(file_now),status="old")
+            read(2,*) tmpstr(1), tmpstr(2), tmpstr(3) 
             do i = 1, np 
                 read(2,*) inp%lon(i), inp%lat(i), inp%var(i) 
             end do 
