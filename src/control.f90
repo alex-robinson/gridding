@@ -204,6 +204,11 @@ contains
                         lon180=.TRUE.,x0=-720.d0,dx=5.0d0,nx=337,y0=-3450.d0,dy=5.0d0,ny=577, &
                         lambda=-45.d0,phi=70.d0)
             
+            case("GRL-4KM")
+                call grid_init(grid,name="GRL-4KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=8.0d0,nx=421,y0=-3450.d0,dy=8.0d0,ny=721, &
+                        lambda=-45.d0,phi=70.d0)
+            
             case("GRL-2KM")
                 call grid_init(grid,name="GRL-2KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-720.d0,dx=2.0d0,nx=841,y0=-3450.d0,dy=2.0d0,ny=1441, &
