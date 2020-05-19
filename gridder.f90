@@ -45,8 +45,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-4KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-8KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -73,7 +73,7 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-!     call rtopo_to_grid(outfldr,grid,domain)
+    call rtopo_to_grid(outfldr,grid,domain)
 
 !     stop 
 
@@ -88,9 +88,9 @@ program gridder
 !     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
-!     call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
+    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
 !     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
@@ -127,19 +127,19 @@ program gridder
 !             call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
             call ghfMartos_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
             
-!             call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-!             call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-!                                             fill=.TRUE.,sigma=100.d0)
+            call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+            call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
+                                            fill=.TRUE.,sigma=100.d0)
             
-!             call antevelr11_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
+            call antevelr11_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",max_neighbors=20,lat_lim=0.5d0)
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2000,2010])
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2001,2030])
 !             call RACMO2rot_to_grid( outfldr, grid, "Antarctica-A1B",clim_range=[2071,2100])
 
-!             call RACMO23_to_grid( outfldr, grid, "ANT27",max_neighbors=20,lat_lim=0.5d0)
-!             call RACMO23_to_grid( outfldr, grid, "ANT27",clim_range=[1981,2010])
+            call RACMO23_to_grid( outfldr, grid, "ANT27",max_neighbors=20,lat_lim=0.5d0)
+            call RACMO23_to_grid( outfldr, grid, "ANT27",clim_range=[1981,2010])
 
             ! Note: Antartica-c20 doesn't work because some files only contain 239 months of
             !      data while they should all have 240 months (1980-1999)
