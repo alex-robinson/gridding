@@ -45,8 +45,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Greenland"
-    grid_name = "GRL-4KM"
+    domain    = "Antarctica"
+    grid_name = "ANT-8KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -58,7 +58,7 @@ program gridder
     call domain_definition(grid,grid_name)  
 
     ! Write a regional mask 
-    call write_regions(outfldr,grid,domain)
+!     call write_regions(outfldr,grid,domain)
     
     ! =========================================================
     !
@@ -88,9 +88,9 @@ program gridder
 !     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
-    call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
+!     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
+!     call ecmwf_to_grid(outfldr,grid,clim_range=[1979,1998])
 
 !     call ecmwf_ocn_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=4,lat_lim=2.d0)
 !     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
