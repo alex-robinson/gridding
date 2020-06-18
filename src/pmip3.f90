@@ -18,9 +18,11 @@ module pmip3
         logical            :: is_pd 
         
         character(len=256) :: nm_tas_ann
-        character(len=256) :: nm_tas_sum
+        character(len=256) :: nm_tas_djf 
+        character(len=256) :: nm_tas_jja
         character(len=256) :: nm_pr_ann
-            
+        character(len=256) :: nm_sst_ann 
+
     end type 
 
     private
@@ -38,12 +40,8 @@ contains
         character(len=*),     intent(IN)    :: experiment 
         character(len=*),     intent(IN)    :: domain 
 
-        ! Local variables 
-        logical :: is_south 
+        ! Local variables  
         character(len=512) :: str 
-
-        is_south = .FALSE. 
-        if (trim(domain) .eq. "Antarctica") is_south = .TRUE. 
 
         ! === Default values for all cases =====
 
@@ -64,14 +62,11 @@ contains
         end if
 
         info%nm_tas_ann = "tas_spatialmean_ann" 
+        info%nm_tas_djf = "tas_spatialmean_djf" 
+        info%nm_tas_jja = "tas_spatialmean_jja" 
         info%nm_pr_ann  = "pr_spatialmean_ann" 
-
-        if (is_south) then 
-            info%nm_tas_sum = "tas_spatialmean_djf" 
-        else 
-            info%nm_tas_sum = "tas_spatialmean_jja" 
-        end if 
-
+        info%nm_sst_ann = "sst_spatialmean_ann" 
+        
         select case(trim(info%pmip_case))
             ! 8 models with all three experiments of interest (piControl,midHolocene,lgm)
 
@@ -215,11 +210,13 @@ contains
         call grid_init(grid0,name=trim(info%grid_name),mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat ) 
 
-        allocate(vars(3))
-        call def_var_info(vars(1),trim(file_in),trim(info%nm_tas_ann),"t2m_ann",units="C",long_name="Near-surface temperature (2-m), annual mean",method="nng")
-        call def_var_info(vars(2),trim(file_in),trim(info%nm_tas_sum),"t2m_sum",units="C",long_name="Near-surface temperature (2-m), summer mean",method="nng")
-        call def_var_info(vars(3),trim(file_in),trim(info%nm_pr_ann), "pr_ann",units="mm*d**-1",long_name="Precipitation, annual mean",method="nng") 
- 
+        allocate(vars(5))
+        call def_var_info(vars(1),trim(file_in),trim(info%nm_tas_ann),"t2m_ann",units="degC",long_name="Near-surface temperature (2-m), annual mean",method="nng")
+        call def_var_info(vars(2),trim(file_in),trim(info%nm_tas_djf),"t2m_djf",units="degC",long_name="Near-surface temperature (2-m), DJF mean",method="nng")
+        call def_var_info(vars(3),trim(file_in),trim(info%nm_tas_jja),"t2m_jja",units="degC",long_name="Near-surface temperature (2-m), JJA mean",method="nng")
+        call def_var_info(vars(4),trim(file_in),trim(info%nm_pr_ann), "pr_ann", units="mm*d**-1",long_name="Precipitation, annual mean",method="nng") 
+        call def_var_info(vars(5),trim(file_in),trim(info%nm_sst_ann),"sst_ann",units="degC",long_name="Sea-surface temperature, annual mean",method="nng") 
+        
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)

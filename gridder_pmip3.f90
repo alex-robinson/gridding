@@ -25,8 +25,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Laurentide"
-    grid_name = "LIS-32KM"
+    domain    = "Greenland"
+    grid_name = "GRL-16KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -56,11 +56,6 @@ program gridder
     outfldr = trim(outfldr)//"/"//trim(subfldr)
     
     call system("mkdir -p "//trim(outfldr))
-
-!     call LGM_dzs_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                               path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
-!     call LGM_extensions_to_grid(outfldr,subfldr,grid,domain="lgm", &
-!                                path_in=path,sigma=sigma,max_neighbors=10,lat_lim=5.d0)
     
     nmodels = 8 
 
