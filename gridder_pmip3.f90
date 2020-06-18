@@ -56,20 +56,21 @@ program gridder
     outfldr = trim(outfldr)//"/"//trim(subfldr)
     
     call system("mkdir -p "//trim(outfldr))
-    
-    nmodels = 8 
+
+    nmodels = 7 
 
     allocate(models(nmodels))
     models(1)  = "CCSM4" 
     models(2)  = "CNRM-CM5"
     models(3)  = "FGOALS-g2"
-    models(4)  = "GISS-E2-R"
-    models(5)  = "IPSL-CM5A-LR"
-    models(6)  = "MIROC-ESM"
-    models(7)  = "MPI-ESM-P"
-    models(8)  = "MRI-CGCM3"
+    models(4)  = "IPSL-CM5A-LR"
+    models(5)  = "MIROC-ESM"
+    models(6)  = "MPI-ESM-P"
+    models(7)  = "MRI-CGCM3"
     
-
+    ! Excluded models
+    !models(4)  = "GISS-E2-R"        ! No sst data available
+    
     do n = 1, nmodels 
         
         model = models(n) 
