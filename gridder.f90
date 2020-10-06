@@ -58,7 +58,7 @@ program gridder
     call domain_definition(grid,grid_name)  
 
     ! Write a regional mask 
-    call write_regions(outfldr,grid,domain)
+    ! call write_regions(outfldr,grid,domain)
     
     ! =========================================================
     !
@@ -73,7 +73,7 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+    ! call rtopo_to_grid(outfldr,grid,domain)
 
 !     stop 
 
@@ -86,7 +86,7 @@ program gridder
 !     call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-!     call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
 !     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
 !     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
@@ -161,14 +161,14 @@ program gridder
 
 !             call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !             call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-            call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=25,lat_lim=0.5d0,grad_lim=0d0,thin_by=15)
+            ! call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=25,lat_lim=0.5d0,grad_lim=0d0,thin_by=15)
 
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 !             call MARv39_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
-            call MARv39ismip6_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=16,lat_lim=0.5d0)
+            ! call MARv39ismip6_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=16,lat_lim=0.5d0)
 
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
