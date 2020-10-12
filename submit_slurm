@@ -8,7 +8,7 @@
 #SBATCH --mail-user=robinson@pik-potsdam.de
 #SBATCH --output=out.out
 #SBATCH --error=out.err
-#SBATCH --time=2:00:00
+#SBATCH --time=5:00:00
 #SBATCH --mem=50000 
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
@@ -21,7 +21,7 @@ export OMP_STACKSIZE=64M
 
 
 # Run the job
-./gridder_pmip3.x 
+./gridder.x 
 
 
 
