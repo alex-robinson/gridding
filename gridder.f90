@@ -73,7 +73,7 @@ program gridder
 !     stop 
 
     ! 2. Perform conservative interpolation to lower resolution 
-    call rtopo_to_grid(outfldr,grid,domain)
+    ! call rtopo_to_grid(outfldr,grid,domain)
 
 !     stop 
 
@@ -125,11 +125,11 @@ program gridder
 !             call bedmap2vel_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !             call bedmap2acc_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 !             call ghfMaule_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
-            call ghfMartos_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
+            ! call ghfMartos_to_grid(outfldr,  grid,"Antarctica",max_neighbors=4,lat_lim=2.d0)
             
-            call nasaBasins_to_grid(outfldr,grid,"Antarctica")
-            call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
-                                            fill=.TRUE.,sigma=100.d0)
+            ! call nasaBasins_to_grid(outfldr,grid,"Antarctica")
+            ! call Rignot13_BasalMelt_to_grid(outfldr,grid,"Antarctica",max_neighbors=10,lat_lim=1.d0, &
+            !                                 fill=.TRUE.,sigma=100.d0)
             
             call antevelr11_to_grid(outfldr,grid,"Antarctica",max_neighbors=20,lat_lim=0.5d0)
 
