@@ -77,7 +77,7 @@ if (TRUE) {
 
     # Zoom on Northern Greenland/Ellesmere Island
     xlim = c(-3000,2000)
-    ylim = c(-2000,0) 
+    ylim = c(-3000,0) 
 
     if (plot_to_file) 
         myfigure("./",paste0("regions_",domain),asp=1.1,pointsize=14,type="png")
@@ -123,7 +123,7 @@ if (TRUE) {
 
 }
 
-if (FALSE) {
+if (TRUE) {
     # Read regions that exist and add them to figure 
     
     fldr = "polygons"
@@ -131,7 +131,7 @@ if (FALSE) {
 
     poly1   = read.table(file.path(fldr,"polygon_laurentide.txt"),header=TRUE)
     coords1 = get_xy(poly1,topo)
-    polygon(coords1$x,coords1$y,border='pink')
+    polygon(coords1$x,coords1$y,border='orange1')
 
     poly2   = read.table(file.path(fldr,"polygon_ellesmere.txt"),header=TRUE)
     coords2 = get_xy(poly2,topo)
@@ -143,7 +143,23 @@ if (FALSE) {
 
     poly4   = read.table(file.path(fldr,"polygon_grl_and_ellesmere.txt"),header=TRUE)
     coords4 = get_xy(poly4,topo)
-    polygon(coords4$x,coords4$y,border='grey80',lwd=2)
+    polygon(coords4$x,coords4$y,border='white',lwd=1.5)
+
+    # poly5   = read.table(file.path(fldr,"test.txt"),header=TRUE)
+    # coords5 = get_xy(poly5,topo)
+    # polygon(coords5$x,coords5$y,border='black',lwd=2)
+
+
+    # pnow = poly1[1,]
+    # i1 = which.min((pnow$x-coords4$x)^2+(pnow$y-coords4$y)^2)
+    # pnow = poly1[2,]
+    # i2 = which.min((pnow$x-coords4$x)^2+(pnow$y-coords4$y)^2)
+
+    # pnow = poly1[1,]
+    # i3 = which.min((pnow$x-coords4$x)^2+(pnow$y-coords4$y)^2)
+    # pnow = poly1[2,]
+    # i4 = which.min((pnow$x-coords4$x)^2+(pnow$y-coords4$y)^2)
+    
 
 }   
 
