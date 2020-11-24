@@ -72,6 +72,18 @@ gridder_pmip3: $(gridder_libs) $(obj_datasets_pmip3)
 	@echo "    gridder_pmip3.x is ready."
 	@echo " "
 
+gridder_badgeley: $(gridder_libs) $(obj_datasets) 
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_badgeley.x $^ gridder_badgeley.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_badgeley.x is ready."
+	@echo " "
+
+gridder_buizert: $(gridder_libs) $(obj_datasets)
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_buizert.x $^ gridder_buizert.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_buizert.x is ready."
+	@echo " "
+
 projector: $(gridder_libs) $(objdir)/control.o
 	$(FC) $(DFLAGS) $(FFLAGS) -o projector.x $^ projector.f90 $(LFLAGS)
 	@echo " "

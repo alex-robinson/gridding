@@ -24,7 +24,13 @@ $(objdir)/AN1CRUST.o: $(srcdir)/AN1CRUST.f90
 $(objdir)/AntarcticaVelocity.o: $(srcdir)/AntarcticaVelocity.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/badgeley2020.o: $(srcdir)/badgeley2020.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
 $(objdir)/bedmap2.o: $(srcdir)/bedmap2.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
+$(objdir)/buizert2018.o: $(srcdir)/buizert2018.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
 $(objdir)/CERES.o: $(srcdir)/CERES.f90
@@ -92,8 +98,10 @@ obj_datasets =     $(objdir)/control.o \
 									 $(objdir)/generic.o \
 									 $(objdir)/regions.o \
 									 $(objdir)/AN1CRUST.o \
-                   $(objdir)/AntarcticaVelocity.o \
+                   					 $(objdir)/AntarcticaVelocity.o \
+                   					 $(objdir)/badgeley2020.o \
 									 $(objdir)/bedmap2.o \
+									 $(objdir)/buizert2018.o \
 									 $(objdir)/CERES.o \
 									 $(objdir)/climber2.o \
 									 $(objdir)/climber3a.o \
