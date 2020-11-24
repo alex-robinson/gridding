@@ -43,7 +43,7 @@ contains
         ! == Continental regions ==
         call points_init(regs(1),grid0=grid,name="reg1",filename="regions/polygons/polygon_laurentide.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(2),grid0=grid,name="reg2",filename="regions/polygons/polygon_eis.txt",latlon=.TRUE.,skip=1)
-        call points_init(regs(3),grid0=grid,name="reg3",filename="regions/polygons/polygon_grl.txt",latlon=.TRUE.,skip=1)
+        call points_init(regs(3),grid0=grid,name="reg3",filename="regions/polygons/polygon_grl_and_ellesmere.txt",latlon=.TRUE.,skip=1)
         call points_init(regs(4),grid0=grid,name="reg4",filename="regions/polygons/polygon_asia.txt",latlon=.TRUE.,skip=1)
         
         ! == Sub-regions ==
