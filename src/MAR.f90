@@ -57,6 +57,8 @@ contains
         double precision, allocatable :: var3D(:,:,:)
         double precision :: sigma   
 
+        logical, allocatable :: is_monthly_field(:) 
+
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
 
@@ -106,7 +108,8 @@ contains
         allocate(var2D(gMAR%G%nx,gMAR%G%ny))
             
         allocate(surf(5))
-        
+        allocate(is_monthly_field(5)) 
+
         call def_var_info(surf(1),trim(file_surface),"MSK", "mask", units="1", &
             long_name="Land/ice mask",method="nn",fill=.FALSE.)
         call def_var_info(surf(2),trim(file_surface),"SH", "z_srf", units="m", &
@@ -120,6 +123,10 @@ contains
             long_name="Runoff",method="con",fill=.FALSE.)
 
         n_var    = size(surf)
+
+        is_monthly_field      = .TRUE. 
+        is_monthly_field(1:2) = .FALSE. 
+
 
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -148,8 +155,13 @@ contains
 
             do m = 1, 12 
 
-                call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
-                                    start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
+                if (is_monthly_field(i)) then 
+                    call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
+                                        start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
+                
+                else 
+                    call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
+                end if 
 
                 ! Eliminate missing values 
                 where(abs(var2D) .gt. 1e10) var2D = mv 
@@ -172,9 +184,13 @@ contains
                     call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
                 end if 
                 
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
-                                            start=[1,1,nm],count=[grid%G%nx,grid%G%ny,1])
-                
+                if (is_monthly_field(i)) then 
+                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
+                                                start=[1,1,nm],count=[grid%G%nx,grid%G%ny,1])
+                else 
+                    call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
+                end if 
+
                 write(*,*) trim(var_now%nm_in),  minval(var2D,mask=var2D .ne. mv), &
                                                  maxval(var2D,mask=var2D .ne. mv)
                 write(*,*) trim(var_now%nm_out), minval(outvar,mask=outvar .ne. mv), &
@@ -184,7 +200,12 @@ contains
                 call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
                 call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
                 call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
-            
+                
+                ! Only perform calculation once if it is not a monthly field
+                if (.not. is_monthly_field(i)) then 
+                    exit 
+                end if 
+
             end do 
 
         end do 
