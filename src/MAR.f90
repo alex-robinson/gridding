@@ -82,7 +82,7 @@ contains
             ! ====================================================================
             ! Read lon/lat fields directly from file to be sure projection matches 
             ! (x/y are defined correctly because they are specified above)
-            
+
             call nc_read(file_surface,"LON",gMAR%lon)
             call nc_read(file_surface,"LAT",gMAR%lat)
 
@@ -146,41 +146,47 @@ contains
 
             var_now = surf(i)  
 
-            call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
+            do m = 1, 12 
 
-            ! Eliminate missing values 
-            where(abs(var2D) .gt. 1e10) var2D = mv 
+                call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
+                                    start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
 
-            ! Initialize output variable to missing data 
-            outvar = mv 
-            
-            if (trim(var_now%nm_in) .eq. "MSK") then
-                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar, &
-                                                            method="count",missing_value=mv)
-            else
-                call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar, &
-                                                            method="mean",missing_value=mv)
-            end if 
+                ! Eliminate missing values 
+                where(abs(var2D) .gt. 1e10) var2D = mv 
 
-            ! if (.not. trim(var_now%nm_in) .eq. "MSK") then
-            !     outmask = 0
-            !     where(outvar.eq.mv) outmask = 1 
-            !     call fill_weighted(outvar,missing_value=mv)
-            !     call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
-            ! end if 
+                ! Initialize output variable to missing data 
+                outvar = mv 
+                
+                if (trim(var_now%nm_in) .eq. "MSK") then
+                    call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar, &
+                                                                method="count",missing_value=mv)
+                else
+                    call map_field_conservative_map1(map%map,var_now%nm_in,var2D,outvar, &
+                                                                method="mean",missing_value=mv)
+                end if 
+
+                if (.not. trim(var_now%nm_in) .eq. "MSK") then
+                    outmask = 0
+                    where(outvar.eq.mv) outmask = 1 
+                    call fill_weighted(outvar,missing_value=mv)
+                    call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
+                end if 
+                
+                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
+                                            start=[1,1,nm],count=[grid%G%nx,grid%G%ny,1])
+                
+                write(*,*) trim(var_now%nm_in),  minval(var2D,mask=var2D .ne. mv), &
+                                                 maxval(var2D,mask=var2D .ne. mv)
+                write(*,*) trim(var_now%nm_out), minval(outvar,mask=outvar .ne. mv), &
+                                                 maxval(outvar,mask=outvar .ne. mv)
+                
+                ! Write variable metadata
+                call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
+                call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
+                call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
-            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
-            
-            write(*,*) trim(var_now%nm_in),  minval(var2D,mask=var2D .ne. mv), &
-                                             maxval(var2D,mask=var2D .ne. mv)
-            write(*,*) trim(var_now%nm_out), minval(outvar,mask=outvar .ne. mv), &
-                                             maxval(outvar,mask=outvar .ne. mv)
-            
-            ! Write variable metadata
-            call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
-            call nc_write_attr(filename,var_now%nm_out,"long_name",var_now%long_name)
-            call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
-        
+            end do 
+
         end do 
         
         return 
