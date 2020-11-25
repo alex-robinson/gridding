@@ -72,24 +72,20 @@ contains
             sigma = grid%G%dx*2.d0 
 
             ! Define MAR input grid and input variable field
+            ! call grid_init(gMAR,name="MARv3.11-10KM",mtype="polar_stereographic",units="kilometers", &
+            !             lon180=.TRUE.,x0=-760.d0,dx=10.0d0,nx=144,y0=-1190.d0,dy=10.0d0,ny=268, &
+            !             lambda=-45.d0,phi=70.d0)
             call grid_init(gMAR,name="MARv3.11-10KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-760.d0,dx=10.0d0,nx=144,y0=-1190.d0,dy=10.0d0,ny=268, &
-                        lambda=-45.d0,phi=70.d0)
+                        lambda=-40.d0,phi=50.d0)
 
             ! ====================================================================
             ! Read lon/lat fields directly from file to be sure projection matches 
+            ! (x/y are defined correctly because they are specified above)
+            
             call nc_read(file_surface,"LON",gMAR%lon)
             call nc_read(file_surface,"LAT",gMAR%lat)
-            call nc_read(file_surface,"X10_153",gMAR%g%x)
-            call nc_read(file_surface,"Y21_288",gMAR%g%y)
-            
-            do i = 1, gMAR%g%ny 
-                gMAR%x(:,i) = gMAR%g%x 
-            end do 
 
-            do i = 1, gMAR%g%nx 
-                gMAR%x(i,:) = gMAR%g%y 
-            end do 
             ! ====================================================================
             
             desc    = "Greenland regional climate simulated by MARv3.11."
