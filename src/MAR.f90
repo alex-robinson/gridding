@@ -61,7 +61,7 @@ contains
         if (trim(domain) .eq. "Greenland-ERA") then 
 
             ! Define the input filenames
-            fldr0 = "/data/sicopolis/data/MARv3.11/Greenland/ERA_1958-2019-10km"
+            fldr0 = "/data/sicopolis/data/MARv3.11/Greenland/ERA_1958-2019-10km/"
             file_surface = trim(fldr0)//"MARv3.11-10km-monmean-ERA-10km-1961-1990.nc"
 
             year0 = 1990 
@@ -76,9 +76,22 @@ contains
                         lon180=.TRUE.,x0=-760.d0,dx=10.0d0,nx=144,y0=-1190.d0,dy=10.0d0,ny=268, &
                         lambda=-45.d0,phi=70.d0)
 
+            ! ====================================================================
             ! Read lon/lat fields directly from file to be sure projection matches 
-            ! ajr: careful, this may break the whole grid object, better not...
+            call nc_read(file_surface,"LON",gMAR%lon)
+            call nc_read(file_surface,"LAT",gMAR%lat)
+            call nc_read(file_surface,"X10_153",gMAR%g%x)
+            call nc_read(file_surface,"Y21_288",gMAR%g%y)
+            
+            do i = 1, gMAR%g%ny 
+                gMAR%x(:,i) = gMAR%g%x 
+            end do 
 
+            do i = 1, gMAR%g%nx 
+                gMAR%x(i,:) = gMAR%g%y 
+            end do 
+            ! ====================================================================
+            
             desc    = "Greenland regional climate simulated by MARv3.11."
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.11"
 
