@@ -116,7 +116,7 @@ contains
             long_name="Surface elevation",method="con",fill=.FALSE.)
         
         call def_var_info(surf(3),trim(file_surface),"TT", "tas", units="degC", &
-            long_name="Surface temperature",method="con",fill=.FALSE.)
+            long_name="Surface air temperature",method="con",fill=.FALSE.)
         call def_var_info(surf(4),trim(file_surface),"SMB", "smb", units="mm a**-1", &
             long_name="Surface mass balance",method="con",fill=.FALSE.)
         call def_var_info(surf(5),trim(file_surface),"RU", "runoff", units="mm a**-1", &
@@ -124,8 +124,9 @@ contains
 
         n_var    = size(surf)
 
-        is_monthly_field      = .TRUE. 
         is_monthly_field(1:2) = .FALSE. 
+        is_monthly_field(3:5) = .TRUE. 
+        
 
 
         ! Initialize mapping
@@ -156,6 +157,7 @@ contains
             do m = 1, 12 
 
                 if (is_monthly_field(i)) then 
+                    write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), gMAR%g%nx,gMAR%g%ny
                     call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
                                         start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
                 
