@@ -130,7 +130,6 @@ contains
         is_monthly_field(3:5) = .TRUE. 
         
 
-
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
@@ -159,11 +158,17 @@ contains
             do m = 1, 12 
 
                 if (is_monthly_field(i)) then 
-                    call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
-                    write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), nms, dims
-                    call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
-                                        start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
-                
+                    !call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
+                    !write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), nms, dims
+                    
+                    if (trim(var_now%nm_in) .eq. "TT") then 
+                        call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
+                                           start=[1,1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1,1])
+                    else 
+                        call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
+                                           start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
+                    end if 
+
                 else 
                     call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
                 end if 
