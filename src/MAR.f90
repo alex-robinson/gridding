@@ -58,9 +58,8 @@ contains
         double precision :: sigma   
 
         logical, allocatable :: is_monthly_field(:) 
-        character(len=56), allocatable :: nms(:) 
-        integer, allocatable :: dims(:) 
-
+        logical, allocatable :: is_4D(:) 
+        
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
 
@@ -111,6 +110,7 @@ contains
             
         allocate(surf(5))
         allocate(is_monthly_field(5)) 
+        allocate(is_4D(5)) 
 
         call def_var_info(surf(1),trim(file_surface),"MSK", "mask", units="1", &
             long_name="Land/ice mask",method="nn",fill=.FALSE.)
@@ -129,6 +129,8 @@ contains
         is_monthly_field(1:2) = .FALSE. 
         is_monthly_field(3:5) = .TRUE. 
         
+        is_4D(1:2) = .FALSE. 
+        is_4D(3:5) = .TRUE. 
 
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -161,7 +163,7 @@ contains
                     !call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
                     !write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), nms, dims
                     
-                    if (trim(var_now%nm_in) .eq. "TT") then 
+                    if (is_4D(i)) then 
                         call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
                                            start=[1,1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1,1])
                     else 
