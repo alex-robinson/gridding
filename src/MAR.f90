@@ -58,6 +58,8 @@ contains
         double precision :: sigma   
 
         logical, allocatable :: is_monthly_field(:) 
+        character(len=56), allocatable :: nms(:) 
+        integer, allocatable :: dims(:) 
 
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
@@ -157,7 +159,8 @@ contains
             do m = 1, 12 
 
                 if (is_monthly_field(i)) then 
-                    write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), gMAR%g%nx,gMAR%g%ny
+                    call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
+                    write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), nms, dims
                     call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
                                         start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
                 
