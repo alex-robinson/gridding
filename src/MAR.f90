@@ -60,6 +60,9 @@ contains
         logical, allocatable :: is_monthly_field(:) 
         logical, allocatable :: is_4D(:) 
         
+        character(len=56), allocatable :: nms(:) 
+        integer, allocatable :: dims(:) 
+        
         ! Define input grid
         if (trim(domain) .eq. "Greenland-ERA") then 
 
@@ -160,8 +163,8 @@ contains
             do m = 1, 12 
 
                 if (is_monthly_field(i)) then 
-                    !call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
-                    !write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), nms, dims
+                    call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
+                    write(*,*) i, m, trim(var_now%nm_in), size(var2D,1), size(var2D,2), nms, dims
                     
                     if (is_4D(i)) then 
                         call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
