@@ -176,8 +176,6 @@ contains
                     call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
                 end if 
 
-                write(*,*) "Got here."
-
                 ! Eliminate missing values 
                 where(abs(var2D) .gt. 1e10) var2D = mv 
 
@@ -192,11 +190,20 @@ contains
                                                                 method="mean",missing_value=mv)
                 end if 
 
-                if (.not. trim(var_now%nm_in) .eq. "MSK") then
+                if (trim(var_now%nm_in) .eq. "MSK" .or. &
+                    trim(var_now%nm_in) .eq. "SH") then
+                    ! Set missing values to zeros 
+
+                    where(outvar.eq.mv) outvar = 0.0
+
+                else
+                    ! Fill in missing values with neighbors
+
                     outmask = 0
                     where(outvar.eq.mv) outmask = 1 
                     call fill_weighted(outvar,missing_value=mv)
                     call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outmask.eq.1)
+                
                 end if 
                 
                 if (is_monthly_field(i)) then 
