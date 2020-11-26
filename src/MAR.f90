@@ -226,6 +226,10 @@ contains
                 ! Eliminate missing values 
                 where(abs(var2D) .gt. 1e10) var2D = mv 
 
+                ! Perform units conversion as needed
+                where (var2D .ne. mv) var2D = var2D*var_now%conv
+
+                
                 ! Initialize output variable to missing data 
                 outvar = mv 
                 
