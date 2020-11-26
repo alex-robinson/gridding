@@ -166,10 +166,13 @@ contains
                         
                     if (is_4D(i)) then 
                         call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
-                        write(*,*) i, m, trim(var_now%nm_in), is_4D(i), size(var2D,1), size(var2D,2), nms, dims
+                        write(*,*) i, m, trim(var_now%nm_in), is_4D(i), size(var2D,1), size(var2D,2)
+                        do q = 1, size(nms)
+                            write(*,*) trim(nms(q)), " : ", dims(q)
+                        end do 
                         
-                        call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)!, &
-                                           !start=[1,1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1,1])
+                        call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
+                                           start=[1,1,1,m],count=[5,5,1,1])
                     else 
                         call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
                                            start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
