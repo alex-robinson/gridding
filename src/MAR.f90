@@ -138,7 +138,7 @@ contains
         
         call def_var_info(surf(3),trim(file_surface),"TT", "tas", units="degC", &
             long_name="Surface air temperature",method="con",fill=.FALSE.)
-        call def_var_info(surf(4),trim(file_surface),"ST2", "tsrf", units="degC", &
+        call def_var_info(surf(4),trim(file_surface),"ST2", "T_srf", units="degC", &
             long_name="Surface air temperature",method="con",fill=.FALSE.)
         call def_var_info(surf(5),trim(file_surface),"SMB", "smb", units="mm d**-1", &
             long_name="Surface mass balance",method="con",fill=.FALSE.)
@@ -229,7 +229,7 @@ contains
                 ! Perform units conversion as needed
                 where (var2D .ne. mv) var2D = var2D*var_now%conv
 
-                
+
                 ! Initialize output variable to missing data 
                 outvar = mv 
                 
