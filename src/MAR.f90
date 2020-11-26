@@ -165,12 +165,6 @@ contains
                 if (is_monthly_field(i)) then 
                         
                     if (is_4D(i)) then 
-                        call nc_dims(trim(var_now%filename),var_now%nm_in,nms,dims)
-                        write(*,*) i, m, trim(var_now%nm_in), is_4D(i), size(var2D,1), size(var2D,2)
-                        do q = 1, size(nms)
-                            write(*,*) trim(nms(q)), " : ", dims(q)
-                        end do 
-                        
                         call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
                                            start=[1,1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1,1])
                     else 
@@ -183,7 +177,7 @@ contains
                 end if 
 
                 write(*,*) "Got here."
-                
+
                 ! Eliminate missing values 
                 where(abs(var2D) .gt. 1e10) var2D = mv 
 
@@ -207,7 +201,7 @@ contains
                 
                 if (is_monthly_field(i)) then 
                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",dim3="month", &
-                                                start=[1,1,nm],count=[grid%G%nx,grid%G%ny,1])
+                                                start=[1,1,m],count=[grid%G%nx,grid%G%ny,1])
                 else 
                     call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
                 end if 
