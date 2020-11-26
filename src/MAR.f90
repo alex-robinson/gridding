@@ -172,7 +172,7 @@ contains
                         end do 
                         
                         call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
-                                           start=[1,1,1,m],count=[5,5,1,1])
+                                           start=[1,1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1,1])
                     else 
                         call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv, &
                                            start=[1,1,m],count=[gMAR%g%nx,gMAR%g%ny,1])
@@ -182,6 +182,8 @@ contains
                     call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
                 end if 
 
+                write(*,*) "Got here."
+                
                 ! Eliminate missing values 
                 where(abs(var2D) .gt. 1e10) var2D = mv 
 
