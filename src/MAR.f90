@@ -56,19 +56,29 @@ contains
         character(len=512) :: units_out 
         double precision, allocatable :: var3D(:,:,:)
         double precision :: sigma   
+        double precision :: conv_day_ann
 
+        logical :: input_is_monthly 
         logical, allocatable :: is_monthly_field(:) 
         logical, allocatable :: is_4D(:) 
         
-        character(len=56), allocatable :: nms(:) 
-        integer, allocatable :: dims(:) 
+        input_is_monthly = .TRUE. 
+        if (trim(domain) .eq. "Greenland-ERA-ann") then 
+            input_is_monthly = .FALSE. 
+        end if 
 
         ! Define input grid
-        if (trim(domain) .eq. "Greenland-ERA") then 
+        if (trim(domain) .eq. "Greenland-ERA-mon" .or. &
+            trim(domain) .eq. "Greenland-ERA-ann") then 
 
             ! Define the input filenames
             fldr0 = "/data/sicopolis/data/MARv3.11/Greenland/ERA_1958-2019-10km/"
-            file_surface = trim(fldr0)//"MARv3.11-10km-monmean-ERA-10km-1961-1990.nc"
+            
+            if (input_is_monthly) then
+                file_surface = trim(fldr0)//"MARv3.11-10km-monmean-ERA-10km-1961-1990.nc"
+            else 
+                file_surface = trim(fldr0)//"MARv3.11-10km-annmean-ERA-10km-1961-1990.nc"
+            end if 
 
             year0 = 1990 
             nyr   = 1 
@@ -98,9 +108,14 @@ contains
             ref     = "Fettweis et al., ftp.climato.be/fettweis/MARv3.11"
 
             ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_MARv3.11-ERA_monmean_1961-1990.nc"
-            
+            if (input_is_monthly) then 
+                write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                                  "_MARv3.11-ERA_monmean_1961-1990.nc"
+            else 
+                write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                                 "_MARv3.11-ERA_annmean_1961-1990.nc"
+            end if 
+
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
@@ -110,10 +125,11 @@ contains
 
         ! Allocate input variable array
         allocate(var2D(gMAR%G%nx,gMAR%G%ny))
-            
-        allocate(surf(5))
-        allocate(is_monthly_field(5)) 
-        allocate(is_4D(5)) 
+        
+        n_var = 9
+        allocate(surf(n_var))
+        allocate(is_monthly_field(n_var)) 
+        allocate(is_4D(n_var)) 
 
         call def_var_info(surf(1),trim(file_surface),"MSK", "mask", units="1", &
             long_name="Land/ice mask",method="nn",fill=.FALSE.)
@@ -122,18 +138,47 @@ contains
         
         call def_var_info(surf(3),trim(file_surface),"TT", "tas", units="degC", &
             long_name="Surface air temperature",method="con",fill=.FALSE.)
-        call def_var_info(surf(4),trim(file_surface),"SMB", "smb", units="mm a**-1", &
+        call def_var_info(surf(4),trim(file_surface),"ST2", "tsrf", units="degC", &
+            long_name="Surface air temperature",method="con",fill=.FALSE.)
+        call def_var_info(surf(5),trim(file_surface),"SMB", "smb", units="mm d**-1", &
             long_name="Surface mass balance",method="con",fill=.FALSE.)
-        call def_var_info(surf(5),trim(file_surface),"RU", "runoff", units="mm a**-1", &
+        call def_var_info(surf(6),trim(file_surface),"ME", "melt", units="mm d**-1", &
+            long_name="Runoff",method="con",fill=.FALSE.)
+        call def_var_info(surf(7),trim(file_surface),"RU", "runoff", units="mm d**-1", &
+            long_name="Runoff",method="con",fill=.FALSE.)
+        call def_var_info(surf(8),trim(file_surface),"SF", "sf", units="mm d**-1", &
+            long_name="Runoff",method="con",fill=.FALSE.)
+        call def_var_info(surf(9),trim(file_surface),"RF", "rf", units="mm d**-1", &
             long_name="Runoff",method="con",fill=.FALSE.)
 
-        n_var    = size(surf)
+        if (input_is_monthly) then 
 
-        is_monthly_field(1:2) = .FALSE. 
-        is_monthly_field(3:5) = .TRUE. 
-        
+            is_monthly_field(1:2)     = .FALSE. 
+            is_monthly_field(3:n_var) = .TRUE. 
+            
+        else 
+
+            is_monthly_field = .FALSE. 
+
+            conv_day_ann = 365.0 
+
+            surf(5)%units_out = "mm a**-1"
+            surf(5)%conv      = conv_day_ann
+            surf(6)%units_out = "mm a**-1"
+            surf(6)%conv      = conv_day_ann
+            surf(7)%units_out = "mm a**-1"
+            surf(7)%conv      = conv_day_ann
+            surf(8)%units_out = "mm a**-1"
+            surf(8)%conv      = conv_day_ann
+            surf(9)%units_out = "mm a**-1"
+            surf(9)%conv      = conv_day_ann
+            
+        end if 
+
+        ! Determine whether field has an extra dimension, eg  [nx,ny,NEXTRA,[nm]]
+        is_4D = .TRUE.
         is_4D(1:2) = .FALSE. 
-        is_4D(3:5) = .TRUE. 
+        is_4D(8:9) = .FALSE. 
 
         ! Initialize mapping
         call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -173,7 +218,9 @@ contains
                     end if 
 
                 else 
+                    
                     call nc_read(trim(var_now%filename),var_now%nm_in,var2D,missing_value=mv)
+
                 end if 
 
                 ! Eliminate missing values 

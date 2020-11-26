@@ -169,7 +169,8 @@ program gridder
 !             call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
             ! call MARv39ismip6_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=16,lat_lim=0.5d0)
-            call MARv311_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=16,lat_lim=0.5d0)
+            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
+            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
 
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
