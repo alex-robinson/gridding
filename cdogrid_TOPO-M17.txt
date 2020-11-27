@@ -9,4 +9,8 @@ yfirst    = -632675
 yinc      = 150 
 grid_mapping = crs 
 grid_mapping_name = polar_stereographic 
-proj_params = "+init=epsg:3413"
+straight_vertical_longitude_from_pole = -45. 
+standard_parallel = 70. 
+latitude_of_projection_origin = 90. 
+false_easting = 0. 
+false_northing = 0.
