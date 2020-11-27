@@ -1,5 +1,10 @@
 program gencdogrid
-
+    ! This program will produce a grid description file
+    ! for use with `cdo remapcon` commands etc. 
+    ! However, it can be generated automatically using 
+    ! `cdo -griddes infile` if the projection is well
+    ! defined. 
+    
     use coord 
     use ncio 
     use control 

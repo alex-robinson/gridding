@@ -132,7 +132,7 @@ contains
         end do 
 
         return
-    end subroutine thin 
+    end subroutine thin
 
     ! Extract a lower resolution average version of an input array
     ! (new array should be a multiple of input array)
@@ -194,7 +194,7 @@ contains
         end do 
 
         return
-    end subroutine thin_ave 
+    end subroutine thin_ave
 
     subroutine replace(s,text,rep,outs)
         ! Adapted from FUNCTION Replace_Text:
