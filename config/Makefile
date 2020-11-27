@@ -84,6 +84,12 @@ gridder_buizert: $(gridder_libs) $(obj_datasets)
 	@echo "    gridder_buizert.x is ready."
 	@echo " "
 
+gencdogrid: $(gridder_libs) $(objdir)/control.o
+	$(FC) $(DFLAGS) $(FFLAGS) -o gencdogrid.x $^ gencdogrid.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gencdogrid.x is ready."
+	@echo " "
+
 projector: $(gridder_libs) $(objdir)/control.o
 	$(FC) $(DFLAGS) $(FFLAGS) -o projector.x $^ projector.f90 $(LFLAGS)
 	@echo " "
