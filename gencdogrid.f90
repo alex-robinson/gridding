@@ -125,6 +125,4 @@ subroutine write_cdo_gridfile(lon2D,lat2D,filename)
 
 end subroutine write_cdo_gridfile
 
-
-
 end program gencdogrid
