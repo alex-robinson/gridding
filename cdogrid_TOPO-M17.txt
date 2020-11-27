@@ -1,0 +1,12 @@
+gridtype = projection 
+xsize     = 10218 
+ysize     = 18346 
+xunits   = "meter" 
+yunits   = "meter" 
+xfirst    = -652925
+xinc      = 150 
+yfirst    = -632675
+yinc      = 150 
+grid_mapping = crs 
+grid_mapping_name = polar_stereographic 
+proj_params = "+init=epsg:3413"
