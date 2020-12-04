@@ -177,24 +177,6 @@ contains
         call nc_write_attr(filename,var_name_out,"long_name",long_name)
         call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
         
-        ! 4. amask ------------------------------------------------
-        var_name     = "amask"
-        var_name_out = "mask"
-        long_name    = "ice ocean rock mask"
-        units        = "--" 
-
-        call nc_read(filename_in,var_name,var1,missing_value=real(mv))
-
-        call map_scrip_field(mps,var_name_out,var1,var2,method="count",missing_value=mv)
-
-        ! Write output variable to output file
-        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
-        
-        ! Write variable metadata
-        call nc_write_attr(filename,var_name_out,"units",units)
-        call nc_write_attr(filename,var_name_out,"long_name",long_name)
-        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
-        
         return 
 
     end subroutine rtopo_latlon_to_grid_cdo
@@ -418,6 +400,31 @@ contains
         units        = "m" 
 
         filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_ice_base_topography.nc"
+        call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
+                     start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
+
+        write(*,*) "input range(var):  ", minval(inp%var), maxval(inp%var)
+
+        ! Interpolate to output grid 
+        call nearest_to_grid(zout=var,z=inp%var,ii=nbs%ii,jj=nbs%jj)
+
+        write(*,*) "output range(var): ", minval(var,mask=var.ne.mv), maxval(var,mask=var.ne.mv)
+        
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,real(var),dim1="xc",dim2="yc")
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+        ! 4. amask ------------------------------------------------
+        var_name     = "amask"
+        var_name_out = "mask"
+        long_name    = "ice ocean rock mask"
+        units        = "--" 
+
+        filename_in = trim(path)//"/"//"RTopo-2.0.1_30sec_aux.nc"
         call nc_read(filename_in,var_name,inp%var,missing_value=real(mv), &
                      start=[inp%i0,inp%j0],count=[inp%ni,inp%nj])
 
