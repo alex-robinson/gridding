@@ -118,7 +118,7 @@ contains
 
         ! Allocate output variable
         call grid_allocate(grid,var2)
-        
+
         ! 1. Bedrock topography ------------------------------------------------
         var_name     = "bedrock_topography"
         var_name_out = "z_bed"
@@ -128,7 +128,7 @@ contains
 
         call nc_read(filename_in,var_name,var1,missing_value=real(mv))
 
-        call map_scrip_field(mps,"z_bed",var1,var2,method="mean",missing_value=mv)
+        call map_scrip_field(mps,var_name_out,var1,var2,method="mean",missing_value=mv)
 
         ! Write output variable to output file
         call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
@@ -137,7 +137,64 @@ contains
         call nc_write_attr(filename,var_name_out,"units",units)
         call nc_write_attr(filename,var_name_out,"long_name",long_name)
         call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
-            
+        
+        ! 2. Surface elevation ------------------------------------------------
+        var_name     = "surface_elevation"
+        var_name_out = "z_srf"
+        long_name    = "upper ice surface height for the Antarctic and Greenland ice sheets &
+                       &/ ice shelves (bedrock topography for ice-free continent; zero for ocean)"
+        units        = "m" 
+
+        call nc_read(filename_in,var_name,var1,missing_value=real(mv))
+
+        call map_scrip_field(mps,var_name_out,var1,var2,method="mean",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+        ! 3. Ice base topography ------------------------------------------------
+        var_name     = "ice_base_topography"
+        var_name_out = "z_ice_base"
+        long_name    = "ice base topography for the Antarctic and Greenland ice sheets &
+                       &/ ice shelves (ice draft for ice shelves and floating glaciers; &
+                       &zero in absence of ice)"
+        units        = "m" 
+
+        call nc_read(filename_in,var_name,var1,missing_value=real(mv))
+
+        call map_scrip_field(mps,var_name_out,var1,var2,method="mean",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+        ! 4. amask ------------------------------------------------
+        var_name     = "amask"
+        var_name_out = "mask"
+        long_name    = "ice ocean rock mask"
+        units        = "--" 
+
+        call nc_read(filename_in,var_name,var1,missing_value=real(mv))
+
+        call map_scrip_field(mps,var_name_out,var1,var2,method="count",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
         return 
 
     end subroutine rtopo_latlon_to_grid_cdo
