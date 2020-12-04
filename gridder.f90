@@ -46,7 +46,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-8KM"
+    grid_name = "GRL-4KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -70,7 +70,8 @@ program gridder
     ! 1. Interpolate rtopo fields to a high resolution regional grid 
     ! (only needed to be done once)
     call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
-    stop 
+    ! stop 
+    
 !     call rtopo_latlon_to_grid(outfldr,grid,domain)
 !     stop 
 
@@ -171,8 +172,8 @@ program gridder
 !             call MARv39_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
 
             ! call MARv39ismip6_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=16,lat_lim=0.5d0)
-            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
-            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
+            ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
+            ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
 
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
