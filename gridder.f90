@@ -46,7 +46,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-4KM"
+    grid_name = "GRL-16KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -71,7 +71,7 @@ program gridder
     ! (only needed to be done once)
     call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
     ! stop 
-    
+
 !     call rtopo_latlon_to_grid(outfldr,grid,domain)
 !     stop 
 

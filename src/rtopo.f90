@@ -138,6 +138,19 @@ contains
         call nc_write_attr(filename,var_name_out,"long_name",long_name)
         call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
         
+        ! Also, stdev(z_bed)
+        var_name_out = "z_bed_sd"
+
+        call map_scrip_field(mps,var_name_out,var1,var2,method="stdev",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
         ! 2. Surface elevation ------------------------------------------------
         var_name     = "surface_elevation"
         var_name_out = "z_srf"
@@ -694,4 +707,4 @@ end if
     end subroutine rtopo_to_grid
 
 
-end module rtopo 
+end module rtopo
