@@ -58,6 +58,8 @@ contains
         real(4), allocatable :: var1(:,:)
         real(4), allocatable :: var2(:,:)
         character(len=56) :: grid_in_name 
+        integer, allocatable :: dims(:)
+        character(len=56), allocatable :: dim_names(:) 
 
         type(map_scrip_class) :: mps 
 
@@ -70,8 +72,11 @@ contains
 
         filename_in = trim(path)//"/"//trim(grid_in_name)//"_bedrock_topography.nc"
 
-        nx1 = nc_size(filename_in,"lon")
-        ny1 = nc_size(filename_in,"lat")
+        call nc_dims(filename_in,"bedrock_topography",dim_names,dims)
+        nx1 = dims(1)
+        ny1 = dims(2)
+
+        write(*,*) "nx1, ny1: ", nx1, ny1 
         
 
         ! Assume SCRIP map is already written for RTOPO file 
