@@ -94,9 +94,6 @@ contains
 
         ! ### Define output information #####
         
-        ! Allocate output variable
-        call grid_allocate(grid,var1)
-
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1-new.nc"
 
@@ -112,13 +109,16 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
-        ! Determine array dimensions
+        ! Determine input array dimensions
         call nc_dims(filename_in,"bedrock_topography",dim_names,dims)
         nx1 = dims(1)
         ny1 = dims(2)
 
         allocate(var1(nx1,ny1))
 
+        ! Allocate output variable
+        call grid_allocate(grid,var2)
+        
         ! 1. Bedrock topography ------------------------------------------------
         var_name     = "bedrock_topography"
         var_name_out = "z_bed"
