@@ -11,6 +11,7 @@ module rtopo
     implicit none 
 
     private 
+    public :: rtopo_latlon_to_grid_cdo
     public :: rtopo_latlon_to_grid 
     public :: rtopo_to_grid 
 
