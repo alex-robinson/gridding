@@ -66,11 +66,13 @@ contains
         ! ### Define input information #####
         path = "/p/projects/megarun/greenrise/datasets/rtopo-2"
 
-        grid_in_name = "RTopo-2.0.1_30sec"
+        !grid_in_name = "RTopo-2.0.1_30sec"
+        grid_in_name = "RTopo-2.0.1_1min"
 
         ! 1. Bedrock topography ======================
 
-        filename_in = trim(path)//"/"//trim(grid_in_name)//"_bedrock_topography.nc"
+        !filename_in = trim(path)//"/"//trim(grid_in_name)//"_bedrock_topography.nc"
+        filename_in = trim(path)//"/"//trim(grid_in_name)//"_data.nc"
 
         call nc_dims(filename_in,"bedrock_topography",dim_names,dims)
         nx1 = dims(1)
