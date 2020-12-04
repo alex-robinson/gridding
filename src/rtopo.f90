@@ -74,13 +74,6 @@ contains
         !filename_in = trim(path)//"/"//trim(grid_in_name)//"_bedrock_topography.nc"
         filename_in = trim(path)//"/"//trim(grid_in_name)//"_data.nc"
 
-        call nc_dims(filename_in,"bedrock_topography",dim_names,dims)
-        nx1 = dims(1)
-        ny1 = dims(2)
-
-        write(*,*) "nx1, ny1: ", nx1, ny1 
-        
-
         ! Assume SCRIP map is already written for RTOPO file 
         ! (done manually to avoid generating a huge grid object)
         !call grid_write_cdo_desc_short(grid_in,fldr="maps") 
@@ -90,8 +83,6 @@ contains
         
         ! Generate SCRIP interpolation weights 
         call map_scrip_init(mps,grid_in_name,grid%name,fldr="maps",src_nc=filename_in)
-
-        stop 
 
         desc    = "RTOPO-2.0.1 present-day Earth topography data"
         ref     = "Schaffer, J., Timmermann, R., Arndt, J. E., Kristensen, S. S., Mayer, C., &
@@ -121,7 +112,32 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
+        ! Determine array dimensions
+        call nc_dims(filename_in,"bedrock_topography",dim_names,dims)
+        nx1 = dims(1)
+        ny1 = dims(2)
 
+        allocate(var1(nx1,ny1))
+
+        ! 1. Bedrock topography ------------------------------------------------
+        var_name     = "bedrock_topography"
+        var_name_out = "z_bed"
+        long_name    = "ocean bathymetry; surface topography of continents; &
+                       &bedrock topography under grounded or floating ice"
+        units        = "m" 
+
+        call nc_read(filename_in,var_name,var1,missing_value=real(mv))
+
+        call map_scrip_field(mps,"z_bed",var1,var2,method="mean",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+            
         return 
 
     end subroutine rtopo_latlon_to_grid_cdo
