@@ -154,7 +154,7 @@ program gridder
 !             call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !             call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
             ! call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=25,lat_lim=0.5d0,grad_lim=0d0,thin_by=15)
-            call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
+            ! call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
 
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])

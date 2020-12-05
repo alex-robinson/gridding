@@ -54,7 +54,7 @@ contains
         character(len=1024) :: desc, ref 
         character(len=1024) :: var_name, var_name_out, long_name, units  
         
-        integer :: nx1, ny1 
+        integer :: nx1, ny1, i 
         real(4), allocatable :: var1(:,:)
         real(4), allocatable :: var2(:,:)
         real(4), allocatable :: var2_tmp(:,:)
@@ -205,6 +205,23 @@ contains
 
         ! Write output variable to output file
         call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+        ! Interpolate latitude field for testing 
+        call nc_read(filename_in,"lat",var1(1,:),missing_value=real(mv))
+
+        do i = 2, size(var1,1)
+            var1(i,:) = var1(1,:) 
+        end do 
+
+        call map_scrip_field(mps,var_name_out,var1,var2,method="mean",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,"lat_orig",var2,dim1="xc",dim2="yc",missing_value=real(mv))
         
         ! Write variable metadata
         call nc_write_attr(filename,var_name_out,"units",units)
