@@ -81,7 +81,7 @@ contains
             
             ! == Resampled dx=450m resolution ==
             file_in = "/data/sicopolis/data/Greenland/Morlighem2017_BedMachine/BedMachineGreenland-2017-09-20-resampledx3.nc"
-            call grid_init(grid0,name="M17-450M",mtype="polar_stereographic", &
+            call grid_init(grid0,name="M17-450m",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-652.925d0,dx=0.450d0,nx=3406,y0=-3384.425d0,dy=0.450d0,ny=6116, &
                             lambda=-45.d0,phi=70.d0)
@@ -109,7 +109,7 @@ contains
         ! ==== MAPPING INFORMATION ====
 
         ! Define input grid in grid description file 
-        call grid_write_cdo_desc_short(grid0,fldr="maps") 
+        !call grid_write_cdo_desc_short(grid0,fldr="maps") 
         
         ! Define output grid in grid description file 
         call grid_write_cdo_desc_short(grid,fldr="maps") 
