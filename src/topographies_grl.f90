@@ -43,6 +43,7 @@ contains
         type(grid_class)   :: grid0
         character(len=512) :: file_in
         type(var_defs), allocatable :: vars(:)
+        double precision, allocatable :: tmp(:,:) 
         double precision, allocatable :: invar(:,:) 
 
         type(map_scrip_class)  :: mps 
@@ -115,7 +116,7 @@ contains
         
         ! Generate SCRIP interpolation weights 
         call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
-        
+
         ! =============================
 
         ! Define the variables to be mapped 
@@ -130,7 +131,8 @@ contains
                           long_name="data source (0 = none, 1 = gimpdem, 2 = Mass conservation, &
                                     &4 = interpolation, 5 = hydrostatic equilibrium, 6=kriging)",method="count")
 
-        ! Allocate the input grid variable
+        ! Allocate the input grid variables
+        call grid_allocate(grid0,tmp)
         call grid_allocate(grid0,invar)
         
         ! Initialize output variable arrays
@@ -151,7 +153,12 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
 
-            call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv)
+            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
+            
+            ! Reverse y-axis
+            do j = 1, size(tmp,2)
+                invar(:,j) = tmp(:,size(tmp,2)-j+1)
+            end do 
             
             ! Perform conservative interpolation 
             outvar = mv 
