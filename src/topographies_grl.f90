@@ -163,6 +163,7 @@ contains
             ! do j = 1, size(tmp,2)
             !     invar(:,j) = tmp(:,size(tmp,2)-j+1)
             ! end do 
+            invar = tmp 
             
             ! Perform conservative interpolation 
             outvar = mv 
