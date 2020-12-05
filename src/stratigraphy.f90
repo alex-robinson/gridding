@@ -34,7 +34,7 @@ contains
         type(var_defs), allocatable :: vars(:)
         double precision, allocatable :: invar(:,:) 
 
-        type(map_class)  :: map 
+        type(map_scrip_class)  :: mps 
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:)
@@ -54,7 +54,8 @@ contains
                     lambda=-45.d0,phi=70.d0,alpha=20.d0)
 
             ! Define the input filenames
-            file_in = "/data/sicopolis/data/Greenland/MacGregor2015_stratigraphy/Greenland_age_grid_zyx.nc"
+            !file_in = "/data/sicopolis/data/Greenland/MacGregor2015_stratigraphy/Greenland_age_grid_zyx.nc"
+            file_in = "data/Greenland/MacGregor2015_stratigraphy/Greenland_age_grid_zyx.nc"
             desc    = "Radiostratigraphy and age structure of the Greenland ice sheet, 24-Jun-2015 (v1.2)"
             ref     = "MacGregor, J. A., Fahnestock, M. A., Catania, G. A., Paden, J. D., &
                       &Prasad Gogineni, S., Young, S. K., Rybarski, S. C., Mabrey, A. N., &
@@ -73,6 +74,19 @@ contains
             stop 
         end if 
 
+        ! ==== MAPPING INFORMATION ====
+
+        ! Define input grid in grid description file
+        call grid_write_cdo_desc_short(grid0,fldr="maps") 
+        
+        ! Define output grid in grid description file 
+        call grid_write_cdo_desc_short(grid,fldr="maps") 
+        
+        ! Generate SCRIP interpolation weights 
+        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
+
+        ! =============================
+
         ! Write the original grid (for Andreas Born)
 !         call grid_write(grid,"macgregor2015_grid.nc",xnm="xc",ynm="yc",create=.TRUE.)
 !         stop 
@@ -84,7 +98,7 @@ contains
         allocate(tmp(1479,2675))
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        !call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
@@ -116,10 +130,15 @@ contains
             where (abs(invar) .gt. 1d8) invar = mv 
             where (isnan(invar)) invar = mv 
 
+            ! Perform conservative interpolation 
             outvar = mv 
-            call map_field(map,"age_norm",invar,outvar,outmask,method="nn", &
-                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+            call map_scrip_field(mps,"age_norm",invar,outvar,method="mean",missing_value=mv)
             where(outvar .ne. mv) outvar = outvar*1d-3
+
+            ! outvar = mv 
+            ! call map_field(map,"age_norm",invar,outvar,outmask,method="nn", &
+            !                radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+            ! where(outvar .ne. mv) outvar = outvar*1d-3
             
             call nc_write(filename,"ice_age",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
@@ -129,10 +148,15 @@ contains
             where (abs(invar) .gt. 1d8) invar = mv 
             where (isnan(invar)) invar = mv 
 
+            ! Perform conservative interpolation 
             outvar = mv 
-            call map_field(map,"ice_age_err",invar,outvar,outmask,method="nn", &
-                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+            call map_scrip_field(mps,"ice_age_err",invar,outvar,method="mean",missing_value=mv)
             where(outvar .ne. mv) outvar = outvar*1d-3
+            
+            ! outvar = mv 
+            ! call map_field(map,"ice_age_err",invar,outvar,outmask,method="nn", &
+            !                radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+            ! where(outvar .ne. mv) outvar = outvar*1d-3
 
             call nc_write(filename,"ice_age_err",real(outvar),dim1="xc",dim2="yc",dim3="depth_norm", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
@@ -159,9 +183,13 @@ contains
             where (abs(invar) .gt. 1d8) invar = mv 
             where (isnan(invar)) invar = mv 
             
+            ! Perform conservative interpolation 
             outvar = mv 
-            call map_field(map,"depth_iso",invar,outvar,outmask,method="nn", &
-                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+            call map_scrip_field(mps,"depth_iso",invar,outvar,method="mean",missing_value=mv)
+            
+            ! outvar = mv 
+            ! call map_field(map,"depth_iso",invar,outvar,outmask,method="nn", &
+            !                radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             
             call nc_write(filename,"depth_iso",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
@@ -171,9 +199,13 @@ contains
             where (abs(invar) .gt. 1d8) invar = mv 
             where (isnan(invar)) invar = mv 
             
+            ! Perform conservative interpolation 
             outvar = mv 
-            call map_field(map,"depth_iso_err",invar,outvar,outmask,method="nn", &
-                           radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+            call map_scrip_field(mps,"depth_iso_err",invar,outvar,method="mean",missing_value=mv)
+            
+            ! outvar = mv 
+            ! call map_field(map,"depth_iso_err",invar,outvar,outmask,method="nn", &
+            !                radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
             
             call nc_write(filename,"depth_iso_err",real(outvar),dim1="xc",dim2="yc",dim3="age_iso", &
                           missing_value=real(mv),start=[1,1,q],count=[grid%G%nx,grid%G%ny,1])
@@ -195,10 +227,15 @@ contains
         where (abs(invar) .gt. 1d8) invar = mv 
         where (isnan(invar)) invar = mv 
         
+        ! Perform conservative interpolation 
         outvar = mv 
-        call map_field(map,"thick",invar,outvar,outmask,method="radius", &
-                       radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+        call map_scrip_field(mps,"thick",invar,outvar,method="mean",missing_value=mv)
         where(outvar .eq. mv) outvar = 0.d0 
+        
+        ! outvar = mv 
+        ! call map_field(map,"thick",invar,outvar,outmask,method="radius", &
+        !                radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
+        ! where(outvar .eq. mv) outvar = 0.d0 
 
         call nc_write(filename,"H_ice",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
         
