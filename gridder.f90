@@ -67,7 +67,7 @@ program gridder
     ! =========================================================
 
     ! Global topography: Rtopo-2.0.1
-    call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
+    ! call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
