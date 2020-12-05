@@ -38,14 +38,14 @@ contains
         character(len=512)  :: filename 
         character(len=1024) :: desc, ref 
 
-        type(grid_class) :: gMAR
+        type(grid_class)   :: gMAR
         character(len=512) :: fldr0 
         character(len=512) :: file_surface
         type(var_defs), allocatable :: surf(:)
         
         real(8), allocatable :: var2D(:,:)
 
-        type(map_class)  :: map 
+        type(map_class):: map 
         type(var_defs) :: var_now 
         double precision, allocatable :: outvar(:,:), tmp(:,:)
         integer, allocatable          :: outmask(:,:), outvar_int(:,:)
@@ -88,12 +88,9 @@ contains
             sigma = grid%G%dx*2.d0 
 
             ! Define MAR input grid and input variable field
-            ! call grid_init(gMAR,name="MARv3.11-10KM",mtype="polar_stereographic",units="kilometers", &
-            !             lon180=.TRUE.,x0=-760.d0,dx=10.0d0,nx=144,y0=-1190.d0,dy=10.0d0,ny=268, &
-            !             lambda=-45.d0,phi=70.d0)
-            call grid_init(gMAR,name="MARv3.11-10KM",mtype="polar_stereographic",units="kilometers", &
+            call grid_init(gMAR,name="MARv3.11-10KM",mtype="stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-760.d0,dx=10.0d0,nx=144,y0=-1190.d0,dy=10.0d0,ny=268, &
-                        lambda=-40.d0,phi=50.d0)
+                        lambda=-40.d0,phi=70.5d0)
 
             ! ====================================================================
             ! Read lon/lat fields directly from file to be sure projection matches 
@@ -123,9 +120,21 @@ contains
 
         end if 
 
+        ! ==== MAPPING INFORMATION ====
+
+        ! Initialize mapping
+        call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! =============================
+
         ! Allocate input variable array
-        allocate(var2D(gMAR%G%nx,gMAR%G%ny))
-        
+        call grid_allocate(gMAR,var2d)
+
+        ! Initialize output variable arrays
+        call grid_allocate(grid,outvar)
+        call grid_allocate(grid,outmask)    
+        call grid_allocate(grid,tmp)
+
         n_var = 9
         allocate(surf(n_var))
         allocate(is_monthly_field(n_var)) 
@@ -179,14 +188,6 @@ contains
         is_4D = .TRUE.
         is_4D(1:2) = .FALSE. 
         is_4D(8:9) = .FALSE. 
-
-        ! Initialize mapping
-        call map_init(map,gMAR,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
-        ! Initialize output variable arrays
-        call grid_allocate(grid,outvar)
-        call grid_allocate(grid,outmask)    
-        call grid_allocate(grid,tmp)
 
         ! Initialize the output file
         call nc_create(filename)
