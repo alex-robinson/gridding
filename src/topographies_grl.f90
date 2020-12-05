@@ -219,28 +219,28 @@ contains
         ! Fill missing data with rtopo2 
 
         ! rtopo2 bedrock
-        call nc_read(filename0,"z_bed",var_fill)
+        call nc_read(filename0,"z_bed",var_fill,missing_value=mv)
         call nc_read(filename, "z_bed",zb,missing_value=mv)
         where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
         ! rtopo2 surface
-        call nc_read(filename0,"z_srf",var_fill)
+        call nc_read(filename0,"z_srf",var_fill,missing_value=mv)
         call nc_read(filename, "z_srf",zs,missing_value=mv)
         where(zs .eq. mv) zs = var_fill 
         var_now = vars(2)
         call nc_write(filename,var_now%nm_out,real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
     
         ! rtopo2 ice thickness 
-        call nc_read(filename0,"H_ice",var_fill)
+        call nc_read(filename0,"H_ice",var_fill,missing_value=mv)
         call nc_read(filename, "H_ice",H,missing_value=mv)
         where(H .eq. mv) H = var_fill 
         var_now = vars(3)
         call nc_write(filename,var_now%nm_out,real(H),dim1="xc",dim2="yc",missing_value=real(mv))
                 
         ! rtopo2 bedrock sd
-        call nc_read(filename0,"z_bed_sd",var_fill)
+        call nc_read(filename0,"z_bed_sd",var_fill,missing_value=mv)
         call nc_read(filename, "z_bed_sd",zb_sd,missing_value=mv)
         where(zb_sd .eq. mv) zb_sd = var_fill 
         var_now = vars(1)

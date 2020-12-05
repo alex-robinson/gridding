@@ -57,6 +57,7 @@ contains
         integer :: nx1, ny1 
         real(4), allocatable :: var1(:,:)
         real(4), allocatable :: var2(:,:)
+        real(4), allocatable :: var2_tmp(:,:)
         character(len=56) :: grid_in_name 
         integer, allocatable :: dims(:)
         character(len=56), allocatable :: dim_names(:) 
@@ -117,6 +118,7 @@ contains
 
         ! Allocate output variable
         call grid_allocate(grid,var2)
+        call grid_allocate(grid,var2_tmp)
 
         ! 1. Bedrock topography ------------------------------------------------
         var_name     = "bedrock_topography"
@@ -180,6 +182,26 @@ contains
         call nc_read(filename_in,var_name,var1,missing_value=real(mv))
 
         call map_scrip_field(mps,var_name_out,var1,var2,method="mean",missing_value=mv)
+
+        ! Write output variable to output file
+        call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        ! Write variable metadata
+        call nc_write_attr(filename,var_name_out,"units",units)
+        call nc_write_attr(filename,var_name_out,"long_name",long_name)
+        call nc_write_attr(filename,var_name_out,"coordinates","lat2D lon2D")
+        
+
+        ! 4. Calculate ice thickness -----------------------
+        var_name     = "none"
+        var_name_out = "H_ice"
+        long_name    = "Ice thickness"
+        units        = "m" 
+
+        call nc_read(filename,"z_srf",var2,missing_value=real(mv))
+        call nc_read(filename,"z_ice_base",var2_tmp,missing_value=real(mv))
+        var2 = max(var2 - var2_tmp,0.0)
+        where(var2_tmp .eq. 0.0) var2 = 0.0 
 
         ! Write output variable to output file
         call nc_write(filename,var_name_out,var2,dim1="xc",dim2="yc",missing_value=real(mv))
