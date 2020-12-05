@@ -94,7 +94,7 @@ contains
         ! ### Define output information #####
         
         ! Define the output filename 
-        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1-new.nc"
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
 
         write(*,*) "Output filename: "//trim(filename)
         

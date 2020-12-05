@@ -167,8 +167,10 @@ contains
             
             ! Note: do not fill in missing values here, except for masks, since they 
             ! will be populated with  rtopo2 data afterwards (see further below) 
-            if (trim(method) .eq. "count") then 
+            if (trim(var_now%method) .eq. "count") then 
                 call fill_nearest(outvar,missing_value=mv)
+            else if (trim(var_now%nm_out) .eq. "z_bed_err") then 
+                where(outvar .eq. mv) outvar = 0.0 
             end if 
 
             write(*,"(a,3f10.2)") trim(var_now%nm_out)//": ", maxval(outvar), maxval(invar)
