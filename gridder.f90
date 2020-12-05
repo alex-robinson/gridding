@@ -66,19 +66,8 @@ program gridder
     !
     ! =========================================================
 
-    ! Global topography: Rtopo-2.0.1, two step process 
-    ! 1. Interpolate rtopo fields to a high resolution regional grid 
-    ! (only needed to be done once)
+    ! Global topography: Rtopo-2.0.1
     call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
-    ! stop 
-
-!     call rtopo_latlon_to_grid(outfldr,grid,domain)
-!     stop 
-
-    ! 2. Perform conservative interpolation to lower resolution 
-    ! call rtopo_to_grid(outfldr,grid,domain)
-
-!     stop 
 
     ! == Global datasets - applicable to all domains ==
 
@@ -165,6 +154,7 @@ program gridder
 !             call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !             call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
             ! call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=25,lat_lim=0.5d0,grad_lim=0d0,thin_by=15)
+            call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
 
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])

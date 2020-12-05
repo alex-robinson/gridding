@@ -69,8 +69,7 @@ contains
         !grid_in_name = "RTopo-2.0.1_30sec"
         grid_in_name = "RTopo-2.0.1_1min"
 
-        ! 1. Bedrock topography ======================
-
+        ! Define filename for getting grid description and calculating scip map
         !filename_in = trim(path)//"/"//trim(grid_in_name)//"_bedrock_topography.nc"
         filename_in = trim(path)//"/"//trim(grid_in_name)//"_data.nc"
 
