@@ -63,14 +63,15 @@ contains
         units(3)    = "km"
         units(4)    = "km"
         
-        long_names(1) = "Geothermal heat flux"
-        long_names(2) = "Geothermal heat flux uncertainty"
+        long_names(1) = "Geothermal heat flow"
+        long_names(2) = "Geothermal heat flow uncertainty"
         long_names(3) = "Curie depth"
         long_names(4) = "Curie depth uncertainty"
         
         if (trim(domain) .eq. "Greenland") then 
 
-            fldr_data = "/data/sicopolis/data/GeothermalHeatFlux/Martos2018/"
+            ! fldr_data = "/data/sicopolis/data/GeothermalHeatFlux/Martos2018/"
+            fldr_data = "data/GeothermalHeatFlux/Martos2018/"
 
             files(1) = trim(fldr_data)//"Martos2018_Greenland_ghf.txt"
             files(2) = trim(fldr_data)//"Martos2018_Greenland_ghf_err.txt"
@@ -83,7 +84,7 @@ contains
             ! Number of data points 
             np = 10715
 
-            desc    = "Geothermal heat flux"
+            desc    = "Geothermal heat flow"
             ref     = "Martos, Yasmina M; Jordan, Tom A; Catalan, Manuel; Jordan, Thomas M; &
                       &Bamber, Jonathan L; Vaughan, David G (2018): Geothermal heat flux &
                       &reveals the Iceland hotspot track underneath Greenland. Geophysical &
@@ -95,7 +96,8 @@ contains
 
         else if (trim(domain) .eq. "Antarctica") then
 
-            fldr_data = "/data/sicopolis/data/GeothermalHeatFlux/Martos2017/"
+            ! fldr_data = "/data/sicopolis/data/GeothermalHeatFlux/Martos2017/"
+            fldr_data = "data/GeothermalHeatFlux/Martos2017/"
 
             files(1) = trim(fldr_data)//"Martos2017_Antarctica_ghf.txt"
             files(2) = trim(fldr_data)//"Martos2017_Antarctica_ghf_err.txt"
@@ -108,7 +110,7 @@ contains
             ! Number of data points 
             np = 59328
             
-            desc    = "Geothermal heat flux"
+            desc    = "Geothermal heat flow"
             ref     = "Martos, Yasmina M; Catalan, Manuel; Jordan, Tom A; Golynsky, Alexander V; &
                       &Golynsky, Dmitry A; Eagles, Graeme; Vaughan, David G (2017): Heat flux &
                       &distribution of Antarctica unveiled. Geophysical Research Letters, &
@@ -153,8 +155,8 @@ contains
         
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -239,8 +241,8 @@ contains
         if (trim(domain) .eq. "Greenland") then 
 
             ! Define the input filename
-!             file_in = "data/GeothermalHeatFlux/mct_mf7_foxmaule05_npolar.txt"
-            file_in = "/data/sicopolis/data/GeothermalHeatFlux/mct_mf7_foxmaule05_npolar.txt"
+            ! file_in = "/data/sicopolis/data/GeothermalHeatFlux/mct_mf7_foxmaule05_npolar.txt"
+            file_in = "data/GeothermalHeatFlux/mct_mf7_foxmaule05_npolar.txt"
             
             pname = "Maul05-npolar"
             np = 1165  ! Number of data points
@@ -248,8 +250,8 @@ contains
         else if (trim(domain) .eq. "Antarctica") then
 
             ! Define the input filename
-!             file_in = "data/GeothermalHeatFlux/heatflux_mf7_foxmaule05.txt"
-            file_in = "/data/sicopolis/data/GeothermalHeatFlux/heatflux_mf7_foxmaule05.txt"
+            ! file_in = "/data/sicopolis/data/GeothermalHeatFlux/heatflux_mf7_foxmaule05.txt"
+            file_in = "data/GeothermalHeatFlux/heatflux_mf7_foxmaule05.txt"
             
             pname = "Maule05"
             np = 656  ! Number of data points
@@ -260,7 +262,7 @@ contains
             stop 
         end if 
 
-        desc    = "Geothermal heat flux"
+        desc    = "Geothermal heat flow"
         ref     = "Maule, C. F., Purucker, M. E., Olsen, N., & Mosegaard, K.: &
                   &Heat flux anomalies in Antarctica revealed by satellite magnetic data, &
                   &Science, 309(5733), 464-467. \n &
@@ -295,8 +297,8 @@ contains
         
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -363,12 +365,13 @@ contains
         ! Define input points from global data
         
         ! Define the input filename
-        file_in = "/data/sicopolis/data/GeothermalHeatFlux/Davies2013/Davies2013_ghf_sup-0001.txt"
+        ! file_in = "/data/sicopolis/data/GeothermalHeatFlux/Davies2013/Davies2013_ghf_sup-0001.txt"
+        file_in = "data/GeothermalHeatFlux/Davies2013/Davies2013_ghf_sup-0001.txt"
         
         pname = "Davies2013"
         np = 10312  ! Number of data points
 
-        desc    = "Geothermal heat flux"
+        desc    = "Geothermal heat flow"
         ref     = "Davies, J. H.: Global map of solid Earth surface heat flow, &
                   &Geochem. Geophys. Geosys., 14, 10, doi:10.1002/ggge.20271, 2013"
 
@@ -405,8 +408,8 @@ contains
         
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -428,7 +431,7 @@ contains
 
         ! Write variable metadata
         call nc_write_attr(filename,"ghf_mean","units","mW m**-2")
-        call nc_write_attr(filename,"ghf_mean","long_name","Geothermal heat flux (mean)")
+        call nc_write_attr(filename,"ghf_mean","long_name","Geothermal heat flow (mean)")
         call nc_write_attr(filename,"ghf_mean","coordinates","lat2D lon2D")
         
         ! ## ghf_median ##
@@ -444,7 +447,7 @@ contains
 
         ! Write variable metadata
         call nc_write_attr(filename,"ghf_med","units","mW m**-2")
-        call nc_write_attr(filename,"ghf_med","long_name","Geothermal heat flux (median)")
+        call nc_write_attr(filename,"ghf_med","long_name","Geothermal heat flow (median)")
         call nc_write_attr(filename,"ghf_med","coordinates","lat2D lon2D")
         
         ! ## ghf_err ##
@@ -460,7 +463,7 @@ contains
 
         ! Write variable metadata
         call nc_write_attr(filename,"ghf_err","units","mW m**-2")
-        call nc_write_attr(filename,"ghf_err","long_name","Geothermal heat flux (error)")
+        call nc_write_attr(filename,"ghf_err","long_name","Geothermal heat flow (error)")
         call nc_write_attr(filename,"ghf_err","coordinates","lat2D lon2D")
             
         return 
@@ -507,12 +510,13 @@ contains
         ! Define input points from global data
         
         ! Define the input filename
-        file_in = "/data/sicopolis/data/GeothermalHeatFlux/Shapiro2004/hfmap.asc"
+        ! file_in = "/data/sicopolis/data/GeothermalHeatFlux/Shapiro2004/hfmap.asc"
+        file_in = "data/GeothermalHeatFlux/Shapiro2004/hfmap.asc"
         
         pname = "Shapiro2004"
         np = 65160  ! Number of data points
 
-        desc    = "Geothermal heat flux"
+        desc    = "Geothermal heat flow"
         ref     = "Shapiro, N. M. and Ritzwoller, M. H.: Inferring surface heat &
                   &flux distributions guided by a global seismic model: &
                   &particular application to Antarctica, Earth Planet. Sci. Lett., &
@@ -549,8 +553,8 @@ contains
         
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -572,7 +576,7 @@ contains
 
         ! Write variable metadata
         call nc_write_attr(filename,"ghf","units","mW m**-2")
-        call nc_write_attr(filename,"ghf","long_name","Geothermal heat flux (mean)")
+        call nc_write_attr(filename,"ghf","long_name","Geothermal heat flow (mean)")
         call nc_write_attr(filename,"ghf","coordinates","lat2D lon2D")
         
         ! ## ghf_median ##
@@ -588,11 +592,11 @@ contains
 
         ! Write variable metadata
         call nc_write_attr(filename,"ghf_sigma","units","mW m**-2")
-        call nc_write_attr(filename,"ghf_sigma","long_name","Geothermal heat flux (standard deviation)")
+        call nc_write_attr(filename,"ghf_sigma","long_name","Geothermal heat flow (standard deviation)")
         call nc_write_attr(filename,"ghf_sigma","coordinates","lat2D lon2D")
             
         return 
 
     end subroutine ghfShapiro_to_grid
 
-end module GeothermalHeatFlux 
+end module GeothermalHeatFlux
