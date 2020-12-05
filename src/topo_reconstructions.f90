@@ -417,7 +417,8 @@ contains
         integer :: q 
         
         ! Define the input filenames
-        fldr_in         = "/data/sicopolis/data/Greenland/huy3_extent/"
+        !fldr_in         = "/data/sicopolis/data/Greenland/huy3_extent/"
+        fldr_in         = "data/Greenland/huy3_extent/"
         prefix          = trim(fldr_in)//"ice_mask."
         suffix          = ".xyz"
 

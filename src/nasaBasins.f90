@@ -78,7 +78,8 @@ contains
         else if (trim(domain) .eq. "Greenland") then 
 
             ! Define the input filenames
-            file_invariant = "/data/sicopolis/data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
+            !file_invariant = "/data/sicopolis/data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
+            file_invariant = "data/Greenland/nasa_basins/GrnDrainageSystems_Ekholm.txt"
             desc = "Greenland drainage basins mapped by NASA."
             ref  = "Zwally, H. Jay, Mario B. Giovinetto, Matthew A. Beckley, &
                    &and Jack L. Saba, 2012, Antarctic and Greenland Drainage &
@@ -202,7 +203,7 @@ contains
                     
         return 
 
-    end subroutine nasaBasins_to_grid 
+    end subroutine nasaBasins_to_grid
 
     subroutine nasaBasins_to_grid_North(outfldr,grid,domain)
 
@@ -278,6 +279,6 @@ contains
                     
         return 
 
-    end subroutine nasaBasins_to_grid_North 
+    end subroutine nasaBasins_to_grid_North
 
 end module nasaBasins

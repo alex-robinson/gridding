@@ -72,7 +72,8 @@ contains
             trim(domain) .eq. "Greenland-ERA-ann") then 
 
             ! Define the input filenames
-            fldr0 = "/data/sicopolis/data/MARv3.11/Greenland/ERA_1958-2019-10km/"
+            !fldr0 = "/data/sicopolis/data/MARv3.11/Greenland/ERA_1958-2019-10km/"
+            fldr0 = "data/MARv3.11/Greenland/ERA_1958-2019-10km/"
             
             if (input_is_monthly) then
                 file_surface = trim(fldr0)//"MARv3.11-10km-monmean-ERA-10km-1961-1990.nc"

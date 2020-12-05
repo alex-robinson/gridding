@@ -66,7 +66,9 @@ contains
         if (trim(domain) .eq. "Greenland") then 
             
             ! Define the input filenames
-            fldr_input     = "/p/projects/megarun/greenrise/datasets/racmo2.3/11km/"
+            !fldr_input     = "/p/projects/megarun/greenrise/datasets/racmo2.3/11km/"
+            fldr_input     = "data/racmo2.3/11km/"
+            ! ajr: to do, make a link to the data source within the data folder
             file_topo      = trim(fldr_input)//"smb.1958-2015.BN_1958_2013.MM.nc"
             file_prefix    = "smb.1958-2015.BN_1958_2013.MM.nc"
             file_suffix    = ""
