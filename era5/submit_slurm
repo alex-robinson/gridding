@@ -8,7 +8,7 @@
 #SBATCH --mail-user=robinson@pik-potsdam.de
 #SBATCH --output=out.out
 #SBATCH --error=out.err
-#SBATCH --time=1:00:00
+#SBATCH --time=0:01:00
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
