@@ -88,9 +88,12 @@ contains
             sigma = grid%G%dx*2.d0 
 
             ! Define MAR input grid and input variable field
+            ! alpha=19.5 is just a guess, since Xavier did not say.
+            ! lon/lat values will be overwritten with actual values 
+            ! in any case. 
             call grid_init(gMAR,name="MARv3.11-10KM",mtype="stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-760.d0,dx=10.0d0,nx=144,y0=-1190.d0,dy=10.0d0,ny=268, &
-                        lambda=-40.d0,phi=70.5d0)
+                        lambda=-40.d0,phi=70.5d0,alpha=19.5d0)
 
             ! ====================================================================
             ! Read lon/lat fields directly from file to be sure projection matches 
