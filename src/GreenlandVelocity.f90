@@ -102,8 +102,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
 
         ! Write meta data 

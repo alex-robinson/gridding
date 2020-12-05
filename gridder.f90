@@ -67,7 +67,7 @@ program gridder
     ! =========================================================
 
     ! Global topography: Rtopo-2.0.1
-    ! call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
+    call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
 
     ! == Global datasets - applicable to all domains ==
 
@@ -147,20 +147,23 @@ program gridder
             ! == Greenland only datasets ==
             write(*,*) "Processing Greenland..."
 
-            ! call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
+            call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
             
-            ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
-            ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
+            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
+            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
 
-            ! call nasaBasins_to_grid(outfldr,grid,"Greenland")
+            call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
-            ! call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
+            call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
 
-            ! call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
+            call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
             
-            call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
-            
+            call MacGregor15_to_grid(outfldr,grid,"Greenland")
+
+
+            ! ==============================================
             ! Older calls (most likely deprecated)
+
 
 !             call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
 !             call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)

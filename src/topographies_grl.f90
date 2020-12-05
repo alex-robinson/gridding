@@ -143,8 +143,8 @@ contains
         
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -164,7 +164,7 @@ contains
             !     invar(:,j) = tmp(:,size(tmp,2)-j+1)
             ! end do 
             invar = tmp 
-            
+
             ! Perform conservative interpolation 
             outvar = mv 
             call map_scrip_field(mps,var_now%nm_out,invar,outvar,method=var_now%method ,missing_value=mv)

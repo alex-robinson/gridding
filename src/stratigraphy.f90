@@ -12,7 +12,7 @@ module stratigraphy
 
 contains 
 
-    subroutine MacGregor15_to_grid(outfldr,grid,domain,max_neighbors,lat_lim)
+    subroutine MacGregor15_to_grid(outfldr,grid,domain)
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
@@ -22,16 +22,16 @@ contains
         
         implicit none 
 
-        character(len=*) :: domain, outfldr 
-        type(grid_class) :: grid 
-        integer :: max_neighbors 
-        double precision :: lat_lim 
-        character(len=512) :: filename 
-        character(len=1024) :: desc, ref 
+        character(len=*), intent(IN) :: outfldr 
+        type(grid_class), intent(IN) :: grid 
+        character(len=*), intent(IN) :: domain
 
-        type(grid_class)   :: grid0
-        character(len=256) :: file_in
-        type(var_defs), allocatable :: vars(:)
+        ! Local variables 
+        character(len=256)  :: file_in
+        character(len=512)  :: filename 
+        character(len=1024) :: desc, ref 
+        type(grid_class)    :: grid0
+        type(var_defs),   allocatable :: vars(:)
         double precision, allocatable :: invar(:,:) 
 
         type(map_scrip_class)  :: mps 
@@ -97,9 +97,6 @@ contains
         ! Allocate tmp array to hold full data (that will potentially be trimmed to smaller size)
         allocate(tmp(1479,2675))
 
-        ! Initialize mapping
-        !call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
-
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
@@ -111,8 +108,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call nc_write_dim(filename,"age_iso",   x=age_iso*1e-3,units="kiloyears")
         call nc_write_dim(filename,"depth_norm",x=depth_norm,  units="1")
 
