@@ -66,16 +66,19 @@ program gridder
     !
     ! =========================================================
 
+    ! == Global datasets - applicable to all domains ==
+
     ! Global topography: Rtopo-2.0.1
     ! call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
 
-    ! == Global datasets - applicable to all domains ==
-
-    call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! Geothermal heat flow fields
+    ! call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
 
-    
+    ! ==============================================
+    ! Older calls (not tested with cdo changes yet)
+
 !     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
 !     call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
@@ -162,8 +165,8 @@ program gridder
             
             ! call MacGregor15_to_grid(outfldr,grid,"Greenland")
 
-            call ghfMartos_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-            call ghfMaule_to_grid(outfldr, grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+            ! call ghfMartos_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+            ! call ghfMaule_to_grid(outfldr, grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
             
             ! ==============================================
             ! Older calls (most likely deprecated)
