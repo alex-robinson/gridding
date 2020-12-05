@@ -53,7 +53,7 @@ c = cdsapi.Client()
 args = str(sys.argv) 
 year_now = sys.argv[1]
 
-print("year = {year}".format(year))
+print("year = {year}".format(year_now))
 
 #for year_now in years:
 
