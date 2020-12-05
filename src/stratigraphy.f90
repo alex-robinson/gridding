@@ -48,7 +48,7 @@ contains
         if (trim(domain) .eq. "Greenland") then 
             
             ! Define grid and input variable field
-            call grid_init(grid0,name="ESPG-3413-1.0KM",mtype="polar_stereographic", &
+            call grid_init(grid0,name="STRAT-M15-1KM",mtype="polar_stereographic", &
                     units="kilometers",lon180=.TRUE., &
                     x0=-632.000d0,dx=1.0d0,nx=1479,y0=-3344.000d0,dy=1.0d0,ny=2675, &
                     lambda=-45.d0,phi=70.d0,alpha=20.d0)
@@ -231,7 +231,7 @@ contains
         outvar = mv 
         call map_scrip_field(mps,"thick",invar,outvar,method="mean",missing_value=mv)
         where(outvar .eq. mv) outvar = 0.d0 
-        
+
         ! outvar = mv 
         ! call map_field(map,"thick",invar,outvar,outmask,method="radius", &
         !                radius=grid%G%dx,fill=.FALSE.,missing_value=mv)
