@@ -115,9 +115,7 @@ contains
         
         ! Generate SCRIP interpolation weights 
         call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
-
-        stop 
-
+        
         ! =============================
 
         ! Define the variables to be mapped 
