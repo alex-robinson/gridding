@@ -105,8 +105,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call nc_write_dim(filename,"time",x=0.d0,units="kiloyears",unlimited=.TRUE.)
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
@@ -232,8 +232,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call nc_write_dim(filename,"time",x=0.d0,units="kiloyears",unlimited=.TRUE.)
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
@@ -351,8 +351,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -566,8 +566,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call nc_write_dim(filename,"time", x=21.0,units="ka BP",unlimited=.TRUE.)
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
