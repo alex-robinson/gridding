@@ -226,8 +226,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -317,7 +317,7 @@ contains
         file_in          = trim(fldr_in)//"pmip3_21k_v0.nc"
 
         ! Filename of already-processed present-day topography to combine with dzs here 
-        file_in_topo     = trim(outfldr)//"/../"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
+        file_in_topo     = trim(outfldr)//"/../"//trim(grid%name)//"_TOPO-M17.nc"
 
         nx = nc_size(file_in,"lon")
         ny = nc_size(file_in,"lat")
@@ -499,7 +499,7 @@ contains
         !call nc_read(file_in,"lon",inp%lon)
         !call nc_read(file_in,"lat",inp%lat)
 
-        call grid_init(grid0,name="ext_LGM-grid",mtype="polar_stereographic",units="kilometers", &
+        call grid_init(grid0,name="ext_LGM-grid",mtype="polar_stereographic",units="km", &
                          lon180=.TRUE.,x0=-3040.d0,dx=32.d0,nx=191,y0=3040.d0,dy=-32.d0,ny=191, &
                    lambda=0.d0,phi=-90.d0,alpha=19.0d0) 
 
@@ -517,8 +517,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename)
-        call nc_write_dim(filename,"xc",   x=grid%G%x,units="kilometers")
-        call nc_write_dim(filename,"yc",   x=grid%G%y,units="kilometers")
+        call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
+        call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
