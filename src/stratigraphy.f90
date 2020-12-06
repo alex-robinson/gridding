@@ -49,7 +49,7 @@ contains
             
             ! Define grid and input variable field
             call grid_init(grid0,name="STRAT-M15-1KM",mtype="polar_stereographic", &
-                    units="kilometers",lon180=.TRUE., &
+                    units="km",lon180=.TRUE., &
                     x0=-632.000d0,dx=1.0d0,nx=1479,y0=-3344.000d0,dy=1.0d0,ny=2675, &
                     lambda=-45.d0,phi=70.d0,alpha=20.d0)
 
@@ -90,7 +90,7 @@ contains
         ! Write the original grid (for Andreas Born)
 !         call grid_write(grid,"macgregor2015_grid.nc",xnm="xc",ynm="yc",create=.TRUE.)
 !         stop 
-
+        
         ! Allocate the input grid variable
         call grid_allocate(grid0,invar)
 
