@@ -51,7 +51,7 @@ contains
         ! Define the input filenames
         fldr_in      = trim(path_in)
         file_in_tas  = trim(fldr_in)//"tas_main_Badgeley_etal_2020.nc"
-        file_in_pr  = trim(fldr_in)//"pr_main_Badgeley_etal_2020.nc"
+        file_in_pr   = trim(fldr_in)//"pr_main_Badgeley_etal_2020.nc"
 
         desc    = "Badgeley et al. 2020 simulation output"
         ref     = "source: https://arcticdata.io/catalog/view/doi:10.18739/A2599Z26M"
