@@ -75,17 +75,16 @@ program gridder
     ! call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
     ! call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
     ! ==============================================
-    ! Older calls (not tested with cdo changes yet)
-
+    ! Older calls
+            
 !     call CERES_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 !     call etopo1_to_grid(outfldr,    grid,"Global",max_neighbors=1,lat_lim=1.d0,grad_lim=0d0) !0.05d0)
-    
     
 !     call ecmwf_to_grid(outfldr,grid,sigma=30.d0,max_neighbors=1,lat_lim=2.d0)
 !     call ecmwf_to_grid(outfldr,grid,clim_range=[1981,2010])
@@ -171,8 +170,7 @@ program gridder
             ! call ghfMaule_to_grid(outfldr, grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
             
             ! ==============================================
-            ! Older calls (most likely deprecated)
-
+            ! Older calls
 
 !             call Bamber13_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)   
 !             call ghfMaule_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
@@ -180,7 +178,6 @@ program gridder
 
 !             call MacGregor15_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0)
 !             call Morlighem14_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.5d0,grad_lim=0d0) !0.05d0)
-            ! call Morlighem17_to_grid(outfldr,grid,"Greenland",max_neighbors=25,lat_lim=0.5d0,grad_lim=0d0,thin_by=15)
 
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",max_neighbors=10,lat_lim=0.5d0)
 !             call MARv35_to_grid(outfldr,grid,"Greenland-ERA",clim_range=[1981,2010])
@@ -194,13 +191,8 @@ program gridder
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",max_neighbors=10,lat_lim=0.5d0)
 !             call RACMO23grl_to_grid( outfldr, grid, "Greenland",clim_range=[1981,2010])
 
-            ! call nasaBasins_to_grid(outfldr,grid,"Greenland")
 !             call LGMsimpson_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
-                
-!             call huy3_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=1.d0)
-!             call grlvelj10_to_grid(outfldr,grid,"Greenland",max_neighbors=10,lat_lim=1.d0)
-            ! call grlvelj18_to_grid(outfldr,grid,"Greenland",max_neighbors=20,lat_lim=0.05d0)
-        
+            
 !             path = "data/Davini_GreenlandAMOC/"
 !             call davini2015_to_grid(outfldr,"Davini2015",grid,domain="control", &
 !                                     path_in=path,sigma=40.d0,max_neighbors=4,lat_lim=5.d0)
