@@ -76,14 +76,18 @@ if (TRUE) {
     #ylim = c(-4800,2000)
 
     # Zoom on Northern Greenland/Ellesmere Island
-    xlim = c(-3000,2000)
-    ylim = c(-3000,0) 
+    #xlim = c(-3000,2000)
+    #ylim = c(-3000,0) 
+
+    # Zoom on North America + Greenland
+    xlim = c(-4500,2000)
+    ylim = c(-4000,0) 
 
     if (plot_to_file) 
         myfigure("./",paste0("regions_",domain),asp=1.1,pointsize=14,type="png")
 
-    par(plt=c(0.1,0.95,0.07,0.95),xaxs="i",yaxs="i")
-    plot(xlim,ylim,type="n",ann=FALSE,axes=FALSE)
+    par(plt=c(0.1,0.95,0.1,0.95),xaxs="i",yaxs="i")
+    plot(xlim,ylim,type="n",ann=FALSE,axes=FALSE,asp=1)
     axis(1)
     axis(2)
 
@@ -131,19 +135,16 @@ if (TRUE) {
 
     poly1   = read.table(file.path(fldr,"polygon_laurentide.txt"),header=TRUE)
     coords1 = get_xy(poly1,topo)
-    polygon(coords1$x,coords1$y,border='orange1')
+    polygon(coords1$x,coords1$y,border='orange1',lwd=3)
 
-    poly2   = read.table(file.path(fldr,"polygon_ellesmere.txt"),header=TRUE)
+    poly2   = read.table(file.path(fldr,"polygon_grl_and_ellesmere.txt"),header=TRUE)
     coords2 = get_xy(poly2,topo)
-    polygon(coords2$x,coords2$y,border='darkmagenta')
+    polygon(coords2$x,coords2$y,border='white',lwd=2)
 
-    poly3   = read.table(file.path(fldr,"polygon_grl.txt"),header=TRUE)
+    poly3   = read.table(file.path(fldr,"polygon_ellesmere.txt"),header=TRUE)
     coords3 = get_xy(poly3,topo)
-    polygon(coords3$x,coords3$y,border='red')
+    polygon(coords3$x,coords3$y,border='grey80',lwd=3)
 
-    poly4   = read.table(file.path(fldr,"polygon_grl_and_ellesmere.txt"),header=TRUE)
-    coords4 = get_xy(poly4,topo)
-    polygon(coords4$x,coords4$y,border='white',lwd=1.5)
 
     # poly5   = read.table(file.path(fldr,"test.txt"),header=TRUE)
     # coords5 = get_xy(poly5,topo)
@@ -182,15 +183,15 @@ if (FALSE) {
     poly1  = get_latlon(coords,topo)
     my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_asia.txt"),scientific=TRUE,digits=4)
 
-    coords = locator(type="l")
-    poly1  = get_latlon(coords,topo)
-    my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_grl.txt"),scientific=TRUE,digits=4)
+    #coords = locator(type="l")
+    #poly1  = get_latlon(coords,topo)
+    #my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_grl.txt"),scientific=TRUE,digits=4)
 
-    coords = locator(type="l")
-    poly1  = get_latlon(coords,topo)
-    kk = rev(1:dim(poly1)[1])
-    poly1  = poly1[kk,]
-    my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_grl_extension.txt"),scientific=TRUE,digits=4)
+    #coords = locator(type="l")
+    #poly1  = get_latlon(coords,topo)
+    #kk = rev(1:dim(poly1)[1])
+    #poly1  = poly1[kk,]
+    #my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_grl_extension.txt"),scientific=TRUE,digits=4)
 
     ### Sub-domains ###
 
@@ -213,6 +214,10 @@ if (FALSE) {
     coords = locator(type="l")
     poly1  = get_latlon(coords,topo)
     my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_barents-kara.txt"),scientific=TRUE,digits=4)
+    
+    coords = locator(type="l")
+    poly1  = get_latlon(coords,topo)
+    my.write.table(poly1[,c("lon","lat")],file.path(fldr,"polygon_hudson.txt"),scientific=TRUE,digits=4)
     
 }
 
