@@ -82,7 +82,7 @@ contains
                 ! This region is a subregion of a continent. Determine
                 ! the extent of its continent. 
 
-                k = minval(abs(reg_vals - floor(reg_vals(q))),1)
+                k = minloc(abs(reg_vals - floor(reg_vals(q))),1)
                 in_continent = point_in_polygon(real(grid%x),real(grid%y),real(regs(k)%x),real(regs(k)%y))
                 
             end if 
