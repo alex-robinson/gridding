@@ -642,9 +642,10 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-M14"//trim(grad_lim_str)//".nc"
 
-            ! Define filename holding ETOPO1 data
+            ! Define filename holding RTOPO-2.0.1 data
             write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
+                              "_TOPO-RTOPO-2.0.1"//trim(grad_lim_str)//".nc"
+
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
@@ -653,10 +654,10 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(6))
-        call def_var_info(vars(1),trim(file_in),"bed",      "zb",units="m",long_name="Bedrock elevation")
-        call def_var_info(vars(2),trim(file_in),"surface",  "zs",units="m",long_name="Surface elevation")
-        call def_var_info(vars(3),trim(file_in),"thickness","H",units="m",long_name="Ice thickness")
-        call def_var_info(vars(4),trim(file_in),"errbed",   "zb_err",units="m",long_name="Bedrock / ice thickness error")
+        call def_var_info(vars(1),trim(file_in),"bed",      "z_bed",units="m",long_name="Bedrock elevation")
+        call def_var_info(vars(2),trim(file_in),"surface",  "z_srf",units="m",long_name="Surface elevation")
+        call def_var_info(vars(3),trim(file_in),"thickness","H_ice",units="m",long_name="Ice thickness")
+        call def_var_info(vars(4),trim(file_in),"errbed",   "z_bed_err",units="m",long_name="Bedrock / ice thickness error")
         call def_var_info(vars(5),trim(file_in),"mask",     "mask",units="(0 - 3)", &
                           long_name="(0 = ocean, 1 = ice-free land, 2 = grounded ice, 3 = floating ice)",method="nn")
         call def_var_info(vars(6),trim(file_in),"source",     "mask_source",units="(0 - 3)", &
@@ -703,9 +704,9 @@ contains
                 call thin(invar,tmp,by=thin_by,missing_value=mv)
             else 
                 call thin(invar,tmp,by=thin_by,missing_value=mv)
-!                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv)  ! Diffuses zs too much!!
+!                 call thin_ave(invar,tmp,by=thin_by,missing_value=mv)  ! Diffuses z_srf too much!!
             end if 
-            if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+            if (trim(var_now%nm_out) .eq. "H_ice" .or. trim(var_now%nm_out) .eq. "z_srf") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
             
@@ -714,8 +715,8 @@ contains
                            radius=grid%G%dx, &
                            sigma=grid%G%dx*0.5d0,fill=.FALSE.,missing_value=mv)
             
-            if (trim(var_now%nm_out) .eq. "zs") then
-                write(*,"(a,3f10.2)") "maxval(zs): ", maxval(outvar), maxval(invar), maxval(tmp)
+            if (trim(var_now%nm_out) .eq. "z_srf") then
+                write(*,"(a,3f10.2)") "maxval(z_srf): ", maxval(outvar), maxval(invar), maxval(tmp)
             end if 
 
             if (var_now%method .eq. "nn") then 
@@ -739,10 +740,10 @@ contains
         call grid_allocate(grid,H)
         call grid_allocate(grid,var_fill)
         
-        ! Bedrock from ETOPO-1 
+        ! Bedrock from RTOPO-2
         ! Also load etopo bedrock, use it to replace high latitude regions 
-        call nc_read(filename0,"zb",var_fill)
-        call nc_read(filename, "zb",zb,missing_value=mv)
+        call nc_read(filename0,"z_bed",var_fill)
+        call nc_read(filename, "z_bed",zb,missing_value=mv)
         where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
@@ -751,9 +752,9 @@ contains
         ! Modify variables for consistency and gradient limit 
 
         ! Re-load data
-        call nc_read(filename,"zs",zs)
-        call nc_read(filename,"zb",zb)
-        call nc_read(filename,"H",H)
+        call nc_read(filename,"z_srf",zs)
+        call nc_read(filename,"z_bed",zb)
+        call nc_read(filename,"H_ice",H)
         
         ! Eliminate problematic regions for this domain ========
         call clean_greenland(zs,zb,grid)
@@ -769,9 +770,9 @@ contains
         call clean_thickness(zs,zb,H)
 
         ! Re-write fields 
-        call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
-        call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
-        call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"z_srf",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"z_bed",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"H_ice",real(H), dim1="xc",dim2="yc",missing_value=real(mv))
 
         ! Define new masks ==========
 
@@ -1131,9 +1132,10 @@ contains
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
                               "_TOPO-B13"//trim(grad_lim_str)//".nc"
 
-            ! Define filename holding ETOPO1 data
+            ! Define filename holding RTOPO-2.0.1 data
             write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-ETOPO1"//trim(grad_lim_str)//".nc"
+                              "_TOPO-RTOPO-2.0.1"//trim(grad_lim_str)//".nc"
+            
         else
 
             write(*,*) "Domain not recognized: ",trim(domain)
@@ -1142,9 +1144,9 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(4))
-        call def_var_info(vars(1),trim(file_in),"BedrockElevation","zb",units="m",long_name="Bedrock elevation",method="nn")
-        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","zs",units="m",long_name="Surface elevation",method="nn")
-        call def_var_info(vars(3),trim(file_in),"IceThickness",     "H",units="m",long_name="Ice thickness",method="nn")
+        call def_var_info(vars(1),trim(file_in),"BedrockElevation","z_bed",units="m",long_name="Bedrock elevation",method="nn")
+        call def_var_info(vars(2),trim(file_in),"SurfaceElevation","z_srf",units="m",long_name="Surface elevation",method="nn")
+        call def_var_info(vars(3),trim(file_in),"IceThickness",    "H_ice",units="m",long_name="Ice thickness",method="nn")
         call def_var_info(vars(4),trim(file_in),"LandMask",      "mask",units="(0 - 4)", &
                           long_name="Land mask",method="nn")
 
@@ -1191,7 +1193,7 @@ contains
                 invar = tmp 
             end if 
 
-            if (trim(var_now%nm_out) .eq. "H" .or. trim(var_now%nm_out) .eq. "zs") then 
+            if (trim(var_now%nm_out) .eq. "H_ice" .or. trim(var_now%nm_out) .eq. "z_srf") then 
                 where( invar .eq. mv ) invar = 0.d0 
             end if
 
@@ -1270,20 +1272,20 @@ contains
         call grid_allocate(grid,H)
         call grid_allocate(grid,var_fill)
         
-        ! Bedrock from ETOPO-1
-        ! Also load etopo bedrock, use it to replace high latitude regions
-        call nc_read(filename0,"zb",var_fill)
-        call nc_read(filename, "zb",zb,missing_value=mv)
-        call nc_read(filename, "zs",zs)  
+        ! Bedrock from RTOPO-2
+        ! Also load RTOPO-2 bedrock, use it to replace high latitude regions
+        call nc_read(filename0,"z_bed",var_fill)
+        call nc_read(filename, "z_bed",zb,missing_value=mv)
+        call nc_read(filename, "z_srf",zs)  
         where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
 
         ! Re-load data
-        call nc_read(filename,"zs",zs)
-        call nc_read(filename,"zb",zb)
-        call nc_read(filename,"H",H)
+        call nc_read(filename,"z_srf",zs)
+        call nc_read(filename,"z_bed",zb)
+        call nc_read(filename,"H_ice",H)
         
         ! Fill in fjords from second zb and zs fields
         where (zb_neg .lt. 0.d0 .and. zb_neg .ne. mv) zb = zb_neg 
@@ -1303,9 +1305,9 @@ contains
         call clean_thickness(zs,zb,H)
 
         ! Re-write fields 
-        call nc_write(filename,"zs",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
-        call nc_write(filename,"zb",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
-        call nc_write(filename,"H", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"z_srf",real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"z_bed",real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
+        call nc_write(filename,"H_ice", real(H), dim1="xc",dim2="yc",missing_value=real(mv))
 
         ! Define new masks ==========
 
