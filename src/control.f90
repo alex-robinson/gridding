@@ -350,7 +350,7 @@ contains
 
         return 
 
-    end subroutine timer_step 
+    end subroutine timer_step
 
     subroutine timer_print(timer,units,label)
 

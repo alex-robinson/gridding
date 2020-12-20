@@ -98,6 +98,37 @@ contains
         return
     end function read_vector
 
+    function read_as_vector(filename,n,col,skip) result(var)
+        ! Read data from an ascii file by row, 
+        ! with 'col' columns as one long vector 
+
+        implicit none 
+
+        character(len=*) :: filename 
+        integer :: n, col, skip 
+        real(8) :: var(n), tmp(50)
+        character(len=10) :: tmpc
+        integer :: i, k1, k2  
+
+        open(16,file=trim(filename),status="old")
+        do i = 1, skip
+            read(16,*) tmpc 
+        end do 
+
+        k1 = 0 
+        k2 = 0 
+        do i = 1, n 
+            read(16,*) tmp(1:col)
+            k1 = k2+1
+            k2 = k2+col 
+            var(k1:k2) = tmp(1:col)
+        end do 
+
+        close(16)
+
+        return
+    end function read_as_vector
+
     ! Extract a thinner version of an input array
     ! (new array should be a multiple of input array)
     subroutine thin(var1,var,by,missing_value)

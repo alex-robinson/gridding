@@ -318,6 +318,8 @@ contains
         double precision, allocatable :: tmp(:,:) 
         double precision, allocatable :: invar(:,:) 
 
+        double precision, allocatable :: tmp_vec(:)
+
         type(map_scrip_class)  :: mps 
         type(var_defs) :: var_now 
         real(8), allocatable :: outvar(:,:)
@@ -350,7 +352,7 @@ contains
             ! == Original dx=5km resolution ==file_in = "/data/sicopolis/data/Greenland/Morlighem2017_BedMachine/BedMachineGreenland-2017-09-20-resampledx3.nc"
             call grid_init(grid0,name="B01-5KM",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
-                            x0=-652.925d0,dx=5d0,nx=301,y0=-3384.425d0,dy=5d0,ny=561, &
+                            x0=-800d0,dx=5d0,nx=301,y0=-3400d0,dy=5d0,ny=561, &
                             lambda=-39.d0,phi=71.d0)
 
             ! Define the input filenames
@@ -394,14 +396,28 @@ contains
         call nc_create(filename00)
         call nc_write_dim(filename00,"xc",   x=grid%G%x,units="km")
         call nc_write_dim(filename00,"yc",   x=grid%G%y,units="km")
-        call grid_write(grid,filename00,xnm="xc",ynm="yc",create=.FALSE.)
+        call grid_write(grid0,filename00,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
         call nc_write_attr(filename00,"Description",desc)
         call nc_write_attr(filename00,"Reference",ref)
 
+        call grid_allocate(grid0,invar)
+        allocate(tmp_vec(grid0%npts))
 
+        ! Read data from file and write to netcdf 
+        file_in = trim(fldr_in)//"dem5k/bamber dem 5km lon.txt"
+        tmp_vec = read_as_vector(file_in,n=grid0%npts,col=4,skip=0)
 
+        invar = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
+
+        call nc_write(filename00,"lon_orig",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+        ! Write variable metadata
+        call nc_write_attr(filename00,"lon_orig","units","m")
+        call nc_write_attr(filename00,"lon_orig","long_name","Original longitude")
+        call nc_write_attr(filename00,"lon_orig","coordinates","lat2D lon2D")
+            
         stop 
 
 
