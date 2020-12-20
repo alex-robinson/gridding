@@ -394,8 +394,8 @@ contains
 
         ! Initialize the output file
         call nc_create(filename00)
-        call nc_write_dim(filename00,"xc",   x=grid%G%x,units="km")
-        call nc_write_dim(filename00,"yc",   x=grid%G%y,units="km")
+        call nc_write_dim(filename00,"xc",   x=grid0%G%x,units="km")
+        call nc_write_dim(filename00,"yc",   x=grid0%G%y,units="km")
         call grid_write(grid0,filename00,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
