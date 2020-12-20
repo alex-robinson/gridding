@@ -406,6 +406,7 @@ contains
         call grid_allocate(grid0,invar)
         allocate(tmp_vec(grid0%npts))
 
+        ! ==== LONGITUDE ====
         ! Read data from file and write to netcdf 
         file_in = trim(fldr_in)//"dem5k/bamber dem 5km lon.txt"
         tmp_vec = read_as_vector(file_in,n=grid0%npts,col=4,skip=0)
@@ -421,7 +422,42 @@ contains
         call nc_write_attr(filename00,"lon_orig","units","m")
         call nc_write_attr(filename00,"lon_orig","long_name","Original longitude")
         call nc_write_attr(filename00,"lon_orig","coordinates","lat2D lon2D")
+        
+        ! ==== LATITUDE ====
+        ! Read data from file and write to netcdf 
+        file_in = trim(fldr_in)//"dem5k/bamber dem 5km lat.txt"
+        tmp_vec = read_as_vector(file_in,n=grid0%npts,col=4,skip=0)
+
+        tmp = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
+        ! Reverse y-axis
+        do j = 1, size(tmp,2)
+            invar(:,j) = tmp(:,size(tmp,2)-j+1)
+        end do 
+        call nc_write(filename00,"lat_orig",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
             
+        ! Write variable metadata
+        call nc_write_attr(filename00,"lat_orig","units","m")
+        call nc_write_attr(filename00,"lat_orig","long_name","Original longitude")
+        call nc_write_attr(filename00,"lat_orig","coordinates","lat2D lon2D")
+        
+        ! ==== bed ====
+        ! Read data from file and write to netcdf 
+        file_in = trim(fldr_in)//"dem5k/bed_5km_corrected.txt"
+        tmp_vec = read_as_vector(file_in,n=grid0%npts,col=10,skip=0)
+
+        tmp = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
+        ! ! Reverse y-axis
+        ! do j = 1, size(tmp,2)
+        !     invar(:,j) = tmp(:,size(tmp,2)-j+1)
+        ! end do 
+        invar = tmp 
+        call nc_write(filename00,"bed",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+        ! Write variable metadata
+        call nc_write_attr(filename00,"bed","units","m")
+        call nc_write_attr(filename00,"bed","long_name","Original longitude")
+        call nc_write_attr(filename00,"bed","coordinates","lat2D lon2D")
+        
         stop 
 
 
