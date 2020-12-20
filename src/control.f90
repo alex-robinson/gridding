@@ -169,10 +169,10 @@ contains
 !                         lon180=.TRUE.,x0=-720.d0,dx=40.0d0,nx=43,y0=-3450.d0,dy=40.0d0,ny=73, &
 !                         lambda=-45.d0,phi=70.d0)
             
-!             case("GRL-20KM")
-!                 call grid_init(grid,name="GRL-20KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=-720.d0,dx=20.0d0,nx=85,y0=-3450.d0,dy=20.0d0,ny=145, &
-!                         lambda=-45.d0,phi=70.d0)
+            case("GRL-20KM")
+                call grid_init(grid,name="GRL-20KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=20.0d0,nx=85,y0=-3450.d0,dy=20.0d0,ny=145, &
+                        lambda=-45.d0,phi=70.d0)
             
 !             case("GRL-10KM")
 !                 call grid_init(grid,name="GRL-10KM",mtype="polar_stereographic",units="kilometers", &

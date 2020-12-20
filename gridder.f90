@@ -45,8 +45,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Laurentide"
-    grid_name = "LIS-32KM"
+    domain    = "Greenland"
+    grid_name = "GRL-20KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -59,6 +59,8 @@ program gridder
 
     ! Write a regional mask 
     call write_regions(outfldr,grid,domain)
+    
+    call Bamber01_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
     stop 
 
     ! =========================================================
