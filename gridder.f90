@@ -57,12 +57,15 @@ program gridder
 
     call domain_definition(grid,grid_name)  
 
+    ! call Bamber01_orig_to_netcdf() 
+    call Bamber01_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
+
+    stop 
+    
     ! Write a regional mask 
     call write_regions(outfldr,grid,domain)
     
-    call Bamber01_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
-    stop 
-
+    
     ! =========================================================
     !
     ! DATASET TO GRID CALCULATIONS

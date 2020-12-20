@@ -14,6 +14,7 @@ module topographies_grl
 
     private 
     public :: Morlighem17_to_grid_cdo
+    public :: Bamber01_orig_to_netcdf
     public :: Bamber01_to_grid_cdo
     public :: Morlighem17_to_grid 
     public :: Morlighem14_to_grid 
@@ -292,97 +293,46 @@ contains
 
     end subroutine Morlighem17_to_grid_cdo
     
-    subroutine Bamber01_to_grid_cdo(outfldr,grid,domain,grad_lim)
-        ! Convert the variables to the desired grid format and write to file
-        ! =========================================================
-        !
-        !       TOPO DATA
-        !       http://sites.uci.edu/morlighem/dataproducts/bedmachine-greenland/
-        !       https://daacdata.apps.nsidc.org/pub/DATASETS/IDBMG4_BedMachineGr/
-        ! =========================================================
-        
+    subroutine Bamber01_orig_to_netcdf()
+        ! Write original 5km Bamber et al (2001)
+        ! Greenland DEM from ascii files to netcdf.
+
         implicit none 
 
-        character(len=*), intent(IN) :: domain
-        character(len=*), intent(IN) :: outfldr 
-        type(grid_class), intent(IN) :: grid 
-        real(8),          intent(IN) :: grad_lim   
-
         ! Local variables 
-        character(len=512) :: filename 
-        character(len=1024) :: desc, ref 
-
         type(grid_class)   :: grid0
-        character(len=512) :: fldr_in, file_in
+        
+        character(len=512) :: fldr_in, file_in, filename00
         type(var_defs), allocatable :: vars(:)
         double precision, allocatable :: tmp(:,:) 
         double precision, allocatable :: invar(:,:) 
-
         double precision, allocatable :: tmp_vec(:)
+        character(len=1024) :: desc, ref 
+        integer :: i, j 
 
-        type(map_scrip_class)  :: mps 
-        type(var_defs) :: var_now 
-        real(8), allocatable :: outvar(:,:)
-        integer, allocatable :: outmask(:,:)
-        integer :: q, k, m, i, l, n_var, j 
-        character(len=128) :: method, grad_lim_str  
-        integer :: status, ncid 
+        fldr_in = "data/Greenland/Bamber2001/"
 
-        character(len=512) :: filename00
+        ! == Original dx=5km resolution ==
+        call grid_init(grid0,name="B01-5KM",mtype="polar_stereographic", &
+                        units="kilometers",lon180=.TRUE., &
+                        x0=-800d0,dx=5d0,nx=301,y0=-3400d0,dy=5d0,ny=561, &
+                        lambda=-39.d0,phi=71.d0)
 
-        double precision, allocatable :: var_fill(:,:)
-        double precision, allocatable :: zs(:,:), zb(:,:), H(:,:), zb_sd(:,:) 
-        character(len=512) :: filename0 
-        double precision :: sigma 
-
-        grad_lim_str = "" 
-        if (grad_lim .gt. 0.09d0) then 
-            write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
-        else if (grad_lim .gt. 0.d0) then 
-            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
-        end if 
-        
-        ! Define input grid
-        if (trim(domain) .eq. "Greenland") then 
-            
-            fldr_in = "data/Greenland/Bamber2001/"
-
-            ! Define grid and input variable field 
-            
-            ! == Original dx=5km resolution ==file_in = "/data/sicopolis/data/Greenland/Morlighem2017_BedMachine/BedMachineGreenland-2017-09-20-resampledx3.nc"
-            call grid_init(grid0,name="B01-5KM",mtype="polar_stereographic", &
-                            units="kilometers",lon180=.TRUE., &
-                            x0=-800d0,dx=5d0,nx=301,y0=-3400d0,dy=5d0,ny=561, &
-                            lambda=-39.d0,phi=71.d0)
-
-            ! Define the input filenames
-            desc    = "Bamber, J. 2001. Greenland 5 km DEM, Ice Thickness, &
-                      &and Bedrock Elevation Grids, Version 1. &
-                      &Downloaded from: &
-                      &https://doi.org/10.5067/01A10Z9BM7KP"
-            ref     = "Bamber, J., R. L. Layberry, and S. P. Gogenini. 2001. &
-                      &A new ice thickness and bed data set for the Greenland &
-                      &ice sheet 1: Measurement, data reduction, and errors., &
-                      &Journal of Geophysical Research. 106. 33,773-33,780. &
-                      &doi:10.1029/2001JD900054. &
-                      &Layberry, R. L. and J. Bamber. 2001. A New Ice Thickness &
-                      &and Bed Data Set for the Greenland Ice Sheet: 2. &
-                      &Relationship between Dynamics and Basal Topography, &
-                      &Journal of Geophysical Research. 106. 33,781 - 33,788. &
-                      &doi:10.1029/2001JD900053."
-
-            ! Define the output filename 
-            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-B01"//trim(grad_lim_str)//".nc"
-
-            ! Define filename holding RTOPO-2.0.1 data
-            write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-RTOPO-2.0.1"//".nc"
-        else
-
-            write(*,*) "Domain not recognized: ",trim(domain)
-            stop 
-        end if 
+        ! Define the input filenames
+        desc    = "Bamber, J. 2001. Greenland 5 km DEM, Ice Thickness, &
+                  &and Bedrock Elevation Grids, Version 1. &
+                  &Downloaded from: &
+                  &https://doi.org/10.5067/01A10Z9BM7KP"
+        ref     = "Bamber, J., R. L. Layberry, and S. P. Gogenini. 2001. &
+                  &A new ice thickness and bed data set for the Greenland &
+                  &ice sheet 1: Measurement, data reduction, and errors., &
+                  &Journal of Geophysical Research. 106. 33,773-33,780. &
+                  &doi:10.1029/2001JD900054. &
+                  &Layberry, R. L. and J. Bamber. 2001. A New Ice Thickness &
+                  &and Bed Data Set for the Greenland Ice Sheet: 2. &
+                  &Relationship between Dynamics and Basal Topography, &
+                  &Journal of Geophysical Research. 106. 33,781 - 33,788. &
+                  &doi:10.1029/2001JD900053."
 
         ! ==== STEP 0 =================
 
@@ -445,28 +395,141 @@ contains
         file_in = trim(fldr_in)//"bed_5km_corrected.txt"
         tmp_vec = read_as_vector(file_in,n=grid0%npts,col=grid0%G%nx,skip=0)
 
-        tmp = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
-        ! ! Reverse y-axis
-        ! do j = 1, size(tmp,2)
-        !     invar(:,j) = tmp(:,size(tmp,2)-j+1)
-        ! end do 
-        invar = tmp 
+        invar = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
         call nc_write(filename00,"bed",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
             
         ! Write variable metadata
         call nc_write_attr(filename00,"bed","units","m")
-        call nc_write_attr(filename00,"bed","long_name","Original longitude")
+        call nc_write_attr(filename00,"bed","long_name","Bedrock elevation")
         call nc_write_attr(filename00,"bed","coordinates","lat2D lon2D")
         
-        stop 
+        ! ==== surface ====
+        ! Read data from file and write to netcdf 
+        file_in = trim(fldr_in)//"surface_5km_corrected.txt"
+        tmp_vec = read_as_vector(file_in,n=grid0%npts,col=grid0%G%nx,skip=0)
 
+        invar = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny]) 
+        call nc_write(filename00,"surface",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+        ! Write variable metadata
+        call nc_write_attr(filename00,"surface","units","m")
+        call nc_write_attr(filename00,"surface","long_name","Surface elevation")
+        call nc_write_attr(filename00,"surface","coordinates","lat2D lon2D")
+        
+        ! ==== thick ====
+        ! Read data from file and write to netcdf 
+        file_in = trim(fldr_in)//"thick_5km_corrected.txt"
+        tmp_vec = read_as_vector(file_in,n=grid0%npts,col=grid0%G%nx,skip=0)
+
+        invar = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny]) 
+        call nc_write(filename00,"thick",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
+            
+        ! Write variable metadata
+        call nc_write_attr(filename00,"thick","units","m")
+        call nc_write_attr(filename00,"thick","long_name","Ice thickness")
+        call nc_write_attr(filename00,"thick","coordinates","lat2D lon2D")
+        
+        return 
+
+    end subroutine Bamber01_orig_to_netcdf
+
+    subroutine Bamber01_to_grid_cdo(outfldr,grid,domain,grad_lim)
+        ! Convert the variables to the desired grid format and write to file
+        ! =========================================================
+        !
+        !       TOPO DATA
+        !       http://sites.uci.edu/morlighem/dataproducts/bedmachine-greenland/
+        !       https://daacdata.apps.nsidc.org/pub/DATASETS/IDBMG4_BedMachineGr/
+        ! =========================================================
+        
+        implicit none 
+
+        character(len=*), intent(IN) :: domain
+        character(len=*), intent(IN) :: outfldr 
+        type(grid_class), intent(IN) :: grid 
+        real(8),          intent(IN) :: grad_lim   
+
+        ! Local variables 
+        character(len=512) :: filename 
+        character(len=1024) :: desc, ref 
+
+        type(grid_class)   :: grid0
+        character(len=512) :: fldr_in, file_in
+        type(var_defs), allocatable :: vars(:)
+        double precision, allocatable :: tmp(:,:) 
+        double precision, allocatable :: invar(:,:) 
+
+        type(map_scrip_class)  :: mps 
+        type(var_defs) :: var_now 
+        real(8), allocatable :: outvar(:,:)
+        integer, allocatable :: outmask(:,:)
+        integer :: q, k, m, i, l, n_var, j 
+        character(len=128) :: method, grad_lim_str  
+        integer :: status, ncid 
+
+        character(len=512) :: filename00
+
+        double precision, allocatable :: var_fill(:,:)
+        double precision, allocatable :: zs(:,:), zb(:,:), H(:,:), zb_sd(:,:) 
+        character(len=512) :: filename0 
+        double precision :: sigma 
+
+        grad_lim_str = "" 
+        if (grad_lim .gt. 0.09d0) then 
+            write(grad_lim_str,"(a,f3.1)") "_gl", grad_lim 
+        else if (grad_lim .gt. 0.d0) then 
+            write(grad_lim_str,"(a,f4.2)") "_gl", grad_lim 
+        end if 
+        
+        ! Define input grid
+        if (trim(domain) .eq. "Greenland") then 
+            
+            fldr_in = "data/Greenland/Bamber2001/"
+            file_in = trim(fldr_in)//"Bamber2001_Greenland_5km_dem.nc"
+
+            ! Define grid and input variable field 
+            
+            ! == Original dx=5km resolution ==file_in = "/data/sicopolis/data/Greenland/Morlighem2017_BedMachine/BedMachineGreenland-2017-09-20-resampledx3.nc"
+            call grid_init(grid0,name="B01-5KM",mtype="polar_stereographic", &
+                            units="kilometers",lon180=.TRUE., &
+                            x0=-800d0,dx=5d0,nx=301,y0=-3400d0,dy=5d0,ny=561, &
+                            lambda=-39.d0,phi=71.d0)
+
+            ! Define the input filenames
+            desc    = "Bamber, J. 2001. Greenland 5 km DEM, Ice Thickness, &
+                      &and Bedrock Elevation Grids, Version 1. &
+                      &Downloaded from: &
+                      &https://doi.org/10.5067/01A10Z9BM7KP"
+            ref     = "Bamber, J., R. L. Layberry, and S. P. Gogenini. 2001. &
+                      &A new ice thickness and bed data set for the Greenland &
+                      &ice sheet 1: Measurement, data reduction, and errors., &
+                      &Journal of Geophysical Research. 106. 33,773-33,780. &
+                      &doi:10.1029/2001JD900054. &
+                      &Layberry, R. L. and J. Bamber. 2001. A New Ice Thickness &
+                      &and Bed Data Set for the Greenland Ice Sheet: 2. &
+                      &Relationship between Dynamics and Basal Topography, &
+                      &Journal of Geophysical Research. 106. 33,781 - 33,788. &
+                      &doi:10.1029/2001JD900053."
+
+            ! Define the output filename 
+            write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO-B01"//trim(grad_lim_str)//".nc"
+
+            ! Define filename holding RTOPO-2.0.1 data
+            write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
+                              "_TOPO-RTOPO-2.0.1"//".nc"
+        else
+
+            write(*,*) "Domain not recognized: ",trim(domain)
+            stop 
+        end if 
 
         ! ==== MAPPING INFORMATION ====
 
         ! Define input grid in grid description file
         ! Note: file already exists, and is better, generated by 
         ! cdo and accounts for reversed y-axis. 
-        !call grid_write_cdo_desc_short(grid0,fldr="maps") 
+        call grid_write_cdo_desc_short(grid0,fldr="maps") 
         
         ! Define output grid in grid description file 
         call grid_write_cdo_desc_short(grid,fldr="maps") 
@@ -478,9 +541,9 @@ contains
 
         ! Define the variables to be mapped 
         allocate(vars(3))
-        call def_var_info(vars(1),trim(file_in),"z_bed",    "z_bed",units="m",long_name="Bedrock elevation",method="mean")
-        call def_var_info(vars(2),trim(file_in),"z_srf",    "z_srf",units="m",long_name="Surface elevation",method="mean")
-        call def_var_info(vars(3),trim(file_in),"H_ice",    "H_ice",units="m",long_name="Ice thickness",    method="mean")
+        call def_var_info(vars(1),trim(file_in),"bed",    "z_bed",units="m",long_name="Bedrock elevation",method="mean")
+        call def_var_info(vars(2),trim(file_in),"surface","z_srf",units="m",long_name="Surface elevation",method="mean")
+        call def_var_info(vars(3),trim(file_in),"thick",  "H_ice",units="m",long_name="Ice thickness",    method="mean")
 
         ! Allocate the input grid variables
         call grid_allocate(grid0,tmp)
@@ -504,36 +567,20 @@ contains
         do i = 1, size(vars)
             var_now = vars(i) 
 
-            call nc_read(trim(var_now%filename),var_now%nm_in,tmp,missing_value=mv)
-            
-            ! Note: not necessary if grid_M17-450m.txt was generated
-            ! by cdo directly.
-            ! ! Reverse y-axis
-            ! do j = 1, size(tmp,2)
-            !     invar(:,j) = tmp(:,size(tmp,2)-j+1)
-            ! end do 
-            invar = tmp 
+            ! Read in input data
+            call nc_read(trim(var_now%filename),var_now%nm_in,invar,missing_value=mv)
 
+            ! Make sure missing values are not interpolated 
+            where (invar .eq. 0.0d0 .or. invar .eq. -0.1d0) invar = mv 
+            
             ! Perform conservative interpolation 
             outvar = mv 
             call map_scrip_field(mps,var_now%nm_out,invar,outvar,method=var_now%method ,missing_value=mv)
 
-            
-            ! Note: do not fill in missing values here, except for masks, since they 
-            ! will be populated with  rtopo2 data afterwards (see further below) 
-            if (trim(var_now%method) .eq. "count") then 
-                call fill_nearest(outvar,missing_value=mv)
-            else if (trim(var_now%nm_out) .eq. "z_bed_err") then 
-                where(outvar .eq. mv) outvar = 0.0 
-            end if 
-
             write(*,"(a,3f10.2)") trim(var_now%nm_out)//": ", maxval(outvar), maxval(invar)
 
-            if (trim(method) .eq. "count") then 
-                call nc_write(filename,var_now%nm_out,nint(outvar),dim1="xc",dim2="yc",missing_value=int(mv))
-            else
-                call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
-            end if 
+            ! Write output data 
+            call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
             
             ! Write variable metadata
             call nc_write_attr(filename,var_now%nm_out,"units",var_now%units_out)
@@ -541,7 +588,7 @@ contains
             call nc_write_attr(filename,var_now%nm_out,"coordinates","lat2D lon2D")
             
             ! For bedrock elevation, additionally calculate the standard deviation of the field 
-            if (.TRUE. .and. trim(var_now%nm_out) .eq. "z_bed") then 
+            if (.FALSE. .and. trim(var_now%nm_out) .eq. "z_bed") then 
 
                 ! invar  == high resolution field 
                 ! outvar == destination field 
@@ -549,6 +596,7 @@ contains
                 outvar = mv 
                 call map_scrip_field(mps,"z_bed_sd",invar,outvar,method="stdev",missing_value=mv)
 
+                ! Write output data 
                 call nc_write(filename,"z_bed_sd",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
                 
                 ! Write variable metadata
@@ -561,52 +609,61 @@ contains
 
         end do 
 
-
         ! === Update specific variables from other information ===
 
         call grid_allocate(grid,zs)
         call grid_allocate(grid,zb)
         call grid_allocate(grid,H)
-        call grid_allocate(grid,zb_sd)
+        !call grid_allocate(grid,zb_sd)
         call grid_allocate(grid,var_fill)
         
+        ! Read in fields 
+        call nc_read(filename, "z_bed",zb,missing_value=mv)
+        call nc_read(filename, "z_srf",zs,missing_value=mv)
+        call nc_read(filename, "H_ice",H,missing_value=mv)
+        !call nc_read(filename, "z_bed_sd",zb_sd,missing_value=mv)
+        
+        ! Set missing values to bed where z_srf==0 (to fill in with rtopo)
+        where(zs .le. 0.0d0) zs = mv 
+        where(zs .eq. mv)    zb = mv 
+        where(zs .eq. mv)    H  = mv 
+
         ! Fill missing data with rtopo2 
 
         ! rtopo2 bedrock
         call nc_read(filename0,"z_bed",var_fill,missing_value=mv)
-        call nc_read(filename, "z_bed",zb,missing_value=mv)
         where(zb .eq. mv) zb = var_fill 
         var_now = vars(1)
         call nc_write(filename,var_now%nm_out,real(zb),dim1="xc",dim2="yc",missing_value=real(mv))
         
         ! rtopo2 surface
         call nc_read(filename0,"z_srf",var_fill,missing_value=mv)
-        call nc_read(filename, "z_srf",zs,missing_value=mv)
         where(zs .eq. mv) zs = var_fill 
         var_now = vars(2)
         call nc_write(filename,var_now%nm_out,real(zs),dim1="xc",dim2="yc",missing_value=real(mv))
     
         ! rtopo2 ice thickness 
         call nc_read(filename0,"H_ice",var_fill,missing_value=mv)
-        call nc_read(filename, "H_ice",H,missing_value=mv)
         where(H .eq. mv) H = var_fill 
         var_now = vars(3)
         call nc_write(filename,var_now%nm_out,real(H),dim1="xc",dim2="yc",missing_value=real(mv))
                 
         ! rtopo2 bedrock sd
-        call nc_read(filename0,"z_bed_sd",var_fill,missing_value=mv)
-        call nc_read(filename, "z_bed_sd",zb_sd,missing_value=mv)
-        where(zb_sd .eq. mv) zb_sd = var_fill 
-        var_now = vars(1)
-        call nc_write(filename,"z_bed_sd",real(zb_sd),dim1="xc",dim2="yc",missing_value=real(mv))
-        
+        if (.FALSE.) then 
+            ! ajr: for now, since z_bed_sd has not been calculated for rtopo2 at 20km yet
+            call nc_read(filename0,"z_bed_sd",var_fill,missing_value=mv)
+            where(zb_sd .eq. mv) zb_sd = var_fill 
+            var_now = vars(1)
+            call nc_write(filename,"z_bed_sd",real(zb_sd),dim1="xc",dim2="yc",missing_value=real(mv))
+        end if 
+
         ! Modify variables for consistency
 
         ! Re-load data
         call nc_read(filename,"z_srf",zs)
         call nc_read(filename,"z_bed",zb)
         call nc_read(filename,"H_ice",H)
-        
+
         ! Apply gradient limit as needed
         if (grad_lim .gt. 0.d0) then 
             ! Limit the gradient (m/m) to below threshold 
