@@ -402,6 +402,7 @@ contains
         call nc_write_attr(filename00,"Description",desc)
         call nc_write_attr(filename00,"Reference",ref)
 
+        call grid_allocate(grid0,tmp)
         call grid_allocate(grid0,invar)
         allocate(tmp_vec(grid0%npts))
 
@@ -409,8 +410,11 @@ contains
         file_in = trim(fldr_in)//"dem5k/bamber dem 5km lon.txt"
         tmp_vec = read_as_vector(file_in,n=grid0%npts,col=4,skip=0)
 
-        invar = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
-
+        tmp = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
+        ! Reverse y-axis
+        do j = 1, size(tmp,2)
+            invar(:,j) = tmp(:,size(tmp,2)-j+1)
+        end do 
         call nc_write(filename00,"lon_orig",real(invar),dim1="xc",dim2="yc",missing_value=real(mv))
             
         ! Write variable metadata
