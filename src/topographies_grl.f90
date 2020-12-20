@@ -442,7 +442,7 @@ contains
         
         ! ==== bed ====
         ! Read data from file and write to netcdf 
-        file_in = trim(fldr_in)//"dem5k/bed_5km_corrected.txt"
+        file_in = trim(fldr_in)//"bed_5km_corrected.txt"
         tmp_vec = read_as_vector(file_in,n=grid0%npts,col=10,skip=0)
 
         tmp = reshape(tmp_vec,[grid0%G%nx,grid0%G%ny])
