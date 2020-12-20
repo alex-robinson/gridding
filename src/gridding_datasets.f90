@@ -118,10 +118,9 @@ contains
         k1 = 0 
         k2 = 0 
         do i = 1, 10000000 
-            read(16,*) tmp(1:col)
             k1 = k2+1
-            k2 = k2+col 
-            var(k1:k2) = tmp(1:col)
+            k2 = min(k2+col,n)
+            read(16,*) var(k1:k2)
             if (k2 .eq. n) exit 
         end do 
 
