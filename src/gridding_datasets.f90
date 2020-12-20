@@ -117,16 +117,18 @@ contains
 
         k1 = 0 
         k2 = 0 
-        do i = 1, n 
+        do i = 1, 10000000 
             read(16,*) tmp(1:col)
             k1 = k2+1
             k2 = k2+col 
             var(k1:k2) = tmp(1:col)
+            if (k2 .eq. n) exit 
         end do 
 
         close(16)
 
         return
+
     end function read_as_vector
 
     ! Extract a thinner version of an input array
