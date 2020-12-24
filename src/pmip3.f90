@@ -141,7 +141,7 @@ contains
 
         return 
 
-    end subroutine pmip3_info 
+    end subroutine pmip3_info
 
 
     subroutine pmip3_to_grid(outfldr,grid,domain,model,experiment,path_in,sigma,max_neighbors,lat_lim)

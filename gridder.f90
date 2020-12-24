@@ -172,7 +172,7 @@ program gridder
 
 
             call ghfMartos_to_grid(outfldr,grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
-            ! call ghfMaule_to_grid(outfldr, grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
+            call ghfMaule_to_grid(outfldr, grid,"Greenland",max_neighbors=4,lat_lim=2.d0)
             
             ! ==============================================
             ! Older calls
