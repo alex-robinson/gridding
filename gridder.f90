@@ -58,7 +58,7 @@ program gridder
     call domain_definition(grid,grid_name)  
 
     ! Write a regional mask 
-    call write_regions(outfldr,grid,domain)
+    ! call write_regions(outfldr,grid,domain)
     
     
     ! =========================================================
@@ -70,16 +70,16 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
     ! Global topography: Rtopo-2.0.1
-    call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
+    ! call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
 
     ! Geothermal heat flow fields
     ! call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    ! call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
     ! ==============================================
     ! Older calls
@@ -154,10 +154,10 @@ program gridder
             ! == Greenland only datasets ==
             write(*,*) "Processing Greenland..."
 
-            call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
+            ! call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
             
-            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
-            call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
+            ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
+            ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)
 
             call nasaBasins_to_grid(outfldr,grid,"Greenland")
 
