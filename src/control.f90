@@ -41,33 +41,6 @@ contains
 
             ! NORTH DOMAINS ======================= 
 
-!             case("NH-40KM")
-!                 call grid_init(grid,name="NH-40KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=-4900.d0,dx=40.0d0,nx=221,y0=-5400.d0,dy=40.0d0,ny=221, &
-!                         lambda=-45.d0,phi=70.d0)
-! !                 call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
-! !                                lon180=.TRUE.,dx=40.d0,nx=225,dy=40.d0,ny=211, &
-! !                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-! !                 call grid_init(grid,name="NH-40KM",mtype="stereographic",units="kilometers", &
-! !                                lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
-! !                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
-
-!             case("NH-20KM")
-!                 call grid_init(grid,name="NH-20KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=-4900.d0,dx=20.0d0,nx=441,y0=-5400.d0,dy=20.0d0,ny=441, &
-!                         lambda=-45.d0,phi=70.d0)
-            
-!             case("NH-10KM")
-!                 call grid_init(grid,name="NH-10KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=-4900.d0,dx=10.0d0,nx=881,y0=-5400.d0,dy=10.0d0,ny=881, &
-!                         lambda=-45.d0,phi=70.d0)
-            
-!             case("NH-5KM")
-!                 call grid_init(grid,name="NH-5KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=-4900.d0,dx=5.0d0,nx=1761,y0=-5400.d0,dy=5.0d0,ny=1761, &
-!                         lambda=-45.d0,phi=70.d0)
-            
-
             case("NH-32KM")
                 call grid_init(grid,name="NH-32KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-4900.d0,dx=32.0d0,nx=276,y0=-5400.d0,dy=32.0d0,ny=276, &
@@ -89,26 +62,6 @@ contains
                         lambda=-45.d0,phi=70.d0)
 
             ! EURASIA DOMAINS ======================= 
-
-!             case("EIS-40KM")
-!                 call grid_init(grid,name="EIS-40KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=380.d0,dx=40.0d0,nx=89,y0=-5000.d0,dy=40.0d0,ny=161, &
-!                         lambda=-45.d0,phi=70.d0)
-            
-!             case("EIS-20KM")
-!                 call grid_init(grid,name="EIS-20KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=380.d0,dx=20.0d0,nx=177,y0=-5000.d0,dy=20.0d0,ny=321, &
-!                         lambda=-45.d0,phi=70.d0)
-            
-!             case("EIS-10KM")
-!                 call grid_init(grid,name="EIS-10KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=380.d0,dx=10.0d0,nx=353,y0=-5000.d0,dy=10.0d0,ny=641, &
-!                         lambda=-45.d0,phi=70.d0)
-            
-!             case("EIS-5KM")
-!                 call grid_init(grid,name="EIS-5KM",mtype="polar_stereographic",units="kilometers", &
-!                         lon180=.TRUE.,x0=380.d0,dx=5.0d0,nx=705,y0=-5000.d0,dy=5.0d0,ny=1281, &
-!                         lambda=-45.d0,phi=70.d0)
             
             case("EIS-32KM")
                 call grid_init(grid,name="EIS-32KM",mtype="polar_stereographic",units="kilometers", &
