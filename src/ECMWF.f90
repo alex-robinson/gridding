@@ -276,6 +276,7 @@ contains
                 
             end do  
 
+if (.FALSE.) then 
 
             ! ## PRESSURE FIELDS ##
             do l = 1, size(files_pres)   ! Loop over pressure layers
@@ -333,6 +334,8 @@ contains
                 end do 
 
             end do 
+
+end if 
 
         end if 
 
@@ -398,6 +401,7 @@ contains
                 
             end do 
 
+if (.FALSE.) then 
             do l = 1, size(files_pres)   ! Loop over pressure layers
 
                 ! ## Make one file for each pressure level ##
@@ -444,6 +448,8 @@ contains
                 end do 
 
             end do 
+
+end if 
 
         end if 
 
