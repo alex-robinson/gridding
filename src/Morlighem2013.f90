@@ -213,7 +213,7 @@ contains
         do k = 1, nz 
 
             ! Load data for this layer (from given column in ascii file)
-            inp%var = read_vector(file_input,np,col=nz-k+1,skip=0)
+            inp%var = read_vector(file_input,np,col=k,skip=0)
 
             ! ## MAP FIELD ##
             outvar = mv 
@@ -247,7 +247,7 @@ contains
         do k = 1, nz 
 
             ! Load data for this layer (from given column in ascii file)
-            inp%var = read_vector(file_input,np,col=nz-k+1,skip=0)
+            inp%var = read_vector(file_input,np,col=k,skip=0)
 
             ! ## MAP FIELD ##
             outvar = mv 
