@@ -63,6 +63,9 @@ $(objdir)/grisli_g40.o: $(srcdir)/grisli_g40.f90
 $(objdir)/MAR.o: $(srcdir)/MAR.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/Morlighem2013.o: $(srcdir)/Morlighem2013.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
 $(objdir)/nasaBasins.o: $(srcdir)/nasaBasins.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
@@ -112,6 +115,7 @@ obj_datasets =     $(objdir)/control.o \
 									 $(objdir)/GreenlandVelocity.o \
 									 $(objdir)/grisli_g40.o \
 									 $(objdir)/MAR.o \
+									 $(objdir)/Morlighem2013.o \
 									 $(objdir)/nasaBasins.o \
 									 $(objdir)/RACMO2.o \
 									 $(objdir)/Rignot13_BasalMelt.o \
