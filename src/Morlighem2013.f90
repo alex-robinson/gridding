@@ -43,7 +43,7 @@ contains
         end type 
 
         type(points_vector_type) :: inp
-        integer :: i, np 
+        integer :: i, np, k, nz 
         character(len=256) :: vnm_now 
         character(len=256) :: units_now 
         character(len=256) :: long_name_now 
@@ -113,10 +113,14 @@ contains
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)    
         
+        ! Define number of vertical layers 
+        nz = 14 
+
         ! Initialize the output file
         call nc_create(filename)
         call nc_write_dim(filename,"xc",   x=grid%G%x,units="km")
         call nc_write_dim(filename,"yc",   x=grid%G%y,units="km")
+        call nc_write_dim(filename,"zeta", x=0.d0,dx=1.d0/dble(nz-1),nx=nz,units="1")
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         ! Write meta data 
@@ -197,7 +201,75 @@ contains
         call nc_write_attr(filename,vnm_now,"units",trim(units_now))
         call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
         call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
-         
+        
+        ! === 3D velocity, ux (14 layers) ===
+
+        vnm_now       = "ux"
+        units_now     = "m/yr"
+        long_name_now = "Velocity, x-direction"
+        
+        file_input = "/data/sicopolis/data/Antarctica/Morlighem2013/Morlighem2013_vx.txt"
+        
+        do k = 1, nz 
+
+            ! Load data for this layer (from given column in ascii file)
+            inp%var = read_vector(file_input,np,col=nz-k+1,skip=0)
+
+            ! ## MAP FIELD ##
+            outvar = mv 
+            call map_field(map,vnm_now,inp%var,outvar,outmask,"nn",fill=.FALSE.,sigma=grid%G%dx,missing_value=mv)
+
+            write(*,*) "Range invar:  ",minval(inp%var,inp%var.ne.mv), maxval(inp%var,inp%var.ne.mv)
+            write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv),   maxval(outvar,outvar.ne.mv)
+            
+            ! Fill any missing values
+            !call fill_weighted(outvar,missing_value=missing_value)
+        
+            ! Write field to output file 
+            call nc_write(filename,vnm_now,real(outvar),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
+
+        end do 
+
+        ! Write variable metadata
+        call nc_write_attr(filename,vnm_now,"units",trim(units_now))
+        call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
+        call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+        
+        ! === 3D velocity, ux (14 layers) ===
+
+        vnm_now       = "uy"
+        units_now     = "m/yr"
+        long_name_now = "Velocity, y-direction"
+        
+        file_input = "/data/sicopolis/data/Antarctica/Morlighem2013/Morlighem2013_vy.txt"
+        
+        do k = 1, nz 
+
+            ! Load data for this layer (from given column in ascii file)
+            inp%var = read_vector(file_input,np,col=nz-k+1,skip=0)
+
+            ! ## MAP FIELD ##
+            outvar = mv 
+            call map_field(map,vnm_now,inp%var,outvar,outmask,"nn",fill=.FALSE.,sigma=grid%G%dx,missing_value=mv)
+
+            write(*,*) "Range invar:  ",minval(inp%var,inp%var.ne.mv), maxval(inp%var,inp%var.ne.mv)
+            write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv),   maxval(outvar,outvar.ne.mv)
+            
+            ! Fill any missing values
+            !call fill_weighted(outvar,missing_value=missing_value)
+        
+            ! Write field to output file 
+            call nc_write(filename,vnm_now,real(outvar),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
+
+        end do 
+
+        ! Write variable metadata
+        call nc_write_attr(filename,vnm_now,"units",trim(units_now))
+        call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
+        call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+        
         return 
 
     end subroutine morlighem2013_taub_to_grid
