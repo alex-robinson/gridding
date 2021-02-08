@@ -38,13 +38,16 @@ contains
         type(points_class) :: pts0 
 
         type points_vector_type 
-            double precision, allocatable :: lon(:), lat(:)
+            double precision, allocatable :: lon(:), lat(:), var(:)
             double precision, allocatable :: taub(:), taud(:), f_vbvs(:)
         end type 
 
         type(points_vector_type) :: inp
         integer :: i, np 
-
+        character(len=256) :: vnm_now 
+        character(len=256) :: units_now 
+        character(len=256) :: long_name_now 
+        
         type(map_class)  :: map 
 
         double precision, allocatable :: outvar(:,:)
@@ -55,6 +58,12 @@ contains
             stop 
         end if 
 
+        ! ============================================================================
+        !
+        ! Input data 
+        !
+        ! ============================================================================
+        
         ! Define the input data information
         file_input = "/data/sicopolis/data/Antarctica/Morlighem2013/Morlighem2013_data.txt"
         desc = "Antarctic basal stress inversion."
@@ -65,7 +74,8 @@ contains
         ! Number of data points 
         np = 32933
 
-        allocate(inp%lon(np),inp%lat(np),inp%taub(np),inp%taud(np),inp%f_vbvs(np))
+        allocate(inp%lon(np),inp%lat(np),inp%var(np))
+        allocate(inp%taub(np),inp%taud(np),inp%f_vbvs(np))
 
         ! File format: lat, lon, basin 
         open(2,file=trim(file_input),status="old")
@@ -73,6 +83,9 @@ contains
             read(2,*) inp%lat(i), inp%lon(i), inp%taub(i), inp%taud(i), inp%f_vbvs(i) 
         end do 
         close(2)
+
+        ! Convert f_vbvs to fraction 
+        inp%f_vbvs = inp%f_vbvs/100.d0 
 
         write(*,*) "lon:    ", minval(inp%lon),    maxval(inp%lon)
         write(*,*) "lat:    ", minval(inp%lat),    maxval(inp%lat)
@@ -83,6 +96,16 @@ contains
         ! Define input points for mapping
         call points_init(pts0,name="M13-taub",mtype="latlon",units="degrees",x=inp%lon,y=inp%lat,lon180=.TRUE.)
         
+
+        ! ============================================================================
+        !
+        ! Output data 
+        !
+        ! ============================================================================
+        
+        ! Define the output filename 
+        write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TAUB-M13.nc"
+
         ! Initialize mapping
         call map_init(map,pts0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
@@ -100,7 +123,81 @@ contains
         call nc_write_attr(filename,"Description",desc)
         call nc_write_attr(filename,"Reference",ref)
 
+        ! === tau_b ===
 
+        inp%var       = inp%taub 
+        vnm_now       = "tau_b"
+        units_now     = "kPa"
+        long_name_now = "Basal shear stress"
+        
+        ! ## MAP FIELD ##
+        outvar = mv 
+        call map_field(map,vnm_now,inp%var,outvar,outmask,"nn",fill=.FALSE.,sigma=grid%G%dx,missing_value=mv)
+
+        write(*,*) "Range invar:  ",minval(inp%var,inp%var.ne.mv), maxval(inp%var,inp%var.ne.mv)
+        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv),   maxval(outvar,outvar.ne.mv)
+        
+        ! Fill any missing values
+        !call fill_weighted(outvar,missing_value=missing_value)
+    
+        ! Write field to output file 
+        call nc_write(filename,vnm_now,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,vnm_now,"units",trim(units_now))
+        call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
+        call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+        
+        ! === tau_d ===
+
+        inp%var       = inp%taud 
+        vnm_now       = "tau_d"
+        units_now     = "kPa"
+        long_name_now = "Driving stress"
+        
+        ! ## MAP FIELD ##
+        outvar = mv 
+        call map_field(map,vnm_now,inp%var,outvar,outmask,"nn",fill=.FALSE.,sigma=grid%G%dx,missing_value=mv)
+
+        write(*,*) "Range invar:  ",minval(inp%var,inp%var.ne.mv), maxval(inp%var,inp%var.ne.mv)
+        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv),   maxval(outvar,outvar.ne.mv)
+        
+        ! Fill any missing values
+        !call fill_weighted(outvar,missing_value=missing_value)
+    
+        ! Write field to output file 
+        call nc_write(filename,vnm_now,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,vnm_now,"units",trim(units_now))
+        call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
+        call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+        
+        ! === f_vbvs ===
+
+        inp%var       = inp%f_vbvs 
+        vnm_now       = "f_vbvs"
+        units_now     = "1"
+        long_name_now = "Basal-to-surface velocity ratio"
+        
+        ! ## MAP FIELD ##
+        outvar = mv 
+        call map_field(map,vnm_now,inp%var,outvar,outmask,"nn",fill=.FALSE.,sigma=grid%G%dx,missing_value=mv)
+
+        write(*,*) "Range invar:  ",minval(inp%var,inp%var.ne.mv), maxval(inp%var,inp%var.ne.mv)
+        write(*,*) "Range outvar: ",minval(outvar,outvar.ne.mv),   maxval(outvar,outvar.ne.mv)
+        
+        ! Fill any missing values
+        !call fill_weighted(outvar,missing_value=missing_value)
+    
+        ! Write field to output file 
+        call nc_write(filename,vnm_now,real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        ! Write variable metadata
+        call nc_write_attr(filename,vnm_now,"units",trim(units_now))
+        call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
+        call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+         
         return 
 
     end subroutine morlighem2013_taub_to_grid
