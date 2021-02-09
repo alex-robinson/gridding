@@ -298,14 +298,16 @@ contains
                 uy = mv 
             end where 
 
-            where(ux .ne. mv .and. uy .ne. mv)
-                outvar = sqrt(ux**2 + uy**2)
-            end where 
-            
             call nc_write(filename,"ux",real(ux),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
                             start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
             call nc_write(filename,"uy",real(uy),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
                             start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
+            
+            outvar = mv 
+            where(ux .ne. mv .and. uy .ne. mv)
+                outvar = sqrt(ux**2 + uy**2)
+            end where 
+            
             call nc_write(filename,"uxy",real(outvar),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
                             start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
 
