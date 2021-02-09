@@ -32,7 +32,7 @@ contains
 
 
         ! Local variables 
-        character(len=512) :: filename, file_input  
+        character(len=512)  :: filename, file_input  
         character(len=1024) :: desc, ref 
 
         type(points_class) :: pts0 
@@ -52,6 +52,12 @@ contains
 
         double precision, allocatable :: outvar(:,:)
         integer, allocatable          :: outmask(:,:)
+        
+        ! === extra ===
+        character(len=512) :: filename_topo
+        double precision, allocatable :: ux(:,:) 
+        double precision, allocatable :: uy(:,:) 
+        double precision, allocatable :: H_ice(:,:) 
 
         if (trim(domain) .ne. "Antarctica") then 
             write(*,*) "Error: Morlighem 2013 dataset is only valid for domain=Antarctica."
@@ -269,6 +275,57 @@ contains
         call nc_write_attr(filename,vnm_now,"units",trim(units_now))
         call nc_write_attr(filename,vnm_now,"long_name",trim(long_name_now))
         call nc_write_attr(filename,vnm_now,"coordinates","lat2D lon2D")
+        
+        ! === EXTRA ========
+        ! Perform data cleanup and calculate extra variables using topo data 
+
+        call grid_allocate(grid,ux)  
+        call grid_allocate(grid,uy)  
+        call grid_allocate(grid,H_ice)    
+        
+        ! Define the output filename 
+        write(filename_topo,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
+
+        call nc_read(filename_topo,"H_ice",H_ice)
+        
+        do k = 1, nz
+
+            call nc_read(filename,"ux",ux,start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=mv)
+            call nc_read(filename,"uy",uy,start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=mv)
+            
+            where(H_ice .eq. 0.0) 
+                ux = 0.0 
+                uy = 0.0 
+            end where 
+
+            outvar = sqrt(ux**2 + uy**2)
+
+            call nc_write(filename,"ux",real(ux),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
+            call nc_write(filename,"uy",real(uy),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
+            call nc_write(filename,"uxy",real(outvar),dim1="xc",dim2="yc",dim3="zeta",missing_value=real(mv), &
+                            start=[1,1,k],count=[grid%G%nx,grid%G%nx,1])
+
+        end do 
+
+        call nc_read(filename,"tau_b",outvar,missing_value=mv)
+        where(outvar .lt. 0.0 .or. H_ice .eq. 0.0) 
+            outvar = mv 
+        end where 
+        call nc_write(filename,"tau_b",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+
+        call nc_read(filename,"tau_d",outvar,missing_value=mv)
+        where(outvar .lt. 0.0 .or. H_ice .eq. 0.0) 
+            outvar = mv 
+        end where 
+        call nc_write(filename,"tau_d",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
+        
+        call nc_read(filename,"f_vbvs",outvar,missing_value=mv)
+        where(outvar .lt. 0.0 .or. H_ice .eq. 0.0) 
+            outvar = mv 
+        end where 
+        call nc_write(filename,"f_vbvs",real(outvar),dim1="xc",dim2="yc",missing_value=real(mv))
         
         return 
 
