@@ -293,9 +293,9 @@ contains
             call nc_read(filename,"ux",ux,start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=mv)
             call nc_read(filename,"uy",uy,start=[1,1,k],count=[grid%G%nx,grid%G%ny,1],missing_value=mv)
             
-            where(H_ice .eq. 0.0) 
-                ux = 0.0 
-                uy = 0.0 
+            where(H_ice .eq. 0.0 .or. abs(ux) .gt. 5e3 .or. abs(uy) .gt. 5e3) 
+                ux = mv 
+                uy = mv 
             end where 
 
             outvar = sqrt(ux**2 + uy**2)
