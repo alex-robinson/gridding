@@ -32,13 +32,23 @@ print(vars)
 
 c = cdsapi.Client()
 
-for year_now in years:
+# Do not loop over years. Instead this script will be called 
+# once per each year, to get request started on CDS server. 
+args = str(sys.argv) 
+year_now = sys.argv[1]
+download_rhum = False
 
-    year_now_str = [str(year_now)]
+print("year = {year}".format(year=year_now))
 
-    # Define output filename for this year
-    filename_download = "{fldr}/era5_{name}_{year}.nc".format(fldr=fldr,name=name,year=year_now)
-    filename_download_rhum = "{fldr}/era5_{name}_rhum_{year}.nc".format(fldr=fldr,name=name,year=year_now)
+# for year_now in years:
+
+year_now_str = [str(year_now)]
+
+# Define output filename for this year
+filename_download = "{fldr}/era5_{name}_{year}.nc".format(fldr=fldr,name=name,year=year_now)
+filename_download_rhum = "{fldr}/era5_{name}_rhum_{year}.nc".format(fldr=fldr,name=name,year=year_now)
+
+if not download_rhum:
 
     # Single pressure-level variables
     c.retrieve(
@@ -58,6 +68,8 @@ for year_now in years:
             'year': year_now_str,
         },
         filename_download)
+
+else:
 
     # Relative humidity at 1000 hPa pressure level
     c.retrieve(
