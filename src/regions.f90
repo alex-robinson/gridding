@@ -164,6 +164,7 @@ contains
 
         character(len=512)   :: filename 
         real(4), allocatable :: mask(:,:) 
+        real(4), allocatable :: mask2(:,:) 
 
         ! Define the output filename 
         write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)//"_REGIONS.nc"
@@ -181,7 +182,13 @@ contains
                 
 !             case("Greenland")
 !                 mask = get_region_map_greenland(grid)
-
+            
+            case("Global") 
+                mask  = get_region_map_north(grid)
+                mask2 = get_region_map_south(grid)
+                
+                where(mask .eq. 0.0) mask = mask2 
+                
             case DEFAULT 
                 write(*,*) "regions:: error: domain not recognized: "//trim(domain)
                 write(*,*) "Setting all values of regions to zero."

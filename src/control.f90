@@ -254,6 +254,10 @@ contains
                 call grid_init(grid,name="NH-40KM-B18",mtype="stereographic",units="kilometers", &
                                lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
                                lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+
+            case("latlon-05deg")     ! For Banderas et al (2018) paper
+                call grid_init(grid,name="latlon-05deg",mtype="latlon",units="degrees",lon180=.TRUE., &
+                               x0=-179.75d0,dx=0.5d0,nx=720,y0=-89.75d0,dy=0.5d0,ny=180)
             
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)

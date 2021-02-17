@@ -46,8 +46,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "North"
-    grid_name = "NH-40KM-B18"
+    domain    = "Global"
+    grid_name = "latlon-05deg"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================

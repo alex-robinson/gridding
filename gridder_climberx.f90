@@ -53,9 +53,17 @@ program gridder
     path = "/Users/robinson/models/climber-x/output/bench_v098/preind"
     call climberx_to_grid(outfldr,grid,expname="preind",infldr=path,sigma=sigma1)
 
-    ! Default LGM simulation 
+    ! Default LGM simulation (shallower, weaker amoc)
     path = "/Users/robinson/models/climber-x/output/bench_v098/lgm"
     call climberx_to_grid(outfldr,grid,expname="lgm-default",infldr=path,sigma=sigma1)
+
+    ! LGM simulation (strong amoc)
+    path = "/Users/robinson/models/climber-x/output/bench_v098/lgm_amoc03_5070"
+    call climberx_to_grid(outfldr,grid,expname="lgm-strong",infldr=path,sigma=sigma1)
+
+    ! LGM simulation (amoc killed)
+    path = "/Users/robinson/models/climber-x/output/bench_v098/lgm_amoc02fw"
+    call climberx_to_grid(outfldr,grid,expname="lgm-off",infldr=path,sigma=sigma1)
 
     write(*,*)
     write(*,*) "Regridding program finished."
