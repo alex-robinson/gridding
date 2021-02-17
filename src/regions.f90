@@ -162,6 +162,8 @@ contains
         type(grid_class), intent(IN) :: grid 
         character(len=*), intent(IN) :: domain 
 
+        ! Local variables
+        integer :: ny 
         character(len=512)   :: filename 
         real(4), allocatable :: mask(:,:) 
         real(4), allocatable :: mask2(:,:) 
@@ -187,8 +189,9 @@ contains
                 mask  = get_region_map_north(grid)
                 mask2 = get_region_map_south(grid)
                 
-                where(mask .eq. 0.0) mask = mask2 
-                
+                ny = size(mask,2)
+                mask(:,1:ny/2) = mask2(:,1:ny/2) 
+
             case DEFAULT 
                 write(*,*) "regions:: error: domain not recognized: "//trim(domain)
                 write(*,*) "Setting all values of regions to zero."
