@@ -250,7 +250,11 @@ contains
                        lon180=.TRUE.,x0=-3040.d0,dx=2.d0,nx=3041,y0=-3040.d0,dy=2.d0,ny=3041, &
                        lambda=0.d0,phi=-71.d0)
                         
-
+            case("NH-40KM-B18")     ! For Banderas et al (2018) paper
+                call grid_init(grid,name="NH-40KM-B18",mtype="stereographic",units="kilometers", &
+                               lon180=.TRUE.,dx=40.d0,nx=224,dy=40.d0,ny=208, &
+                               lambda=-53.d0,phi=78.d0,alpha=32.7d0)
+            
             case DEFAULT
                 write(*,*) "domain_definition:: error: grid name not recognized: "//trim(grid_name)
                 stop 

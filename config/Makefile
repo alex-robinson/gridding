@@ -60,10 +60,16 @@ gridder_help: $(gridder_libs) $(obj_datasets)
 	@echo "    gridder_help.x is ready."
 	@echo " "
 
-gridder_climber: $(gridder_libs) $(obj_datasets_climber) 
-	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_climber.x $^ gridder_climber.f90 $(LFLAGS)
+gridder_climber3a: $(gridder_libs) $(obj_datasets_climber) 
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_climber3a.x $^ gridder_climber3a.f90 $(LFLAGS)
 	@echo " "
-	@echo "    gridder_climber.x is ready."
+	@echo "    gridder_climber3a.x is ready."
+	@echo " "
+
+gridder_climberx: $(gridder_libs) $(obj_datasets_climberx) 
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_climberx.x $^ gridder_climberx.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_climberx.x is ready."
 	@echo " "
 
 gridder_pmip3: $(gridder_libs) $(obj_datasets_pmip3) 
