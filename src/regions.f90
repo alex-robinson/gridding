@@ -210,7 +210,7 @@ contains
 
         return 
 
-    end subroutine write_regions 
+    end subroutine write_regions
 
 end module regions
 

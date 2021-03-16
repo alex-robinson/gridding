@@ -90,6 +90,12 @@ gridder_buizert: $(gridder_libs) $(obj_datasets)
 	@echo "    gridder_buizert.x is ready."
 	@echo " "
 
+gridder_banderas: $(gridder_libs) $(obj_datasets_banderas)
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_banderas.x $^ gridder_banderas.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_banderas.x is ready."
+	@echo " "
+
 gencdogrid: $(gridder_libs) $(objdir)/control.o
 	$(FC) $(DFLAGS) $(FFLAGS) -o gencdogrid.x $^ gencdogrid.f90 $(LFLAGS)
 	@echo " "

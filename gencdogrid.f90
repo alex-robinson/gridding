@@ -14,120 +14,173 @@ program gencdogrid
     integer :: nx, ny 
     real(4), allocatable :: lon2D(:,:) 
     real(4), allocatable :: lat2D(:,:) 
-    
+    real(4), allocatable :: lon(:) 
+    real(4), allocatable :: lat(:) 
+    logical :: is_projection 
+
     character(len=512) :: filename_in, filename_out
 
-    filename_in  = "ice_data/Greenland/GRL-32KM/GRL-32KM_REGIONS.nc"
-    filename_out = "ice_data/Greenland/GRL-32KM/GRL-32KM_cdodesc.txt"
+    !filename_in  = "ice_data/Greenland/GRL-32KM/GRL-32KM_REGIONS.nc"
+    !filename_out = "ice_data/Greenland/GRL-32KM/GRL-32KM_cdodesc.txt"
 
-    nx = nc_size(filename_in,"xc")
-    ny = nc_size(filename_in,"yc")
+    filename_in  = "/Users/robinson/GoogleDriveUCM/wrk/mypapers/pmip-mis3/wrk/latlon-05deg_REGIONS.nc"
+    filename_out = "/Users/robinson/GoogleDriveUCM/wrk/mypapers/pmip-mis3/wrk/grid_latlon-05deg.txt"
+
+    is_projection = .TRUE. 
+
+    if (is_projection) then 
+
+        nx = nc_size(filename_in,"xc")
+        ny = nc_size(filename_in,"yc")
     
-    allocate(lon2D(nx,ny))
-    allocate(lat2D(nx,ny))
+        allocate(lon2D(nx,ny))
+        allocate(lat2D(nx,ny))
     
-    call nc_read(filename_in,"lon2D",lon2D)
-    call nc_read(filename_in,"lat2D",lat2D)
+        call nc_read(filename_in,"lon2D",lon2D)
+        call nc_read(filename_in,"lat2D",lat2D)
     
+    else 
+        ! latlon grid 
+
+        nx = nc_size(filename_in,"lon")
+        ny = nc_size(filename_in,"lat")
+    
+        allocate(lon2D(nx,ny))
+        allocate(lat2D(nx,ny))
+        allocate(lon(nx),lat(ny))
+
+        call nc_read(filename_in,"lon",lon)
+        call nc_read(filename_in,"lat",lat)
+    
+        call gen_latlon2D(lon2D,lat2D,lon,lat)
+
+    end if 
+
     call write_cdo_gridfile(lon2D,lat2D,filename_out)
 
     write(*,*) "Grid description file written: "//trim(filename_out)
 
 contains 
+    
+    subroutine write_cdo_gridfile(lon2D,lat2D,filename)
 
+        implicit none 
 
-subroutine write_cdo_gridfile(lon2D,lat2D,filename)
+        real(4), intent(IN) :: lon2D(:,:) 
+        real(4), intent(IN) :: lat2D(:,:) 
+        character(len=*), intent(IN) :: filename 
 
-    implicit none 
+        ! Local variables 
+        integer :: i, j, nx, ny 
+        integer :: im1, jm1, ip1, jp1 
+        integer :: fnum
+        real(4) :: bnds(4) 
 
-    real(4), intent(IN) :: lon2D(:,:) 
-    real(4), intent(IN) :: lat2D(:,:) 
-    character(len=*), intent(IN) :: filename 
+        fnum = 98 
 
-    ! Local variables 
-    integer :: i, j, nx, ny 
-    integer :: im1, jm1, ip1, jp1 
-    integer :: fnum
-    real(4) :: bnds(4) 
+        nx = size(lon2D,1)
+        ny = size(lon2D,2)
 
-    fnum = 98 
+        open(fnum,file=filename,status='unknown',action='write')
 
-    nx = size(lon2D,1)
-    ny = size(lon2D,2)
+        write(fnum,"(a)")     "gridtype = curvilinear"
+        write(fnum,"(a,i10)") "gridsize = ", nx*ny 
+        write(fnum,"(a,i10)") "xsize    = ", nx
+        write(fnum,"(a,i10)") "ysize    = ", ny
 
-    open(fnum,file=filename,status='unknown',action='write')
+        ! x values 
+        write(fnum,*) ""
+        write(fnum,"(a)") "# Longitudes"
+        write(fnum,"(a)") "xvals = "
+        do j = 1, ny 
+            write(fnum,"(50000f10.3)") lon2D(:,j)
+        end do 
 
-    write(fnum,"(a)")     "gridtype = curvilinear"
-    write(fnum,"(a,i10)") "gridsize = ", nx*ny 
-    write(fnum,"(a,i10)") "xsize    = ", nx
-    write(fnum,"(a,i10)") "ysize    = ", ny
+        write(fnum,*) ""
+        write(fnum,"(a)") "# Longitudes of cell corners"
+        write(fnum,"(a)") "xbounds = "
+        do j = 1, ny 
+        do i = 1, nx 
 
-    ! x values 
-    write(fnum,*) ""
-    write(fnum,"(a)") "# Longitudes"
-    write(fnum,"(a)") "xvals = "
-    do j = 1, ny 
-        write(fnum,"(50000f10.3)") lon2D(:,j)
-    end do 
+            im1 = max(1,i-1)
+            jm1 = max(1,j-1)
+            ip1 = min(nx,i+1)
+            jp1 = min(ny,j+1)
 
-    write(fnum,*) ""
-    write(fnum,"(a)") "# Longitudes of cell corners"
-    write(fnum,"(a)") "xbounds = "
-    do j = 1, ny 
-    do i = 1, nx 
+            ! Determine bounds (lower-right, upper-right, upper-left, lower-left)
+            ! ie, get ab-nodes from aa-nodes
+            bnds(1) = 0.25*(lon2D(i,j)+lon2D(ip1,j)+lon2D(i,jm1)+lon2D(ip1,jm1))
+            bnds(2) = 0.25*(lon2D(i,j)+lon2D(ip1,j)+lon2D(i,jp1)+lon2D(ip1,jp1))
+            bnds(3) = 0.25*(lon2D(i,j)+lon2D(im1,j)+lon2D(i,jp1)+lon2D(im1,jp1))
+            bnds(4) = 0.25*(lon2D(i,j)+lon2D(im1,j)+lon2D(i,jm1)+lon2D(im1,jm1))
+            
+            write(fnum,"(4f10.3)") bnds 
 
-        im1 = max(1,i-1)
-        jm1 = max(1,j-1)
-        ip1 = min(nx,i+1)
-        jp1 = min(ny,j+1)
+        end do 
+        end do 
 
-        ! Determine bounds (lower-right, upper-right, upper-left, lower-left)
-        ! ie, get ab-nodes from aa-nodes
-        bnds(1) = 0.25*(lon2D(i,j)+lon2D(ip1,j)+lon2D(i,jm1)+lon2D(ip1,jm1))
-        bnds(2) = 0.25*(lon2D(i,j)+lon2D(ip1,j)+lon2D(i,jp1)+lon2D(ip1,jp1))
-        bnds(3) = 0.25*(lon2D(i,j)+lon2D(im1,j)+lon2D(i,jp1)+lon2D(im1,jp1))
-        bnds(4) = 0.25*(lon2D(i,j)+lon2D(im1,j)+lon2D(i,jm1)+lon2D(im1,jm1))
-        
-        write(fnum,"(4f10.3)") bnds 
+        ! y values 
+        write(fnum,*) ""
+        write(fnum,"(a)") "# Latitudes"
+        write(fnum,"(a)") "yvals = "
+        do j = 1, ny 
+            write(fnum,"(50000f10.3)") lat2D(:,j)
+        end do 
 
-    end do 
-    end do 
+        write(fnum,*) ""
+        write(fnum,"(a)") "# Latitudes of cell corners"
+        write(fnum,"(a)") "ybounds = "
+        do j = 1, ny 
+        do i = 1, nx 
 
-    ! y values 
-    write(fnum,*) ""
-    write(fnum,"(a)") "# Latitudes"
-    write(fnum,"(a)") "yvals = "
-    do j = 1, ny 
-        write(fnum,"(50000f10.3)") lat2D(:,j)
-    end do 
+            im1 = max(1,i-1)
+            jm1 = max(1,j-1)
+            ip1 = min(nx,i+1)
+            jp1 = min(ny,j+1)
 
-    write(fnum,*) ""
-    write(fnum,"(a)") "# Latitudes of cell corners"
-    write(fnum,"(a)") "ybounds = "
-    do j = 1, ny 
-    do i = 1, nx 
+            ! Determine bounds (lower-right, upper-right, upper-left, lower-left)
+            ! ie, get ab-nodes from aa-nodes
+            bnds(1) = 0.25*(lat2D(i,j)+lat2D(ip1,j)+lat2D(i,jm1)+lat2D(ip1,jm1))
+            bnds(2) = 0.25*(lat2D(i,j)+lat2D(ip1,j)+lat2D(i,jp1)+lat2D(ip1,jp1))
+            bnds(3) = 0.25*(lat2D(i,j)+lat2D(im1,j)+lat2D(i,jp1)+lat2D(im1,jp1))
+            bnds(4) = 0.25*(lat2D(i,j)+lat2D(im1,j)+lat2D(i,jm1)+lat2D(im1,jm1))
+            
+            write(fnum,"(4f10.3)") bnds 
 
-        im1 = max(1,i-1)
-        jm1 = max(1,j-1)
-        ip1 = min(nx,i+1)
-        jp1 = min(ny,j+1)
+        end do 
+        end do 
 
-        ! Determine bounds (lower-right, upper-right, upper-left, lower-left)
-        ! ie, get ab-nodes from aa-nodes
-        bnds(1) = 0.25*(lat2D(i,j)+lat2D(ip1,j)+lat2D(i,jm1)+lat2D(ip1,jm1))
-        bnds(2) = 0.25*(lat2D(i,j)+lat2D(ip1,j)+lat2D(i,jp1)+lat2D(ip1,jp1))
-        bnds(3) = 0.25*(lat2D(i,j)+lat2D(im1,j)+lat2D(i,jp1)+lat2D(im1,jp1))
-        bnds(4) = 0.25*(lat2D(i,j)+lat2D(im1,j)+lat2D(i,jm1)+lat2D(im1,jm1))
-        
-        write(fnum,"(4f10.3)") bnds 
+        close(fnum)
 
-    end do 
-    end do 
+        return 
 
-    close(fnum)
+    end subroutine write_cdo_gridfile
 
-    return 
+    subroutine gen_latlon2D(lon2D,lat2D,lon,lat)
 
-end subroutine write_cdo_gridfile
+        implicit none 
+
+        real(4), intent(OUT) :: lon2D(:,:) 
+        real(4), intent(OUT) :: lat2D(:,:) 
+        real(4), intent(IN)  :: lon(:) 
+        real(4), intent(IN)  :: lat(:) 
+
+        ! Local variables 
+        integer :: i, j, nx, ny 
+
+        nx = size(lon,1)
+        ny = size(lat,1)
+
+        do j = 1, ny 
+            lon2D(:,j) = lon 
+        end do 
+
+        do i = 1, nx 
+            lat2D(i,:) = lat 
+        end do 
+
+        return 
+
+    end subroutine gen_latlon2D
 
 end program gencdogrid

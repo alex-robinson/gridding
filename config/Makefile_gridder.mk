@@ -24,6 +24,9 @@ $(objdir)/AN1CRUST.o: $(srcdir)/AN1CRUST.f90
 $(objdir)/AntarcticaVelocity.o: $(srcdir)/AntarcticaVelocity.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/banderas2018.o: $(srcdir)/banderas2018.f90
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
 $(objdir)/badgeley2020.o: $(srcdir)/badgeley2020.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
@@ -143,5 +146,9 @@ obj_datasets_climberx = $(objdir)/control.o \
 obj_datasets_pmip3 = $(objdir)/control.o \
 									 $(objdir)/gridding_datasets.o \
 									 $(objdir)/pmip3.o
+
+obj_datasets_banderas = $(objdir)/control.o \
+									 $(objdir)/gridding_datasets.o \
+									 $(objdir)/banderas2018.o
 
 gridder_libs = $(objdir)/ncio.o $(objdir)/nml.o

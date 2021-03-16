@@ -46,8 +46,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Global"
-    grid_name = "latlon-05deg"
+    domain    = "Laurentide"
+    grid_name = "LIS-16KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -59,8 +59,7 @@ program gridder
     call domain_definition(grid,grid_name)  
 
     ! Write a regional mask 
-    call write_regions(outfldr,grid,domain)
-    stop 
+    call write_regions(outfldr,grid,domain) 
     
     ! =========================================================
     !
@@ -71,15 +70,15 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
     ! Global topography: Rtopo-2.0.1
-    ! call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
+    call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
 
     ! ! Geothermal heat flow fields
-    ! call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
-    ! call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ghfDavies_to_grid(outfldr, grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    ! call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call sedLaske_to_grid(outfldr,  grid,"Global",max_neighbors=4,lat_lim=2.d0)
     
-    ! call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
+    call ICE6GC_to_grid(outfldr,    grid,"Global",max_neighbors=4,lat_lim=2.d0)
     ! call ICE5G_to_grid(outfldr,     grid,"Global",max_neighbors=4,lat_lim=2.d0)
 
     ! ==============================================
