@@ -364,16 +364,16 @@ contains
             call nc_write_attr(filename,"z_srf","long_name","Surface elevation")
             call nc_write_attr(filename,"z_srf","coordinates","lat2D lon2D")
 
-            ! Load PD mask
-            call nc_read(file_in_topo,"mask",outmask)
+            ! ! Load PD mask
+            ! call nc_read(file_in_topo,"mask",outmask)
 
-            ! Write output variable to output file
-            call nc_write(filename,"mask",outmask,dim1="xc",dim2="yc")
+            ! ! Write output variable to output file
+            ! call nc_write(filename,"mask",outmask,dim1="xc",dim2="yc")
 
-            ! Write variable metadata
-            call nc_write_attr(filename,"mask","units","")
-            call nc_write_attr(filename,"mask","long_name","Mask (0:ocean, 1:land, 2:grounded ice, 3:floating ice)")
-            call nc_write_attr(filename,"mask","coordinates","lat2D lon2D")
+            ! ! Write variable metadata
+            ! call nc_write_attr(filename,"mask","units","")
+            ! call nc_write_attr(filename,"mask","long_name","Mask (0:ocean, 1:land, 2:grounded ice, 3:floating ice)")
+            ! call nc_write_attr(filename,"mask","coordinates","lat2D lon2D")
 
         else 
 
