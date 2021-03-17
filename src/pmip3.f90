@@ -229,8 +229,9 @@ contains
         ! Assume SCRIP map is already written.
         ! (done manually to avoid generating a huge grid object via 
         ! cdo griddes path_to_grid_file.nc > maps/grid_GRIDNAME.txt
-        call grid_write_cdo_desc_short(grid0,fldr="maps") 
-        
+        !call grid_write_cdo_desc_short(grid0,fldr="maps") 
+        call grid_write_cdo_desc_cdo(grid0%name,fldr="maps",file_nc=file_in)
+
         ! Define output grid in grid description file 
         call grid_write_cdo_desc_short(grid,fldr="maps") 
         
