@@ -309,6 +309,8 @@ contains
 
         integer :: q, k, m, i, l, n_var
 
+        type(map_scrip_class) :: mps
+
         ! For intermediate interpolation 
         character(len=256) :: pmip3_grid
 
@@ -338,7 +340,7 @@ contains
         call nc_read(file_in,"lon",inp%lon)
         call nc_read(file_in,"lat",inp%lat)
 
-        call grid_init(grid0,name="pmip3_dzs_grid",mtype="latlon",units="degrees", &
+        call grid_init(grid0,name="pmip3_dzs",mtype="latlon",units="degrees", &
                          lon180=.TRUE.,x=inp%lon,y=inp%lat) 
 
         ! Initialize output variable arrays
@@ -378,7 +380,19 @@ contains
         else 
 
             ! Initialize mapping
-            call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+            ! call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+            ! Assume SCRIP map is already written.
+            ! (done manually to avoid generating a huge grid object via 
+            ! cdo griddes path_to_grid_file.nc > maps/grid_GRIDNAME.txt
+            !call grid_write_cdo_desc_short(grid0,fldr="maps") 
+            
+            ! Define output grid in grid description file 
+            call grid_write_cdo_desc_short(grid,fldr="maps") 
+            
+            ! Generate SCRIP interpolation weights 
+            call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
+
 
             ! dz_srf =========
 
@@ -388,8 +402,10 @@ contains
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
             ! Map variable to new grid
-            call map_field(map,"dz_srf",inp%var,outvar,outmask,method="nng", &
-                          fill=.TRUE.,missing_value=mv,sigma=sigma)
+            ! call map_field(map,"dz_srf",inp%var,outvar,outmask,method="nng", &
+            !               fill=.TRUE.,missing_value=mv,sigma=sigma)
+
+            call map_scrip_field(mps,"dz_srf",inp%var,outvar,method="mean",missing_value=mv)
 
             ! Write output variable to output file
             call nc_write(filename,"dz_srf",real(outvar),dim1="xc",dim2="yc")
