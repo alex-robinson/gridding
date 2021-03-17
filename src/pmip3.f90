@@ -187,6 +187,8 @@ contains
 
         integer :: q, k, m, i, l, n_var
 
+        type(map_scrip_class) :: mps
+
         ! Get PMIP info 
         call pmip3_info(info,model,experiment,domain)
 
@@ -222,7 +224,18 @@ contains
         call grid_allocate(grid,outmask)
 
         ! Initialize mapping
-        call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+        ! call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
+
+        ! Assume SCRIP map is already written.
+        ! (done manually to avoid generating a huge grid object via 
+        ! cdo griddes path_to_grid_file.nc > maps/grid_GRIDNAME.txt
+        call grid_write_cdo_desc_short(grid0,fldr="maps") 
+        
+        ! Define output grid in grid description file 
+        call grid_write_cdo_desc_short(grid,fldr="maps") 
+        
+        ! Generate SCRIP interpolation weights 
+        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
 
         ! Initialize the output file
         call nc_create(filename)
@@ -244,8 +257,9 @@ contains
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
             ! Map variable to new grid
-            call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-                          fill=.TRUE.,missing_value=mv,sigma=sigma)
+            ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
+            !               fill=.TRUE.,missing_value=mv,sigma=sigma)
+            call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
 
             outvar = outvar
             ! Write output variable to output file
