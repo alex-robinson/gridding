@@ -316,8 +316,19 @@ contains
         fldr_in          = trim(path_in)//"/extensions/"
         file_in          = trim(fldr_in)//"pmip3_21k_v0.nc"
 
-        ! Filename of already-processed present-day topography to combine with dzs here 
-        file_in_topo     = trim(outfldr)//"/../"//trim(grid%name)//"_TOPO-M17.nc"
+        select case(trim(domain))
+
+            case("Greenland")
+
+            ! Filename of already-processed present-day topography to combine with dzs here 
+            file_in_topo = trim(outfldr)//"/../"//trim(grid%name)//"_TOPO-M17.nc"
+
+            case DEFAULT ! Antarctica, North, Laurentide, etc...
+
+            ! Filename of already-processed present-day topography to combine with dzs here 
+            file_in_topo = trim(outfldr)//"/../"//trim(grid%name)//"_TOPO-RTOPO-2.0.1.nc"
+
+        end select 
 
         nx = nc_size(file_in,"lon")
         ny = nc_size(file_in,"lat")
