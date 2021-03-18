@@ -177,6 +177,7 @@ contains
         type(inp_type)     :: inp
         type(grid_class)   :: grid0
         character(len=256) :: fldr_in, file_in_topo, file_in, nm_topo
+        character(len=256) :: file_grid_in 
         type(var_defs), allocatable :: vars(:)
         integer :: nx, ny, np
 
@@ -210,7 +211,7 @@ contains
         call nc_read(file_in,"lat",inp%lat)
 
         call grid_init(grid0,name=trim(info%grid_name),mtype="latlon",units="degrees", &
-                         lon180=.TRUE.,x=inp%lon,y=inp%lat ) 
+                         lon180=.FALSE.,x=inp%lon,y=inp%lat ) 
 
         allocate(vars(5))
         call def_var_info(vars(1),trim(file_in),trim(info%nm_tas_ann),"t2m_ann",units="degC",long_name="Near-surface temperature (2-m), annual mean",method="nng")
@@ -231,13 +232,16 @@ contains
         ! cdo griddes path_to_grid_file.nc > maps/grid_GRIDNAME.txt
         !call grid_write_cdo_desc_short(grid0,fldr="maps") 
         !call grid_write_cdo_desc_cdo(grid0%name,fldr="maps",file_nc=file_in)
+
+        call gen_grid_file(trim(file_in),src_var=trim(info%nm_tas_ann),grid_name=grid0%name,fldr="maps")
         call grid_write_cdo_desc_explicit_latlon(real(grid0%G%x,4),real(grid0%G%y,4),grid0%name,fldr="maps")
 
         ! Define output grid in grid description file 
         call grid_write_cdo_desc_short(grid,fldr="maps") 
         
         ! Generate SCRIP interpolation weights 
-        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
+        file_grid_in = "maps/grid_"//trim(grid0%name)//".nc" 
+        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_grid_in)
 
         ! Initialize the output file
         call nc_create(filename)
@@ -256,14 +260,17 @@ contains
             ! Read in current variable
             call nc_read(trim(var_now%filename),var_now%nm_in,inp%var,missing_value=mv)
             
+            ! Define missing values well
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
+
+            ! Fill in missing values via poisson filling (best on native lonlat grid first)
+            call fill_poisson(inp%var,missing_value=mv)
 
             ! Map variable to new grid
             ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
             !               fill=.TRUE.,missing_value=mv,sigma=sigma)
             call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
 
-            outvar = outvar
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
 
