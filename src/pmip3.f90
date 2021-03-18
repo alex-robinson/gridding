@@ -231,7 +231,7 @@ contains
         ! cdo griddes path_to_grid_file.nc > maps/grid_GRIDNAME.txt
         !call grid_write_cdo_desc_short(grid0,fldr="maps") 
         !call grid_write_cdo_desc_cdo(grid0%name,fldr="maps",file_nc=file_in)
-        call grid_write_cdo_desc_explicit_latlon(real(grid%G%x,4),real(grid0%G%y,4),grid0%name,fldr="maps")
+        call grid_write_cdo_desc_explicit_latlon(real(grid0%G%x,4),real(grid0%G%y,4),grid0%name,fldr="maps")
 
         ! Define output grid in grid description file 
         call grid_write_cdo_desc_short(grid,fldr="maps") 
