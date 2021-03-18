@@ -3,7 +3,7 @@ FC  = ifort
 INC_NC  = -I${NETCDF_FORTRANROOT}/include
 LIB_NC  = -L${NETCDF_FORTRANROOT}/lib -lnetcdff -L${NETCDF_CROOT}/lib -lnetcdf
 
-COORDROOT = /home/robinson/apps/coordinates/libcoordinates
+COORDROOT = coordinates/libcoordinates
 INC_COORD = -I${COORDROOT}/include
 LIB_COORD = -L${COORDROOT}/include -lcoordinates
 

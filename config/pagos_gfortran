@@ -4,7 +4,7 @@ INC_NC  = -I/opt/local/include
 #LIB_NC  = -L/opt/local/lib -lnetcdff -lnetcdf
 LIB_NC  = -L/opt/local/lib -lnetcdff -L/opt/local/lib -Wl,-headerpad_max_install_names -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -arch x86_64 -lnetcdf -lnetcdf
 
-COORDROOT = /Users/robinson/models/EURICE/coordinates/libcoordinates
+COORDROOT = coordinates/libcoordinates
 INC_COORD = -I${COORDROOT}/include
 LIB_COORD = -L${COORDROOT}/include -lcoordinates
 
