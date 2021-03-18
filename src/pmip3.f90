@@ -149,7 +149,7 @@ contains
         ! Convert the variables to the desired grid format and write to file
         ! =========================================================
         !
-        !       CCSM4 ATM LGM data
+        !       PMIP3 data
         !
         ! =========================================================
         implicit none
@@ -195,7 +195,7 @@ contains
         call pmip3_info(info,model,experiment,domain)
 
         ! Define the input filenames
-        file_in          = trim(path_in)//trim(info%file_in_suffix)
+        file_in = trim(path_in)//trim(info%file_in_suffix)
 
         desc    = trim(info%desc)
         ref     = "source folder: "//trim(path_in)
@@ -228,17 +228,14 @@ contains
         ! Initialize mapping
         ! call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-        ! Assume SCRIP map is already written.
-        ! (done manually to avoid generating a huge grid object via 
-        ! cdo griddes path_to_grid_file.nc > maps/grid_GRIDNAME.txt
-        !call grid_write_cdo_desc_short(grid0,fldr="maps") 
-        !call grid_write_cdo_desc_cdo(grid0%name,fldr="maps",file_nc=file_in)
-
-        call gen_grid_file(trim(file_in),src_var=trim(info%nm_tas_ann),grid_name=grid0%name,fldr="maps")
+        ! Define the input grid description file
         call grid_write_cdo_desc_explicit_latlon(real(grid0%G%x,4),real(grid0%G%y,4),grid0%name,fldr="maps")
 
-        ! Define output grid in grid description file 
+        ! Define the output grid description file
         call grid_write_cdo_desc_short(grid,fldr="maps") 
+        
+        ! Write a convenient grid file for use with scrip mapping
+        call gen_grid_file(trim(file_in),src_var=trim(info%nm_tas_ann),grid_name=grid0%name,fldr="maps")
         
         ! Generate SCRIP interpolation weights 
         file_grid_in = "maps/grid_"//trim(grid0%name)//".nc" 
@@ -271,6 +268,9 @@ contains
             ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
             !               fill=.TRUE.,missing_value=mv,sigma=sigma)
             call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
+
+            ! Smooth output field to match target smoothness via sigma 
+            call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
