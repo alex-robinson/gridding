@@ -264,17 +264,17 @@ contains
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
             ! Fill in missing values via poisson filling (best on native lonlat grid first)
-            ! call fill_poisson(inp%var,missing_value=mv)
+            ! call fill_poisson(inp%var,missing_value=mv,method=3,wraplon=.TRUE.,verbose=.TRUE.)
 
             ! Map variable to new grid
             ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
             !               fill=.TRUE.,missing_value=mv,sigma=sigma)
             call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
 
-            ! call fill_poisson(outvar,missing_value=mv)
+            call fill_poisson(outvar,missing_value=mv,method=3,wraplon=.FALSE.,verbose=.TRUE.)
 
             ! Smooth output field to match target smoothness via sigma 
-            ! call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
+            call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
