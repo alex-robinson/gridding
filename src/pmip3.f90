@@ -229,13 +229,15 @@ contains
         ! call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
         ! Define the input grid description file
-        call grid_write_cdo_desc_explicit_latlon(real(grid0%G%x,4),real(grid0%G%y,4),grid0%name,fldr="maps")
+        call grid_write_cdo_desc_short(grid0,fldr="maps")
 
         ! Define the output grid description file
         call grid_write_cdo_desc_short(grid,fldr="maps") 
         
         ! Write a convenient grid file for use with scrip mapping
-        call gen_grid_file(trim(file_in),src_var=trim(info%nm_tas_ann),grid_name=grid0%name,fldr="maps")
+        ! (should have specific name: grid_GRIDNAME.nc)
+        call grid_write(grid0,fnm="maps/grid_"//trim(grid0%name)//".nc", &
+                                            xnm="lon",ynm="lat",create=.TRUE.)
         
         ! Generate SCRIP interpolation weights 
         file_grid_in = "maps/grid_"//trim(grid0%name)//".nc" 
@@ -262,15 +264,17 @@ contains
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
             ! Fill in missing values via poisson filling (best on native lonlat grid first)
-            call fill_poisson(inp%var,missing_value=mv)
+            ! call fill_poisson(inp%var,missing_value=mv)
 
             ! Map variable to new grid
             ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
             !               fill=.TRUE.,missing_value=mv,sigma=sigma)
             call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
 
+            ! call fill_poisson(outvar,missing_value=mv)
+
             ! Smooth output field to match target smoothness via sigma 
-            call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
+            ! call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
