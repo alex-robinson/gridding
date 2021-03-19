@@ -187,6 +187,8 @@ contains
         double precision, allocatable :: outvar(:,:), outzs(:,:)
         integer, allocatable          :: outmask(:,:)
 
+        double precision, allocatable :: tmpvar(:,:) 
+
         integer :: q, k, m, i, l, n_var
 
         type(map_scrip_class) :: mps
@@ -224,6 +226,7 @@ contains
         ! Initialize output variable arrays
         call grid_allocate(grid,outvar)
         call grid_allocate(grid,outmask)
+        call grid_allocate(grid,tmpvar)
 
         ! Initialize mapping
         ! call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
@@ -264,17 +267,28 @@ contains
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
             ! Fill in missing values via poisson filling (best on native lonlat grid first)
-            ! call fill_poisson(inp%var,missing_value=mv,method=3,wraplon=.TRUE.,verbose=.TRUE.)
-
+            ! call fill_poisson(inp%var,missing_value=mv,method=0,wrapx=.TRUE.,verbose=.TRUE.)
+            
             ! Map variable to new grid
             ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
             !               fill=.TRUE.,missing_value=mv,sigma=sigma)
             call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
 
-            call fill_poisson(outvar,missing_value=mv,method=3,wraplon=.FALSE.,verbose=.TRUE.)
+            ! Fill missing values 
+            !call fill_weighted(outvar,missing_value=mv)
 
+            ! call fill_poisson(outvar,missing_value=mv,method=3,wraplon=.FALSE.,verbose=.TRUE.)
+
+            ! tmpvar = outvar
+            ! do q = 1, 1000
+            !     outvar = tmpvar
             ! Smooth output field to match target smoothness via sigma 
-            call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
+            ! call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.ne.mv)
+            call smooth_poisson(outvar,mask=outvar.ne.mv,iter_max=1000,tol=1d-2, &
+                                rel=0.5d0,missing_value=mv,wrapx=.FALSE.,verbose=.TRUE.)
+
+            ! end do 
+            ! stop "Done."
 
             ! Write output variable to output file
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
