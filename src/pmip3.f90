@@ -231,20 +231,22 @@ contains
         ! Initialize mapping
         ! call map_init(map,grid0,grid,max_neighbors=max_neighbors,lat_lim=lat_lim,fldr="maps",load=.TRUE.)
 
-        ! Define the input grid description file
-        call grid_write_cdo_desc_short(grid0,fldr="maps")
+        ! ! Define the input grid description file
+        ! call grid_write_cdo_desc_short(grid0,fldr="maps")
 
-        ! Define the output grid description file
-        call grid_write_cdo_desc_short(grid,fldr="maps") 
+        ! ! Define the output grid description file
+        ! call grid_write_cdo_desc_short(grid,fldr="maps") 
         
-        ! Write a convenient grid file for use with scrip mapping
-        ! (should have specific name: grid_GRIDNAME.nc)
-        call grid_write(grid0,fnm="maps/grid_"//trim(grid0%name)//".nc", &
-                                            xnm="lon",ynm="lat",create=.TRUE.)
+        ! ! Write a convenient grid file for use with scrip mapping
+        ! ! (should have specific name: grid_GRIDNAME.nc)
+        ! call grid_write(grid0,fnm="maps/grid_"//trim(grid0%name)//".nc", &
+        !                                     xnm="lon",ynm="lat",create=.TRUE.)
         
         ! Generate SCRIP interpolation weights 
-        file_grid_in = "maps/grid_"//trim(grid0%name)//".nc" 
-        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_grid_in)
+        ! file_grid_in = "maps/grid_"//trim(grid0%name)//".nc" 
+        ! call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_grid_in)
+
+        call map_scrip_init(mps,grid0,grid,fldr="maps",load=.TRUE.,clean=.FALSE.)
 
         ! Initialize the output file
         call nc_create(filename)
@@ -267,12 +269,12 @@ contains
             where((abs(inp%var) .ge. 1d10)) inp%var = mv
 
             ! Fill in missing values via poisson filling (best on native lonlat grid first)
-            ! call fill_poisson(inp%var,missing_value=mv,method=0,wrapx=.TRUE.,verbose=.TRUE.)
+            ! call fill_poisson(inp%var,missing_value=mv,method=3,wrapx=.TRUE.,verbose=.TRUE.)
             
             ! Map variable to new grid
-            ! call map_field(map,var_now%nm_in,inp%var,outvar,outmask,var_now%method, &
-            !               fill=.TRUE.,missing_value=mv,sigma=sigma)
-            call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv)
+            call map_scrip_field(mps,var_now%nm_in,inp%var,outvar,method="mean",missing_value=mv, &
+                                fill_method="weighted",filt_method="gaussian",filt_par=[sigma,grid%G%dx])
+            !filt_method="poisson",filt_par=[1d-2]
 
             ! Fill missing values 
             !call fill_weighted(outvar,missing_value=mv)
@@ -280,12 +282,12 @@ contains
             ! call fill_poisson(outvar,missing_value=mv,method=3,wraplon=.FALSE.,verbose=.TRUE.)
 
             ! tmpvar = outvar
-            ! do q = 1, 1000
+            ! do q = 1, 200
             !     outvar = tmpvar
             ! Smooth output field to match target smoothness via sigma 
             ! call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx,mask=outvar.ne.mv)
-            call smooth_poisson(outvar,mask=outvar.ne.mv,iter_max=1000,tol=1d-2, &
-                                rel=0.5d0,missing_value=mv,wrapx=.FALSE.,verbose=.TRUE.)
+            ! call filter_poisson(outvar,mask=outvar.ne.mv,tol=1d-2, &
+            !                     missing_value=mv,wrapx=.FALSE.,verbose=.TRUE.)
 
             ! end do 
             ! stop "Done."
@@ -430,10 +432,12 @@ contains
             !call grid_write_cdo_desc_short(grid0,fldr="maps") 
             
             ! Define output grid in grid description file 
-            call grid_write_cdo_desc_short(grid,fldr="maps") 
+            ! call grid_write_cdo_desc_short(grid,fldr="maps") 
             
-            ! Generate SCRIP interpolation weights 
-            call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
+            ! ! Generate SCRIP interpolation weights 
+            ! call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
+
+            call map_scrip_init(mps,grid0,grid,fldr="maps",load=.TRUE.,clean=.FALSE.)
 
 
             ! dz_srf =========
