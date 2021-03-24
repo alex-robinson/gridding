@@ -416,6 +416,9 @@ contains
             ! Map variable to new grid
             call map_scrip_field(mps,"dz_srf",inp%var,outvar,method="mean",missing_value=mv)
 
+            ! Smooth it out to match target smoothness via sigma 
+            call filter_gaussian(var=outvar,sigma=sigma,dx=grid%G%dx)
+
             ! Write output variable to output file
             call nc_write(filename,"dz_srf",real(outvar),dim1="xc",dim2="yc")
 
@@ -462,7 +465,7 @@ contains
             where(outvar1 .gt. 0.5 .and. outvar .le. 0.5) outmask = 3  ! Floating ice 
 
             ! Write output variable to output file
-            call nc_write(filename,"mask",outmask,dim1="xc",dim2="yc")
+            call nc_write(filename,"mask",outmask,dim1="xc",dim2="yc",grid_mapping="crs")
 
             ! Write variable metadata
             call nc_write_attr(filename,"mask","units","")
