@@ -12,5 +12,6 @@ do
 #
 #  # Submit the job 
 #  sbatch $filename
-   python get-era5-hourly-local.py $year
+   #python get-era5-hourly-local.py $year
+   python get-era5-monthly-single-levels.py $year
 done
