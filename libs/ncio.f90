@@ -1426,7 +1426,8 @@ contains
         call nc_check( nf90_close(ncid) )
     end subroutine
 
-    subroutine nc_write_map(filename,grid_mapping_name,lambda,phi,alpha,x_e,y_n,ncid)
+    subroutine nc_write_map(filename,grid_mapping_name,lambda,phi,alpha,x_e,y_n, &
+                            is_sphere,semi_major_axis,inverse_flattening,ncid)
         ! CF map conventions can be found here:
         ! http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#appendix-grid-mappings
         
@@ -1439,6 +1440,9 @@ contains
         character(len=*), intent(IN) :: filename, grid_mapping_name
         double precision, intent(IN), optional :: lambda, phi
         double precision, intent(IN), optional :: alpha, x_e, y_n
+        logical,          intent(IN), optional :: is_sphere 
+        double precision, intent(IN), optional :: semi_major_axis
+        double precision, intent(IN), optional :: inverse_flattening
         integer,          intent(in), optional :: ncid
         
         ! Local variables 
@@ -1534,17 +1538,56 @@ contains
                     if (present(alpha)) &
                     call nc_check( nf90_put_att(nc_id,varid, "standard_parallel", alpha) )
                         
-                case("latlon")
+                case("latitude_longitude","latlon","gaussian")
                     
+                    ! Pass - no grid mapping needed for a latitude_longitude grid
                     
                     ! Add grid mapping attributes 
-                    call nc_check( nf90_put_att(nc_id,varid, "grid_mapping_name", "latitude_longitude") )
+                    !call nc_check( nf90_put_att(nc_id,varid, "grid_mapping_name", "latitude_longitude") )
                     ! == No additional parameters needed == 
 
                 case DEFAULT
                     ! Do nothing
 
-            end select
+            end select 
+
+
+            select case(trim(grid_mapping_name))
+
+                case("latitude_longitude","latlon","gaussian")
+
+                    ! Pass - do nothing for latitude_longitude grids 
+
+                case DEFAULT 
+                    ! For other projections, add planet information if available
+
+                    ! Add planet information if desired 
+                    if (present(is_sphere) .and. &
+                        present(semi_major_axis) .and. &
+                        present(inverse_flattening)) then 
+
+                        if (is_sphere) then  
+                            call nc_check( nf90_put_att(nc_id,varid, "semi_major_axis", semi_major_axis) )
+                            call nc_check( nf90_put_att(nc_id,varid, "inverse_flattening", 0.0d0) )
+                        else 
+                            call nc_check( nf90_put_att(nc_id,varid, "semi_major_axis", semi_major_axis) )
+                            call nc_check( nf90_put_att(nc_id,varid, "inverse_flattening", inverse_flattening) )
+                            
+                        end if 
+
+                    else if (present(is_sphere) .or. &
+                             present(semi_major_axis) .or. &
+                             present(inverse_flattening)) then 
+
+                        write(*,*) "ncio:: nc_write_map:: Error: to write planet information, &
+                                    &all three planet parameters must be provided: &
+                                    &is_sphere, semi_major_axis, inverse_flattening. &
+                                    &Try again."
+                                    
+                                    stop
+                    end if
+
+            end select 
 
             write(*,"(a,a,a)") "ncio:: nc_write_map:: ",trim(filename)//" : ",trim(grid_mapping_name)
 

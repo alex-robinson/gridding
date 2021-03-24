@@ -196,7 +196,8 @@ contains
 
             case("ANT-40KM")
                 call grid_init(grid,name="ANT-40KM",mtype="polar_stereographic",units="kilometers", &
-                       lon180=.TRUE.,dx=40.d0,nx=157,dy=40.d0,ny=147,lambda=0.d0,phi=-71.d0)
+                       lon180=.TRUE.,dx=40.d0,nx=157,dy=40.d0,ny=147, &
+                       lambda=0.d0,phi=-71.d0)
 
 !             case("ANT-20KM")
 !                 call grid_init(grid,name="ANT-20KM",mtype="polar_stereographic",units="kilometers", &
