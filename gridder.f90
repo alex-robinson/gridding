@@ -46,8 +46,8 @@ program gridder
     !
     ! =========================================================
     
-    domain    = "Laurentide"
-    grid_name = "LIS-16KM"
+    domain    = "Greenland"
+    grid_name = "GRL-16KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -95,9 +95,9 @@ program gridder
     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1981,2010])
     call ecmwf_ocn_to_grid(outfldr,grid,clim_range=[1979,1998])
 
-!     call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
-!     call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
+    call ecmwf40_to_grid(outfldr,grid,sigma=100.d0,max_neighbors=1,lat_lim=2.d0)
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1958,2001])
+    call ecmwf40_to_grid(outfldr,grid,clim_range=[1961,1990])
 
 !     call dated1_to_grid(outfldr,grid,domain,max_neighbors=1,lat_lim=1.d0)
     
