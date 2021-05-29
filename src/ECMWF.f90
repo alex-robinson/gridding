@@ -43,10 +43,14 @@ contains
         type(inp_type)     :: inp
 
         type(grid_class)   :: gECMWF 
-        character(len=256) :: file_invariant, file_surface, files_pres(9), file_precip
+        character(len=256) :: file_invariant, file_surface, file_precip
         type(var_defs), allocatable :: invariant(:), surf(:), pres(:), precip(:)
         double precision, allocatable :: invar(:,:) 
-        integer :: plev(9) 
+        
+        ! character(len=256) :: files_pres(9)
+        ! integer :: plev(9) 
+        character(len=256) :: files_pres(1)
+        integer :: plev(1) 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -62,16 +66,18 @@ contains
         file_invariant = "/data/sicopolis/data/ECMWF/ERA-INTERIM-invariant_historical_mon_197901-201212.nc"
         file_surface   = "/data/sicopolis/data/ECMWF/ERA-INTERIM-surface_historical_mon_197901-201212.nc"
         file_precip    = "/data/sicopolis/data/ECMWF/ERA-INTERIM-sf-tp_historical_mon_197901-201412.nc"
-        files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-1000Mb_historical_mon_197901-201212.nc"
-        files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-950Mb_historical_mon_197901-201212.nc"
-        files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-850Mb_historical_mon_197901-201212.nc"
-        files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
-        files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-700Mb_historical_mon_197901-201212.nc"
-        files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-650Mb_historical_mon_197901-201212.nc"
-        files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-600Mb_historical_mon_197901-201212.nc"
-        files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-550Mb_historical_mon_197901-201212.nc"
-        files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
+        ! files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-1000Mb_historical_mon_197901-201212.nc"
+        ! files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-950Mb_historical_mon_197901-201212.nc"
+        ! files_pres(3)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-850Mb_historical_mon_197901-201212.nc"
+        ! files_pres(4)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
+        ! files_pres(5)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-700Mb_historical_mon_197901-201212.nc"
+        ! files_pres(6)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-650Mb_historical_mon_197901-201212.nc"
+        ! files_pres(7)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-600Mb_historical_mon_197901-201212.nc"
+        ! files_pres(8)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-550Mb_historical_mon_197901-201212.nc"
+        ! files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
 
+        files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
+        
         desc    = "ERA-Interim dataset"
         ref     = "Dee et al., 2011, BAMS, &
                   &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
@@ -119,7 +125,8 @@ contains
         end if 
 
         ! Define the pressure levels to be mapped
-        plev = [1000,950,850,750,700,650,600,550,500]
+        !plev = [1000,950,850,750,700,650,600,550,500]
+        plev = [750] 
 
         ! Define the variables to be mapped 
         
@@ -276,7 +283,7 @@ contains
                 
             end do  
 
-if (.FALSE.) then 
+if (.TRUE.) then 
 
             ! ## PRESSURE FIELDS ##
             do l = 1, size(files_pres)   ! Loop over pressure layers
