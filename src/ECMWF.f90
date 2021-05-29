@@ -49,8 +49,8 @@ contains
         
         ! character(len=256) :: files_pres(9)
         ! integer :: plev(9) 
-        character(len=256) :: files_pres(1)
-        integer :: plev(1) 
+        character(len=256) :: files_pres(2)
+        integer :: plev(2) 
 
         type(map_class)  :: map 
         type(var_defs) :: var_now 
@@ -77,7 +77,12 @@ contains
         ! files_pres(9)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
 
         files_pres(1)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-750Mb_historical_mon_197901-201212.nc"
-        
+        files_pres(2)  = "/data/sicopolis/data/ECMWF/ERA-INTERIM-500Mb_historical_mon_197901-201212.nc"
+
+        ! Define the pressure levels to be mapped
+        !plev = [1000,950,850,750,700,650,600,550,500]
+        plev = [750,500] 
+
         desc    = "ERA-Interim dataset"
         ref     = "Dee et al., 2011, BAMS, &
                   &http://onlinelibrary.wiley.com/doi/10.1002/qj.828/abstract"
@@ -123,10 +128,6 @@ contains
             write(filename_clim,"(a,i4,a1,i4,a3)") trim(outfldr)//"/"//trim(subfldr)//"/"// &
                     trim(grid%name)//"_ERA-INT_",clim_range(1),"-",clim_range(2),".nc"
         end if 
-
-        ! Define the pressure levels to be mapped
-        !plev = [1000,950,850,750,700,650,600,550,500]
-        plev = [750] 
 
         ! Define the variables to be mapped 
         
