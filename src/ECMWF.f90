@@ -408,7 +408,7 @@ end if
                 
             end do 
 
-if (.FALSE.) then 
+if (.TRUE.) then 
             do l = 1, size(files_pres)   ! Loop over pressure layers
 
                 ! ## Make one file for each pressure level ##
