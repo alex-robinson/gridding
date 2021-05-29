@@ -1,8 +1,8 @@
 module climberx
     
-    use gridding_datasets
     use coord
     use ncio 
+    use gridding_datasets
     use gaussian_filter 
 
     implicit none 
@@ -97,10 +97,10 @@ contains
         !call grid_write_cdo_desc_short(grid0,fldr="maps") 
         
         ! Define output grid in grid description file 
-        call grid_write_cdo_desc_short(grid,fldr="maps") 
+        ! call grid_write_cdo_desc_short(grid,fldr="maps") 
         
         ! Generate SCRIP interpolation weights 
-        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=filename0)
+        call map_scrip_init(mps,grid0,grid,fldr="maps")
 
 
         ! Initialize output variable arrays

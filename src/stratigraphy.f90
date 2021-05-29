@@ -76,14 +76,14 @@ contains
 
         ! ==== MAPPING INFORMATION ====
 
-        ! Define input grid in grid description file
-        call grid_write_cdo_desc_short(grid0,fldr="maps") 
+        ! ! Define input grid in grid description file
+        ! call grid_cdo_write_desc_short(grid0,fldr="maps") 
         
-        ! Define output grid in grid description file 
-        call grid_write_cdo_desc_short(grid,fldr="maps") 
+        ! ! Define output grid in grid description file 
+        ! call grid_cdo_write_desc_short(grid,fldr="maps") 
         
         ! Generate SCRIP interpolation weights 
-        call map_scrip_init(mps,grid0%name,grid%name,fldr="maps",src_nc=file_in)
+        call map_scrip_init(mps,grid0,grid,fldr="maps")
 
         ! =============================
 

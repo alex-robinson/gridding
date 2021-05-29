@@ -19,6 +19,17 @@ module gridding_datasets
         logical            :: fill 
     end type 
 
+    private 
+    public :: missing_value 
+    public :: mv 
+    public :: var_defs
+    public :: def_var_info
+    public :: read_vector 
+    public :: read_as_vector
+    public :: thin 
+    public :: thin_ave
+    public :: replace 
+
 contains
 
     !##############################################

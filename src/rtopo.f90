@@ -76,13 +76,14 @@ contains
 
         ! Assume SCRIP map is already written for RTOPO file 
         ! (done manually to avoid generating a huge grid object)
-        !call grid_write_cdo_desc_short(grid_in,fldr="maps") 
+        !call grid_cdo_write_desc_short(grid_in,fldr="maps") 
         
         ! Define output grid in grid description file 
-        call grid_write_cdo_desc_short(grid,fldr="maps") 
+        call grid_cdo_write_desc_short(grid,fldr="maps") 
         
         ! Generate SCRIP interpolation weights 
-        call map_scrip_init(mps,grid_in_name,grid%name,fldr="maps",src_nc=filename_in)
+        call map_scrip_init_from_griddesc(mps,grid_in_name,grid%name,fldr="maps", &
+                                                    src_nc=filename_in,method="con")
 
         desc    = "RTOPO-2.0.1 present-day Earth topography data"
         ref     = "Schaffer, J., Timmermann, R., Arndt, J. E., Kristensen, S. S., Mayer, C., &

@@ -120,7 +120,7 @@ contains
             var_now = invariant(i) 
     
             ! Read in variable, flip y-direction, thin it to match defined input grid
-            call nc_read(var_now%filename,var_now%nm_in,tmp2,missing_value=missing_value)
+            call nc_read(var_now%filename,var_now%nm_in,tmp2,missing_value=mv)
             do j = 1, size(tmp2,2)
                 tmp1(:,j) = tmp2(:,size(tmp2,2)-j+1)
             end do 
@@ -132,7 +132,7 @@ contains
 
             ! Fill in missing values for thick ice points (to avoid island), 
             ! then limit field to where H_ice exists, and ensure no missing values
-            call fill_mean(outvar,missing_value=missing_value,mask=H_ice .gt. 500.0)
+            call fill_mean(outvar,missing_value=mv,mask=H_ice .gt. 500.0)
             where(H_ice .eq. 0.0) outvar = 0.0 
             where(outvar .eq. mv) outvar = 0.0 
             call nc_write(filename,var_now%nm_out,real(outvar),dim1="xc",dim2="yc")
