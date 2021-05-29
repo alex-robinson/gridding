@@ -25,8 +25,34 @@ print("Summary:")
 print("name: {name}".format(name=name))
 print("years: {years}".format(years=years))
 
+# vars = [
+#             '2m_temperature', 'sea_surface_temperature', 'total_precipitation',
+#         ]
 vars = [
-            '2m_temperature', 'sea_surface_temperature', 'total_precipitation',
+        '100m_u_component_of_wind', 
+        '100m_v_component_of_wind',
+        '10m_u_component_of_wind',
+        '10m_v_component_of_wind',
+        '2m_temperature',
+        'ice_temperature_layer_1',
+        'mean_sea_level_pressure',
+        'mean_snowfall_rate',
+        'mean_snowmelt_rate',
+        'mean_surface_direct_short_wave_radiation_flux',
+        'mean_surface_downward_long_wave_radiation_flux',
+        'mean_surface_downward_short_wave_radiation_flux',
+        'mean_surface_latent_heat_flux',
+        'mean_surface_net_long_wave_radiation_flux',
+        'mean_surface_net_short_wave_radiation_flux',
+        'mean_surface_sensible_heat_flux',
+        'mean_top_net_long_wave_radiation_flux',
+        'mean_top_net_short_wave_radiation_flux',
+        'mean_total_precipitation_rate', 
+        'sea_surface_temperature',
+        'surface_pressure',
+        'total_cloud_cover',
+        'total_column_cloud_liquid_water',
+        'total_column_water_vapour'
         ]
 print(vars)
 
