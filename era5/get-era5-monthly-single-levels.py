@@ -46,12 +46,13 @@ else:
 # If var_now is an integer, select the variable name of interest 
 try:
     var_int = int(var_now)
-    if var_int > len(vars)-1: raise
+    if var_int > len(vars)-1:
+        print("\nOnly 0-{n} variable names available. Try again.\n".format(n=len(vars)-1))
+        sys.exit(2)
     var_now = vars[var_int]
 except:
     # Pass, assume the variable name was provided
-    print("\nOnly 0-{n} variable names available. Try again.\n".format(n=len(vars)-1))
-    sys.exit(2)
+    pass
 
 if not var_now in vars:
     print("\nVariable not available: {var}\n".format(var=var_now))
