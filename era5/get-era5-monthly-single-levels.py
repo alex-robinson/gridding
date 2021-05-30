@@ -61,7 +61,7 @@ print("var  = {var}".format(var=var_now))
 print("plev = {plev}".format(plev=plev_now))
 print("year = {year}".format(year=year_now))
 
-sys.exit() 
+#sys.exit() 
 
 if plev is None:
     dataset     = "reanalysis-era5-single-levels-monthly-means"
