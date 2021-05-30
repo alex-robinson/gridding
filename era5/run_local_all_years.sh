@@ -3,6 +3,7 @@
 search='YEARNOW'
 templatename='submit_slurm'
 filename='submit_slurm_now'
+var='2m_temperature'
 
 for year in {1979..2019}
 do
@@ -13,5 +14,5 @@ do
 #  # Submit the job 
 #  sbatch $filename
    #python get-era5-hourly-local.py $year
-   python get-era5-monthly-single-levels.py $year
+   python get-era5-monthly-single-levels.py $var $year
 done
