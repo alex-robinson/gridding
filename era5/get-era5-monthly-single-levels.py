@@ -63,12 +63,12 @@ print("year = {year}".format(year=year_now))
 
 #sys.exit() 
 
-if plev is None:
+if plev_now is None:
     dataset     = "reanalysis-era5-single-levels-monthly-means"
     plev_str    = ""
 else:
     dataset     = "reanalysis-era5-pressure-levels-monthly-means"
-    plev_str    = "_{plev}".format(plev=plev)
+    plev_str    = "_{plev}".format(plev=plev_now)
 
 # ajr: disable loop over years 
 # for year_now in years:
@@ -88,7 +88,7 @@ c.retrieve(
         'format': 'netcdf',
         'product_type': 'monthly_averaged_reanalysis',
         'variable': var_now,
-        'pressure_level': plev,
+        'pressure_level': plev_now,
         'month': [
             '01', '02', '03',
             '04', '05', '06',
