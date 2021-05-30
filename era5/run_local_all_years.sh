@@ -5,7 +5,7 @@ templatename='submit_slurm'
 filename='submit_slurm_now'
 var='2m_temperature'
 
-for year in {1979..2019}
+for year in {1979..2020}
 do
     
 #  # Insert the current year into the slurm submit script as an argument  
@@ -14,5 +14,5 @@ do
 #  # Submit the job 
 #  sbatch $filename
    #python get-era5-hourly-local.py $year
-   python get-era5-monthly-single-levels.py $var $year
+   ./get-era5-monthly-single-levels.py $var $year
 done
