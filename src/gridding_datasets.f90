@@ -4,6 +4,13 @@ module gridding_datasets
 
     implicit none 
 
+    ! Internal constants
+    integer,  parameter :: dp  = kind(1.d0)
+    integer,  parameter :: sp  = kind(1.0)
+
+    ! Choose the working precision of the library (sp,dp)
+    integer,  parameter :: wp = sp 
+
     double precision, parameter :: missing_value = -9999.d0
     double precision, parameter :: mv            = missing_value
     
@@ -20,6 +27,9 @@ module gridding_datasets
     end type 
 
     private 
+    public :: dp 
+    public :: sp 
+    public :: wp 
     public :: missing_value 
     public :: mv 
     public :: var_defs

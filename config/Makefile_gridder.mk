@@ -6,6 +6,10 @@ $(objdir)/ncio.o: $(libdir)/ncio.f90
 $(objdir)/nml.o: $(libdir)/nml.f90
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
+$(objdir)/varslice.o: $(libdir)/varslice.f90 $(objdir)/nml.o $(objdir)/ncio.o
+		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
+
+
 $(objdir)/control.o: $(srcdir)/control.f90 $(objdir)/nml.o
 		$(FC) $(DFLAGS) $(FFLAGS) -c -o $@ $<
 
@@ -151,4 +155,4 @@ obj_datasets_banderas = $(objdir)/control.o \
 									 $(objdir)/gridding_datasets.o \
 									 $(objdir)/banderas2018.o
 
-gridder_libs = $(objdir)/ncio.o $(objdir)/nml.o
+gridder_libs = $(objdir)/ncio.o $(objdir)/nml.o $(objdir)/varslice.o

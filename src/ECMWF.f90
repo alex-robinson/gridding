@@ -3,17 +3,75 @@ module ECMWF
     use gridding_datasets
     use coord
     use ncio 
+    use varslice 
     
     implicit none 
 
     double precision, parameter :: sec_day = 86400.d0 
 
-    private 
+    private
+    public :: era5_to_grid  
     public :: ecmwf_to_grid
     public :: ecmwf_ocn_to_grid 
     public :: ecmwf40_to_grid
     
 contains 
+    
+
+
+    subroutine era5_to_grid(outfldr,grid,sigma)
+
+        implicit none
+
+        character(len=*), intent(IN) :: outfldr 
+        type(grid_class), intent(IN) :: grid 
+        real(wp),         intent(IN), optional :: sigma
+
+        ! Local variables 
+        integer :: nx, ny 
+        real(wp), allocatable :: lon(:) 
+        real(wp), allocatable :: lat(:) 
+        
+        character(len=1028) :: path_ref 
+        character(len=1028) :: desc 
+        character(len=1028) :: ref 
+
+        type(grid_class) :: grid_ref 
+        type(map_scrip_class) :: mps 
+
+        ! Define dataset description
+        desc     = "ECMWF ERA5 data"
+        ref      = "[To do], doi:10.24381/cds.f17050d7"
+
+        ! Load reference grid info 
+        path_ref = "data/era5/monthly-single-levels/era5_monthly-single-levels_2m_temperature_1979.nc"
+        nx = nc_size(path_ref,"longitude")
+        ny = nc_size(path_ref,"latitude")
+
+        allocate(lon(nx))
+        allocate(lat(ny))
+
+        call nc_read(path_ref,"longitude",lon)
+        call nc_read(path_ref,"longitude",lat)
+
+        ! Define reference grid 
+        call grid_init(grid_ref,name="era5-0.25deg",mtype="latlon",units="degrees",lon180=.TRUE., &
+                            x=real(lon,dp),y=real(lat,dp))
+
+        ! Generate SCRIP interpolation weights 
+        call map_scrip_init(mps,grid_ref,grid,fldr="maps",load=.TRUE.,clean=.TRUE.)
+
+
+        
+        return
+
+    end subroutine era5_to_grid
+
+
+
+
+
+
 
     subroutine ecmwf_to_grid(outfldr,grid,sigma,max_neighbors,lat_lim,clim_range)
         ! Convert the variables to the desired grid format and write to file
