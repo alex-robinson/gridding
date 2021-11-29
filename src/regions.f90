@@ -206,7 +206,7 @@ contains
         call grid_write(grid,filename,xnm="xc",ynm="yc",create=.FALSE.)
         
         call nc_write(filename,"mask",mask,dim1="xc",dim2="yc", &  
-                      long_name="Regional mask")
+                      long_name="Regional mask",grid_mapping="crs")
 
         return 
 
