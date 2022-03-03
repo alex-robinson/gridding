@@ -85,6 +85,14 @@ contains
                 k = minloc(abs(reg_vals - floor(reg_vals(q))),1)
                 in_continent = point_in_polygon(real(grid%x),real(grid%y),real(regs(k)%x),real(regs(k)%y))
                 
+                if (q .eq. 9) then
+                    ! Currently Iceland does not have a continent defined for it. So
+                    ! let it match the north index as its continent.
+
+                    in_continent = .TRUE. 
+                    
+                end if
+
             end if 
 
             ! Check which grid points are contained in the current region defined 
