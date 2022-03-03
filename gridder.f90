@@ -61,10 +61,8 @@ program gridder
     call domain_definition(grid,grid_name)  
 
     ! Write a regional mask 
-    !call write_regions(outfldr,grid,domain) 
+    call write_regions(outfldr,grid,domain) 
     
-    call grid_cdo_write_desc_short(grid,fldr="maps")
-
     stop 
 
     ! =========================================================

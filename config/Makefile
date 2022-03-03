@@ -54,6 +54,12 @@ gridder: $(gridder_libs) $(obj_datasets)
 	@echo "    gridder.x is ready."
 	@echo " "
 
+gridder_griddes: $(gridder_libs) $(obj_datasets) 
+	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_griddes.x $^ gridder_griddes.f90 $(LFLAGS)
+	@echo " "
+	@echo "    gridder_griddes.x is ready."
+	@echo " "
+
 gridder_help: $(gridder_libs) $(obj_datasets) 
 	$(FC) $(DFLAGS) $(FFLAGS) -o gridder_help.x $^ gridder_help.f90 $(LFLAGS)
 	@echo " "
