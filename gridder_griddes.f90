@@ -21,7 +21,7 @@ program gridder_griddes
         
     ! Default case:
     domain    = "Greenland"
-    grid_name = "GRL-16KM"
+    grid_name = "GRL-8KM"
     
     ! Replace with command line arguments:
     call load_command_line_args(domain,grid_name)
@@ -37,7 +37,10 @@ program gridder_griddes
     ! Write a regional mask 
     !call write_regions(outfldr,grid,domain) 
     
-    call grid_cdo_write_desc_short(grid,fldr="maps")
+    !call grid_cdo_write_desc_short(grid,fldr="maps")
+
+    ! Write a long description file (for projected grids, cdo needs this sometimes)
+    call grid_cdo_write_desc_explicit_proj(grid%lon,grid%lat,grid_name,fldr="maps",grid_type="projection")
 
     write(*,*) "Grid description file written." 
 
