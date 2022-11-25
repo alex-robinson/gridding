@@ -1,6 +1,6 @@
 {
     "name"  : "monthly-single-levels",
-    "year0" : 1979,
+    "year0" : 1959,
     "year1" : 2020,
     "vars"  : [
         "100m_u_component_of_wind", 
@@ -26,6 +26,17 @@
         "surface_pressure",
         "total_cloud_cover",
         "total_column_cloud_liquid_water",
-        "total_column_water_vapour"
+        "total_column_water_vapour",
+        "toa_incident_solar_radiation",
+        "sea_ice_cover",
+        "snow_depth",
+        "soil_temperature_level_1",
+        "soil_temperature_level_2",
+        "soil_temperature_level_3",
+        "soil_temperature_level_4",
+        "volumetric_soil_water_layer_1",
+        "volumetric_soil_water_layer_2",
+        "volumetric_soil_water_layer_3",
+        "volumetric_soil_water_layer_4"
         ]
 }

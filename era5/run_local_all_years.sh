@@ -17,7 +17,11 @@ var='2m_temperature'
 #    ./get-era5-monthly-single-levels.py $var $year
 # done
 
-for v in {0..23}
+# Variables 0..23 are initial variables down through "total_column_water_vapour"
+# Variables 24..34 are additional variables of interest 
+
+#for v in {0..23}
+for v in {24..34}
 do
    for year in {1979..2020}
    do
