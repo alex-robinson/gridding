@@ -26,20 +26,29 @@ function calc_multifile_average(files,var_name)
     return var
 end
 
-function calc_clim_dataset(var_file_name)
+function calc_clim_dataset(var_file_name;pres=none)
 
     # Define climatology range to generate
     clim_range = (1981,2010);
-
+    
     # Generate correct filename for output
     clim_range_str = string.(clim_range);
-    file_out = fldr_out*"era5_monthly-single-levels_"*var_file_name*"_"*clim_range_str[1]*"-"*clim_range_str[2]*".nc";
+
+    
+    if isnone(pres)
+        var_file_name_now = var_file_name;
+    else
+        var_file_name_now = var_file_name*"_"*string(pres);
+    end
+
+    file_out = fldr_out*"era5_monthly-single-levels_"*var_file_name_now*"_"*clim_range_str[1]*"-"*clim_range_str[2]*".nc";
+
 
     #var_name  = "t2m";
     #long_name = "2m_temperature";
 
     # Get list of relevant files for this variable
-    files = glob("era5_monthly-single-levels_"*var_file_name*"*.nc",fldr_data);
+    files = glob("era5_monthly-single-levels_"*var_file_name_now*"*.nc",fldr_data);
 
     # Define the variable name of interest 
     nc = NCDataset(files[1]);
@@ -90,12 +99,16 @@ info      = JSON.parsefile("era5_config_monthly.json");
 fldr_data = "data/era5/monthly-single-levels/";
 fldr_out  = "data/era5/monthly-single-levels/clim/";
 
-# Choose variable to process
-#var_file_name = info["vars"][1];
+# Are we working with a specific pressure level (else `none`)
+#pres = none;
+#vars_all = info["vars"];
 
-# Loop over all filenames
-for var_file_name in info["vars"]
-    calc_clim_dataset(var_file_name)
+pres = 750;
+vars_all = info["vars_pres"];
+
+# Loop over all filename variables
+for var_file_name in vars_all
+    calc_clim_dataset(var_file_name,pres=pres)
 end
 
 # Take a look at the final file...
