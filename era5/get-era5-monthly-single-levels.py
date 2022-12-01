@@ -84,6 +84,8 @@ filename_download = "{fldr}/era5_{name}_{var}{plev}_{year}.nc".format(
 
 ### BEGIN DOWNLOAD REQUEST ###
 
+c = cdsapi.Client()
+
 c.retrieve(
     dataset,
     {
