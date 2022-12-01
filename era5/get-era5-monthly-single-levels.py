@@ -5,6 +5,19 @@ import os, sys, json
 
 ##### User options ###########
 
+# Do not loop over years. Instead this script will be called 
+# once per variable per year, to get request started on CDS server. 
+args        = str(sys.argv) 
+var_now     = sys.argv[1]
+year_now    = sys.argv[2]
+
+if len(sys.argv)==4:
+    plev_now = sys.argv[3]
+else:
+    plev_now = None 
+
+verbose = False
+
 # Load from config file
 info      = json.load(open("era5_config_monthly.json"))
 name      = info["name"]
@@ -18,30 +31,21 @@ years = list(range(year0,year1+1))
 #year0 = years[0]    # First year
 #year1 = years[-1]   # Last  year
 
-vars      = info["vars"]
+if plev_now is None:
+    vars = info["vars"]
+else
+    vars = info["vars_pres"]
 
 # Make output folder with the name the same as the region
 fldr = "data/era5/"+name 
 if not os.path.exists(fldr):
     os.makedirs(fldr)
 
-print("Summary:")
-print("name: {name}".format(name=name))
-print("years: {years}".format(years=years))
-print(vars)
-
-c = cdsapi.Client()
-
-# Do not loop over years. Instead this script will be called 
-# once per variable per year, to get request started on CDS server. 
-args        = str(sys.argv) 
-var_now     = sys.argv[1]
-year_now    = sys.argv[2]
-
-if len(sys.argv)==4:
-    plev_now = sys.argv[3]
-else:
-    plev_now = None 
+if verbose:
+    print("Summary:")
+    print("name: {name}".format(name=name))
+    print("years: {years}".format(years=years))
+    print(vars)
 
 # If var_now is an integer, select the variable name of interest 
 try:
@@ -71,36 +75,9 @@ else:
     dataset     = "reanalysis-era5-pressure-levels-monthly-means"
     plev_str    = "_{plev}".format(plev=plev_now)
 
-# ajr: disable loop over years 
-# for year_now in years:
-
+# Get a string corresponding to current year
 year_now_str = [str(year_now)]
 
 # Define output filename for this year
 filename_download = "{fldr}/era5_{name}_{var}{plev}_{year}.nc".format(
                                 fldr=fldr,name=name,var=var_now,plev=plev_str,year=year_now)
-
-
-### BEGIN DOWNLOAD REQUEST ###
-
-c.retrieve(
-    dataset,
-    {
-        'format': 'netcdf',
-        'product_type': 'monthly_averaged_reanalysis',
-        'variable': var_now,
-        'pressure_level': plev_now,
-        'month': [
-            '01', '02', '03',
-            '04', '05', '06',
-            '07', '08', '09',
-            '10', '11', '12',
-        ],
-        'time': '00:00',
-        'area': area,
-        'year': year_now_str,
-    },
-    filename_download)
-
-
-
