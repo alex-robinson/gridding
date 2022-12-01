@@ -17,15 +17,13 @@ var='2m_temperature'
 #    ./get-era5-monthly-single-levels.py $var $year
 # done
 
-# Variables 0..23 are initial variables down through "total_column_water_vapour"
-# Variables 24..34 are additional variables of interest 
-
+#pres=
 pres=750
 
-#for v in {0..23}
-for v in {24..34}
+#for v in {0..34}
+for v in {0..2}
 do
-   for year in {1979..2020}
+   for year in {1959..1978}
    do
        
    #  # Insert the current year into the slurm submit script as an argument  
@@ -34,7 +32,7 @@ do
    #  # Submit the job 
    #  sbatch $filename
       #python get-era5-hourly-local.py $year
-      ./get-era5-monthly-single-levels.py $v $year
+      ./get-era5-monthly-single-levels.py $v $year $pres
 
       #echo $v $year
    done

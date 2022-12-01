@@ -26,16 +26,13 @@ function calc_multifile_average(files,var_name)
     return var
 end
 
-function calc_clim_dataset(var_file_name;pres=none)
+function calc_clim_dataset(var_file_name;clim_range = (1961,1990),pres=nothing)
 
-    # Define climatology range to generate
-    clim_range = (1981,2010);
-    
     # Generate correct filename for output
     clim_range_str = string.(clim_range);
 
     
-    if isnone(pres)
+    if isnothing(pres)
         var_file_name_now = var_file_name;
     else
         var_file_name_now = var_file_name*"_"*string(pres);
@@ -99,16 +96,20 @@ info      = JSON.parsefile("era5_config_monthly.json");
 fldr_data = "data/era5/monthly-single-levels/";
 fldr_out  = "data/era5/monthly-single-levels/clim/";
 
-# Are we working with a specific pressure level (else `none`)
-#pres = none;
+# Are we working with a specific pressure level (else `nothing`)
+#pres = nothing;
 #vars_all = info["vars"];
 
 pres = 750;
 vars_all = info["vars_pres"];
 
+# Define climatology range of interest
+clim_range = (1961,1990);
+#clim_rante = (1981,2010);
+
 # Loop over all filename variables
 for var_file_name in vars_all
-    calc_clim_dataset(var_file_name,pres=pres)
+    calc_clim_dataset(var_file_name;clim_range=clim_range,pres=pres)
 end
 
 # Take a look at the final file...
