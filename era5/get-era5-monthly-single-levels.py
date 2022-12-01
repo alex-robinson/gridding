@@ -33,7 +33,7 @@ years = list(range(year0,year1+1))
 
 if plev_now is None:
     vars = info["vars"]
-else
+else:
     vars = info["vars_pres"]
 
 # Make output folder with the name the same as the region
@@ -81,3 +81,25 @@ year_now_str = [str(year_now)]
 # Define output filename for this year
 filename_download = "{fldr}/era5_{name}_{var}{plev}_{year}.nc".format(
                                 fldr=fldr,name=name,var=var_now,plev=plev_str,year=year_now)
+
+### BEGIN DOWNLOAD REQUEST ###
+
+c.retrieve(
+    dataset,
+    {
+        'format': 'netcdf',
+        'product_type': 'monthly_averaged_reanalysis',
+        'variable': var_now,
+        'pressure_level': plev_now,
+        'month': [
+            '01', '02', '03',
+            '04', '05', '06',
+            '07', '08', '09',
+            '10', '11', '12',
+        ],
+        'time': '00:00',
+        'area': area,
+        'year': year_now_str,
+    },
+    filename_download)
+
