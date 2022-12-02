@@ -137,6 +137,16 @@ contains
 !                         lon180=.TRUE.,x0=-720.d0,dx=5.0d0,nx=337,y0=-3450.d0,dy=5.0d0,ny=577, &
 !                         lambda=-45.d0,phi=70.d0)
             
+            case("GRL-128KM")
+                call grid_init(grid,name="GRL-128KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=128.0d0,nx=15,y0=-3450.d0,dy=128.0d0,ny=24, &
+                        lambda=-45.d0,phi=70.d0)
+            
+            case("GRL-64KM")
+                call grid_init(grid,name="GRL-64KM",mtype="polar_stereographic",units="kilometers", &
+                        lon180=.TRUE.,x0=-720.d0,dx=64.0d0,nx=28,y0=-3450.d0,dy=64.0d0,ny=46, &
+                        lambda=-45.d0,phi=70.d0)
+            
             case("GRL-32KM")
                 call grid_init(grid,name="GRL-32KM",mtype="polar_stereographic",units="kilometers", &
                         lon180=.TRUE.,x0=-720.d0,dx=32.0d0,nx=54,y0=-3450.d0,dy=32.0d0,ny=91, &
