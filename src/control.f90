@@ -231,6 +231,16 @@ contains
 
             ! ISIMIP6 grid definitions 
 
+            case("ANT-128KM")
+                call grid_init(grid,name="ANT-128KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=128.d0,nx=49,y0=-3040.d0,dy=128.d0,ny=49, &
+                       lambda=0.d0,phi=-71.d0)
+
+            case("ANT-64KM")
+                call grid_init(grid,name="ANT-64KM",mtype="polar_stereographic",units="kilometers", &
+                       lon180=.TRUE.,x0=-3040.d0,dx=64.d0,nx=96,y0=-3040.d0,dy=64.d0,ny=96, &
+                       lambda=0.d0,phi=-71.d0)
+
             case("ANT-32KM")
                 call grid_init(grid,name="ANT-32KM",mtype="polar_stereographic",units="kilometers", &
                        lon180=.TRUE.,x0=-3040.d0,dx=32.d0,nx=191,y0=-3040.d0,dy=32.d0,ny=191, &
