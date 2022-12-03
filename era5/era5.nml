@@ -1,0 +1,10 @@
+&2m_temperature
+    filename    = "data/era5/monthly-single-levels/era5_monthly-single-levels_2m_temperature_{year}.nc"
+    name        = "t2m"
+    units_in    = "K"
+    units_out   = "K"
+    unit_scale  = 1.0 
+    unit_offset = 0.0 
+    with_time   = TRUE 
+    time_par    = 1979, 2020, 1
+/
