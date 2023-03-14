@@ -49,7 +49,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-128KM"
+    grid_name = "GRL-16KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -63,7 +63,7 @@ program gridder
     ! Write a regional mask 
     call write_regions(outfldr,grid,domain) 
     
-    stop 
+    !stop 
 
     ! =========================================================
     !
@@ -163,7 +163,7 @@ program gridder
             ! == Greenland only datasets ==
             write(*,*) "Processing Greenland..."
 
-            ! call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
+            call Morlighem17_to_grid_cdo(outfldr,grid,"Greenland",grad_lim=0d0)
             
             ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-mon",max_neighbors=16,lat_lim=0.5d0)
             ! call MARv311_to_grid(outfldr,grid,"Greenland-ERA-ann",max_neighbors=16,lat_lim=0.5d0)

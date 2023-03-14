@@ -82,14 +82,14 @@ contains
             !                 lambda=-45.d0,phi=70.d0)
             
             ! == Resampled dx=450m resolution ==
-            file_in = "/data/sicopolis/data/Greenland/Morlighem2017_BedMachine/BedMachineGreenland-2017-09-20-resampledx3.nc"
+            file_in = "/data/sicopolis/data/Greenland/Morlighem2017_BedMachine/BedMachineGreenland-v5-resampledx3.nc"
             call grid_init(grid0,name="M17-450m",mtype="polar_stereographic", &
                             units="kilometers",lon180=.TRUE., &
                             x0=-652.925d0,dx=0.450d0,nx=3406,y0=-3384.425d0,dy=0.450d0,ny=6116, &
                             lambda=-45.d0,phi=70.d0)
 
             ! Define the input filenames
-            desc    = "BedMachine v3.1 (2017-09-20): Greenland dataset based on mass conservation"
+            desc    = "BedMachine v5.5 (2023-03-14): Greenland dataset based on mass conservation"
             ref     = "Morlighem M. et al., (2017), BedMachine v3: Complete bed topography and &
                       &ocean bathymetry mapping of Greenland from multi-beam echo sounding combined &
                       &with mass conservation, Geophys. Res. Lett., 44, doi:10.1002/2017GL074954. &
@@ -97,7 +97,7 @@ contains
 
             ! Define the output filename 
             write(filename,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
-                              "_TOPO-M17"//trim(grad_lim_str)//".nc"
+                              "_TOPO-M17-v5"//trim(grad_lim_str)//".nc"
 
             ! Define filename holding RTOPO-2.0.1 data
             write(filename0,"(a)") trim(outfldr)//"/"//trim(grid%name)// &
