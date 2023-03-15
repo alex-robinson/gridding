@@ -161,11 +161,14 @@ contains
             
             ! Note: not necessary if grid_M17-450m.txt was generated
             ! by cdo directly.
-            ! ! Reverse y-axis
-            ! do j = 1, size(tmp,2)
-            !     invar(:,j) = tmp(:,size(tmp,2)-j+1)
-            ! end do 
-            invar = tmp 
+if (.TRUE.) then
+            ! Reverse y-axis
+            do j = 1, size(tmp,2)
+                invar(:,j) = tmp(:,size(tmp,2)-j+1)
+            end do
+else
+            invar = tmp
+end if  
 
             ! Perform conservative interpolation 
             outvar = mv 
