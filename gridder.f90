@@ -49,7 +49,7 @@ program gridder
     ! =========================================================
     
     domain    = "Greenland"
-    grid_name = "GRL-16KM"
+    grid_name = "GRL-64KM"
     outfldr   = "output/"//trim(domain)//"/"//trim(grid_name)
 
     ! =========================================================
@@ -74,7 +74,7 @@ program gridder
     ! == Global datasets - applicable to all domains ==
 
     ! Global topography: Rtopo-2.0.1
-    ! call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
+    call rtopo_latlon_to_grid_cdo(outfldr,grid,domain)
 
     ! ! Geothermal heat flow fields
     ! call ghfShapiro_to_grid(outfldr,grid,"Global",max_neighbors=4,lat_lim=2.d0)
