@@ -18,12 +18,12 @@ var='2m_temperature'
 # done
 
 #pres=
-pres=750
+pres=650
 
 #for v in {0..34}
-for v in {0..2}
+for v in {0..5}
 do
-   for year in {1959..1978}
+   for year in {1959..2020}
    do
        
    #  # Insert the current year into the slurm submit script as an argument  
