@@ -17,11 +17,12 @@ var='2m_temperature'
 #    ./get-era5-monthly-single-levels.py $var $year
 # done
 
-#pres=
-pres=650
+pres=
+#pres=700
 
-#for v in {0..34}
-for v in {0..5}
+#for v in {0..38}
+#for v in {0..5}
+for v in {38..38}
 do
    for year in {1959..2020}
    do

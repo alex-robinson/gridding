@@ -27,6 +27,7 @@
         "total_cloud_cover",
         "total_column_cloud_liquid_water",
         "total_column_water_vapour",
+        "total_column_water",
         "toa_incident_solar_radiation",
         "sea_ice_cover",
         "snow_depth",
@@ -37,7 +38,10 @@
         "volumetric_soil_water_layer_1",
         "volumetric_soil_water_layer_2",
         "volumetric_soil_water_layer_3",
-        "volumetric_soil_water_layer_4"
+        "volumetric_soil_water_layer_4",
+        "vertical_integral_of_temperature", 
+        "vertical_integral_of_total_energy",
+        "vertical_integral_of_mass_of_atmosphere"
         ],
     "vars_pres" : [
         "geopotential", 
